@@ -1,0 +1,24 @@
+{
+  "name": "vencorddesktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsx scripts/build.mts",
+    "watch": "pnpm build --watch",
+    "start": "pnpm build && electron .",
+    "start:watch": "tsx scripts/startWatch.mts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [ ],
+  "author": "Vendicated <vendicated@riseup.net>",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "electron": "^23.2.0",
+    "esbuild": "^0.17.14",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.2"
+  }
+}
