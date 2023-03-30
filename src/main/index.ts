@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron';
 import { createMainWindow } from "./mainWindow";
 import { createSplashWindow } from "./splash";
 
+import "./ipc";
+
 function createWindows() {
     const mainWindow = createMainWindow();
     const splash = createSplashWindow();
