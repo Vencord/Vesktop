@@ -2,7 +2,10 @@ import { app, BrowserWindow } from 'electron';
 import { createMainWindow } from "./mainWindow";
 import { createSplashWindow } from "./splash";
 
+import { join } from "path";
 import "./ipc";
+
+require(join(__dirname, "Vencord/main.js"));
 
 function createWindows() {
     const mainWindow = createMainWindow();

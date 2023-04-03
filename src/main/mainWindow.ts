@@ -6,7 +6,7 @@ export function createMainWindow() {
         show: false,
         webPreferences: {
             nodeIntegration: false,
-            sandbox: true,
+            sandbox: false,
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js")
