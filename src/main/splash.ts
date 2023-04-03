@@ -12,7 +12,7 @@ export function createSplashWindow() {
         maximizable: false
     });
 
-    splash.loadFile(join(__dirname, "..", "static", "splash.html"));
+    splash.loadFile(join(__dirname, "..", "..", "static", "splash.html"));
 
     return splash;
 }

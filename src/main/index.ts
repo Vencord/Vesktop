@@ -3,13 +3,25 @@ import { createMainWindow } from "./mainWindow";
 import { createSplashWindow } from "./splash";
 
 import { join } from "path";
+
+import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
+
+import { once } from "../shared/utils/once";
 import "./ipc";
+import { ensureVencordFiles } from "./utils/vencordLoader";
 
-require(join(__dirname, "Vencord/main.js"));
+// Make the Vencord files use our DATA_DIR
+process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
-function createWindows() {
-    const mainWindow = createMainWindow();
+const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "main.js")));
+
+async function createWindows() {
     const splash = createSplashWindow();
+
+    await ensureVencordFiles();
+    runVencordMain();
+
+    const mainWindow = createMainWindow();
 
     mainWindow.once("ready-to-show", () => {
         splash.destroy();
@@ -17,7 +29,7 @@ function createWindows() {
     });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     createWindows();
 
     app.on('activate', () => {

@@ -1,3 +1,4 @@
-import { join } from "path";
+import { ipcRenderer } from "electron";
+import { GET_PRELOAD_FILE } from "../shared/IpcEvents";
 
-require(join(__dirname, "Vencord/preload.js"));
+require(ipcRenderer.sendSync(GET_PRELOAD_FILE));
