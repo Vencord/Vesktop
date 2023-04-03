@@ -1,22 +1,41 @@
-import { BrowserWindow, Menu, Tray, app } from "electron";
+import { BrowserWindow, Menu, Tray, app, shell } from "electron";
 import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
 
-export function createMainWindow() {
-    let isQuitting = false;
+let isQuitting = false;
 
-    const win = new BrowserWindow({
-        show: false,
-        webPreferences: {
-            nodeIntegration: false,
-            sandbox: false,
-            contextIsolation: true,
-            devTools: true,
-            preload: join(__dirname, "preload.js")
-        },
-        icon: ICON_PATH
+app.on("before-quit", () => {
+    isQuitting = true;
+});
+
+function initWindowOpenHandler(win: BrowserWindow) {
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        switch (url) {
+            case "about:blank":
+            case "https://discord.com/popout":
+                return { action: "allow" };
+        }
+
+        try {
+            var protocol = new URL(url).protocol;
+        } catch {
+            return { action: "deny" };
+        }
+
+        switch (protocol) {
+            case "http:":
+            case "https:":
+            case "mailto:":
+            case "steam:":
+            case "spotify:":
+                shell.openExternal(url);
+        }
+
+        return { action: "deny" };
     });
+}
 
+function initTray(win: BrowserWindow) {
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
@@ -39,8 +58,27 @@ export function createMainWindow() {
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
 
-    app.on("before-quit", () => {
-        isQuitting = true;
+    win.on("show", () => {
+        trayMenu.items[0].enabled = false;
+    });
+
+    win.on("hide", () => {
+        trayMenu.items[0].enabled = true;
+    });
+}
+
+export function createMainWindow() {
+    const win = new BrowserWindow({
+        show: false,
+        autoHideMenuBar: true,
+        webPreferences: {
+            nodeIntegration: false,
+            sandbox: false,
+            contextIsolation: true,
+            devTools: true,
+            preload: join(__dirname, "preload.js")
+        },
+        icon: ICON_PATH
     });
 
     win.on("close", e => {
@@ -52,14 +90,8 @@ export function createMainWindow() {
         return false;
     });
 
-    win.on("show", () => {
-        trayMenu.items[0].enabled = false;
-    });
-
-    win.on("hide", () => {
-        trayMenu.items[0].enabled = true;
-    });
-
+    initTray(win);
+    initWindowOpenHandler(win);
 
     win.loadURL("https://discord.com/app");
 
