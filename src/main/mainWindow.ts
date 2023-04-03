@@ -1,5 +1,6 @@
 import { BrowserWindow, Menu, Tray, app } from "electron";
 import { join } from "path";
+import { ICON_PATH } from "../shared/paths";
 
 export function createMainWindow() {
     let isQuitting = false;
@@ -13,8 +14,30 @@ export function createMainWindow() {
             devTools: true,
             preload: join(__dirname, "preload.js")
         },
-        icon: join(__dirname, "..", "..", "static", "icon.ico")
+        icon: ICON_PATH
     });
+
+    const trayMenu = Menu.buildFromTemplate([
+        {
+            label: "Open",
+            click() {
+                win.show();
+            },
+            enabled: false
+        },
+        {
+            label: "Quit Vencord Desktop",
+            click() {
+                isQuitting = true;
+                app.quit();
+            }
+        }
+    ]);
+
+    const tray = new Tray(ICON_PATH);
+    tray.setToolTip("Vencord Desktop");
+    tray.setContextMenu(trayMenu);
+    tray.on("click", () => win.show());
 
     app.on("before-quit", () => {
         isQuitting = true;
@@ -29,24 +52,14 @@ export function createMainWindow() {
         return false;
     });
 
-    const tray = new Tray(join(__dirname, "..", "..", "static", "icon.ico"));
-    tray.setToolTip("Vencord Desktop");
-    tray.setContextMenu(Menu.buildFromTemplate([
-        {
-            label: "Open",
-            click() {
-                win.show();
-            }
-        },
-        {
-            label: "Quit",
-            click() {
-                isQuitting = true;
-                app.quit();
-            }
-        }
-    ]));
-    tray.on("click", () => win.show());
+    win.on("show", () => {
+        trayMenu.items[0].enabled = false;
+    });
+
+    win.on("hide", () => {
+        trayMenu.items[0].enabled = true;
+    });
+
 
     win.loadURL("https://discord.com/app");
 

@@ -1,1 +1,2 @@
 export const GET_PRELOAD_FILE = "VCD_GET_PRELOAD_FILE";
+export const RELAUNCH = "VCD_RELAUNCH";
