@@ -1,0 +1,8 @@
+tabWidth: 4
+semi: true
+printWidth: 120
+trailingComma: none
+bracketSpacing: true
+arrowParens: avoid
+useTabs: false
+endOfLine: auto

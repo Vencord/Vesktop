@@ -1,24 +1,54 @@
 {
-  "name": "vencorddesktop",
-  "private": true,
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/main.js",
-  "scripts": {
-    "build": "tsx scripts/build.mts",
-    "watch": "pnpm build --watch",
-    "start": "pnpm build && electron .",
-    "start:watch": "tsx scripts/startWatch.mts",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [ ],
-  "author": "Vendicated <vendicated@riseup.net>",
-  "license": "GPL-3.0",
-  "devDependencies": {
-    "@types/node": "^18.15.11",
-    "electron": "^23.2.0",
-    "esbuild": "^0.17.14",
-    "tsx": "^3.12.6",
-    "typescript": "^5.0.2"
-  }
+    "name": "vencorddesktop",
+    "private": true,
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/js/main.js",
+    "scripts": {
+        "build": "tsx scripts/build.mts",
+        "watch": "pnpm build --watch",
+        "package": "pnpm build && electron-builder",
+        "package:dir": "pnpm build && electron-builder --dir",
+        "start": "pnpm build && electron .",
+        "start:watch": "tsx scripts/startWatch.mts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Vendicated <vendicated@riseup.net>",
+    "license": "GPL-3.0",
+    "devDependencies": {
+        "@types/node": "^18.15.11",
+        "electron": "^23.2.0",
+        "electron-builder": "^23.6.0",
+        "esbuild": "^0.17.14",
+        "tsx": "^3.12.6",
+        "typescript": "^5.0.2"
+    },
+    "build": {
+        "appId": "dev.vencord.desktop",
+        "productName": "Vencord Desktop",
+        "mac": {
+            "category": "Network"
+        },
+        "nsis": {
+            "include": "build/installer.nsh"
+        },
+        "linux": {
+            "category": "Network",
+            "maintainer": "vendicated+vencord-desktop@riseup.net",
+            "target": [
+                "deb",
+                "tar.gz",
+                "rpm",
+                "AppImage"
+            ]
+        },
+        "files": [
+            "!*",
+            "dist/js",
+            "static",
+            "package.json",
+            "LICENSE"
+        ]
+    }
 }

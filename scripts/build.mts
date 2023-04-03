@@ -19,12 +19,12 @@ await Promise.all([
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
-        outfile: "dist/main.js"
+        outfile: "dist/js/main.js"
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
-        outfile: "dist/preload.js"
+        outfile: "dist/js/preload.js"
     })
 ]);
 
