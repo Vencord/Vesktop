@@ -142,7 +142,11 @@ export function createMainWindow() {
     initTray(win);
     initWindowOpenHandler(win);
 
-    win.loadURL("https://discord.com/app");
+    const subdomain = Settings.discordBranch === "canary" || Settings.discordBranch === "ptb"
+        ? `${Settings.discordBranch}.`
+        : "";
+
+    win.loadURL(`https://${subdomain}discord.com/app`);
 
     return win;
 }

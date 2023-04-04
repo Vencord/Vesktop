@@ -1,13 +1,18 @@
 import { BuildContext, BuildOptions, context } from "esbuild";
 
-const NodeCommonOpts: BuildOptions = {
-    format: "cjs",
-    platform: "node",
-    external: ["electron"],
+const CommonOpts: BuildOptions = {
     minify: true,
     bundle: true,
     sourcemap: "linked",
     logLevel: "info"
+};
+
+const NodeCommonOpts: BuildOptions = {
+    ...CommonOpts,
+    format: "cjs",
+    platform: "node",
+    external: ["electron"],
+    target: ["esnext"],
 };
 
 const contexts = [] as BuildContext[];
@@ -25,6 +30,12 @@ await Promise.all([
         ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
         outfile: "dist/js/preload.js"
+    }),
+    createContext({
+        ...CommonOpts,
+        entryPoints: ["src/renderer/index.ts"],
+        outfile: "dist/js/renderer.js",
+        format: "iife",
     })
 ]);
 

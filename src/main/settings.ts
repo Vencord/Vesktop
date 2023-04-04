@@ -13,24 +13,36 @@ interface Settings {
         width: number;
         height: number;
     };
+    discordBranch: "stable" | "canary" | "ptb";
 }
 
-let settings = {} as Settings;
+export let PlainSettings = {} as Settings;
 try {
     const content = readFileSync(SETTINGS_FILE, "utf8");
     try {
-        settings = JSON.parse(content);
+        PlainSettings = JSON.parse(content);
     } catch (err) {
         console.error("Failed to parse settings.json:", err);
     }
 } catch { }
 
-export const Settings = new Proxy(settings, {
-    set(target, prop, value) {
-        Reflect.set(target, prop, value);
+function makeSettingsProxy(settings: Settings) {
+    return new Proxy(settings, {
+        set(target, prop, value) {
+            Reflect.set(target, prop, value);
 
-        writeFileSync(SETTINGS_FILE, JSON.stringify(target, null, 4));
+            writeFileSync(SETTINGS_FILE, JSON.stringify(target, null, 4));
 
-        return true;
-    }
-});
+            return true;
+        }
+    });
+}
+
+export let Settings = makeSettingsProxy(PlainSettings);
+
+export function setSettings(settings: Settings) {
+    writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 4));
+    PlainSettings = settings;
+    Settings = makeSettingsProxy(settings);
+}
+
