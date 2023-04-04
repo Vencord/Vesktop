@@ -81,6 +81,10 @@ export function createMainWindow() {
         icon: ICON_PATH
     });
 
+    // le epic crapple moment
+    if (process.platform === "darwin")
+        app.dock.setIcon(ICON_PATH);
+
     win.on("close", e => {
         if (isQuitting) return;
 
