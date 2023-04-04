@@ -4,7 +4,7 @@ import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
 import { downloadFile, simpleGet } from "./http";
 
 // TODO: Setting to switch repo
-const API_BASE = "https://api.github.com/repos/Vendicated/VencordDev";
+const API_BASE = "https://api.github.com/repos/Vendicated/Vencord";
 
 const FILES_TO_DOWNLOAD = [
     "vencordDesktopMain.js",
