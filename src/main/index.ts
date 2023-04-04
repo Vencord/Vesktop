@@ -9,6 +9,7 @@ import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
 import { once } from "../shared/utils/once";
 import { ensureVencordFiles } from "./utils/vencordLoader";
 
+import { ICON_PATH } from "../shared/paths";
 import "./ipc";
 
 // Make the Vencord files use our DATA_DIR
@@ -30,6 +31,9 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     app.whenReady().then(async () => {
+        if (process.platform === "darwin")
+            app.dock.setIcon(ICON_PATH);
+
         createWindows();
 
         app.on('activate', () => {
