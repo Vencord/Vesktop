@@ -1,6 +1,7 @@
-import { BrowserWindow, Menu, Tray, app, shell } from "electron";
+import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app, shell } from "electron";
 import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
+import { Settings } from "./settings";
 
 let isQuitting = false;
 
@@ -67,6 +68,52 @@ function initTray(win: BrowserWindow) {
     });
 }
 
+function getWindowBoundsOptions() {
+    const options = {} as BrowserWindowConstructorOptions;
+
+    const { x, y, width, height } = Settings.windowBounds ?? {};
+    if (x != null && y != null) {
+        options.x = x;
+        options.y = y;
+    }
+
+    if (width) options.width = width;
+    if (height) options.height = height;
+
+    return options;
+}
+
+function initWindowBoundsListeners(win: BrowserWindow) {
+    win.on("maximize", () => {
+        Settings.maximized = true;
+        Settings.minimized = false;
+    });
+
+    win.on("minimize", () => {
+        Settings.minimized = true;
+    });
+
+    win.on("unmaximize", () => {
+        Settings.maximized = false;
+        Settings.minimized = false;
+    });
+
+    const saveBounds = () => {
+        const [width, height] = win.getSize();
+        const [x, y] = win.getPosition();
+
+        Settings.windowBounds = {
+            width,
+            height,
+            x,
+            y
+        };
+    };
+
+    win.on("resize", saveBounds);
+    win.on("move", saveBounds);
+}
+
 export function createMainWindow() {
     const win = new BrowserWindow({
         show: false,
@@ -78,7 +125,8 @@ export function createMainWindow() {
             devTools: true,
             preload: join(__dirname, "preload.js")
         },
-        icon: ICON_PATH
+        icon: ICON_PATH,
+        ...getWindowBoundsOptions()
     });
 
     win.on("close", e => {
@@ -90,6 +138,7 @@ export function createMainWindow() {
         return false;
     });
 
+    initWindowBoundsListeners(win);
     initTray(win);
     initWindowOpenHandler(win);
 

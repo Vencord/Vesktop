@@ -11,6 +11,7 @@ import { ensureVencordFiles } from "./utils/vencordLoader";
 
 import { ICON_PATH } from "../shared/paths";
 import "./ipc";
+import { Settings } from "./settings";
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
@@ -53,6 +54,10 @@ async function createWindows() {
     mainWin.once("ready-to-show", () => {
         splash.destroy();
         mainWin!.show();
+
+        if (Settings.maximized) {
+            mainWin!.maximize();
+        }
     });
 }
 
