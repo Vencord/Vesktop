@@ -1,6 +1,54 @@
 # Vencord Desktop
 
-A standalone Electron app that loads Discord & Vencord (very early and unfinished)
+A standalone Electron app that loads Discord & Vencord
+
+Vencord Desktop is currently in very early alpha. Bug reports, feature requests & contributions are highly appreciated!!
+
+## Installing
+
+### Windows
+
+Download and run Vencord-Desktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Desktop/releases/latest)
+
+### Mac
+
+Download and run Vencord-Desktop-VERSION.dmg from [releases](https://github.com/Vencord/Desktop/releases/latest)
+
+### Linux
+
+#### Ubuntu/Debian based
+
+Download Vencord-Desktop-VERSION.deb from [releases](https://github.com/Vencord/Desktop/releases/latest)
+
+#### Fedora/RHEL based
+
+Download Vencord-Desktop-VERSION.rpm from [releases](https://github.com/Vencord/Desktop/releases/latest)
+
+#### Other
+
+Either download Vencord-Desktop-VERSION.AppImage and just run it directly or grab Vencord-Desktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
+
+An AUR package and flatpak are planned, if you want packages for other repos, feel free to create them and they can be linked as unofficial here
+
+## Building
+
+Packaging will create builds in the dist/ folder. You can then install them like mentioned above or distribute them
+
+```sh
+git clone https://github.com/Vencord/Desktop
+cd Desktop
+
+# Install Dependencies
+pnpm i
+
+# Either run it without packaging
+pnpm start
+
+# Or package
+pnpm package
+# Or package to a directory only
+pnpm package:dir
+```
 
 ## Motivation
 
