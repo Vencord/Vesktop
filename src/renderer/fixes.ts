@@ -1,3 +1,5 @@
+import "./hideGarbage.css";
+
 // Make clicking Notifications focus the window
 const originalSetOnClick = Object.getOwnPropertyDescriptor(Notification.prototype, "onclick")!.set!;
 Object.defineProperty(Notification.prototype, "onclick", {
