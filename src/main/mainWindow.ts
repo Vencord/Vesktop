@@ -24,6 +24,25 @@ function initTray(win: BrowserWindow) {
             enabled: false
         },
         {
+            label: "About",
+            click: createAboutWindow
+        },
+        {
+            label: "Update Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
+            label: "Relaunch",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
             label: "Quit Vencord Desktop",
             click() {
                 isQuitting = true;
