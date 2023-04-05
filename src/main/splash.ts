@@ -1,5 +1,6 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
+import { STATIC_DIR } from "shared/paths";
 
 export function createSplashWindow() {
     const splash = new BrowserWindow({
@@ -12,7 +13,7 @@ export function createSplashWindow() {
         maximizable: false
     });
 
-    splash.loadFile(join(__dirname, "..", "..", "static", "splash.html"));
+    splash.loadFile(join(STATIC_DIR, "splash.html"));
 
     return splash;
 }

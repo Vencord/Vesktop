@@ -1,7 +1,9 @@
-import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app, shell } from "electron";
+import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app } from "electron";
 import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
+import { createAboutWindow } from "./about";
 import { Settings } from "./settings";
+import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
@@ -11,33 +13,6 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
-
-function initWindowOpenHandler(win: BrowserWindow) {
-    win.webContents.setWindowOpenHandler(({ url }) => {
-        switch (url) {
-            case "about:blank":
-            case "https://discord.com/popout":
-                return { action: "allow" };
-        }
-
-        try {
-            var protocol = new URL(url).protocol;
-        } catch {
-            return { action: "deny" };
-        }
-
-        switch (protocol) {
-            case "http:":
-            case "https:":
-            case "mailto:":
-            case "steam:":
-            case "spotify:":
-                shell.openExternal(url);
-        }
-
-        return { action: "deny" };
-    });
-}
 
 function initTray(win: BrowserWindow) {
     const trayMenu = Menu.buildFromTemplate([
@@ -79,7 +54,7 @@ function initMenuBar(win: BrowserWindow) {
             submenu: [
                 {
                     label: "About Vencord Desktop",
-                    role: "about"
+                    click: createAboutWindow
                 },
                 {
                     label: "Force Update Vencord",
@@ -241,7 +216,7 @@ export function createMainWindow() {
     initWindowBoundsListeners(win);
     initTray(win);
     initMenuBar(win);
-    initWindowOpenHandler(win);
+    makeLinksOpenExternally(win);
 
     const subdomain = Settings.discordBranch === "canary" || Settings.discordBranch === "ptb"
         ? `${Settings.discordBranch}.`

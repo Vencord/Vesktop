@@ -13,7 +13,8 @@ interface Settings {
         width: number;
         height: number;
     };
-    discordBranch: "stable" | "canary" | "ptb";
+    discordBranch?: "stable" | "canary" | "ptb";
+    openLinksWithElectron?: boolean;
 }
 
 export let PlainSettings = {} as Settings;
