@@ -1,21 +1,21 @@
 {
     "name": "VencordDesktop",
-    "private": true,
     "version": "0.1.2",
+    "private": true,
     "description": "",
+    "keywords": [],
+    "license": "GPL-3.0",
+    "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
     "scripts": {
         "build": "tsx scripts/build.mts",
-        "watch": "pnpm build --watch",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "start": "pnpm build && electron .",
         "start:watch": "tsx scripts/startWatch.mts",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "pnpm build --watch"
     },
-    "keywords": [],
-    "author": "Vendicated <vendicated@riseup.net>",
-    "license": "GPL-3.0",
     "devDependencies": {
         "@types/node": "^18.15.11",
         "electron": "^23.2.0",
@@ -26,15 +26,13 @@
     },
     "build": {
         "appId": "dev.vencord.desktop",
-        "productName": "Vencord Desktop",
-        "mac": {
-            "category": "Network"
-        },
-        "nsis": {
-            "include": "build/installer.nsh",
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true
-        },
+        "files": [
+            "!*",
+            "dist/js",
+            "static",
+            "package.json",
+            "LICENSE"
+        ],
         "linux": {
             "category": "Network",
             "maintainer": "vendicated+vencord-desktop@riseup.net",
@@ -45,12 +43,14 @@
                 "AppImage"
             ]
         },
-        "files": [
-            "!*",
-            "dist/js",
-            "static",
-            "package.json",
-            "LICENSE"
-        ]
+        "mac": {
+            "category": "Network"
+        },
+        "nsis": {
+            "allowToChangeInstallationDirectory": true,
+            "include": "build/installer.nsh",
+            "oneClick": false
+        },
+        "productName": "Vencord Desktop"
     }
 }
