@@ -27,6 +27,7 @@ if (!app.requestSingleInstanceLock()) {
     app.on("second-instance", () => {
         if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
+            if (!mainWin.isVisible()) mainWin.show();
             mainWin.focus();
         }
     });
