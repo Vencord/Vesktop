@@ -1,8 +1,9 @@
 import { app, ipcMain, shell } from "electron";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { GET_RENDERER_SCRIPT, GET_SETTINGS, GET_VENCORD_PRELOAD_FILE, RELAUNCH, SET_SETTINGS, SHOW_IN_FOLDER } from "../shared/IpcEvents";
+import { FOCUS, GET_RENDERER_SCRIPT, GET_SETTINGS, GET_VENCORD_PRELOAD_FILE, RELAUNCH, SET_SETTINGS, SHOW_ITEM_IN_FOLDER } from "../shared/IpcEvents";
 import { VENCORD_FILES_DIR } from "./constants";
+import { mainWin } from "./mainWindow";
 import { PlainSettings, setSettings } from "./settings";
 
 ipcMain.on(GET_VENCORD_PRELOAD_FILE, e => {
@@ -26,6 +27,10 @@ ipcMain.handle(RELAUNCH, () => {
     app.exit();
 });
 
-ipcMain.handle(SHOW_IN_FOLDER, (_, path) => {
+ipcMain.handle(SHOW_ITEM_IN_FOLDER, (_, path) => {
     shell.showItemInFolder(path);
+});
+
+ipcMain.handle(FOCUS, () => {
+    mainWin?.focus();
 });

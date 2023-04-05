@@ -9,6 +9,8 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
+export let mainWin: BrowserWindow;
+
 function initWindowOpenHandler(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url }) => {
         switch (url) {
@@ -115,7 +117,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 }
 
 export function createMainWindow() {
-    const win = new BrowserWindow({
+    const win = mainWin = new BrowserWindow({
         show: false,
         autoHideMenuBar: true,
         webPreferences: {
