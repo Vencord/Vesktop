@@ -28,6 +28,14 @@ function initTray(win: BrowserWindow) {
             click: createAboutWindow
         },
         {
+            label: "Force Update Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
             label: "Relaunch",
             click() {
                 app.relaunch();
