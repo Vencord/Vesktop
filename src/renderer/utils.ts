@@ -1,4 +1,4 @@
-export const localStorage = window.localStorage;
+export const localStorage = window.vcdLS = window.localStorage;
 
 export const isFirstRun = (() => {
     const key = "VCD_FIRST_RUN";
