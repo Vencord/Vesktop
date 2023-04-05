@@ -32,7 +32,9 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     app.whenReady().then(async () => {
-        if (process.platform === "darwin")
+        if (process.platform === "win32")
+            app.setAppUserModelId("dev.vencord.desktop");
+        else if (process.platform === "darwin")
             app.dock.setIcon(ICON_PATH);
 
         createWindows();
