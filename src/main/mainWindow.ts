@@ -2,6 +2,7 @@ import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app, shell 
 import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
 import { Settings } from "./settings";
+import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 
@@ -68,6 +69,103 @@ function initTray(win: BrowserWindow) {
     win.on("hide", () => {
         trayMenu.items[0].enabled = true;
     });
+}
+
+function initMenuBar(win: BrowserWindow) {
+    console.log(process.platform);
+    const menu = Menu.buildFromTemplate([
+        {
+            label: "Vencord Desktop",
+            submenu: [
+                {
+                    label: "About Vencord Desktop",
+                    role: "about"
+                },
+                {
+                    label: "Force Update Vencord",
+                    async click() {
+                        await downloadVencordFiles();
+                        app.relaunch();
+                        app.quit();
+                    },
+                    toolTip: "Vencord Desktop will automatically restart after this operation"
+                },
+                {
+                    label: "Toggle Developer Tools",
+                    accelerator: "CmdOrCtrl+Shift+I",
+                    click() {
+                        BrowserWindow.getFocusedWindow()!.webContents.toggleDevTools();
+                    }
+                },
+                {
+                    label: "Toggle Developer Tools (Hidden)",
+                    accelerator: "F12",
+                    visible: false,
+                    click() {
+                        BrowserWindow.getFocusedWindow()!.webContents.toggleDevTools();
+                    }
+                },
+                {
+                    label: "Reload Window",
+                    accelerator: "CmdOrCtrl+R",
+                    click() {
+                        BrowserWindow.getFocusedWindow()!.webContents.reload();
+                    }
+                },
+                {
+                    label: "Relaunch",
+                    accelerator: "CmdOrCtrl+Shift+R",
+                    click() {
+                        app.relaunch();
+                        app.quit();
+                    }
+                },
+                {
+                    label: "Quit",
+                    accelerator: process.platform === "win32" ? void 0 : "CmdOrCtrl+Q",
+                    // TODO: Setting
+                    visible: process.platform !== "win32",
+                    click() {
+                        app.quit();
+                    }
+                },
+                {
+                    label: "Quit",
+                    accelerator: "Alt+F4",
+                    visible: process.platform === "win32",
+                    acceleratorWorksWhenHidden: false,
+                    click() {
+                        app.quit();
+                    }
+                }
+            ]
+        },
+        {
+            label: "Zoom",
+            submenu: [
+                {
+                    label: "Zoom in",
+                    accelerator: "CmdOrCtrl+Plus",
+                    role: "zoomIn"
+                },
+                // Fix for zoom in on keyboards with dedicated + like QWERTZ (or numpad)
+                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+                {
+                    label: "Zoom in",
+                    accelerator: "CmdOrCtrl+=",
+                    role: "zoomIn",
+                    visible: false
+                },
+                {
+                    label: "Zoom out",
+                    accelerator: "CmdOrCtrl+-",
+                    role: "zoomOut"
+                }
+            ]
+        }
+    ]);
+
+    Menu.setApplicationMenu(menu);
 }
 
 function getWindowBoundsOptions() {
@@ -142,6 +240,7 @@ export function createMainWindow() {
 
     initWindowBoundsListeners(win);
     initTray(win);
+    initMenuBar(win);
     initWindowOpenHandler(win);
 
     const subdomain = Settings.discordBranch === "canary" || Settings.discordBranch === "ptb"
