@@ -36,6 +36,9 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            type: "separator"
+        },
+        {
             label: "Relaunch",
             click() {
                 app.relaunch();
