@@ -1,6 +1,9 @@
-name: Build/release
+name: Release
 
-on: push
+on:
+  push:
+    tags:
+      - v*
 
 jobs:
   release:
@@ -22,4 +25,4 @@ jobs:
         uses: samuelmeuli/action-electron-builder@e4b12cd06ddf023422f1ac4e39632bd76f6e6928
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          RELEASE: true
