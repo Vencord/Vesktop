@@ -27,6 +27,7 @@
     },
     "build": {
         "appId": "dev.vencord.desktop",
+        "productName": "Vencord Desktop",
         "files": [
             "!*",
             "dist/js",
@@ -41,8 +42,16 @@
                 "deb",
                 "tar.gz",
                 "rpm",
-                "AppImage"
-            ]
+                "AppImage",
+                "pacman"
+            ],
+            "desktop": {
+                "Name": "Vencord Desktop",
+                "GenericName": "Internet Messenger",
+                "Type": "Application",
+                "Categories": "Network;InstantMessaging;Chat;",
+                "Keywords": "discord;vencord;electron;chat;"
+            }
         },
         "mac": {
             "category": "Network"
@@ -51,7 +60,6 @@
             "allowToChangeInstallationDirectory": true,
             "include": "build/installer.nsh",
             "oneClick": false
-        },
-        "productName": "Vencord Desktop"
+        }
     }
 }
