@@ -36,6 +36,11 @@ await Promise.all([
         entryPoints: ["src/renderer/index.ts"],
         outfile: "dist/js/renderer.js",
         format: "iife",
+        inject: ["./scripts/build/injectReact.mjs"],
+        jsxFactory: "VencordCreateElement",
+        jsxFragment: "VencordFragment",
+        // Work around https://github.com/evanw/esbuild/issues/2460
+        tsconfig: "./scripts/build/tsconfig.esbuild.json"
     })
 ]);
 
