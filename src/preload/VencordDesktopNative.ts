@@ -1,21 +1,21 @@
 import { app, ipcRenderer } from "electron";
 import type { Settings } from "../main/settings";
-import { FOCUS, GET_SETTINGS, RELAUNCH, SET_SETTINGS, SHOW_ITEM_IN_FOLDER } from "../shared/IpcEvents";
+import { IpcEvents } from "../shared/IpcEvents";
 
 export const VencordDesktopNative = {
     app: {
-        relaunch: () => ipcRenderer.invoke(RELAUNCH),
+        relaunch: () => ipcRenderer.invoke(IpcEvents.RELAUNCH),
         getVersion: () => app.getVersion()
     },
     fileManager: {
-        showItemInFolder: (path: string) => ipcRenderer.invoke(SHOW_ITEM_IN_FOLDER, path)
+        showItemInFolder: (path: string) => ipcRenderer.invoke(IpcEvents.SHOW_ITEM_IN_FOLDER, path)
     },
     settings: {
-        get: () => ipcRenderer.sendSync(GET_SETTINGS),
-        set: (settings: typeof Settings) => ipcRenderer.invoke(SET_SETTINGS, settings)
+        get: () => ipcRenderer.sendSync(IpcEvents.GET_SETTINGS),
+        set: (settings: typeof Settings) => ipcRenderer.invoke(IpcEvents.SET_SETTINGS, settings)
     },
     win: {
-        focus: () => ipcRenderer.invoke(FOCUS)
+        focus: () => ipcRenderer.invoke(IpcEvents.FOCUS)
     }
 }
 
