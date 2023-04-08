@@ -4,9 +4,9 @@ import { Common } from "./vencord";
 
 const signals = new Set<() => void>();
 
-export const PlainSettings = VencordDesktop.settings.get() as TSettings;
+export const PlainSettings = VencordDesktopNative.settings.get() as TSettings;
 export const Settings = makeChangeListenerProxy(PlainSettings, s => {
-    VencordDesktop.settings.set(s);
+    VencordDesktopNative.settings.set(s);
     signals.forEach(fn => fn());
 });
 

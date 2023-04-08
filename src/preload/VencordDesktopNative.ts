@@ -1,10 +1,11 @@
-import { ipcRenderer } from "electron";
+import { app, ipcRenderer } from "electron";
 import type { Settings } from "../main/settings";
 import { FOCUS, GET_SETTINGS, RELAUNCH, SET_SETTINGS, SHOW_ITEM_IN_FOLDER } from "../shared/IpcEvents";
 
-export const VencordDesktop = {
+export const VencordDesktopNative = {
     app: {
-        relaunch: () => ipcRenderer.invoke(RELAUNCH)
+        relaunch: () => ipcRenderer.invoke(RELAUNCH),
+        getVersion: () => app.getVersion()
     },
     fileManager: {
         showItemInFolder: (path: string) => ipcRenderer.invoke(SHOW_ITEM_IN_FOLDER, path)

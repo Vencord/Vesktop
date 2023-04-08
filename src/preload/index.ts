@@ -1,8 +1,8 @@
 import { contextBridge, ipcRenderer, webFrame } from "electron";
 import { GET_RENDERER_SCRIPT, GET_RENDERER_STYLES, GET_VENCORD_PRELOAD_FILE } from "../shared/IpcEvents";
-import { VencordDesktop } from "./VencordDesktop";
+import { VencordDesktopNative } from "./VencordDesktopNative";
 
-contextBridge.exposeInMainWorld("VencordDesktop", VencordDesktop);
+contextBridge.exposeInMainWorld("VencordDesktopNative", VencordDesktopNative);
 
 require(ipcRenderer.sendSync(GET_VENCORD_PRELOAD_FILE));
 
