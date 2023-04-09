@@ -63,7 +63,7 @@ async function createWindows() {
         splash.destroy();
         mainWin!.show();
 
-        if (Settings.maximized) {
+        if (Settings.store.maximized) {
             mainWin!.maximize();
         }
     });

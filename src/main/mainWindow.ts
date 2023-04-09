@@ -78,7 +78,7 @@ function initTray(win: BrowserWindow) {
 
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
-    const wantCtrlQ = !isWindows || VencordSettings.winCtrlQ;
+    const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
 
     const menu = Menu.buildFromTemplate([
         {
@@ -174,7 +174,7 @@ function initMenuBar(win: BrowserWindow) {
 }
 
 function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
-    const { x, y, width, height } = Settings.windowBounds ?? {};
+    const { x, y, width, height } = Settings.store.windowBounds ?? {};
 
     const options = {
         width: width ?? DEFAULT_WIDTH,
@@ -186,7 +186,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         options.y = y;
     }
 
-    if (!Settings.disableMinSize) {
+    if (!Settings.store.disableMinSize) {
         options.minWidth = MIN_WIDTH;
         options.minHeight = MIN_HEIGHT;
     }
@@ -196,8 +196,8 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
 
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
-        Settings.maximized = win.isMaximized();
-        Settings.minimized = win.isMinimized();
+        Settings.store.maximized = win.isMaximized();
+        Settings.store.minimized = win.isMinimized();
     };
 
     win.on("maximize", saveState);
@@ -205,7 +205,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("unmaximize", saveState);
 
     const saveBounds = () => {
-        Settings.windowBounds = win.getBounds();
+        Settings.store.windowBounds = win.getBounds();
     };
 
     win.on("resize", saveBounds);
@@ -224,12 +224,12 @@ export function createMainWindow() {
             preload: join(__dirname, "preload.js")
         },
         icon: ICON_PATH,
-        frame: VencordSettings.frameless !== true,
+        frame: VencordSettings.store.frameless !== true,
         ...getWindowBoundsOptions()
     }));
 
     win.on("close", e => {
-        if (isQuitting || Settings.minimizeToTray === false) return;
+        if (isQuitting || Settings.store.minimizeToTray === false) return;
 
         e.preventDefault();
         win.hide();
@@ -243,7 +243,9 @@ export function createMainWindow() {
     makeLinksOpenExternally(win);
 
     const subdomain =
-        Settings.discordBranch === "canary" || Settings.discordBranch === "ptb" ? `${Settings.discordBranch}.` : "";
+        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
+            ? `${Settings.store.discordBranch}.`
+            : "";
 
     win.loadURL(`https://${subdomain}discord.com/app`);
 

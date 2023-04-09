@@ -25,7 +25,7 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
         switch (protocol) {
             case "http:":
             case "https:":
-                if (Settings.openLinksWithElectron) {
+                if (Settings.store.openLinksWithElectron) {
                     return { action: "allow" };
                 }
             // eslint-disable-next-line no-fallthrough

@@ -13,7 +13,7 @@ import { debounce } from "shared/utils/debounce";
 import { IpcEvents } from "../shared/IpcEvents";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE } from "./constants";
 import { mainWin } from "./mainWindow";
-import { PlainSettings, setSettings } from "./settings";
+import { Settings } from "./settings";
 
 ipcMain.on(IpcEvents.GET_VENCORD_PRELOAD_FILE, e => {
     e.returnValue = join(VENCORD_FILES_DIR, "preload.js");
@@ -32,7 +32,7 @@ ipcMain.on(IpcEvents.GET_RENDERER_CSS_FILE, e => {
 });
 
 ipcMain.on(IpcEvents.GET_SETTINGS, e => {
-    e.returnValue = PlainSettings;
+    e.returnValue = Settings.plain;
 });
 
 ipcMain.on(IpcEvents.GET_VERSION, e => {
@@ -40,7 +40,7 @@ ipcMain.on(IpcEvents.GET_VERSION, e => {
 });
 
 ipcMain.handle(IpcEvents.SET_SETTINGS, (_, settings) => {
-    setSettings(settings);
+    Settings.setData(settings);
 });
 
 ipcMain.handle(IpcEvents.RELAUNCH, () => {

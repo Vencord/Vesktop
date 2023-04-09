@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Settings as TSettings } from "shared/settings";
-import { makeChangeListenerProxy } from "shared/utils/makeChangeListenerProxy";
+import { SettingsStore } from "shared/utils/makeChangeListenerProxy";
 
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
 
@@ -24,23 +24,11 @@ function loadSettings<T extends object = any>(file: string, name: string) {
         }
     } catch {}
 
-    const makeSettingsProxy = (settings: T) =>
-        makeChangeListenerProxy(settings, target => writeFileSync(file, JSON.stringify(target, null, 4)));
+    const store = new SettingsStore(settings);
+    store.addGlobalChangeListener(o => writeFileSync(file, JSON.stringify(o, null, 4)));
 
-    return [settings, makeSettingsProxy] as const;
+    return store;
 }
 
-// eslint-disable-next-line prefer-const
-let [PlainSettings, makeSettingsProxy] = loadSettings<TSettings>(SETTINGS_FILE, "VencordDesktop");
-export let Settings = makeSettingsProxy(PlainSettings);
-
-const [PlainVencordSettings, makeVencordSettingsProxy] = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
-export const VencordSettings = makeVencordSettingsProxy(PlainVencordSettings);
-
-export function setSettings(settings: TSettings) {
-    writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 4));
-    PlainSettings = settings;
-    Settings = makeSettingsProxy(settings);
-}
-
-export { PlainSettings, PlainVencordSettings };
+export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vencord Desktop");
+export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
