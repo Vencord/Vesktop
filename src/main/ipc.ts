@@ -20,10 +20,16 @@ ipcMain.on(IpcEvents.GET_RENDERER_SCRIPT, e => {
     e.returnValue = readFileSync(join(__dirname, "renderer.js"), "utf-8");
 });
 
-ipcMain.handle(IpcEvents.GET_RENDERER_STYLES, () => readFile(join(__dirname, "renderer.css"), "utf-8"));
+ipcMain.on(IpcEvents.GET_RENDERER_CSS_FILE, e => {
+    e.returnValue = join(__dirname, "renderer.css");
+});
 
 ipcMain.on(IpcEvents.GET_SETTINGS, e => {
     e.returnValue = PlainSettings;
+});
+
+ipcMain.on(IpcEvents.GET_VERSION, e => {
+    e.returnValue = app.getVersion();
 });
 
 ipcMain.handle(IpcEvents.SET_SETTINGS, (_, settings) => {

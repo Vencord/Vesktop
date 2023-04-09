@@ -14,6 +14,7 @@
         "package:dir": "pnpm build && electron-builder --dir",
         "start": "pnpm build && electron .",
         "start:dev": "pnpm build --dev && electron .",
+        "start:watch": "tsx scripts/startWatch.mts",
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "pnpm build --watch"
     },

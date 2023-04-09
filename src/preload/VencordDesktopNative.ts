@@ -1,4 +1,4 @@
-import { app, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
 import { IpcEvents } from "../shared/IpcEvents";
@@ -14,7 +14,7 @@ function sendSync<T = any>(event: IpcEvents, ...args: any[]) {
 export const VencordDesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
-        getVersion: () => app.getVersion()
+        getVersion: () => sendSync<void>(IpcEvents.GET_VERSION)
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),

@@ -11,5 +11,5 @@ function spawn(bin: string, args: string[]) {
     cpSpawn(join("node_modules", ".bin", bin + EXT), args, OPTS);
 }
 
-spawn("tsx", ["scripts/build/build.mts", "--", "--watch"]);
+spawn("tsx", ["scripts/build/build.mts", "--", "--watch", "--dev"]);
 spawn("electron", ["."]);
