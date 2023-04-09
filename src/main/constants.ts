@@ -10,3 +10,9 @@ export const VENCORD_QUICKCSS_FILE = join(VENCORD_SETTINGS_DIR, "quickCss.css");
 export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json");
 
 export const USER_AGENT = `VencordDesktop/${app.getVersion()} (https://github.com/Vencord/Electron)`;
+
+// dimensions shamelessly stolen from Discord Desktop :3
+export const MIN_WIDTH = 940;
+export const MIN_HEIGHT = 500;
+export const DEFAULT_WIDTH = 1280;
+export const DEFAULT_HEIGHT = 720;

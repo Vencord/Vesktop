@@ -2,6 +2,7 @@ import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app } from 
 import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { Settings } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles } from "./utils/vencordLoader";
@@ -165,46 +166,39 @@ function initMenuBar(win: BrowserWindow) {
     Menu.setApplicationMenu(menu);
 }
 
-function getWindowBoundsOptions() {
-    const options = {} as BrowserWindowConstructorOptions;
-
+function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     const { x, y, width, height } = Settings.windowBounds ?? {};
+
+    const options = {
+        width: width ?? DEFAULT_WIDTH,
+        height: height ?? DEFAULT_HEIGHT
+    } as BrowserWindowConstructorOptions;
+
     if (x != null && y != null) {
         options.x = x;
         options.y = y;
     }
 
-    if (width) options.width = width;
-    if (height) options.height = height;
+    if (!Settings.disableMinSize) {
+        options.minWidth = MIN_WIDTH;
+        options.minHeight = MIN_HEIGHT;
+    }
 
     return options;
 }
 
 function initWindowBoundsListeners(win: BrowserWindow) {
-    win.on("maximize", () => {
-        Settings.maximized = true;
-        Settings.minimized = false;
-    });
+    const saveState = () => {
+        Settings.maximized = win.isMaximized();
+        Settings.minimized = win.isMinimized();
+    };
 
-    win.on("minimize", () => {
-        Settings.minimized = true;
-    });
-
-    win.on("unmaximize", () => {
-        Settings.maximized = false;
-        Settings.minimized = false;
-    });
+    win.on("maximize", saveState);
+    win.on("minimize", saveState);
+    win.on("unmaximize", saveState);
 
     const saveBounds = () => {
-        const [width, height] = win.getSize();
-        const [x, y] = win.getPosition();
-
-        Settings.windowBounds = {
-            width,
-            height,
-            x,
-            y
-        };
+        Settings.windowBounds = win.getBounds();
     };
 
     win.on("resize", saveBounds);

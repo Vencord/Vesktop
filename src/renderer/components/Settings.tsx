@@ -9,6 +9,11 @@ export default function SettingsUi() {
     const Settings = useSettings();
     const { Forms: { FormSection, FormText, FormDivider, FormSwitch, FormTitle }, Text, Select, Button } = Common;
 
+    const switches: [keyof typeof Settings, string, string, boolean?][] = [
+        ["openLinksWithElectron", "Open Links in app", "Opens links in a new window instead of your WebBrowser"],
+        ["disableMinSize", "Disable minimum window size", "Allows you to resize the window smaller than the default size"],
+    ];
+
     return (
         <FormSection>
             <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
@@ -33,12 +38,16 @@ export default function SettingsUi() {
 
             <FormDivider className={Margins.top16 + " " + Margins.bottom16} />
 
-            <FormSwitch
-                {...getValueAndOnChange("openLinksWithElectron")}
-                note={"This will open links in a new window instead of your WebBrowser"}
-            >
-                Open Links in app
-            </FormSwitch>
+            {switches.map(([key, text, note, def]) => (
+                <FormSwitch
+                    value={Settings[key] ?? def ?? false}
+                    onChange={v => Settings[key] = v}
+                    note={note}
+                    key={key}
+                >
+                    {text}
+                </FormSwitch>
+            ))}
 
             <FormTitle>Vencord Desktop Location</FormTitle>
             <FormText>
@@ -83,6 +92,6 @@ export default function SettingsUi() {
                     Reset
                 </Button>
             </div>
-        </FormSection>
+        </FormSection >
     );
 }

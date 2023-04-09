@@ -1,13 +1,11 @@
+import type { Rectangle } from "electron";
+
 export interface Settings {
     maximized?: boolean;
     minimized?: boolean;
-    windowBounds?: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
+    windowBounds?: Rectangle;
     discordBranch?: "stable" | "canary" | "ptb";
     openLinksWithElectron?: boolean;
     vencordDir?: string;
+    disableMinSize?: boolean;
 }
