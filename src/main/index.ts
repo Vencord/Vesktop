@@ -3,16 +3,20 @@ import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
 import { once } from "../shared/utils/once";
 import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
-import "./ipc";
 import { createMainWindow } from "./mainWindow";
 import { Settings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { ensureVencordFiles } from "./utils/vencordLoader";
 
+import "./ipc";
+if (IS_DEV) {
+    require("source-map-support").install();
+}
+
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
-const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "main.js")));
+const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
 let mainWin: BrowserWindow | null = null;
 

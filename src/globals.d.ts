@@ -4,6 +4,8 @@ declare global {
     // TODO
     export var Vencord: any;
     export var vcdLS: typeof localStorage;
+
+    export var IS_DEV: boolean;
 }
 
 export { };

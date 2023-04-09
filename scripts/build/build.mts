@@ -1,7 +1,9 @@
 import { BuildContext, BuildOptions, context } from "esbuild";
 
+const isDev = process.argv.includes("--dev");
+
 const CommonOpts: BuildOptions = {
-    minify: true,
+    minify: !isDev,
     bundle: true,
     sourcemap: "linked",
     logLevel: "info"
@@ -13,6 +15,9 @@ const NodeCommonOpts: BuildOptions = {
     platform: "node",
     external: ["electron"],
     target: ["esnext"],
+    define: {
+        IS_DEV: JSON.stringify(isDev)
+    }
 };
 
 const contexts = [] as BuildContext[];

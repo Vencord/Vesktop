@@ -13,16 +13,19 @@
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "start": "pnpm build && electron .",
-        "start:watch": "tsx scripts/startWatch.mts",
+        "start:dev": "pnpm build --dev && electron .",
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "pnpm build --watch"
     },
     "devDependencies": {
         "@types/node": "^18.15.11",
+        "@types/react": "^18.0.33",
         "electron": "^23.2.0",
         "electron-builder": "^23.6.0",
         "esbuild": "^0.17.14",
+        "source-map-support": "^0.5.21",
         "tsx": "^3.12.6",
+        "type-fest": "^3.8.0",
         "typescript": "^5.0.2"
     },
     "build": {

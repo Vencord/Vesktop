@@ -1,21 +1,31 @@
 import { app, ipcRenderer } from "electron";
-import type { Settings } from "../main/settings";
+import type { Settings } from "shared/settings";
+import type { LiteralUnion } from "type-fest";
 import { IpcEvents } from "../shared/IpcEvents";
+
+function invoke<T = any>(event: IpcEvents, ...args: any[]) {
+    return ipcRenderer.invoke(event, ...args) as Promise<T>;
+}
+
+function sendSync<T = any>(event: IpcEvents, ...args: any[]) {
+    return ipcRenderer.sendSync(event, ...args) as T;
+}
 
 export const VencordDesktopNative = {
     app: {
-        relaunch: () => ipcRenderer.invoke(IpcEvents.RELAUNCH),
+        relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => app.getVersion()
     },
     fileManager: {
-        showItemInFolder: (path: string) => ipcRenderer.invoke(IpcEvents.SHOW_ITEM_IN_FOLDER, path)
+        showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
+        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
     },
     settings: {
-        get: () => ipcRenderer.sendSync(IpcEvents.GET_SETTINGS),
-        set: (settings: typeof Settings) => ipcRenderer.invoke(IpcEvents.SET_SETTINGS, settings)
+        get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
+        set: (settings: Settings) => invoke<void>(IpcEvents.SET_SETTINGS, settings)
     },
     win: {
-        focus: () => ipcRenderer.invoke(IpcEvents.FOCUS)
+        focus: () => invoke<void>(IpcEvents.FOCUS)
     }
 }
 

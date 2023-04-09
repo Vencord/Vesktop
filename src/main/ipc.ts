@@ -1,5 +1,5 @@
-import { app, ipcMain, shell } from "electron";
-import { readFileSync, watch } from "fs";
+import { app, dialog, ipcMain, shell } from "electron";
+import { existsSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { join } from "path";
 import { debounce } from "shared/utils/debounce";
@@ -10,6 +10,10 @@ import { PlainSettings, setSettings } from "./settings";
 
 ipcMain.on(IpcEvents.GET_VENCORD_PRELOAD_FILE, e => {
     e.returnValue = join(VENCORD_FILES_DIR, "preload.js");
+});
+
+ipcMain.on(IpcEvents.GET_VENCORD_RENDERER_SCRIPT, e => {
+    e.returnValue = readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopRenderer.js"), "utf-8");
 });
 
 ipcMain.on(IpcEvents.GET_RENDERER_SCRIPT, e => {
@@ -37,6 +41,20 @@ ipcMain.handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 
 ipcMain.handle(IpcEvents.FOCUS, () => {
     mainWin?.focus();
+});
+
+ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
+    const res = await dialog.showOpenDialog(mainWin!, {
+        properties: ["openDirectory"]
+    });
+    if (!res.filePaths.length) return "cancelled";
+
+    const dir = res.filePaths[0];
+    for (const file of ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"]) {
+        if (!existsSync(join(dir, file))) return "invalid";
+    }
+
+    return dir;
 });
 
 function readCss() {

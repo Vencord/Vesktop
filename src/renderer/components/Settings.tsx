@@ -1,9 +1,13 @@
 import { getValueAndOnChange, useSettings } from "renderer/settings";
-import { Common } from "../vencord";
+import { Common, Util } from "../vencord";
+
+import "./settings.css";
+
+const { Margins } = Util;
 
 export default function SettingsUi() {
     const Settings = useSettings();
-    const { Forms: { FormSection, FormText, FormDivider, FormSwitch, FormTitle }, Text, Select } = Common;
+    const { Forms: { FormSection, FormText, FormDivider, FormSwitch, FormTitle }, Text, Select, Button } = Common;
 
     return (
         <FormSection>
@@ -11,7 +15,9 @@ export default function SettingsUi() {
                 Vencord Desktop Settings
             </Text>
 
-            <FormTitle>Discord Branch</FormTitle>
+            <FormTitle className={Margins.top16}>
+                Discord Branch
+            </FormTitle>
             <Select
                 placeholder="Stable"
                 options={[
@@ -25,12 +31,58 @@ export default function SettingsUi() {
                 serialize={s => s}
             />
 
+            <FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+
             <FormSwitch
                 {...getValueAndOnChange("openLinksWithElectron")}
                 note={"This will open links in a new window instead of your WebBrowser"}
             >
                 Open Links in app
             </FormSwitch>
+
+            <FormTitle>Vencord Desktop Location</FormTitle>
+            <FormText>
+                Files are loaded from
+                {" "}
+                {Settings.vencordDir
+                    ? (
+                        <a
+                            href="about:blank"
+                            onClick={e => {
+                                e.preventDefault();
+                                VencordDesktopNative.fileManager.showItemInFolder(Settings.vencordDir!);
+                            }}
+                        >
+                            {Settings.vencordDir}
+                        </a>
+                    )
+                    : "the default location"
+                }
+            </FormText>
+            <div className="vcd-location-btns">
+                <Button
+                    size={Button.Sizes.SMALL}
+                    onClick={async () => {
+                        const choice = await VencordDesktopNative.fileManager.selectVencordDir();
+                        switch (choice) {
+                            case "cancelled":
+                            case "invalid":
+                                // TODO
+                                return;
+                        }
+                        Settings.vencordDir = choice;
+                    }}
+                >
+                    Change
+                </Button>
+                <Button
+                    size={Button.Sizes.SMALL}
+                    color={Button.Colors.RED}
+                    onClick={() => Settings.vencordDir = void 0}
+                >
+                    Reset
+                </Button>
+            </div>
         </FormSection>
     );
 }

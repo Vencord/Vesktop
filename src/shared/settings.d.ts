@@ -9,4 +9,5 @@ export interface Settings {
     };
     discordBranch?: "stable" | "canary" | "ptb";
     openLinksWithElectron?: boolean;
+    vencordDir?: string;
 }
