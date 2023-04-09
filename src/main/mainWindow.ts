@@ -222,7 +222,7 @@ export function createMainWindow() {
     });
 
     win.on("close", e => {
-        if (isQuitting) return;
+        if (isQuitting || Settings.minimizeToTray === false) return;
 
         e.preventDefault();
         win.hide();
