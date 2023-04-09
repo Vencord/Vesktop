@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 export const enum IpcEvents {
     GET_VENCORD_PRELOAD_FILE = "VCD_GET_VC_PRELOAD_FILE",
     GET_VENCORD_RENDERER_SCRIPT = "VCD_GET_VC_RENDERER_SCRIPT",
@@ -15,4 +21,3 @@ export const enum IpcEvents {
 
     SELECT_VENCORD_DIR = "VCD_SELECT_VENCORD_DIR"
 }
-

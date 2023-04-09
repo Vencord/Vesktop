@@ -1,16 +1,18 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
+
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
 import { downloadFile, simpleGet } from "./http";
 
 const API_BASE = "https://api.github.com/repos/Vendicated/Vencord";
 
-const FILES_TO_DOWNLOAD = [
-    "vencordDesktopMain.js",
-    "preload.js",
-    "vencordDesktopRenderer.js",
-    "renderer.css"
-];
+const FILES_TO_DOWNLOAD = ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"];
 
 export async function githubGet(endpoint: string) {
     return simpleGet(API_BASE + endpoint, {
@@ -32,12 +34,8 @@ export async function downloadVencordFiles() {
 
     await Promise.all(
         assets
-            .filter(({ name }) =>
-                FILES_TO_DOWNLOAD.some(f => name.startsWith(f))
-            )
-            .map(({ name, browser_download_url }) =>
-                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name))
-            )
+            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
+            .map(({ name, browser_download_url }) => downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name)))
     );
 }
 

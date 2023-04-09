@@ -1,5 +1,14 @@
-import { app, BrowserWindow } from 'electron';
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
+import "./ipc";
+
+import { app, BrowserWindow } from "electron";
 import { join } from "path";
+
 import { ICON_PATH } from "../shared/paths";
 import { once } from "../shared/utils/once";
 import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
@@ -7,8 +16,6 @@ import { createMainWindow } from "./mainWindow";
 import { Settings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { ensureVencordFiles } from "./utils/vencordLoader";
-
-import "./ipc";
 if (IS_DEV) {
     require("source-map-support").install();
 }
@@ -33,14 +40,12 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     app.whenReady().then(async () => {
-        if (process.platform === "win32")
-            app.setAppUserModelId("dev.vencord.desktop");
-        else if (process.platform === "darwin")
-            app.dock.setIcon(ICON_PATH);
+        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
+        else if (process.platform === "darwin") app.dock.setIcon(ICON_PATH);
 
         createWindows();
 
-        app.on('activate', () => {
+        app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
         });
     });
@@ -65,6 +70,5 @@ async function createWindows() {
 }
 
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin")
-        app.quit();
+    if (process.platform !== "darwin") app.quit();
 });

@@ -1,5 +1,12 @@
-import { BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray, app } from "electron";
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
+import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
 import { join } from "path";
+
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
@@ -206,7 +213,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 }
 
 export function createMainWindow() {
-    const win = mainWin = new BrowserWindow({
+    const win = (mainWin = new BrowserWindow({
         show: false,
         autoHideMenuBar: true,
         webPreferences: {
@@ -219,7 +226,7 @@ export function createMainWindow() {
         icon: ICON_PATH,
         frame: VencordSettings.frameless !== true,
         ...getWindowBoundsOptions()
-    });
+    }));
 
     win.on("close", e => {
         if (isQuitting || Settings.minimizeToTray === false) return;
@@ -235,9 +242,8 @@ export function createMainWindow() {
     initMenuBar(win);
     makeLinksOpenExternally(win);
 
-    const subdomain = Settings.discordBranch === "canary" || Settings.discordBranch === "ptb"
-        ? `${Settings.discordBranch}.`
-        : "";
+    const subdomain =
+        Settings.discordBranch === "canary" || Settings.discordBranch === "ptb" ? `${Settings.discordBranch}.` : "";
 
     win.loadURL(`https://${subdomain}discord.com/app`);
 

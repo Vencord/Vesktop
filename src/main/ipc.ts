@@ -1,8 +1,15 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 import { app, dialog, ipcMain, shell } from "electron";
 import { existsSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { join } from "path";
 import { debounce } from "shared/utils/debounce";
+
 import { IpcEvents } from "../shared/IpcEvents";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE } from "./constants";
 import { mainWin } from "./mainWindow";
@@ -69,7 +76,11 @@ function readCss() {
 
 open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
     fd.close();
-    watch(VENCORD_QUICKCSS_FILE, { persistent: false }, debounce(async () => {
-        mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
-    }, 50));
+    watch(
+        VENCORD_QUICKCSS_FILE,
+        { persistent: false },
+        debounce(async () => {
+            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
+        }, 50)
+    );
 });

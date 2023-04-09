@@ -1,7 +1,14 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Settings as TSettings } from "shared/settings";
 import { makeChangeListenerProxy } from "shared/utils/makeChangeListenerProxy";
+
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
 
 const SETTINGS_FILE = join(DATA_DIR, "settings.json");
@@ -15,20 +22,19 @@ function loadSettings<T extends object = any>(file: string, name: string) {
         } catch (err) {
             console.error(`Failed to parse ${name} settings.json:`, err);
         }
-    } catch { }
+    } catch {}
 
-    const makeSettingsProxy = (settings: T) => makeChangeListenerProxy(
-        settings,
-        target => writeFileSync(file, JSON.stringify(target, null, 4))
-    );
+    const makeSettingsProxy = (settings: T) =>
+        makeChangeListenerProxy(settings, target => writeFileSync(file, JSON.stringify(target, null, 4)));
 
     return [settings, makeSettingsProxy] as const;
 }
 
+// eslint-disable-next-line prefer-const
 let [PlainSettings, makeSettingsProxy] = loadSettings<TSettings>(SETTINGS_FILE, "VencordDesktop");
 export let Settings = makeSettingsProxy(PlainSettings);
 
-let [PlainVencordSettings, makeVencordSettingsProxy] = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
+const [PlainVencordSettings, makeVencordSettingsProxy] = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
 export const VencordSettings = makeVencordSettingsProxy(PlainVencordSettings);
 
 export function setSettings(settings: TSettings) {
@@ -37,7 +43,4 @@ export function setSettings(settings: TSettings) {
     Settings = makeSettingsProxy(settings);
 }
 
-export {
-    PlainSettings,
-    PlainVencordSettings,
-};
+export { PlainSettings, PlainVencordSettings };
