@@ -227,6 +227,16 @@ function initSettingsListeners(win: BrowserWindow) {
             });
         }
     });
+
+    VencordSettings.addChangeListener("macosTranslucency", enabled => {
+        if (enabled) {
+            win.setVibrancy('sidebar')
+            win.setBackgroundColor('#ffffff00');
+        } else {
+            win.setVibrancy(null);
+            win.setBackgroundColor('#ffffff');
+        }
+    })
 }
 
 export function createMainWindow() {
@@ -242,6 +252,12 @@ export function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        ...(VencordSettings.store.macosTranslucency
+            ? {
+                  vibrancy: "sidebar",
+                  backgroundColor: "#ffffff00"
+              }
+            : {}),
         ...getWindowBoundsOptions()
     }));
 
