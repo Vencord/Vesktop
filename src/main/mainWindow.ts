@@ -212,6 +212,12 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("move", saveBounds);
 }
 
+function initSettingsListeners(win: BrowserWindow) {
+    Settings.addChangeListener("disableMinSize", disable => {
+        win.setMinimumSize(disable ? 1 : MIN_WIDTH, disable ? 1 : MIN_HEIGHT);
+    });
+}
+
 export function createMainWindow() {
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -241,6 +247,7 @@ export function createMainWindow() {
     initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
+    initSettingsListeners(win);
 
     const subdomain =
         Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"

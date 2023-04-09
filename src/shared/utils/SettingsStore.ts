@@ -4,13 +4,24 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { LiteralUnion } from "type-fest";
+
+// Resolves a possibly nested prop in the form of "some.nested.prop" to type of T.some.nested.prop
+type ResolvePropDeep<T, P> = P extends `${infer Pre}.${infer Suf}`
+    ? Pre extends keyof T
+        ? ResolvePropDeep<T[Pre], Suf>
+        : any
+    : P extends keyof T
+    ? T[P]
+    : any;
+
 /**
  * The SettingsStore allows you to easily create a mutable store that
  * has support for global and path-based change listeners.
  */
 export class SettingsStore<T extends object> {
-    private pathListeners = new Map<string, Set<(newData: unknown) => void>>();
-    private globalListeners = new Set<(newData: T) => void>();
+    private pathListeners = new Map<string, Set<(newData: any) => void>>();
+    private globalListeners = new Set<(newData: T, path: string) => void>();
 
     /**
      * The store object. Making changes to this object will trigger the applicable change listeners
@@ -44,7 +55,7 @@ export class SettingsStore<T extends object> {
                 Reflect.set(target, key, value);
                 const setPath = `${path}${path && "."}${key}`;
 
-                self.globalListeners.forEach(cb => cb(root));
+                self.globalListeners.forEach(cb => cb(root, setPath));
                 self.pathListeners.get(setPath)?.forEach(cb => cb(value));
 
                 return true;
@@ -56,20 +67,38 @@ export class SettingsStore<T extends object> {
      * Set the data of the store.
      * This will update this.store and this.plain (and old references to them will be stale! Avoid storing them in variables)
      *
-     * Additionally, all global listeners will be called with the new data
-     * @param value
+     * Additionally, all global listeners (or those for pathToNotify, if specified) will be called with the new data
+     * @param value New data
+     * @param pathToNotify Optional path to notify instead of globally. Used to transfer path via ipc
      */
-    public setData(value: T) {
+    public setData(value: T, pathToNotify?: string) {
         this.plain = value;
         this.store = this.makeProxy(value);
 
-        this.globalListeners.forEach(cb => cb(value));
+        if (pathToNotify) {
+            let v = value;
+
+            const path = pathToNotify.split(".");
+            for (const p of path) {
+                if (!v) {
+                    console.warn(
+                        `Settings#setData: Path ${pathToNotify} does not exist in new data. Not dispatching update`
+                    );
+                    return;
+                }
+                v = v[p];
+            }
+
+            this.pathListeners.get(pathToNotify)?.forEach(cb => cb(v));
+        } else {
+            this.globalListeners.forEach(cb => cb(value, ""));
+        }
     }
 
     /**
      * Add a global change listener, that will fire whenever any setting is changed
      */
-    public addGlobalChangeListener(cb: (store: T) => void) {
+    public addGlobalChangeListener(cb: (data: T, path: string) => void) {
         this.globalListeners.add(cb);
     }
 
@@ -87,17 +116,20 @@ export class SettingsStore<T extends object> {
      * @param path
      * @param cb
      */
-    public addChangeListener(path: string, cb: (data: any) => void) {
-        const listeners = this.pathListeners.get(path) ?? new Set();
+    public addChangeListener<P extends LiteralUnion<keyof T, string>>(
+        path: P,
+        cb: (data: ResolvePropDeep<T, P>) => void
+    ) {
+        const listeners = this.pathListeners.get(path as string) ?? new Set();
         listeners.add(cb);
-        this.pathListeners.set(path, listeners);
+        this.pathListeners.set(path as string, listeners);
     }
 
     /**
      * Remove a global listener
      * @see {@link addGlobalChangeListener}
      */
-    public removeGlobalChangeListener(cb: (store: T) => void) {
+    public removeGlobalChangeListener(cb: (data: T, path: string) => void) {
         this.globalListeners.delete(cb);
     }
 
@@ -105,11 +137,11 @@ export class SettingsStore<T extends object> {
      * Remove a scoped listener
      * @see {@link addChangeListener}
      */
-    public removeChangeListener(path: string, cb: (data: any) => void) {
-        const listeners = this.pathListeners.get(path);
+    public removeChangeListener(path: LiteralUnion<keyof T, string>, cb: (data: any) => void) {
+        const listeners = this.pathListeners.get(path as string);
         if (!listeners) return;
 
         listeners.delete(cb);
-        if (!listeners.size) this.pathListeners.delete(path);
+        if (!listeners.size) this.pathListeners.delete(path as string);
     }
 }

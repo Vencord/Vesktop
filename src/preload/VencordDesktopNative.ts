@@ -29,7 +29,7 @@ export const VencordDesktopNative = {
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
-        set: (settings: Settings) => invoke<void>(IpcEvents.SET_SETTINGS, settings)
+        set: (settings: Settings, path?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, path)
     },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS)

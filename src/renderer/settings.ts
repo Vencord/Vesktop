@@ -11,6 +11,7 @@ import { Common } from "./vencord";
 
 export const PlainSettings = VencordDesktopNative.settings.get() as TSettings;
 export const Settings = new SettingsStore(PlainSettings);
+Settings.addGlobalChangeListener((o, p) => VencordDesktopNative.settings.set(o, p));
 
 export function useSettings() {
     const [, update] = Common.React.useReducer(x => x + 1, 0);

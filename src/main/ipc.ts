@@ -39,8 +39,8 @@ ipcMain.on(IpcEvents.GET_VERSION, e => {
     e.returnValue = app.getVersion();
 });
 
-ipcMain.handle(IpcEvents.SET_SETTINGS, (_, settings) => {
-    Settings.setData(settings);
+ipcMain.handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: string) => {
+    Settings.setData(settings, path);
 });
 
 ipcMain.handle(IpcEvents.RELAUNCH, () => {
