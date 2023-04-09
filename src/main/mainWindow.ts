@@ -214,7 +214,18 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
 function initSettingsListeners(win: BrowserWindow) {
     Settings.addChangeListener("disableMinSize", disable => {
-        win.setMinimumSize(disable ? 1 : MIN_WIDTH, disable ? 1 : MIN_HEIGHT);
+        if (disable) {
+            // 0 no work
+            win.setMinimumSize(1, 1);
+        } else {
+            win.setMinimumSize(MIN_WIDTH, MIN_HEIGHT);
+
+            const { width, height } = win.getBounds();
+            win.setBounds({
+                width: Math.max(width, MIN_WIDTH),
+                height: Math.max(height, MIN_HEIGHT)
+            });
+        }
     });
 }
 
