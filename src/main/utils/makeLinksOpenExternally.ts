@@ -1,4 +1,11 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 import { BrowserWindow, shell } from "electron";
+
 import { Settings } from "../settings";
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
@@ -10,7 +17,7 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
         }
 
         try {
-            var protocol = new URL(url).protocol;
+            var { protocol } = new URL(url);
         } catch {
             return { action: "deny" };
         }
@@ -21,6 +28,7 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
                 if (Settings.openLinksWithElectron) {
                     return { action: "allow" };
                 }
+            // eslint-disable-next-line no-fallthrough
             case "mailto:":
             case "steam:":
             case "spotify:":

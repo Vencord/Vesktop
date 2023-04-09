@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 export function makeChangeListenerProxy<T extends object>(object: T, onChange: (object: T) => void, _root = object): T {
     return new Proxy(object, {
         get(target, key) {
@@ -15,6 +21,6 @@ export function makeChangeListenerProxy<T extends object>(object: T, onChange: (
             onChange(_root);
 
             return true;
-        },
+        }
     });
 }
