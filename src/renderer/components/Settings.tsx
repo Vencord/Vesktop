@@ -21,7 +21,7 @@ export default function SettingsUi() {
         Button
     } = Common;
 
-    const switches: [keyof typeof Settings, string, string, boolean?][] = [
+    const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
         [
             "tray",
             "Use tray",
@@ -32,7 +32,8 @@ export default function SettingsUi() {
             "minimizeToTray",
             "Minimize to tray",
             "Hitting X will make Vencord Desktop minimize to the tray instead of closing",
-            true
+            true,
+            () => Settings["tray"] ?? true
         ],
         [
             "disableMinSize",
@@ -68,9 +69,10 @@ export default function SettingsUi() {
 
             <FormDivider className={Margins.top16 + " " + Margins.bottom16} />
 
-            {switches.map(([key, text, note, def]) => (
+            {switches.map(([key, text, note, def, predicate]) => (
                 <FormSwitch
-                    value={Settings[key] ?? def ?? false}
+                    value={(Settings[key] ?? def ?? false) && (!predicate || predicate())}
+                    disabled={predicate && !predicate()}
                     onChange={v => (Settings[key] = v)}
                     note={note}
                     key={key}

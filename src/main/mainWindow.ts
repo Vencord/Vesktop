@@ -246,7 +246,7 @@ export function createMainWindow() {
     }));
 
     win.on("close", e => {
-        if (isQuitting || Settings.store.minimizeToTray === false) return;
+        if (isQuitting || Settings.store.minimizeToTray === false || Settings.store.tray === false) return;
 
         e.preventDefault();
         win.hide();
@@ -255,7 +255,7 @@ export function createMainWindow() {
     });
 
     initWindowBoundsListeners(win);
-    if (Settings.tray !== false) initTray(win);
+    if (Settings.store.tray ?? true) initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
