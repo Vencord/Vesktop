@@ -46,8 +46,7 @@
                 "deb",
                 "tar.gz",
                 "rpm",
-                "AppImage",
-                "pacman"
+                "AppImage"
             ],
             "desktop": {
                 "Name": "Vencord Desktop",
