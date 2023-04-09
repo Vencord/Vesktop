@@ -18,7 +18,7 @@ Download and run Vencord-Desktop-VERSION.dmg from [releases](https://github.com/
 
 #### Arch based
 
-Install [vencord-desktop-git from the AUR](https://aur.archlinux.org/packages/vencord-desktop-git) using your favourite AUR helper, for example [yay](https://github.com/Jguer/yay)
+Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop-git) from the AUR using your favourite AUR helper, for example [yay](https://github.com/Jguer/yay)
 
 #### Ubuntu/Debian based
 
