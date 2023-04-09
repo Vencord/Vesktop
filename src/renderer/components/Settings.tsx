@@ -10,9 +10,9 @@ export default function SettingsUi() {
     const { Forms: { FormSection, FormText, FormDivider, FormSwitch, FormTitle }, Text, Select, Button } = Common;
 
     const switches: [keyof typeof Settings, string, string, boolean?][] = [
-        ["minimizeToTray", "Minimize to tray", "Hitting X will make Discord minimize to the tray instead of closing", true],
-        ["openLinksWithElectron", "Open Links in app", "Opens links in a new window instead of your WebBrowser"],
-        ["disableMinSize", "Disable minimum window size", "Allows you to resize the window smaller than the default size"],
+        ["minimizeToTray", "Minimize to tray", "Hitting X will make Vencord Desktop minimize to the tray instead of closing", true],
+        ["disableMinSize", "Disable minimum window size", "Allows you to make the window as small as your heart desires"],
+        ["openLinksWithElectron", "Open Links in app (experimental)", "Opens links in a new Vencord Desktop window instead of your web browser"],
     ];
 
     return (
