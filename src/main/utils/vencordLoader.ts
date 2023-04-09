@@ -3,7 +3,6 @@ import { join } from "path";
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
 import { downloadFile, simpleGet } from "./http";
 
-// TODO: Setting to switch repo
 const API_BASE = "https://api.github.com/repos/Vendicated/Vencord";
 
 const FILES_TO_DOWNLOAD = [
@@ -33,21 +32,17 @@ export async function downloadVencordFiles() {
 
     await Promise.all(
         assets
-            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
+            .filter(({ name }) =>
+                FILES_TO_DOWNLOAD.some(f => name.startsWith(f))
+            )
             .map(({ name, browser_download_url }) =>
-                downloadFile(
-                    browser_download_url,
-                    join(
-                        VENCORD_FILES_DIR,
-                        name.replace(/vencordDesktop(\w)/, (_, c) => c.toLowerCase())
-                    )
-                )
+                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name))
             )
     );
 }
 
 export async function ensureVencordFiles() {
-    if (existsSync(join(VENCORD_FILES_DIR, "main.js"))) return;
+    if (existsSync(join(VENCORD_FILES_DIR, "vencordDesktopMain.js"))) return;
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
     await downloadVencordFiles();
