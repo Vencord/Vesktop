@@ -14,5 +14,6 @@ export interface Settings {
     openLinksWithElectron?: boolean;
     vencordDir?: string;
     disableMinSize?: boolean;
+    tray?: boolean;
     minimizeToTray?: boolean;
 }

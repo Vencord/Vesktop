@@ -23,6 +23,12 @@ export default function SettingsUi() {
 
     const switches: [keyof typeof Settings, string, string, boolean?][] = [
         [
+            "tray",
+            "Use tray",
+            "Add a tray icon for Vencord Desktop",
+            true
+        ],
+        [
             "minimizeToTray",
             "Minimize to tray",
             "Hitting X will make Vencord Desktop minimize to the tray instead of closing",

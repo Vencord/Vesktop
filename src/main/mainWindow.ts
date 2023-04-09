@@ -255,7 +255,7 @@ export function createMainWindow() {
     });
 
     initWindowBoundsListeners(win);
-    initTray(win);
+    if (Settings.tray !== false) initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
