@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Settings as TSettings } from "shared/settings";
-import { SettingsStore } from "shared/utils/makeChangeListenerProxy";
+import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
 

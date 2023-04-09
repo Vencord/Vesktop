@@ -5,7 +5,7 @@
  */
 
 import type { Settings as TSettings } from "shared/settings";
-import { SettingsStore } from "shared/utils/makeChangeListenerProxy";
+import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { Common } from "./vencord";
 
