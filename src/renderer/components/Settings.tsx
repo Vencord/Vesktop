@@ -49,9 +49,9 @@ export default function SettingsUi() {
                 </FormSwitch>
             ))}
 
-            <FormTitle>Vencord Desktop Location</FormTitle>
+            <FormTitle>Vencord Location</FormTitle>
             <FormText>
-                Files are loaded from
+                Vencord files are loaded from
                 {" "}
                 {Settings.vencordDir
                     ? (

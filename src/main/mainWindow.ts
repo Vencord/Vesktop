@@ -3,7 +3,7 @@ import { join } from "path";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
-import { Settings } from "./settings";
+import { Settings, VencordSettings } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
@@ -70,7 +70,9 @@ function initTray(win: BrowserWindow) {
 }
 
 function initMenuBar(win: BrowserWindow) {
-    console.log(process.platform);
+    const isWindows = process.platform === "win32";
+    const wantCtrlQ = !isWindows || VencordSettings.winCtrlQ;
+
     const menu = Menu.buildFromTemplate([
         {
             label: "Vencord Desktop",
@@ -120,18 +122,16 @@ function initMenuBar(win: BrowserWindow) {
                 },
                 {
                     label: "Quit",
-                    accelerator: process.platform === "win32" ? void 0 : "CmdOrCtrl+Q",
-                    // TODO: Setting
-                    visible: process.platform !== "win32",
+                    accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
+                    visible: !isWindows,
                     click() {
                         app.quit();
                     }
                 },
                 {
                     label: "Quit",
-                    accelerator: "Alt+F4",
-                    visible: process.platform === "win32",
-                    acceleratorWorksWhenHidden: false,
+                    accelerator: isWindows ? "Alt+F4" : void 0,
+                    visible: isWindows,
                     click() {
                         app.quit();
                     }
@@ -217,6 +217,7 @@ export function createMainWindow() {
             preload: join(__dirname, "preload.js")
         },
         icon: ICON_PATH,
+        frame: VencordSettings.frameless !== true,
         ...getWindowBoundsOptions()
     });
 
