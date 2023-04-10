@@ -5,6 +5,7 @@
  */
 
 import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { Settings } from "main/settings";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
@@ -38,6 +39,10 @@ ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
     shell.openExternal(url);
 });
 
+ipcMain.handle(IpcEvents.UPDATE_IGNORE, () => {
+    Settings.store.skippedUpdate = updateData.latestVersion;
+});
+
 function isOutdated(oldVersion: string, newVersion: string) {
     const oldParts = oldVersion.split(".");
     const newParts = newVersion.split(".");
@@ -67,12 +72,13 @@ export async function checkUpdates() {
 
         const oldVersion = app.getVersion();
         const newVersion = data.tag_name.replace(/^v/, "");
-        if (isOutdated(oldVersion, newVersion)) {
+        if (Settings.store.skippedUpdate !== newVersion && isOutdated(oldVersion, newVersion)) {
             updateData = {
                 currentVersion: oldVersion,
                 latestVersion: newVersion,
                 release: data
             };
+
             openNewUpdateWindow();
         }
     } catch (e) {

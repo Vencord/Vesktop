@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld("Updater", {
         invoke<void>(IpcEvents.UPDATER_DOWNLOAD);
         invoke<void>(IpcEvents.CLOSE);
     },
+    ignore: () => invoke<void>(IpcEvents.UPDATE_IGNORE),
     close: () => invoke<void>(IpcEvents.CLOSE)
 });
