@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
 import { BuildContext, BuildOptions, context } from "esbuild";
 
 const isDev = process.argv.includes("--dev");
@@ -55,8 +61,10 @@ const watch = process.argv.includes("--watch");
 if (watch) {
     await Promise.all(contexts.map(ctx => ctx.watch()));
 } else {
-    await Promise.all(contexts.map(async ctx => {
-        await ctx.rebuild();
-        await ctx.dispose();
-    }));
+    await Promise.all(
+        contexts.map(async ctx => {
+            await ctx.rebuild();
+            await ctx.dispose();
+        })
+    );
 }

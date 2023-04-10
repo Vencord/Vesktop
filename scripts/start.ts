@@ -4,7 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import "./start";
+import "./utils/dotenv";
 
 import { spawnNodeModuleBin } from "./utils/spawn.mjs";
-spawnNodeModuleBin("tsx", ["scripts/build/build.mts", "--", "--watch", "--dev"]);
+
+spawnNodeModuleBin("electron", ["."]);

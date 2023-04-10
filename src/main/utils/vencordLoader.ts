@@ -5,6 +5,7 @@
  */
 
 import { existsSync, mkdirSync } from "fs";
+import type { RequestOptions } from "https";
 import { join } from "path";
 
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
@@ -15,12 +16,16 @@ const API_BASE = "https://api.github.com/repos/Vendicated/Vencord";
 const FILES_TO_DOWNLOAD = ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"];
 
 export async function githubGet(endpoint: string) {
-    return simpleGet(API_BASE + endpoint, {
+    const opts: RequestOptions = {
         headers: {
             Accept: "application/vnd.github+json",
             "User-Agent": USER_AGENT
         }
-    });
+    };
+
+    if (process.env.GITHUB_TOKEN) opts.headers!.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+
+    return simpleGet(API_BASE + endpoint, opts);
 }
 
 export async function downloadVencordFiles() {
