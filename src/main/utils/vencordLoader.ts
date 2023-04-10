@@ -10,9 +10,19 @@ import { join } from "path";
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
 import { downloadFile, simpleGet } from "./http";
 
-const API_BASE = "https://api.github.com/repos/Vendicated/Vencord";
+const API_BASE = "https://api.github.com";
 
 const FILES_TO_DOWNLOAD = ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"];
+
+export interface ReleaseData {
+    name: string;
+    tag_name: string;
+    html_url: string;
+    assets: Array<{
+        name: string;
+        browser_download_url: string;
+    }>;
+}
 
 export async function githubGet(endpoint: string) {
     return simpleGet(API_BASE + endpoint, {
@@ -24,13 +34,9 @@ export async function githubGet(endpoint: string) {
 }
 
 export async function downloadVencordFiles() {
-    const release = await githubGet("/releases/latest");
+    const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
 
-    const data = JSON.parse(release.toString("utf-8"));
-    const assets = data.assets as Array<{
-        name: string;
-        browser_download_url: string;
-    }>;
+    const { assets } = JSON.parse(release.toString("utf-8")) as ReleaseData;
 
     await Promise.all(
         assets
