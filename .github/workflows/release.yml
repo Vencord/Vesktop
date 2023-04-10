@@ -1,42 +1,42 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - v*
+    push:
+        tags:
+            - v*
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+    release:
+        runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest, windows-latest]
 
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
 
-      - name: Run Electron Builder
-        uses: samuelmeuli/action-electron-builder@e4b12cd06ddf023422f1ac4e39632bd76f6e6928
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE: true
+            - name: Run Electron Builder
+              uses: samuelmeuli/action-electron-builder@e4b12cd06ddf023422f1ac4e39632bd76f6e6928
+              with:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASE: true
 
-      - name: Update AUR package
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt install makepkg
+            - name: Update AUR package
+              if: ${{ matrix.os == 'ubuntu-latest' }}
+              run: |
+                  sudo apt install makepkg
 
-          echo $SSH_KEY > ~/.ssh/aur
-          echo $SSH_PUB_KEY > ~/.ssh/aur.pub
-          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
+                  echo $SSH_KEY > ~/.ssh/aur
+                  echo $SSH_PUB_KEY > ~/.ssh/aur.pub
+                  export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
 
-          ./scripts/aur_bump.sh
-        with:
-          SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
-          SSH_PUB_KEY: ${{ secrets.AUR_SSH_PUB_KEY }}
+                  ./scripts/aur_bump.sh
+              env:
+                  SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+                  SSH_PUB_KEY: ${{ secrets.AUR_SSH_PUB_KEY }}
