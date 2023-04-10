@@ -4,13 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { Settings as TSettings } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { Common } from "./vencord";
 
-export const PlainSettings = VencordDesktopNative.settings.get() as TSettings;
-export const Settings = new SettingsStore(PlainSettings);
+export const Settings = new SettingsStore(VencordDesktopNative.settings.get());
 Settings.addGlobalChangeListener((o, p) => VencordDesktopNative.settings.set(o, p));
 
 export function useSettings() {
@@ -25,9 +23,9 @@ export function useSettings() {
     return Settings.store;
 }
 
-export function getValueAndOnChange(key: keyof TSettings) {
+export function getValueAndOnChange(key: keyof typeof Settings.store) {
     return {
-        value: Settings[key] as any,
-        onChange: (value: any) => (Settings[key] = value)
+        value: Settings.store[key] as any,
+        onChange: (value: any) => (Settings.store[key] = value)
     };
 }
