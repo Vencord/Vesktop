@@ -24,7 +24,7 @@ export default function SettingsUi() {
     const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
         [
             "tray",
-            "Use tray",
+            "Tray Icon",
             "Add a tray icon for Vencord Desktop",
             true
         ],
