@@ -15,6 +15,7 @@ import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
+let tray: Tray;
 
 app.on("before-quit", () => {
     isQuitting = true;
@@ -62,7 +63,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    const tray = new Tray(ICON_PATH);
+    tray = new Tray(ICON_PATH);
     tray.setToolTip("Vencord Desktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
@@ -213,6 +214,12 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 }
 
 function initSettingsListeners(win: BrowserWindow) {
+    Settings.addChangeListener("tray", enable => {
+        if (enable)
+            initTray(win);
+        else
+            tray?.destroy();
+    });
     Settings.addChangeListener("disableMinSize", disable => {
         if (disable) {
             // 0 no work
