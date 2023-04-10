@@ -215,10 +215,8 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
 function initSettingsListeners(win: BrowserWindow) {
     Settings.addChangeListener("tray", enable => {
-        if (enable)
-            initTray(win);
-        else
-            tray?.destroy();
+        if (enable) initTray(win);
+        else tray?.destroy();
     });
     Settings.addChangeListener("disableMinSize", disable => {
         if (disable) {
