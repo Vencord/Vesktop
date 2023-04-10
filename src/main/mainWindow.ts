@@ -230,13 +230,13 @@ function initSettingsListeners(win: BrowserWindow) {
 
     VencordSettings.addChangeListener("macosTranslucency", enabled => {
         if (enabled) {
-            win.setVibrancy('sidebar')
-            win.setBackgroundColor('#ffffff00');
+            win.setVibrancy("sidebar");
+            win.setBackgroundColor("#ffffff00");
         } else {
             win.setVibrancy(null);
-            win.setBackgroundColor('#ffffff');
+            win.setBackgroundColor("#ffffff");
         }
-    })
+    });
 }
 
 export function createMainWindow() {
