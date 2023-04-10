@@ -42,7 +42,6 @@ if (!app.requestSingleInstanceLock()) {
 
     app.whenReady().then(async () => {
         checkUpdates();
-
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
         else if (process.platform === "darwin") app.dock.setIcon(ICON_PATH);
 

@@ -4,19 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
 
 import { IpcEvents } from "../shared/IpcEvents";
-
-function invoke<T = any>(event: IpcEvents, ...args: any[]) {
-    return ipcRenderer.invoke(event, ...args) as Promise<T>;
-}
-
-function sendSync<T = any>(event: IpcEvents, ...args: any[]) {
-    return ipcRenderer.sendSync(event, ...args) as T;
-}
+import { invoke, sendSync } from "./typedIpcs";
 
 export const VencordDesktopNative = {
     app: {

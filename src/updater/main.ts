@@ -4,15 +4,39 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
+import { SplashProps } from "shared/browserWinProperties";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
-let latestVersion: string;
+export interface UpdateData {
+    currentVersion: string;
+    latestVersion: string;
+    release: ReleaseData;
+}
 
-ipcMain.handle(IpcEvents.UPDATER_GET_LATEST_VERSION, () => latestVersion);
+let updateData: UpdateData;
+
+ipcMain.handle(IpcEvents.UPDATER_GET_DATA, () => updateData);
+ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
+    const { assets } = updateData.release;
+    const url = (() => {
+        switch (process.platform) {
+            case "win32":
+                return assets.find(a => a.name.endsWith(".exe"))!.browser_download_url;
+            case "darwin":
+                return assets.find(a => a.name.endsWith(".dmg"))!.browser_download_url;
+            case "linux":
+                return updateData.release.html_url;
+            default:
+                throw new Error(`Unsupported platform: ${process.platform}`);
+        }
+    })();
+
+    shell.openExternal(url);
+});
 
 function isOutdated(oldVersion: string, newVersion: string) {
     const oldParts = oldVersion.split(".");
@@ -36,15 +60,21 @@ function isOutdated(oldVersion: string, newVersion: string) {
 }
 
 export async function checkUpdates() {
-    if (IS_DEV) return;
-
+    // if (IS_DEV) return;
     try {
         const raw = await githubGet("/repos/Vencord/Desktop/releases/latest");
-        const { tag_name } = JSON.parse(raw.toString("utf-8")) as ReleaseData;
+        const data = JSON.parse(raw.toString("utf-8")) as ReleaseData;
 
         const oldVersion = app.getVersion();
-        const newVersion = (latestVersion = tag_name.replace(/^v/, ""));
-        if (isOutdated(oldVersion, newVersion)) openNewUpdateWindow();
+        const newVersion = data.tag_name.replace(/^v/, "");
+        if (isOutdated(oldVersion, newVersion)) {
+            updateData = {
+                currentVersion: oldVersion,
+                latestVersion: newVersion,
+                release: data
+            };
+            openNewUpdateWindow();
+        }
     } catch (e) {
         console.error("AppUpdater: Failed to check for updates\n", e);
     }
@@ -52,6 +82,7 @@ export async function checkUpdates() {
 
 function openNewUpdateWindow() {
     const win = new BrowserWindow({
+        ...SplashProps,
         webPreferences: {
             preload: join(__dirname, "updaterPreload.js")
         }
