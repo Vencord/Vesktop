@@ -16,4 +16,5 @@ export interface Settings {
     disableMinSize?: boolean;
     tray?: boolean;
     minimizeToTray?: boolean;
+    skippedUpdate?: string;
 }

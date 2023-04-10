@@ -43,6 +43,11 @@ await Promise.all([
         outfile: "dist/js/preload.js"
     }),
     createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/updater/preload.ts"],
+        outfile: "dist/js/updaterPreload.js"
+    }),
+    createContext({
         ...CommonOpts,
         globalName: "VencordDesktop",
         entryPoints: ["src/renderer/index.ts"],

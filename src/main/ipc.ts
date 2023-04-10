@@ -52,8 +52,12 @@ ipcMain.handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
     shell.showItemInFolder(path);
 });
 
-ipcMain.handle(IpcEvents.FOCUS, () => {
-    mainWin?.focus();
+ipcMain.handle(IpcEvents.FOCUS, e => {
+    e.sender.focus();
+});
+
+ipcMain.handle(IpcEvents.CLOSE, e => {
+    e.sender.close();
 });
 
 ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {

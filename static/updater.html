@@ -1,0 +1,115 @@
+<head>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+                "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: rgb(219, 222, 225);
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            height: 100%;
+            background-color: #313338;
+            border-radius: 8px;
+            border: 1px solid #248046;
+            padding: 1em;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5em;
+            margin-top: 0.25em;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 0.5em;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: filter 0.2 ease-in-out;
+        }
+
+        button:hover,
+        button:active {
+            filter: brightness(0.9);
+        }
+
+        .green {
+            background-color: #248046;
+        }
+
+        .red {
+            background-color: #ed4245;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <section>
+            <h1>Update Available</h1>
+            <p>There's a new update for Vencord Desktop! Update now to get new fixes and features!</p>
+            <p>
+                Current: <span id="current"></span>
+                <br />
+                Latest: <span id="latest"></span>
+            </p>
+        </section>
+
+        <section>
+            <label id="disable-remind">
+                <input type="checkbox" />
+                <span>Do not remind again for </span>
+            </label>
+
+            <div class="buttons">
+                <button name="download" class="green">Download Update</button>
+                <button name="close" class="red">Close</button>
+            </div>
+        </section>
+    </div>
+</body>
+
+<script type="module">
+    const data = await Updater.getData();
+    document.getElementById("current").textContent = data.currentVersion;
+    document.getElementById("latest").textContent = data.latestVersion;
+
+    document.querySelector("#disable-remind > span").textContent += data.latestVersion;
+
+    function checkDisableRemind() {
+        const checkbox = document.querySelector("#disable-remind > input");
+        if (checkbox.checked) {
+            Updater.ignore();
+        }
+    }
+
+    const onClicks = {
+        download() {
+            checkDisableRemind();
+            Updater.download();
+        },
+        close() {
+            checkDisableRemind();
+            Updater.close();
+        }
+    };
+
+    for (const name in onClicks) {
+        document.querySelectorAll(`button[name="${name}"]`).forEach(button => {
+            button.addEventListener("click", onClicks[name]);
+        });
+    }
+</script>

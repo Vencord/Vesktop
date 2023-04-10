@@ -8,6 +8,7 @@ import "./ipc";
 
 import { app, BrowserWindow } from "electron";
 import { join } from "path";
+import { checkUpdates } from "updater/main";
 
 import { ICON_PATH } from "../shared/paths";
 import { once } from "../shared/utils/once";
@@ -40,6 +41,7 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     app.whenReady().then(async () => {
+        checkUpdates();
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
         else if (process.platform === "darwin") app.dock.setIcon(ICON_PATH);
 
