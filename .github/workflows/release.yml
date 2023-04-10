@@ -30,13 +30,12 @@ jobs:
             - name: Update AUR package
               if: ${{ matrix.os == 'ubuntu-latest' }}
               run: |
-                  sudo apt install makepkg
-
                   echo $SSH_KEY > ~/.ssh/aur
                   echo $SSH_PUB_KEY > ~/.ssh/aur.pub
                   export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
 
-                  ./scripts/aur_bump.sh
+                  ./scripts/ci/install_makepkg.sh
+                  ./scripts/ci/aur_bump.sh
               env:
                   SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
                   SSH_PUB_KEY: ${{ secrets.AUR_SSH_PUB_KEY }}
