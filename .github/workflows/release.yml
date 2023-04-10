@@ -34,7 +34,7 @@ jobs:
                   echo $SSH_PUB_KEY > ~/.ssh/aur.pub
                   export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
 
-                  ./scripts/ci/install_makepkg.sh
+                  ./scripts/ci/install_makepkg.sh >/dev/null 2>&1
                   ./scripts/ci/aur_bump.sh
               env:
                   SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
