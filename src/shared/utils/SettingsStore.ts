@@ -67,7 +67,7 @@ export class SettingsStore<T extends object> {
      * Set the data of the store.
      * This will update this.store and this.plain (and old references to them will be stale! Avoid storing them in variables)
      *
-     * Additionally, all global listeners (or those for pathToNotify, if specified) will be called with the new data
+     * Additionally, all global listeners (and those for pathToNotify, if specified) will be called with the new data
      * @param value New data
      * @param pathToNotify Optional path to notify instead of globally. Used to transfer path via ipc
      */
@@ -90,9 +90,9 @@ export class SettingsStore<T extends object> {
             }
 
             this.pathListeners.get(pathToNotify)?.forEach(cb => cb(v));
-        } else {
-            this.globalListeners.forEach(cb => cb(value, ""));
         }
+
+        this.globalListeners.forEach(cb => cb(value, ""));
     }
 
     /**
