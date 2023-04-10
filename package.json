@@ -79,7 +79,6 @@
             "category": "Network"
         },
         "nsis": {
-            "allowToChangeInstallationDirectory": true,
             "include": "build/installer.nsh",
             "oneClick": false
         }
