@@ -30,8 +30,11 @@ jobs:
             - name: Update AUR package
               if: ${{ matrix.os == 'ubuntu-latest' }}
               run: |
+                  mkdir -p -m 700 ~/.ssh
                   echo $SSH_KEY > ~/.ssh/aur
                   echo $SSH_PUB_KEY > ~/.ssh/aur.pub
+                  chmod 600 ~/.ssh/*
+
                   export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
 
                   ./scripts/ci/install_makepkg.sh >/dev/null 2>&1
