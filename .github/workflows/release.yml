@@ -37,7 +37,7 @@ jobs:
 
                   export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur"
 
-                  ./scripts/ci/install_makepkg.sh >/dev/null 2>&1
+                  sudo ./scripts/ci/install_makepkg.sh
                   ./scripts/ci/aur_bump.sh
               env:
                   SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
