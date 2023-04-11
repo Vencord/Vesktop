@@ -79,7 +79,6 @@ function initTray(win: BrowserWindow) {
 
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
-    const isMacOS = process.platform === "darwin";
     const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
 
     const menu = Menu.buildFromTemplate([
@@ -132,7 +131,19 @@ function initMenuBar(win: BrowserWindow) {
         { role: "fileMenu" },
         { role: "editMenu" },
         { role: "viewMenu" },
-        { role: "windowMenu" }
+        { role: "windowMenu" },
+        {
+            label: "Zoom",
+            submenu: [
+                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+                {
+                    label: "Zoom in",
+                    accelerator: "CmdOrCtrl+=",
+                    role: "zoomIn"
+                }
+            ],
+            visible: false
+        }
     ]);
 
     Menu.setApplicationMenu(menu);
