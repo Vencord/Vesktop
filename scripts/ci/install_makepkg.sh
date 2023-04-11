@@ -10,4 +10,4 @@ for i in \
 	dpkg -i /tmp/$i || true
 done
 
-apt -f install -q
+apt-get -f install -oDpkg::Use-Pty=0 -qq
