@@ -79,6 +79,7 @@ function initTray(win: BrowserWindow) {
 
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
+    const isMacOS = process.platform === "darwin";
     const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
 
     const menu = Menu.buildFromTemplate([
@@ -146,6 +147,7 @@ function initMenuBar(win: BrowserWindow) {
                 }
             ]
         },
+        ...(isMacOS ? [{ role: "editMenu" as const }] : []),
         {
             label: "Zoom",
             submenu: [
