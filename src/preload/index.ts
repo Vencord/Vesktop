@@ -39,5 +39,6 @@ if (IS_DEV) {
         document.getElementById("vcd-css-core")!.textContent = readFileSync(rendererCss, "utf-8");
     });
 }
-
 // #endregion
+
+VencordDesktopNative.spellcheck.setLanguages(window.navigator.languages);
