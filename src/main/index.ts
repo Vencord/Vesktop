@@ -28,12 +28,10 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 
 let mainWin: BrowserWindow | null = null;
 
-if (!app.requestSingleInstanceLock()) {
-    console.log("Vencord Desktop is already running. Quitting...");
-    app.quit();
-} else {
-    app.on("second-instance", () => {
-        if (mainWin) {
+function init() {
+    app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
+        if (data.IS_DEV) app.quit();
+        else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
             if (!mainWin.isVisible()) mainWin.show();
             mainWin.focus();
@@ -51,6 +49,18 @@ if (!app.requestSingleInstanceLock()) {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
         });
     });
+}
+
+if (!app.requestSingleInstanceLock({ IS_DEV })) {
+    if (IS_DEV) {
+        console.log("Vencord Desktop is already running. Quitting previous instance...");
+        init();
+    } else {
+        console.log("Vencord Desktop is already running. Quitting...");
+        app.quit();
+    }
+} else {
+    init();
 }
 
 async function createWindows() {
