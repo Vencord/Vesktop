@@ -1,0 +1,29 @@
+.vcd-screen-picker-grid {
+    padding: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em 1em;
+}
+
+.vcd-screen-picker-grid input {
+    appearance: none;
+    cursor: pointer;
+}
+
+.vcd-screen-picker-selected img {
+    outline: 2px solid var(--brand-experiment);
+}
+
+.vcd-screen-picker-grid label {
+    overflow: hidden;
+    padding: 4px 0px;
+}
+
+.vcd-screen-picker-grid div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+    font-weight: 600;
+    margin-inline: 0.5em;
+}

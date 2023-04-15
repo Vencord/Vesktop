@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import type { DesktopCapturerSource, SourcesOptions } from "electron";
 import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
 
@@ -29,5 +30,15 @@ export const VencordDesktopNative = {
     },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS)
+    },
+    capturer: {
+        getSources: async (options?: SourcesOptions) => {
+            const res = await invoke<DesktopCapturerSource[]>(IpcEvents.CAPTURER_GET_SOURCES, options);
+            return res.map(({ id, name, thumbnail }) => ({
+                id,
+                name,
+                url: thumbnail.toDataURL()
+            }));
+        }
     }
 };

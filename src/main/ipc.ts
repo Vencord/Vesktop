@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, dialog, ipcMain, session, shell } from "electron";
+import { app, desktopCapturer, dialog, ipcMain, session, shell } from "electron";
 import { existsSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { join } from "path";
@@ -67,6 +67,8 @@ ipcMain.handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
     const applicable = languages.filter(l => available.includes(l)).slice(0, 3);
     if (applicable.length) ses.setSpellCheckerLanguages(applicable);
 });
+
+ipcMain.handle(IpcEvents.CAPTURER_GET_SOURCES, (_, options) => desktopCapturer.getSources(options));
 
 ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     const res = await dialog.showOpenDialog(mainWin!, {
