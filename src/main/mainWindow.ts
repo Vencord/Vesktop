@@ -84,9 +84,11 @@ function initMenuBar(win: BrowserWindow) {
     const menu = Menu.buildFromTemplate([
         {
             label: "Vencord Desktop",
+            role: "appMenu",
             submenu: [
                 {
                     label: "About Vencord Desktop",
+                    role: "about",
                     click: createAboutWindow
                 },
                 {
@@ -97,28 +99,6 @@ function initMenuBar(win: BrowserWindow) {
                         app.quit();
                     },
                     toolTip: "Vencord Desktop will automatically restart after this operation"
-                },
-                {
-                    label: "Toggle Developer Tools",
-                    accelerator: "CmdOrCtrl+Shift+I",
-                    click() {
-                        BrowserWindow.getFocusedWindow()!.webContents.toggleDevTools();
-                    }
-                },
-                {
-                    label: "Toggle Developer Tools (Hidden)",
-                    accelerator: "F12",
-                    visible: false,
-                    click() {
-                        BrowserWindow.getFocusedWindow()!.webContents.toggleDevTools();
-                    }
-                },
-                {
-                    label: "Reload Window",
-                    accelerator: "CmdOrCtrl+R",
-                    click() {
-                        BrowserWindow.getFocusedWindow()!.webContents.reload();
-                    }
                 },
                 {
                     label: "Relaunch",
@@ -132,6 +112,7 @@ function initMenuBar(win: BrowserWindow) {
                     label: "Quit",
                     accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
                     visible: !isWindows,
+                    role: "quit",
                     click() {
                         app.quit();
                     }
@@ -140,34 +121,28 @@ function initMenuBar(win: BrowserWindow) {
                     label: "Quit",
                     accelerator: isWindows ? "Alt+F4" : void 0,
                     visible: isWindows,
+                    role: "quit",
                     click() {
                         app.quit();
                     }
                 }
             ]
         },
+        { role: "fileMenu" },
+        { role: "editMenu" },
+        { role: "viewMenu" },
+        { role: "windowMenu" },
         {
             label: "Zoom",
             submenu: [
-                {
-                    label: "Zoom in",
-                    accelerator: "CmdOrCtrl+Plus",
-                    role: "zoomIn"
-                },
-                // Fix for zoom in on keyboards with dedicated + like QWERTZ (or numpad)
                 // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
                 {
                     label: "Zoom in",
                     accelerator: "CmdOrCtrl+=",
-                    role: "zoomIn",
-                    visible: false
-                },
-                {
-                    label: "Zoom out",
-                    accelerator: "CmdOrCtrl+-",
-                    role: "zoomOut"
+                    role: "zoomIn"
                 }
-            ]
+            ],
+            visible: false
         }
     ]);
 
