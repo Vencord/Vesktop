@@ -23,6 +23,10 @@ export const VencordDesktopNative = {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
         set: (settings: Settings, path?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, path)
     },
+    spellcheck: {
+        setLanguages: (languages: readonly string[]) => invoke<void>(IpcEvents.SPELLCHECK_SET_LANGUAGES, languages)
+        // todo: perhaps add ways to learn words
+    },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS)
     }
