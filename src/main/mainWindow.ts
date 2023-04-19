@@ -76,7 +76,7 @@ function initTray(win: BrowserWindow) {
         trayMenu.items[0].enabled = true;
     });
 
-    win.on('page-title-updated', (e) => e.preventDefault());
+    win.on("page-title-updated", e => e.preventDefault());
 }
 
 function initMenuBar(win: BrowserWindow) {
