@@ -17,8 +17,8 @@ devDependencies:
     specifier: ^5.57.1
     version: 5.57.1(eslint@8.38.0)(typescript@5.0.2)
   '@vencord/types':
-    specifier: ^0.1.1
-    version: 0.1.1
+    specifier: ^0.1.2
+    version: 0.1.2
   dotenv:
     specifier: ^16.0.3
     version: 16.0.3
@@ -725,8 +725,8 @@ packages:
       eslint-visitor-keys: 3.4.0
     dev: true
 
-  /@vencord/types@0.1.1:
-    resolution: {integrity: sha512-QbAeVafeMpkteSscgtnXmwvwmXaePqOI4jwaLb9DAwIKpuVRCtT2V48th8PCuL228NyBMBRI+rpYaf1JmSB7UQ==}
+  /@vencord/types@0.1.2:
+    resolution: {integrity: sha512-C/dqZHn3aod/4izZT9sgZEef4478M7QNKTY8Gx2yB1CRYawJcs6hupXT/1SMmepKqrULbltL04Cnh5ieBm3Ucw==}
     dependencies:
       '@types/lodash': 4.14.194
       '@types/node': 18.15.11
