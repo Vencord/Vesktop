@@ -75,6 +75,8 @@ function initTray(win: BrowserWindow) {
     win.on("hide", () => {
         trayMenu.items[0].enabled = true;
     });
+
+    win.on('page-title-updated', (e) => e.preventDefault());
 }
 
 function initMenuBar(win: BrowserWindow) {
@@ -230,6 +232,7 @@ export function createMainWindow() {
             devTools: true,
             preload: join(__dirname, "preload.js")
         },
+        title: "Vencord",
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
         ...(VencordSettings.store.macosTranslucency
