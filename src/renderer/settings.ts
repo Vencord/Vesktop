@@ -4,17 +4,16 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { useEffect, useReducer } from "@vencord/types/webpack/common";
 import { SettingsStore } from "shared/utils/SettingsStore";
-
-import { Common } from "./vencord";
 
 export const Settings = new SettingsStore(VencordDesktopNative.settings.get());
 Settings.addGlobalChangeListener((o, p) => VencordDesktopNative.settings.set(o, p));
 
 export function useSettings() {
-    const [, update] = Common.React.useReducer(x => x + 1, 0);
+    const [, update] = useReducer(x => x + 1, 0);
 
-    Common.React.useEffect(() => {
+    useEffect(() => {
         Settings.addGlobalChangeListener(update);
 
         return () => Settings.removeGlobalChangeListener(update);

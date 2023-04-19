@@ -6,6 +6,8 @@
 
 import "./hideGarbage.css";
 
+import { waitFor } from "@vencord/types/webpack";
+
 import { isFirstRun, localStorage } from "./utils";
 
 // Make clicking Notifications focus the window
@@ -25,7 +27,7 @@ if (isFirstRun) {
     // Hide "Download Discord Desktop now!!!!" banner
     localStorage.setItem("hideNag", "true");
 
-    Vencord.Webpack.waitFor("setDesktopType", m => {
+    waitFor("setDesktopType", m => {
         m.setDesktopType("all");
     });
 }

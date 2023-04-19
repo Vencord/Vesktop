@@ -23,10 +23,12 @@
         "watch": "pnpm build --watch"
     },
     "devDependencies": {
+        "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^18.15.11",
         "@types/react": "^18.0.33",
         "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "^5.57.1",
+        "@vencord/types": "^0.1.1",
         "dotenv": "^16.0.3",
         "electron": "^23.2.0",
         "electron-builder": "^23.6.0",

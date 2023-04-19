@@ -6,20 +6,12 @@
 
 import "./settings.css";
 
+import { Margins } from "@vencord/types/utils";
+import { Button, Forms, Select, Switch, Text } from "@vencord/types/webpack/common";
 import { useSettings } from "renderer/settings";
-
-import { Common, Util } from "../vencord";
-
-const { Margins } = Util;
 
 export default function SettingsUi() {
     const Settings = useSettings();
-    const {
-        Forms: { FormSection, FormText, FormDivider, FormSwitch, FormTitle },
-        Text,
-        Select,
-        Button
-    } = Common;
 
     const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
         ["tray", "Tray Icon", "Add a tray icon for Vencord Desktop", true],
@@ -43,12 +35,12 @@ export default function SettingsUi() {
     ];
 
     return (
-        <FormSection>
+        <Forms.FormSection>
             <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
                 Vencord Desktop Settings
             </Text>
 
-            <FormTitle className={Margins.top16}>Discord Branch</FormTitle>
+            <Forms.FormTitle className={Margins.top16}>Discord Branch</Forms.FormTitle>
             <Select
                 placeholder="Stable"
                 options={[
@@ -62,22 +54,22 @@ export default function SettingsUi() {
                 serialize={s => s}
             />
 
-            <FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+            <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
 
             {switches.map(([key, text, note, def, predicate]) => (
-                <FormSwitch
-                    value={(Settings[key] ?? def ?? false) && (!predicate || predicate())}
+                <Switch
+                    value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
                     disabled={predicate && !predicate()}
-                    onChange={v => (Settings[key] = v)}
+                    onChange={v => (Settings[key as any] = v)}
                     note={note}
                     key={key}
                 >
                     {text}
-                </FormSwitch>
+                </Switch>
             ))}
 
-            <FormTitle>Vencord Location</FormTitle>
-            <FormText>
+            <Forms.FormTitle>Vencord Location</Forms.FormTitle>
+            <Forms.FormText>
                 Vencord files are loaded from{" "}
                 {Settings.vencordDir ? (
                     <a
@@ -92,7 +84,7 @@ export default function SettingsUi() {
                 ) : (
                     "the default location"
                 )}
-            </FormText>
+            </Forms.FormText>
             <div className="vcd-location-btns">
                 <Button
                     size={Button.Sizes.SMALL}
@@ -117,6 +109,6 @@ export default function SettingsUi() {
                     Reset
                 </Button>
             </div>
-        </FormSection>
+        </Forms.FormSection>
     );
 }

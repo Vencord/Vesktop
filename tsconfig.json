@@ -10,7 +10,9 @@
         "target": "ESNEXT",
         "jsx": "preserve",
 
-        "baseUrl": "./src/"
+        "baseUrl": "./src/",
+
+        "typeRoots": ["./node_modules/@types", "./node_modules/@vencord"]
     },
     "include": ["src/**/*"]
 }
