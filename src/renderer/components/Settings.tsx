@@ -35,7 +35,7 @@ export default function SettingsUi() {
         [
             "staticTitle",
             "Static Title",
-            "Makes the window title \"Vencord\" instead of changing to the current page"
+            'Makes the window title "Vencord" instead of changing to the current page'
         ]
     ];
 

@@ -232,7 +232,7 @@ export function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
-        ...Settings.store.staticTitle ? { title: "Vencord" } : {},
+        ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency
             ? {
                   vibrancy: "sidebar",
