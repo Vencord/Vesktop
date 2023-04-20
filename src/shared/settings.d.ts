@@ -17,4 +17,5 @@ export interface Settings {
     tray?: boolean;
     minimizeToTray?: boolean;
     skippedUpdate?: string;
+    staticTitle?: boolean;
 }

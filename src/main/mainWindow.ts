@@ -75,8 +75,6 @@ function initTray(win: BrowserWindow) {
     win.on("hide", () => {
         trayMenu.items[0].enabled = true;
     });
-
-    win.on("page-title-updated", e => e.preventDefault());
 }
 
 function initMenuBar(win: BrowserWindow) {
@@ -232,9 +230,9 @@ export function createMainWindow() {
             devTools: true,
             preload: join(__dirname, "preload.js")
         },
-        title: "Vencord",
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        ...Settings.store.staticTitle ? { title: "Vencord" } : {},
         ...(VencordSettings.store.macosTranslucency
             ? {
                   vibrancy: "sidebar",
@@ -252,6 +250,8 @@ export function createMainWindow() {
 
         return false;
     });
+
+    if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
     if (Settings.store.tray ?? true) initTray(win);
