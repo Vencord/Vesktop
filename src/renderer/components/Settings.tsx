@@ -31,7 +31,8 @@ export default function SettingsUi() {
             "openLinksWithElectron",
             "Open Links in app (experimental)",
             "Opens links in a new Vencord Desktop window instead of your web browser"
-        ]
+        ],
+        ["staticTitle", "Static Title", 'Makes the window title "Vencord" instead of changing to the current page']
     ];
 
     return (
