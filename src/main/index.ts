@@ -17,6 +17,7 @@ import { createMainWindow } from "./mainWindow";
 import { Settings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { ensureVencordFiles } from "./utils/vencordLoader";
+
 if (IS_DEV) {
     require("source-map-support").install();
 }
@@ -29,6 +30,20 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 let mainWin: BrowserWindow | null = null;
 
 function init() {
+    // <-- BEGIN COPY PASTED FROM DISCORD -->
+
+    // work around chrome 66 disabling autoplay by default
+    app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
+
+    // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
+    // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
+    app.commandLine.appendSwitch(
+        "disable-features",
+        "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService"
+    );
+
+    // <-- END COPY PASTED FROM DISCORD -->
+
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
         else if (mainWin) {
