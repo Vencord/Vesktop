@@ -88,7 +88,6 @@ function initMenuBar(win: BrowserWindow) {
             submenu: [
                 {
                     label: "About Vencord Desktop",
-                    role: "about",
                     click: createAboutWindow
                 },
                 {
@@ -125,25 +124,20 @@ function initMenuBar(win: BrowserWindow) {
                     click() {
                         app.quit();
                     }
+                },
+                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+                {
+                    label: "Zoom in (hidden, hack for Qwertz and others)",
+                    accelerator: "CmdOrCtrl+=",
+                    role: "zoomIn",
+                    visible: false
                 }
             ]
         },
         { role: "fileMenu" },
         { role: "editMenu" },
         { role: "viewMenu" },
-        { role: "windowMenu" },
-        {
-            label: "Zoom",
-            submenu: [
-                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-                {
-                    label: "Zoom in",
-                    accelerator: "CmdOrCtrl+=",
-                    role: "zoomIn"
-                }
-            ],
-            visible: false
-        }
+        { role: "windowMenu" }
     ]);
 
     Menu.setApplicationMenu(menu);
