@@ -85,6 +85,16 @@
         "nsis": {
             "include": "build/installer.nsh",
             "oneClick": false
+        },
+        "win": {
+            "target": [
+                "nsis",
+                "portable"
+            ]
+        },
+        "publish": {
+            "provider": "github",
+            "releaseType": "release"
         }
     }
 }
