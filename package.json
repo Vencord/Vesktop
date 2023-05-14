@@ -9,7 +9,7 @@
     "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
     "scripts": {
-        "build": "tsx scripts/build/build.mts",
+        "build": "tsc scripts/build/build.mts",
         "build:dev": "pnpm build --dev",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
@@ -96,5 +96,8 @@
             "provider": "github",
             "releaseType": "release"
         }
+    },
+    "dependencies": {
+        "deno": "^0.1.1"
     }
 }

@@ -51,6 +51,9 @@ git clone https://github.com/Vencord/Desktop
 cd Desktop
 
 # Install Dependencies
+npm i -g pnpm
+npm i -g typescript
+npm i -g deno
 pnpm i
 
 # Either run it without packaging
