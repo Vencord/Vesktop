@@ -226,6 +226,7 @@ export function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        transparent: Settings.store.transparent,
         ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency
             ? {
