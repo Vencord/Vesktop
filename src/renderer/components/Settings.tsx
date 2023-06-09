@@ -22,6 +22,7 @@ export default function SettingsUi() {
             true,
             () => Settings.tray ?? true
         ],
+        ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
             "Disable minimum window size",

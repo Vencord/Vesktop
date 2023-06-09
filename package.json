@@ -82,11 +82,11 @@
         "mac": {
             "target": [
                 {
-                  "target": "default",
-                  "arch": [
-                    "x64",
-                    "arm64"
-                  ]
+                    "target": "default",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
                 }
             ],
             "category": "Network"
@@ -105,5 +105,8 @@
             "provider": "github",
             "releaseType": "release"
         }
+    },
+    "dependencies": {
+        "arrpc": "^3.1.0"
     }
 }

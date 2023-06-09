@@ -1,5 +1,10 @@
 lockfileVersion: '6.0'
 
+dependencies:
+  arrpc:
+    specifier: ^3.1.0
+    version: 3.1.0
+
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
     specifier: ^2.1.2
@@ -888,6 +893,15 @@ packages:
       es-abstract: 1.21.2
       es-shim-unscopables: 1.0.0
     dev: true
+
+  /arrpc@3.1.0:
+    resolution: {integrity: sha512-QKagtB5fUDqDXT31tTUzcG3+rFxsMlrjKb3iE68/b2NbT1c6+0WYkkrJh4GaVPqH0Tlqy13sEgPW3XJ/VNmBDQ==}
+    dependencies:
+      ws: 8.13.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
 
   /asar@3.2.0:
     resolution: {integrity: sha512-COdw2ZQvKdFGFxXwX3oYh2/sOsJWJegrdJCGxnN4MZ7IULgRBp9P6665aqj9z1v9VwP4oP1hRBojRDQ//IGgAg==}
@@ -3784,6 +3798,19 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
+
+  /ws@8.13.0:
+    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
 
   /xmlbuilder@15.1.1:
     resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}

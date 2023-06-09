@@ -9,4 +9,17 @@ import "./fixes";
 console.log("read if cute :3");
 
 export * as Components from "./components";
-export { Settings } from "./settings";
+import { Settings } from "./settings";
+export { Settings };
+
+const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"];
+
+arRPC.required = !!Settings.store.arRPC;
+
+Settings.addChangeListener("arRPC", v => {
+    arRPC.required = !!v;
+    if (v && !arRPC.started) Vencord.Plugins.startPlugin(arRPC);
+    else if (arRPC.started) {
+        Vencord.Plugins.stopPlugin(arRPC);
+    }
+});

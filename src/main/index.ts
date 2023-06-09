@@ -12,6 +12,7 @@ import { checkUpdates } from "updater/main";
 
 import { ICON_PATH } from "../shared/paths";
 import { once } from "../shared/utils/once";
+import { initArRPC } from "./arrpc";
 import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
 import { createMainWindow } from "./mainWindow";
 import { Settings } from "./settings";
@@ -94,6 +95,8 @@ async function createWindows() {
             mainWin!.maximize();
         }
     });
+
+    initArRPC();
 }
 
 app.on("window-all-closed", () => {
