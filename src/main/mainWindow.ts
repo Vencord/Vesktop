@@ -6,13 +6,16 @@
 
 import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
 import { join } from "path";
+import { once } from "shared/utils/once";
 
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
+import { initArRPC } from "./arrpc";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
 import { Settings, VencordSettings } from "./settings";
+import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
-import { downloadVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 let tray: Tray;
@@ -213,7 +216,7 @@ function initSettingsListeners(win: BrowserWindow) {
     });
 }
 
-export function createMainWindow() {
+function createMainWindow() {
     const win = (mainWin = new BrowserWindow({
         show: false,
         autoHideMenuBar: true,
@@ -265,4 +268,26 @@ export function createMainWindow() {
     win.loadURL(`https://${subdomain}discord.com/app`);
 
     return win;
+}
+
+const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export async function createWindows() {
+    const splash = createSplashWindow();
+
+    await ensureVencordFiles();
+    runVencordMain();
+
+    mainWin = createMainWindow();
+
+    mainWin.once("ready-to-show", () => {
+        splash.destroy();
+        mainWin!.show();
+
+        if (Settings.store.maximized) {
+            mainWin!.maximize();
+        }
+    });
+
+    initArRPC();
 }

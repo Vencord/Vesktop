@@ -19,4 +19,6 @@ export interface Settings {
     skippedUpdate?: string;
     staticTitle?: boolean;
     arRPC?: boolean;
+
+    firstLaunch?: boolean;
 }

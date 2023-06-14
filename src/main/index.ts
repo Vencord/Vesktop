@@ -7,17 +7,13 @@
 import "./ipc";
 
 import { app, BrowserWindow } from "electron";
-import { join } from "path";
 import { checkUpdates } from "updater/main";
 
 import { ICON_PATH } from "../shared/paths";
-import { once } from "../shared/utils/once";
-import { initArRPC } from "./arrpc";
-import { DATA_DIR, VENCORD_FILES_DIR } from "./constants";
-import { createMainWindow } from "./mainWindow";
+import { DATA_DIR } from "./constants";
+import { createFirstLaunchTour } from "./firstLaunch";
+import { createWindows, mainWin } from "./mainWindow";
 import { Settings } from "./settings";
-import { createSplashWindow } from "./splash";
-import { ensureVencordFiles } from "./utils/vencordLoader";
 
 if (IS_DEV) {
     require("source-map-support").install();
@@ -25,10 +21,6 @@ if (IS_DEV) {
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
-
-const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
-
-let mainWin: BrowserWindow | null = null;
 
 function init() {
     // <-- BEGIN COPY PASTED FROM DISCORD -->
@@ -59,7 +51,7 @@ function init() {
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
         else if (process.platform === "darwin") app.dock.setIcon(ICON_PATH);
 
-        createWindows();
+        bootstrap();
 
         app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
@@ -79,24 +71,12 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
     init();
 }
 
-async function createWindows() {
-    const splash = createSplashWindow();
-
-    await ensureVencordFiles();
-    runVencordMain();
-
-    mainWin = createMainWindow();
-
-    mainWin.once("ready-to-show", () => {
-        splash.destroy();
-        mainWin!.show();
-
-        if (Settings.store.maximized) {
-            mainWin!.maximize();
-        }
-    });
-
-    initArRPC();
+async function bootstrap() {
+    if (!Object.hasOwn(Settings.store, "firstLaunch")) {
+        createFirstLaunchTour();
+    } else {
+        createWindows();
+    }
 }
 
 app.on("window-all-closed", () => {
