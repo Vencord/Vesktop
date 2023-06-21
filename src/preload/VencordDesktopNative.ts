@@ -34,5 +34,8 @@ export const VencordDesktopNative = {
     },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS)
+    },
+    capturer: {
+        getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
     }
 };

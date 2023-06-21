@@ -13,6 +13,7 @@ import { ICON_PATH } from "../shared/paths";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
+import { registerScreenShareHandler } from "./screenShare";
 import { Settings } from "./settings";
 
 if (IS_DEV) {
@@ -51,6 +52,7 @@ function init() {
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
         else if (process.platform === "darwin") app.dock.setIcon(ICON_PATH);
 
+        registerScreenShareHandler();
         bootstrap();
 
         app.on("activate", () => {

@@ -12,3 +12,7 @@ export const isFirstRun = (() => {
     localStorage.setItem(key, "false");
     return true;
 })();
+
+const { platform } = navigator;
+
+export const isWindows = platform.startsWith("Win");
