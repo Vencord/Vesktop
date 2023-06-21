@@ -22,6 +22,9 @@
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch"
     },
+    "dependencies": {
+        "arrpc": "^3.1.0"
+    },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^18.15.11",
@@ -105,8 +108,5 @@
             "provider": "github",
             "releaseType": "release"
         }
-    },
-    "dependencies": {
-        "arrpc": "^3.1.0"
     }
 }
