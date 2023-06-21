@@ -8,7 +8,13 @@ import { app } from "electron";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
 
-function makeAutoStartLinux() {
+interface AutoStart {
+    isEnabled(): boolean;
+    enable(): void;
+    disable(): void;
+}
+
+function makeAutoStartLinux(): AutoStart {
     const dir = join(process.env.HOME!, ".config", "autostart");
     const file = join(dir, "vencord.desktop");
 
@@ -33,7 +39,7 @@ StartupNotify=false
     };
 }
 
-const autoStartWindowsMac = {
+const autoStartWindowsMac: AutoStart = {
     isEnabled: () => app.getLoginItemSettings().openAtLogin,
     enable: () => app.setLoginItemSettings({ openAtLogin: true }),
     disable: () => app.setLoginItemSettings({ openAtLogin: false })
