@@ -4,9 +4,22 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { desktopCapturer, session } from "electron";
+import { desktopCapturer, ipcMain, session, Streams } from "electron";
+import type { StreamPick } from "renderer/components/ScreenSharePicker";
+import { IpcEvents } from "shared/IpcEvents";
 
 export function registerScreenShareHandler() {
+    ipcMain.handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
+        const sources = await desktopCapturer.getSources({
+            types: ["window", "screen"],
+            thumbnailSize: {
+                width: 1920,
+                height: 1080
+            }
+        });
+        return sources.find(s => s.id === id)?.thumbnail.toDataURL();
+    });
+
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
         const sources = await desktopCapturer.getSources({
             types: ["window", "screen"],
@@ -24,17 +37,19 @@ export function registerScreenShareHandler() {
 
         const choice = await request.frame
             .executeJavaScript(`VencordDesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
-            .catch(() => "cancelled");
+            .then(e => e as StreamPick)
+            .catch(() => null);
 
-        if (choice === "cancelled") {
-            callback({});
-            return;
-        }
+        if (!choice) return callback({});
 
-        const source = sources.find(s => s.id === choice);
-        callback({
-            video: source,
-            audio: "loopback"
-        });
+        const source = sources.find(s => s.id === choice.id);
+        if (!source) return callback({});
+
+        const streams: Streams = {
+            video: source
+        };
+        if (choice.audio) streams.audio = "loopback";
+
+        callback(streams);
     });
 }

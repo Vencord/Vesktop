@@ -6,9 +6,9 @@
 
 import "./screenSharePicker.css";
 
-import { Modals, openModal } from "@vencord/types/utils";
+import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
 import { Button, Card, Forms, Switch, Text, useState } from "@vencord/types/webpack/common";
-import { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 const StreamResolutions = ["720", "1080", "1440", "Source"] as const;
 const StreamFps = ["15", "30", "60"] as const;
@@ -22,6 +22,10 @@ interface StreamSettings {
     audio: boolean;
 }
 
+export interface StreamPick extends StreamSettings {
+    id: string;
+}
+
 interface Source {
     id: string;
     name: string;
@@ -29,18 +33,26 @@ interface Source {
 }
 
 export function openScreenSharePicker(screens: Source[]) {
-    return new Promise<string>((resolve, reject) => {
-        openModal(props => (
-            <ModalComponent
-                screens={screens}
-                modalProps={props}
-                submit={resolve}
-                close={() => {
-                    props.onClose();
-                    reject(new Error("Aborted"));
-                }}
-            />
-        ));
+    return new Promise<StreamPick>((resolve, reject) => {
+        const key = openModal(
+            props => (
+                <ModalComponent
+                    screens={screens}
+                    modalProps={props}
+                    submit={resolve}
+                    close={() => {
+                        props.onClose();
+                        reject("Aborted");
+                    }}
+                />
+            ),
+            {
+                onCloseRequest() {
+                    closeModal(key);
+                    reject("Aborted");
+                }
+            }
+        );
     });
 }
 
@@ -68,11 +80,16 @@ function StreamSettings({
     settings: StreamSettings;
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
 }) {
+    const [thumb] = useAwaiter(() => VencordDesktopNative.capturer.getLargeThumbnail(source.id), {
+        fallbackValue: source.url,
+        deps: [source.id]
+    });
+
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
             <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
-                <img src={source.url} alt="" />
+                <img src={thumb} alt="" />
                 <Text variant="text-sm/normal">{source.name}</Text>
             </Card>
 
@@ -85,7 +102,7 @@ function StreamSettings({
                         <div className="vcd-screen-picker-radios">
                             {StreamResolutions.map(res => (
                                 <label className="vcd-screen-picker-radio" data-checked={settings.resolution === res}>
-                                    <Forms.FormTitle>{res}</Forms.FormTitle>
+                                    <Text variant="text-sm/bold">{res}</Text>
                                     <input
                                         type="radio"
                                         name="resolution"
@@ -103,7 +120,7 @@ function StreamSettings({
                         <div className="vcd-screen-picker-radios">
                             {StreamFps.map(fps => (
                                 <label className="vcd-screen-picker-radio" data-checked={settings.fps === fps}>
-                                    <Forms.FormTitle>{fps}</Forms.FormTitle>
+                                    <Text variant="text-sm/bold">{fps}</Text>
                                     <input
                                         type="radio"
                                         name="fps"
@@ -138,7 +155,7 @@ function ModalComponent({
 }: {
     screens: Source[];
     modalProps: any;
-    submit: (id: string) => void;
+    submit: (data: StreamPick) => void;
     close: () => void;
 }) {
     const [selected, setSelected] = useState<string>();
@@ -150,8 +167,8 @@ function ModalComponent({
 
     return (
         <Modals.ModalRoot {...modalProps}>
-            <Modals.ModalHeader>
-                <Forms.FormTitle tag="h2">Screen Picker</Forms.FormTitle>
+            <Modals.ModalHeader className="vcd-screen-picker-header">
+                <Forms.FormTitle tag="h2">ScreenShare</Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
 
@@ -167,11 +184,14 @@ function ModalComponent({
                 )}
             </Modals.ModalContent>
 
-            <Modals.ModalFooter>
+            <Modals.ModalFooter className="vcd-screen-picker-footer">
                 <Button
                     disabled={!selected}
                     onClick={() => {
-                        submit(selected!);
+                        submit({
+                            id: selected!,
+                            ...settings
+                        });
                         close();
                     }}
                 >
