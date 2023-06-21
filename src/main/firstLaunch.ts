@@ -6,10 +6,12 @@
 
 import { app } from "electron";
 import { BrowserWindow } from "electron/main";
+import { copyFileSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { STATIC_DIR } from "shared/paths";
 
+import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings } from "./settings";
 
@@ -32,6 +34,21 @@ export function createFirstLaunchTour() {
         Settings.store.minimizeToTray = data.minimizeToTray;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.firstLaunch = false;
+
+        if (data.importSettings) {
+            const from = join(app.getPath("userData"), "..", "Vencord", "settings");
+            const to = join(DATA_DIR, "settings");
+            try {
+                const files = readdirSync(from);
+                mkdirSync(to, { recursive: true });
+
+                for (const file of files) {
+                    copyFileSync(join(from, file), join(to, file));
+                }
+            } catch (e) {
+                console.error("Failed to import settings:", e);
+            }
+        }
 
         win.close();
 
