@@ -1,6 +1,6 @@
 {
     "name": "VencordDesktop",
-    "version": "0.1.8",
+    "version": "0.2.1",
     "private": true,
     "description": "",
     "keywords": [],
@@ -22,11 +22,16 @@
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch"
     },
+    "dependencies": {
+        "arrpc": "^3.1.0"
+    },
     "devDependencies": {
+        "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^18.15.11",
         "@types/react": "^18.0.33",
         "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "^5.57.1",
+        "@vencord/types": "^0.1.2",
         "dotenv": "^16.0.3",
         "electron": "^23.2.0",
         "electron-builder": "^23.6.0",
@@ -78,11 +83,30 @@
             }
         },
         "mac": {
+            "target": [
+                {
+                    "target": "default",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
+            ],
             "category": "Network"
         },
         "nsis": {
             "include": "build/installer.nsh",
             "oneClick": false
+        },
+        "win": {
+            "target": [
+                "nsis",
+                "portable"
+            ]
+        },
+        "publish": {
+            "provider": "github",
+            "releaseType": "release"
         }
     }
 }

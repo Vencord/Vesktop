@@ -6,6 +6,8 @@
 
 import { BuildContext, BuildOptions, context } from "esbuild";
 
+import vencordDep from "./vencordDep.mjs";
+
 const isDev = process.argv.includes("--dev");
 
 const CommonOpts: BuildOptions = {
@@ -35,17 +37,20 @@ await Promise.all([
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
-        outfile: "dist/js/main.js"
+        outfile: "dist/js/main.js",
+        footer: { js: "//# sourceURL=VCDMain" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
-        outfile: "dist/js/preload.js"
+        outfile: "dist/js/preload.js",
+        footer: { js: "//# sourceURL=VCDPreload" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/updater/preload.ts"],
-        outfile: "dist/js/updaterPreload.js"
+        outfile: "dist/js/updaterPreload.js",
+        footer: { js: "//# sourceURL=VCDUpdaterPreload" }
     }),
     createContext({
         ...CommonOpts,
@@ -57,7 +62,10 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         // Work around https://github.com/evanw/esbuild/issues/2460
-        tsconfig: "./scripts/build/tsconfig.esbuild.json"
+        tsconfig: "./scripts/build/tsconfig.esbuild.json",
+        external: ["@vencord/types/*"],
+        plugins: [vencordDep],
+        footer: { js: "//# sourceURL=VCDRenderer" }
     })
 ]);
 

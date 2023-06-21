@@ -22,11 +22,18 @@ let updateData: UpdateData;
 
 ipcMain.handle(IpcEvents.UPDATER_GET_DATA, () => updateData);
 ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
+    const portable = !!process.env.PORTABLE_EXECUTABLE_FILE;
+
     const { assets } = updateData.release;
     const url = (() => {
         switch (process.platform) {
             case "win32":
-                return assets.find(a => a.name.endsWith(".exe"))!.browser_download_url;
+                return assets.find(a => {
+                    if (!a.name.endsWith(".exe")) return false;
+
+                    const isSetup = a.name.includes("Setup");
+                    return portable ? !isSetup : isSetup;
+                })!.browser_download_url;
             case "darwin":
                 return assets.find(a => a.name.endsWith(".dmg"))!.browser_download_url;
             case "linux":

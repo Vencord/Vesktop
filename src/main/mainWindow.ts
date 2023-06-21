@@ -6,13 +6,16 @@
 
 import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
 import { join } from "path";
+import { once } from "shared/utils/once";
 
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
+import { initArRPC } from "./arrpc";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
 import { Settings, VencordSettings } from "./settings";
+import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
-import { downloadVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 let tray: Tray;
@@ -88,7 +91,6 @@ function initMenuBar(win: BrowserWindow) {
             submenu: [
                 {
                     label: "About Vencord Desktop",
-                    role: "about",
                     click: createAboutWindow
                 },
                 {
@@ -125,25 +127,20 @@ function initMenuBar(win: BrowserWindow) {
                     click() {
                         app.quit();
                     }
+                },
+                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+                {
+                    label: "Zoom in (hidden, hack for Qwertz and others)",
+                    accelerator: "CmdOrCtrl+=",
+                    role: "zoomIn",
+                    visible: false
                 }
             ]
         },
         { role: "fileMenu" },
         { role: "editMenu" },
         { role: "viewMenu" },
-        { role: "windowMenu" },
-        {
-            label: "Zoom",
-            submenu: [
-                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-                {
-                    label: "Zoom in",
-                    accelerator: "CmdOrCtrl+=",
-                    role: "zoomIn"
-                }
-            ],
-            visible: false
-        }
+        { role: "windowMenu" }
     ]);
 
     Menu.setApplicationMenu(menu);
@@ -219,7 +216,7 @@ function initSettingsListeners(win: BrowserWindow) {
     });
 }
 
-export function createMainWindow() {
+function createMainWindow() {
     const win = (mainWin = new BrowserWindow({
         show: false,
         autoHideMenuBar: true,
@@ -232,6 +229,7 @@ export function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency
             ? {
                   vibrancy: "sidebar",
@@ -249,6 +247,8 @@ export function createMainWindow() {
 
         return false;
     });
+
+    if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
     if (Settings.store.tray ?? true) initTray(win);
@@ -268,4 +268,26 @@ export function createMainWindow() {
     win.loadURL(`https://${subdomain}discord.com/app`);
 
     return win;
+}
+
+const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export async function createWindows() {
+    const splash = createSplashWindow();
+
+    await ensureVencordFiles();
+    runVencordMain();
+
+    mainWin = createMainWindow();
+
+    mainWin.once("ready-to-show", () => {
+        splash.destroy();
+        mainWin!.show();
+
+        if (Settings.store.maximized) {
+            mainWin!.maximize();
+        }
+    });
+
+    initArRPC();
 }

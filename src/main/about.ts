@@ -4,7 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { BrowserWindow } from "electron";
+import { app, BrowserWindow } from "electron";
+import { readFileSync } from "fs";
 import { join } from "path";
 import { ICON_PATH, STATIC_DIR } from "shared/paths";
 
@@ -19,7 +20,9 @@ export function createAboutWindow() {
 
     makeLinksOpenExternally(about);
 
-    about.loadFile(join(STATIC_DIR, "about.html"));
+    const html = readFileSync(join(STATIC_DIR, "about.html"), "utf-8").replaceAll("%VERSION%", app.getVersion());
+
+    about.loadURL("data:text/html;charset=utf-8," + html);
 
     return about;
 }

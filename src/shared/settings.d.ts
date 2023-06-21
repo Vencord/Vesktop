@@ -17,4 +17,8 @@ export interface Settings {
     tray?: boolean;
     minimizeToTray?: boolean;
     skippedUpdate?: string;
+    staticTitle?: boolean;
+    arRPC?: boolean;
+
+    firstLaunch?: boolean;
 }

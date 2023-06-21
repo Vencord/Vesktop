@@ -10,7 +10,12 @@
         "target": "ESNEXT",
         "jsx": "preserve",
 
-        "baseUrl": "./src/"
+        // we have duplicate electron types but it's w/e
+        "skipLibCheck": true,
+
+        "baseUrl": "./src/",
+
+        "typeRoots": ["./node_modules/@types", "./node_modules/@vencord"]
     },
     "include": ["src/**/*"]
 }
