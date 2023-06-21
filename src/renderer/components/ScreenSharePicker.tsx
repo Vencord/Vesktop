@@ -10,6 +10,7 @@ import { classes, closeModal, Margins, Modals, openModal, useAwaiter } from "@ve
 import { findByPropsLazy } from "@vencord/types/webpack";
 import { Button, Card, Forms, Switch, Text, useState } from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
+import { isWindows } from "renderer/utils";
 
 const StreamResolutions = ["720", "1080", "1440", "Source"] as const;
 const StreamFps = ["15", "30", "60"] as const;
@@ -143,14 +144,16 @@ function StreamSettings({
                     </section>
                 </div>
 
-                <Switch
-                    value={settings.audio}
-                    onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
-                    hideBorder
-                    className="vcd-screen-picker-audio"
-                >
-                    Stream With Audio
-                </Switch>
+                {isWindows && (
+                    <Switch
+                        value={settings.audio}
+                        onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
+                        hideBorder
+                        className="vcd-screen-picker-audio"
+                    >
+                        Stream With Audio
+                    </Switch>
+                )}
             </Card>
         </div>
     );
