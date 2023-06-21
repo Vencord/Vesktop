@@ -11,16 +11,24 @@ import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { STATIC_DIR } from "shared/paths";
 
+import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings } from "./settings";
+
+interface Data {
+    minimizeToTray: boolean;
+    discordBranch: "stable" | "canary" | "ptb";
+    autoStart: boolean;
+    importSettings: boolean;
+}
 
 export function createFirstLaunchTour() {
     const win = new BrowserWindow({
         ...SplashProps,
         frame: true,
         autoHideMenuBar: true,
-        height: 320,
+        height: 420,
         width: 550
     });
 
@@ -29,11 +37,13 @@ export function createFirstLaunchTour() {
         if (msg === "cancel") return app.exit();
 
         if (!msg.startsWith("form:")) return;
-        const data = JSON.parse(msg.slice(5));
+        const data = JSON.parse(msg.slice(5)) as Data;
 
         Settings.store.minimizeToTray = data.minimizeToTray;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.firstLaunch = false;
+
+        if (data.autoStart) autoStart.enable();
 
         if (data.importSettings) {
             const from = join(app.getPath("userData"), "..", "Vencord", "settings");
