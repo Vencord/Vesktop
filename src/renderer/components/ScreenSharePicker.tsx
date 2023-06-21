@@ -6,12 +6,15 @@
 
 import "./screenSharePicker.css";
 
-import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
+import { classes, closeModal, Margins, Modals, openModal, useAwaiter } from "@vencord/types/utils";
+import { findByPropsLazy } from "@vencord/types/webpack";
 import { Button, Card, Forms, Switch, Text, useState } from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
 
 const StreamResolutions = ["720", "1080", "1440", "Source"] as const;
 const StreamFps = ["15", "30", "60"] as const;
+
+const WarningIconClasses = findByPropsLazy("warning", "error", "container");
 
 export type StreamResolution = (typeof StreamResolutions)[number];
 export type StreamFps = (typeof StreamFps)[number];
@@ -96,6 +99,12 @@ function StreamSettings({
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
 
             <Card className="vcd-screen-picker-card">
+                <Card className={classes(WarningIconClasses.container, WarningIconClasses.warning, Margins.bottom8)}>
+                    <Forms.FormText>
+                        Resolution and Frame Rate aren't implemented for now. Locked to 720p 30fps
+                    </Forms.FormText>
+                </Card>
+
                 <div className="vcd-screen-picker-quality">
                     <section>
                         <Forms.FormTitle>Resolution</Forms.FormTitle>
