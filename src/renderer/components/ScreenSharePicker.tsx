@@ -59,12 +59,12 @@ export function openScreenSharePicker(screens: Source[]) {
     });
 }
 
-function ScreenPicker({ screens, onPick }: { screens: Source[]; onPick: (id: string) => void; }) {
+function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (id: string) => void }) {
     return (
         <div className="vcd-screen-picker-grid">
             {screens.map(({ id, name, url }) => (
                 <label key={id}>
-                    <input type="radio" name="screen" value={id} onChange={() => onPick(id)} />
+                    <input type="radio" name="screen" value={id} onChange={() => chooseScreen(id)} />
 
                     <img src={url} alt="" />
                     <Text variant="text-sm/normal">{name}</Text>
@@ -183,7 +183,7 @@ function ModalComponent({
 
             <Modals.ModalContent className="vcd-screen-picker-modal">
                 {!selected ? (
-                    <ScreenPicker screens={screens} onPick={setSelected} />
+                    <ScreenPicker screens={screens} chooseScreen={setSelected} />
                 ) : (
                     <StreamSettings
                         source={screens.find(s => s.id === selected)!}
