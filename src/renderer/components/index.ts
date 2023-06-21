@@ -4,4 +4,5 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+export * as ScreenShare from "./ScreenSharePicker";
 export { default as Settings } from "./Settings";

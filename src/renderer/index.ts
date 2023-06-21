@@ -5,7 +5,6 @@
  */
 
 import "./fixes";
-import "./screenshare";
 
 console.log("read if cute :3");
 
