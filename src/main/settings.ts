@@ -4,8 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
+import { dirname, join } from "path";
 import type { Settings as TSettings } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
@@ -25,7 +25,10 @@ function loadSettings<T extends object = any>(file: string, name: string) {
     } catch {}
 
     const store = new SettingsStore(settings);
-    store.addGlobalChangeListener(o => writeFileSync(file, JSON.stringify(o, null, 4)));
+    store.addGlobalChangeListener(o => {
+        mkdirSync(dirname(file), { recursive: true });
+        writeFileSync(file, JSON.stringify(o, null, 4));
+    });
 
     return store;
 }
