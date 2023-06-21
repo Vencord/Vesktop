@@ -7,11 +7,14 @@
 import "./settings.css";
 
 import { Margins } from "@vencord/types/utils";
-import { Button, Forms, Select, Switch, Text } from "@vencord/types/webpack/common";
+import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
 import { useSettings } from "renderer/settings";
 
 export default function SettingsUi() {
     const Settings = useSettings();
+
+    const { autostart } = VencordDesktopNative;
+    const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
         ["tray", "Tray Icon", "Add a tray icon for Vencord Desktop", true],
@@ -57,6 +60,17 @@ export default function SettingsUi() {
             />
 
             <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+
+            <Switch
+                value={autoStartEnabled}
+                onChange={async v => {
+                    await autostart[v ? "enable" : "disable"]();
+                    setAutoStartEnabled(v);
+                }}
+                note="Automatically start Vencord Desktop on computer start-up"
+            >
+                Start With System
+            </Switch>
 
             {switches.map(([key, text, note, def, predicate]) => (
                 <Switch

@@ -11,6 +11,7 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
+import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
@@ -38,6 +39,12 @@ ipcMain.on(IpcEvents.GET_SETTINGS, e => {
 ipcMain.on(IpcEvents.GET_VERSION, e => {
     e.returnValue = app.getVersion();
 });
+
+ipcMain.on(IpcEvents.AUTOSTART_ENABLED, e => {
+    e.returnValue = autoStart.isEnabled();
+});
+ipcMain.handle(IpcEvents.ENABLE_AUTOSTART, autoStart.enable);
+ipcMain.handle(IpcEvents.DISABLE_AUTOSTART, autoStart.disable);
 
 ipcMain.handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: string) => {
     Settings.setData(settings, path);

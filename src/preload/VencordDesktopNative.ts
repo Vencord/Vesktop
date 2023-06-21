@@ -15,6 +15,11 @@ export const VencordDesktopNative = {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION)
     },
+    autostart: {
+        isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
+        enable: () => invoke<void>(IpcEvents.ENABLE_AUTOSTART),
+        disable: () => invoke<void>(IpcEvents.DISABLE_AUTOSTART)
+    },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
         selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
