@@ -5,7 +5,6 @@ Vencord Desktop is a cross platform desktop app aiming to give you a snappier Di
 Vencord Desktop is currently in beta
 
 **Not yet supported**:
-- Screensharing
 - Global Keybinds
 
 Bug reports, feature requests & contributions are highly appreciated!!
