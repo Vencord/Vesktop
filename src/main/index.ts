@@ -72,7 +72,7 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
 }
 
 async function bootstrap() {
-    if (!Object.hasOwn(Settings.store, "firstLaunch") || true) {
+    if (!Object.hasOwn(Settings.store, "firstLaunch")) {
         createFirstLaunchTour();
     } else {
         createWindows();
