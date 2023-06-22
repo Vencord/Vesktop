@@ -21,6 +21,7 @@ interface Data {
     discordBranch: "stable" | "canary" | "ptb";
     autoStart: boolean;
     importSettings: boolean;
+    richPresence: boolean;
 }
 
 export function createFirstLaunchTour() {
@@ -28,7 +29,7 @@ export function createFirstLaunchTour() {
         ...SplashProps,
         frame: true,
         autoHideMenuBar: true,
-        height: 420,
+        height: 470,
         width: 550
     });
 
@@ -42,6 +43,7 @@ export function createFirstLaunchTour() {
         Settings.store.minimizeToTray = data.minimizeToTray;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.firstLaunch = false;
+        Settings.store.arRPC = data.richPresence;
 
         if (data.autoStart) autoStart.enable();
 
