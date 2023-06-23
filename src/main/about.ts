@@ -7,7 +7,7 @@
 import { app, BrowserWindow } from "electron";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { ICON_PATH, STATIC_DIR } from "shared/paths";
+import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
@@ -20,7 +20,7 @@ export function createAboutWindow() {
 
     makeLinksOpenExternally(about);
 
-    const html = readFileSync(join(STATIC_DIR, "about.html"), "utf-8").replaceAll("%VERSION%", app.getVersion());
+    const html = readFileSync(join(VIEW_DIR, "about.html"), "utf-8").replaceAll("%VERSION%", app.getVersion());
 
     about.loadURL("data:text/html;charset=utf-8," + html);
 

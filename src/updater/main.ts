@@ -10,7 +10,7 @@ import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { IpcEvents } from "shared/IpcEvents";
-import { STATIC_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 export interface UpdateData {
     currentVersion: string;
@@ -101,5 +101,5 @@ function openNewUpdateWindow() {
         }
     });
 
-    win.loadFile(join(STATIC_DIR, "updater.html"));
+    win.loadFile(join(VIEW_DIR, "updater.html"));
 }

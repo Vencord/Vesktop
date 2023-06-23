@@ -9,7 +9,7 @@ import { BrowserWindow } from "electron/main";
 import { copyFileSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { STATIC_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
@@ -33,7 +33,7 @@ export function createFirstLaunchTour() {
         width: 550
     });
 
-    win.loadFile(join(STATIC_DIR, "first-launch.html"));
+    win.loadFile(join(VIEW_DIR, "first-launch.html"));
     win.webContents.addListener("console-message", (_e, _l, msg) => {
         if (msg === "cancel") return app.exit();
 

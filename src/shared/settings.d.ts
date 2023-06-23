@@ -19,6 +19,7 @@ export interface Settings {
     skippedUpdate?: string;
     staticTitle?: boolean;
     arRPC?: boolean;
+    appBadge?: boolean;
 
     firstLaunch?: boolean;
 }

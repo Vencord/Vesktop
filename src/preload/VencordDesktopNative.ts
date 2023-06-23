@@ -13,7 +13,8 @@ import { invoke, sendSync } from "./typedIpcs";
 export const VencordDesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
-        getVersion: () => sendSync<void>(IpcEvents.GET_VERSION)
+        getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
+        setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count)
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),

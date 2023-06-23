@@ -11,6 +11,7 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
+import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE } from "./constants";
 import { mainWin } from "./mainWindow";
@@ -88,6 +89,8 @@ ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 
     return dir;
 });
+
+ipcMain.handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");

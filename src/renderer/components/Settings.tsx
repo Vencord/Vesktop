@@ -8,6 +8,7 @@ import "./settings.css";
 
 import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
+import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
 
 export default function SettingsUi() {
@@ -70,6 +71,18 @@ export default function SettingsUi() {
                 note="Automatically start Vencord Desktop on computer start-up"
             >
                 Start With System
+            </Switch>
+
+            <Switch
+                value={Settings.appBadge ?? true}
+                onChange={v => {
+                    Settings.appBadge = v;
+                    if (v) setBadge();
+                    else VencordDesktopNative.app.setBadgeCount(0);
+                }}
+                note="Show mention badge on the app icon"
+            >
+                Notification Badge
             </Switch>
 
             {switches.map(([key, text, note, def, predicate]) => (
