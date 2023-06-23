@@ -17,7 +17,7 @@ export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json")
 export const VENCORD_FILES_DIR =
     (require("./settings") as typeof import("./settings")).Settings.store.vencordDir || join(DATA_DIR, "vencordDist");
 
-export const USER_AGENT = `VencordDesktop/${app.getVersion()} (https://github.com/Vencord/Electron)`;
+export const USER_AGENT = `VencordDesktop/${app.getVersion()} (https://github.com/Vencord/Desktop)`;
 
 // dimensions shamelessly stolen from Discord Desktop :3
 export const MIN_WIDTH = 940;
