@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 dependencies:
   arrpc:
-    specifier: ^3.1.0
-    version: 3.1.0
+    specifier: github:OpenAsar/arrpc#3eb5d36a5e9295d3aeafc49975df5d399eb627fd
+    version: github.com/OpenAsar/arrpc/3eb5d36a5e9295d3aeafc49975df5d399eb627fd
 
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
@@ -889,15 +889,6 @@ packages:
       es-abstract: 1.21.2
       es-shim-unscopables: 1.0.0
     dev: true
-
-  /arrpc@3.1.0:
-    resolution: {integrity: sha512-QKagtB5fUDqDXT31tTUzcG3+rFxsMlrjKb3iE68/b2NbT1c6+0WYkkrJh4GaVPqH0Tlqy13sEgPW3XJ/VNmBDQ==}
-    dependencies:
-      ws: 8.13.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
 
   /asar@3.2.0:
     resolution: {integrity: sha512-COdw2ZQvKdFGFxXwX3oYh2/sOsJWJegrdJCGxnN4MZ7IULgRBp9P6665aqj9z1v9VwP4oP1hRBojRDQ//IGgAg==}
@@ -3852,3 +3843,14 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  github.com/OpenAsar/arrpc/3eb5d36a5e9295d3aeafc49975df5d399eb627fd:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/3eb5d36a5e9295d3aeafc49975df5d399eb627fd}
+    name: arrpc
+    version: 3.1.0
+    dependencies:
+      ws: 8.13.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
