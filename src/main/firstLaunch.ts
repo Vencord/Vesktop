@@ -15,6 +15,7 @@ import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings } from "./settings";
+import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
 interface Data {
     minimizeToTray: boolean;
@@ -32,6 +33,8 @@ export function createFirstLaunchTour() {
         height: 470,
         width: 550
     });
+
+    makeLinksOpenExternally(win);
 
     win.loadFile(join(VIEW_DIR, "first-launch.html"));
     win.webContents.addListener("console-message", (_e, _l, msg) => {

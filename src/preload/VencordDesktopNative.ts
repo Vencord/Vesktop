@@ -9,7 +9,7 @@ import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
 
 import { IpcEvents } from "../shared/IpcEvents";
-import { invoke, sendSync } from "./typedIpcs";
+import { invoke, sendSync } from "./typedIpc";
 
 type SpellCheckerResultCallback = (word: string, suggestions: string[]) => void;
 

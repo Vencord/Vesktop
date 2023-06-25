@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-export const localStorage = (window.vcdLS = window.localStorage);
+export const { localStorage } = window;
 
 export const isFirstRun = (() => {
     const key = "VCD_FIRST_RUN";

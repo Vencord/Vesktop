@@ -23,7 +23,7 @@ export function addPatch<P extends PatchData>(p: P) {
         }
 
         patch.plugin = "VencordDesktop";
-        Vencord.Plugins.patches.push(patch as Patch);
+        Vencord.Plugins.patches.push(patch);
     }
 
     Object.assign(VCDP, globals);

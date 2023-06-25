@@ -22,11 +22,11 @@ Object.defineProperty(Notification.prototype, "onclick", {
     configurable: true
 });
 
-// Enable Desktop Notifications by default
 if (isFirstRun) {
     // Hide "Download Discord Desktop now!!!!" banner
     localStorage.setItem("hideNag", "true");
 
+    // Enable Desktop Notifications by default
     waitFor("setDesktopType", m => {
         m.setDesktopType("all");
     });

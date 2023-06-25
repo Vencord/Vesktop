@@ -24,8 +24,6 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    // <-- BEGIN COPY PASTED FROM DISCORD -->
-
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -37,8 +35,6 @@ function init() {
         "disable-features",
         "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering"
     );
-
-    // <-- END COPY PASTED FROM DISCORD -->
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();

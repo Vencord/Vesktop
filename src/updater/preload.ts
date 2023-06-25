@@ -5,7 +5,7 @@
  */
 
 import { contextBridge } from "electron";
-import { invoke } from "preload/typedIpcs";
+import { invoke } from "preload/typedIpc";
 import { IpcEvents } from "shared/IpcEvents";
 
 import type { UpdateData } from "./main";
