@@ -1,22 +1,13 @@
 <head>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-                "Open Sans", "Helvetica Neue", sans-serif;
-            margin: 0;
-            padding: 0;
-            color: rgb(219, 222, 225);
-        }
+    <link rel="stylesheet" href="./style.css" type="text/css" />
 
+    <style>
         .wrapper {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
-            height: 100%;
-            background-color: #313338;
-            border-radius: 8px;
-            border: 1px solid #248046;
+            min-height: 100%;
             padding: 1em;
         }
 
@@ -34,7 +25,7 @@
         button {
             cursor: pointer;
             padding: 0.5em;
-            color: white;
+            color: var(--fg);
             border: none;
             border-radius: 3px;
             font-weight: bold;
@@ -66,6 +57,9 @@
                 <br />
                 Latest: <span id="latest"></span>
             </p>
+
+            <h2>Changelog</h2>
+            <p id="changelog">Loading...</p>
         </section>
 
         <section>
@@ -112,4 +106,18 @@
             button.addEventListener("click", onClicks[name]);
         });
     }
+</script>
+
+<script type="module">
+    import { micromark } from "https://esm.sh/micromark@3?bundle";
+    import { gfm, gfmHtml } from "https://esm.sh/micromark-extension-gfm@2?bundle";
+
+    const changelog = (await Updater.getData()).release.body;
+    if (changelog)
+        document.getElementById("changelog").innerHTML = micromark(changelog, {
+            extensions: [gfm()],
+            htmlExtensions: [gfmHtml()]
+        })
+            .replace(/h1>/g, "h3>")
+            .replace(/<a /g, '<a target="_blank" ');
 </script>

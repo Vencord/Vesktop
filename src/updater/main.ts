@@ -6,9 +6,9 @@
 
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { Settings } from "main/settings";
+import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
-import { SplashProps } from "shared/browserWinProperties";
 import { IpcEvents } from "shared/IpcEvents";
 import { VIEW_DIR } from "shared/paths";
 
@@ -79,13 +79,13 @@ export async function checkUpdates() {
 
         const oldVersion = app.getVersion();
         const newVersion = data.tag_name.replace(/^v/, "");
-        if (Settings.store.skippedUpdate !== newVersion && isOutdated(oldVersion, newVersion)) {
-            updateData = {
-                currentVersion: oldVersion,
-                latestVersion: newVersion,
-                release: data
-            };
+        updateData = {
+            currentVersion: oldVersion,
+            latestVersion: newVersion,
+            release: data
+        };
 
+        if (Settings.store.skippedUpdate !== newVersion && isOutdated(oldVersion, newVersion)) {
             openNewUpdateWindow();
         }
     } catch (e) {
@@ -95,11 +95,18 @@ export async function checkUpdates() {
 
 function openNewUpdateWindow() {
     const win = new BrowserWindow({
-        ...SplashProps,
+        width: 500,
+        autoHideMenuBar: true,
+        alwaysOnTop: true,
         webPreferences: {
-            preload: join(__dirname, "updaterPreload.js")
+            preload: join(__dirname, "updaterPreload.js"),
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: true
         }
     });
+
+    makeLinksOpenExternally(win);
 
     win.loadFile(join(VIEW_DIR, "updater.html"));
 }
