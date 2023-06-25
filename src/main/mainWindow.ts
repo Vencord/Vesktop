@@ -8,6 +8,7 @@ import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from 
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { once } from "shared/utils/once";
+import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
@@ -26,6 +27,27 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
+
+function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
+    const listeners = new Map<(data: any) => void, PropertyKey>();
+
+    const addListener: typeof o.addChangeListener = (path, cb) => {
+        listeners.set(cb, path);
+        o.addChangeListener(path, cb);
+    };
+    const removeListener = () => {
+        for (const [listener, path] of listeners) {
+            o.removeChangeListener(path as any, listener);
+        }
+
+        listeners.clear();
+    };
+
+    return [addListener, removeListener] as const;
+}
+
+const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
+const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
 function initTray(win: BrowserWindow) {
     const trayMenu = Menu.buildFromTemplate([
@@ -187,11 +209,11 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 }
 
 function initSettingsListeners(win: BrowserWindow) {
-    Settings.addChangeListener("tray", enable => {
+    addSettingsListener("tray", enable => {
         if (enable) initTray(win);
         else tray?.destroy();
     });
-    Settings.addChangeListener("disableMinSize", disable => {
+    addSettingsListener("disableMinSize", disable => {
         if (disable) {
             // 0 no work
             win.setMinimumSize(1, 1);
@@ -206,7 +228,7 @@ function initSettingsListeners(win: BrowserWindow) {
         }
     });
 
-    VencordSettings.addChangeListener("macosTranslucency", enabled => {
+    addVencordSettingsListener("macosTranslucency", enabled => {
         if (enabled) {
             win.setVibrancy("sidebar");
             win.setBackgroundColor("#ffffff00");
@@ -224,6 +246,10 @@ function initSpellCheck(win: BrowserWindow) {
 }
 
 function createMainWindow() {
+    // Clear up previous settings listeners
+    removeSettingsListeners();
+    removeVencordSettingsListeners();
+
     const win = (mainWin = new BrowserWindow({
         show: false,
         autoHideMenuBar: true,

@@ -5,12 +5,15 @@
  */
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
-import { Menu } from "@vencord/types/webpack/common";
+import { findStoreLazy } from "@vencord/types/webpack";
+import { ContextMenu, FluxDispatcher, Menu } from "@vencord/types/webpack/common";
 
 import { addPatch } from "./shared";
 
 let word: string;
 let corrections: string[];
+
+const SpellCheckStore = findStoreLazy("SpellcheckStore");
 
 // Make spellcheck suggestions work
 addPatch({
@@ -38,22 +41,36 @@ addPatch({
 });
 
 addContextMenuPatch("textarea-context", children => () => {
-    if (!word || !corrections?.length) return;
+    const hasCorrections = Boolean(word && corrections?.length);
 
     children.push(
         <Menu.MenuGroup>
-            {corrections.map(c => (
-                <Menu.MenuItem
-                    id={"vcd-spellcheck-suggestion-" + c}
-                    label={c}
-                    action={() => VencordDesktopNative.spellcheck.replaceMisspelling(c)}
-                />
-            ))}
-            <Menu.MenuSeparator />
-            <Menu.MenuItem
-                id="vcd-spellcheck-learn"
-                label={`Add ${word} to dictionary`}
-                action={() => VencordDesktopNative.spellcheck.addToDictionary(word)}
+            {hasCorrections && (
+                <>
+                    {corrections.map(c => (
+                        <Menu.MenuItem
+                            id={"vcd-spellcheck-suggestion-" + c}
+                            label={c}
+                            action={() => VencordDesktopNative.spellcheck.replaceMisspelling(c)}
+                        />
+                    ))}
+                    <Menu.MenuSeparator />
+                    <Menu.MenuItem
+                        id="vcd-spellcheck-learn"
+                        label={`Add ${word} to dictionary`}
+                        action={() => VencordDesktopNative.spellcheck.addToDictionary(word)}
+                    />
+                </>
+            )}
+            <Menu.MenuCheckboxItem
+                id="vcd-spellcheck-enabled"
+                label="Enable Spellcheck"
+                checked={SpellCheckStore.isEnabled()}
+                action={() => {
+                    FluxDispatcher.dispatch({ type: "SPELLCHECK_TOGGLE" });
+                    // Haven't found a good way to update state, so just close for now 🤷‍♀️
+                    ContextMenu.close();
+                }}
             />
         </Menu.MenuGroup>
     );
