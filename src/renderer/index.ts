@@ -6,6 +6,7 @@
 
 import "./fixes";
 import "./appBadge";
+import "./patches";
 
 console.log("read if cute :3");
 

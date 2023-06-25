@@ -6,6 +6,7 @@
 
 import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
 import { join } from "path";
+import { IpcEvents } from "shared/IpcEvents";
 import { once } from "shared/utils/once";
 
 import { ICON_PATH } from "../shared/paths";
@@ -216,6 +217,12 @@ function initSettingsListeners(win: BrowserWindow) {
     });
 }
 
+function initSpellCheck(win: BrowserWindow) {
+    win.webContents.on("context-menu", (_, data) => {
+        win.webContents.send(IpcEvents.SPELLCHECK_RESULT, data.misspelledWord, data.dictionarySuggestions);
+    });
+}
+
 function createMainWindow() {
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -225,7 +232,8 @@ function createMainWindow() {
             sandbox: false,
             contextIsolation: true,
             devTools: true,
-            preload: join(__dirname, "preload.js")
+            preload: join(__dirname, "preload.js"),
+            spellcheck: true
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
@@ -255,6 +263,7 @@ function createMainWindow() {
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
+    initSpellCheck(win);
 
     win.webContents.setUserAgent(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"

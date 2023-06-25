@@ -4,11 +4,20 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpcs";
+
+type SpellCheckerResultCallback = (word: string, suggestions: string[]) => void;
+
+const spellCheckCallbacks = new Set<SpellCheckerResultCallback>();
+
+ipcRenderer.on(IpcEvents.SPELLCHECK_RESULT, (_, w: string, s: string[]) => {
+    spellCheckCallbacks.forEach(cb => cb(w, s));
+});
 
 export const VencordDesktopNative = {
     app: {
@@ -30,8 +39,15 @@ export const VencordDesktopNative = {
         set: (settings: Settings, path?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, path)
     },
     spellcheck: {
-        setLanguages: (languages: readonly string[]) => invoke<void>(IpcEvents.SPELLCHECK_SET_LANGUAGES, languages)
-        // todo: perhaps add ways to learn words
+        setLanguages: (languages: readonly string[]) => invoke<void>(IpcEvents.SPELLCHECK_SET_LANGUAGES, languages),
+        onSpellcheckResult(cb: SpellCheckerResultCallback) {
+            spellCheckCallbacks.add(cb);
+        },
+        offSpellcheckResult(cb: SpellCheckerResultCallback) {
+            spellCheckCallbacks.delete(cb);
+        },
+        replaceMisspelling: (word: string) => invoke<void>(IpcEvents.SPELLCHECK_REPLACE_MISSPELLING, word),
+        addToDictionary: (word: string) => invoke<void>(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, word)
     },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS)

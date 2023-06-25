@@ -76,6 +76,14 @@ ipcMain.handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
     if (applicable.length) ses.setSpellCheckerLanguages(applicable);
 });
 
+ipcMain.handle(IpcEvents.SPELLCHECK_REPLACE_MISSPELLING, (e, word: string) => {
+    e.sender.replaceMisspelling(word);
+});
+
+ipcMain.handle(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, (e, word: string) => {
+    e.sender.session.addWordToSpellCheckerDictionary(word);
+});
+
 ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openDirectory"]
