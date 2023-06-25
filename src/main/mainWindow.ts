@@ -35,7 +35,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
         listeners.set(cb, path);
         o.addChangeListener(path, cb);
     };
-    const removeListener = () => {
+    const removeAllListeners = () => {
         for (const [listener, path] of listeners) {
             o.removeChangeListener(path as any, listener);
         }
@@ -43,7 +43,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
         listeners.clear();
     };
 
-    return [addListener, removeListener] as const;
+    return [addListener, removeAllListeners] as const;
 }
 
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
