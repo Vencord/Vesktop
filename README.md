@@ -2,8 +2,6 @@
 
 Vencord Desktop is a cross platform desktop app aiming to give you a snappier Discord experience with Vencord pre-installed
 
-Vencord Desktop is currently in beta
-
 **Not yet supported**:
 - Global Keybinds
 
