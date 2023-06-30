@@ -11,8 +11,29 @@ import "./patches";
 console.log("read if cute :3");
 
 export * as Components from "./components";
+import { findByPropsLazy } from "@vencord/types/webpack";
+import { FluxDispatcher } from "@vencord/types/webpack/common";
+
 import { Settings } from "./settings";
 export { Settings };
+
+const InviteActions = findByPropsLazy("resolveInvite");
+
+export async function openInviteModal(code: string) {
+    const { invite } = await InviteActions.resolveInvite(code, "Desktop Modal");
+    if (!invite) return false;
+
+    VencordDesktopNative.win.focus();
+
+    FluxDispatcher.dispatch({
+        type: "INVITE_MODAL_OPEN",
+        invite,
+        code,
+        context: "APP"
+    });
+
+    return true;
+}
 
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"];
 

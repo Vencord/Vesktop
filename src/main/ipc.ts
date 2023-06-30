@@ -60,8 +60,11 @@ ipcMain.handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
     shell.showItemInFolder(path);
 });
 
-ipcMain.handle(IpcEvents.FOCUS, e => {
-    e.sender.focus();
+ipcMain.handle(IpcEvents.FOCUS, () => {
+    if (process.platform === "win32") mainWin.minimize(); // Windows is weird
+
+    mainWin.restore();
+    mainWin.show();
 });
 
 ipcMain.handle(IpcEvents.CLOSE, e => {
