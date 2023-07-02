@@ -36,7 +36,6 @@ if (isFirstRun) {
 
 // Prevent pressing Alt from opening the menu bar
 document.addEventListener("keyup", e => {
-    console.log(e);
     if (e.key !== "Alt") return;
     if (!Settings.store.disableAltMenu) return;
     e.preventDefault();
