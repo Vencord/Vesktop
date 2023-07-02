@@ -10,6 +10,8 @@ import { waitFor } from "@vencord/types/webpack";
 
 import { isFirstRun, localStorage } from "./utils";
 
+import { Settings } from "./settings";
+
 // Make clicking Notifications focus the window
 const originalSetOnClick = Object.getOwnPropertyDescriptor(Notification.prototype, "onclick")!.set!;
 Object.defineProperty(Notification.prototype, "onclick", {
@@ -31,3 +33,12 @@ if (isFirstRun) {
         m.setDesktopType("all");
     });
 }
+
+// Prevent pressing Alt from opening the menu bar
+document.addEventListener("keyup", e => {
+    console.log(e);
+    if (e.key !== "Alt") return;
+    if (!Settings.store.disableAltMenu) return;
+    e.preventDefault();
+});
+

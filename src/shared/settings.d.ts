@@ -18,6 +18,7 @@ export interface Settings {
     minimizeToTray?: boolean;
     skippedUpdate?: string;
     staticTitle?: boolean;
+    disableAltMenu?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
 
