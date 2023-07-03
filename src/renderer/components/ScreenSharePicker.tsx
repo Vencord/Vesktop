@@ -56,14 +56,16 @@ addPatch({
         const height = Number(currentSettings.resolution);
         const width = Math.round(height * (16 / 9));
 
+        Object.assign(opts, {
+            bitrateMin: 500000,
+            bitrateMax: 8000000,
+            bitrateTarget: 600000
+        });
         Object.assign(opts.capture, {
             framerate,
             width,
             height,
-            pixelCount: height * width,
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
+            pixelCount: height * width
         });
     }
 });
