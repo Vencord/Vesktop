@@ -6,16 +6,17 @@
 
 import "./screenSharePicker.css";
 
-import { classes, closeModal, Margins, Modals, openModal, useAwaiter } from "@vencord/types/utils";
-import { findByPropsLazy } from "@vencord/types/webpack";
+import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
+import { findStoreLazy } from "@vencord/types/webpack";
 import { Button, Card, Forms, Switch, Text, useState } from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
+import { addPatch } from "renderer/patches/shared";
 import { isWindows } from "renderer/utils";
 
-const StreamResolutions = ["720", "1080", "1440", "Source"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440"] as const;
 const StreamFps = ["15", "30", "60"] as const;
 
-const WarningIconClasses = findByPropsLazy("warning", "error", "container");
+const MediaEngineStore = findStoreLazy("MediaEngineStore");
 
 export type StreamResolution = (typeof StreamResolutions)[number];
 export type StreamFps = (typeof StreamFps)[number];
@@ -35,6 +36,37 @@ interface Source {
     name: string;
     url: string;
 }
+
+let currentSettings: StreamSettings | null = null;
+
+addPatch({
+    patches: [
+        {
+            find: "this.localWant=",
+            replacement: {
+                match: /this.localWant=/,
+                replace: "$self.patchStreamQuality(this);$&"
+            }
+        }
+    ],
+    patchStreamQuality(opts: any) {
+        if (!currentSettings) return;
+
+        const framerate = Number(currentSettings.fps);
+        const height = Number(currentSettings.resolution);
+        const width = Math.round(height * (16 / 9));
+
+        Object.assign(opts.capture, {
+            framerate,
+            width,
+            height,
+            pixelCount: height * width,
+            bitrateMin: 500000,
+            bitrateMax: 8000000,
+            bitrateTarget: 600000
+        });
+    }
+});
 
 export function openScreenSharePicker(screens: Source[]) {
     return new Promise<StreamPick>((resolve, reject) => {
@@ -100,12 +132,6 @@ function StreamSettings({
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
 
             <Card className="vcd-screen-picker-card">
-                <Card className={classes(WarningIconClasses.container, WarningIconClasses.warning, Margins.bottom8)}>
-                    <Forms.FormText>
-                        Resolution and Frame Rate aren't implemented for now. Locked to 720p 30fps
-                    </Forms.FormText>
-                </Card>
-
                 <div className="vcd-screen-picker-quality">
                     <section>
                         <Forms.FormTitle>Resolution</Forms.FormTitle>
@@ -200,10 +226,31 @@ function ModalComponent({
                 <Button
                     disabled={!selected}
                     onClick={() => {
+                        currentSettings = settings;
+
+                        // If there are 2 connections, the second one is the existing stream.
+                        // In that case, we patch its quality
+                        const conn = [...MediaEngineStore.getMediaEngine().connections][1];
+                        if (conn && conn.videoStreamParameters.length > 0) {
+                            const height = Number(settings.resolution);
+                            const width = Math.round(height * (16 / 9));
+                            Object.assign(conn.videoStreamParameters[0], {
+                                maxFrameRate: Number(settings.fps),
+                                maxPixelCount: width * height,
+                                maxBitrate: 8000000,
+                                maxResolution: {
+                                    type: "fixed",
+                                    width,
+                                    height
+                                }
+                            });
+                        }
+
                         submit({
                             id: selected!,
                             ...settings
                         });
+
                         close();
                     }}
                 >
