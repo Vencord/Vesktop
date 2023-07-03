@@ -252,7 +252,6 @@ function createMainWindow() {
 
     const win = (mainWin = new BrowserWindow({
         show: false,
-        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             sandbox: false,
@@ -272,6 +271,7 @@ function createMainWindow() {
             : {}),
         ...getWindowBoundsOptions()
     }));
+    win.setMenuBarVisibility(false);
 
     win.on("close", e => {
         if (isQuitting || Settings.store.minimizeToTray === false || Settings.store.tray === false) return;
