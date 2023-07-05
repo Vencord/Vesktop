@@ -10,6 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
+import { isWindows } from "renderer/utils";
 
 export default function SettingsUi() {
     const Settings = useSettings();
@@ -46,7 +47,7 @@ export default function SettingsUi() {
                 Vencord Desktop Settings
             </Text>
 
-            <Forms.FormTitle className={Margins.top16}>Discord Branch</Forms.FormTitle>
+            <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Discord Branch</Forms.FormTitle>
             <Select
                 placeholder="Stable"
                 options={[
@@ -96,6 +97,36 @@ export default function SettingsUi() {
                     {text}
                 </Switch>
             ))}
+
+            {isWindows &&
+                <>
+                    <Switch
+                        value={Settings.transparent ?? false}
+                        onChange={v => (Settings.transparent = v)}
+                        note="Requires a full restart"
+                    >
+                        Enable window transparency
+                    </Switch>
+
+                    <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Transparency Options</Forms.FormTitle>
+
+                    <Select
+                        placeholder="Mica"
+                        options={[
+                            { label: "Mica (incorporates system theme + desktop wallpaper to \"paint\" the background)", value: "mica", default: true },
+                            { label: "Tabbed (variant of Mica with stronger background tinting)", value: "tabbed" },
+                            { label: "Acrylic (blurs the window behind Vencord Desktop for a translucent background)", value: "acrylic" }
+                        ]}
+                        closeOnSelect={true}
+                        select={v => (Settings.transparencyOption = v)}
+                        isSelected={v => v === Settings.transparencyOption}
+                        serialize={s => s}
+                        isDisabled={!Settings.transparent} 
+                    />
+
+                    <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+                </>
+            }
 
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>
