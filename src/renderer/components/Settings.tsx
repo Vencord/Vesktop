@@ -100,25 +100,24 @@ export default function SettingsUi() {
 
             {supportsWindowsTransparency && (
                 <>
-                    <Switch
-                        value={Settings.transparent ?? false}
-                        onChange={v => (Settings.transparent = v)}
-                        note="Requires a full restart"
-                    >
-                        Enable window transparency
-                    </Switch>
-
                     <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>
                         Transparency Options
                     </Forms.FormTitle>
+                    <Forms.FormText className={Margins.bottom8}>
+                        Requires a full restart. You will need a theme that supports transparency for this to work.
+                    </Forms.FormText>
 
                     <Select
-                        placeholder="Mica (incorporates system theme + desktop wallpaper to paint the background)"
+                        placeholder="None"
                         options={[
                             {
-                                label: "Mica (incorporates system theme + desktop wallpaper to paint the background)",
-                                value: "mica",
+                                label: "None",
+                                value: "none",
                                 default: true
+                            },
+                            {
+                                label: "Mica (incorporates system theme + desktop wallpaper to paint the background)",
+                                value: "mica"
                             },
                             { label: "Tabbed (variant of Mica with stronger background tinting)", value: "tabbed" },
                             {
@@ -130,7 +129,6 @@ export default function SettingsUi() {
                         select={v => (Settings.transparencyOption = v)}
                         isSelected={v => v === Settings.transparencyOption}
                         serialize={s => s}
-                        isDisabled={!Settings.transparent}
                     />
 
                     <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
