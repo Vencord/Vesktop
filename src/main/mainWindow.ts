@@ -264,10 +264,10 @@ function createMainWindow() {
         frame: VencordSettings.store.frameless !== true,
         ...(Settings.store.transparent
             ? {
-                backgroundColor: "#00000000",
-                backgroundMaterial: Settings.store.transparencyOption,
-                transparent: true
-            }
+                  backgroundColor: "#00000000",
+                  backgroundMaterial: Settings.store.transparencyOption,
+                  transparent: true
+              }
             : {}),
         ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency

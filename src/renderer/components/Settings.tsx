@@ -98,7 +98,7 @@ export default function SettingsUi() {
                 </Switch>
             ))}
 
-            {supportsWindowsTransparency &&
+            {supportsWindowsTransparency && (
                 <>
                     <Switch
                         value={Settings.transparent ?? false}
@@ -108,14 +108,23 @@ export default function SettingsUi() {
                         Enable window transparency
                     </Switch>
 
-                    <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Transparency Options</Forms.FormTitle>
+                    <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>
+                        Transparency Options
+                    </Forms.FormTitle>
 
                     <Select
                         placeholder="Mica (incorporates system theme + desktop wallpaper to paint the background)"
                         options={[
-                            { label: "Mica (incorporates system theme + desktop wallpaper to paint the background)", value: "mica", default: true },
+                            {
+                                label: "Mica (incorporates system theme + desktop wallpaper to paint the background)",
+                                value: "mica",
+                                default: true
+                            },
                             { label: "Tabbed (variant of Mica with stronger background tinting)", value: "tabbed" },
-                            { label: "Acrylic (blurs the window behind Vencord Desktop for a translucent background)", value: "acrylic" }
+                            {
+                                label: "Acrylic (blurs the window behind Vencord Desktop for a translucent background)",
+                                value: "acrylic"
+                            }
                         ]}
                         closeOnSelect={true}
                         select={v => (Settings.transparencyOption = v)}
@@ -126,7 +135,7 @@ export default function SettingsUi() {
 
                     <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
                 </>
-            }
+            )}
 
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>
