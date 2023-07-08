@@ -290,6 +290,7 @@ function createMainWindow() {
                   backgroundColor: "#ffffff00"
               }
             : {}),
+        ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
         ...getWindowBoundsOptions()
     }));
     win.setMenuBarVisibility(false);
