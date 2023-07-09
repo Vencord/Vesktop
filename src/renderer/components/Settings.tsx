@@ -42,6 +42,7 @@ export default function SettingsUi() {
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
+        ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",

@@ -26,4 +26,8 @@ export interface Settings {
 
     skippedUpdate?: string;
     firstLaunch?: boolean;
+
+    splashTheming?: boolean;
+    splashColor?: string;
+    splashBackground?: string;
 }

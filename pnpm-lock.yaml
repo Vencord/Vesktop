@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   arrpc:
     specifier: github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d
@@ -4392,3 +4388,7 @@ packages:
       - bufferutil
       - utf-8-validate
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
