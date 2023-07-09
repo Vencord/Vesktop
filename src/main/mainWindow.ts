@@ -274,10 +274,17 @@ function createMainWindow() {
     win.setMenuBarVisibility(false);
 
     win.on("close", e => {
-        if (isQuitting || Settings.store.minimizeToTray === false || Settings.store.tray === false) return;
+        if (
+            isQuitting ||
+            (process.platform !== "darwin" &&
+                (Settings.store.minimizeToTray === false || Settings.store.tray === false))
+        )
+            return;
 
         e.preventDefault();
-        win.hide();
+
+        if (process.platform === "darwin") app.hide();
+        else win.hide();
 
         return false;
     });
