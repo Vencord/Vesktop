@@ -4,7 +4,15 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, MenuItemConstructorOptions, Tray } from "electron";
+import {
+    app,
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    dialog,
+    Menu,
+    MenuItemConstructorOptions,
+    Tray
+} from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
@@ -126,9 +134,21 @@ function initMenuBar(win: BrowserWindow) {
         {
             label: "Clear data",
             async click() {
+                const { response } = await dialog.showMessageBox(win, {
+                    message: "Are you sure you want to clear all web storage?",
+                    detail: "Vencord Desktop will automatically restart after this operation",
+                    buttons: ["Yes", "No"],
+                    cancelId: 1,
+                    defaultId: 0,
+                    type: "warning"
+                });
+
+                if (response === 1) return;
+
                 await win.webContents.session.clearStorageData();
                 await win.webContents.session.clearCache();
                 await win.webContents.session.clearCodeCaches({});
+
                 app.relaunch();
                 app.quit();
             },
