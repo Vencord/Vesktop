@@ -133,6 +133,18 @@ function initMenuBar(win: BrowserWindow) {
                         app.quit();
                     }
                 },
+                ...(process.platform === "darwin"
+                    ? [
+                          {
+                              label: "Hide",
+                              role: "hide" as const
+                          },
+                          {
+                              label: "Hide others",
+                              role: "hideOthers" as const
+                          }
+                      ]
+                    : []),
                 {
                     label: "Quit",
                     accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
