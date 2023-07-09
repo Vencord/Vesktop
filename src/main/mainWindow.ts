@@ -124,6 +124,17 @@ function initMenuBar(win: BrowserWindow) {
             toolTip: "Vencord Desktop will automatically restart after this operation"
         },
         {
+            label: "Clear data",
+            async click() {
+                await win.webContents.session.clearStorageData();
+                await win.webContents.session.clearCache();
+                await win.webContents.session.clearCodeCaches({});
+                app.relaunch();
+                app.quit();
+            },
+            toolTip: "Vencord Desktop will automatically restart after this operation"
+        },
+        {
             label: "Relaunch",
             accelerator: "CmdOrCtrl+Shift+R",
             click() {
