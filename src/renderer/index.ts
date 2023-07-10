@@ -7,6 +7,7 @@
 import "./fixes";
 import "./appBadge";
 import "./patches";
+import "./secureKeyboardEntry";
 
 console.log("read if cute :3");
 

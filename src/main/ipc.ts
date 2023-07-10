@@ -103,6 +103,16 @@ ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 
 ipcMain.handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
 
+ipcMain.handle(IpcEvents.ENABLE_SECURE_KEYBOARD_ENTRY, () => {
+    if (process.platform !== "darwin") return;
+    if (!app.isSecureKeyboardEntryEnabled()) app.setSecureKeyboardEntryEnabled(true);
+});
+
+ipcMain.handle(IpcEvents.DISABLE_SECURE_KEYBOARD_ENTRY, () => {
+    if (process.platform !== "darwin") return;
+    if (app.isSecureKeyboardEntryEnabled()) app.setSecureKeyboardEntryEnabled(false);
+});
+
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
 }

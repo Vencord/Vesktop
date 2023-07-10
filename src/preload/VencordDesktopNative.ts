@@ -54,5 +54,9 @@ export const VencordDesktopNative = {
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
+    },
+    secureKeyboardEntry: {
+        enable: () => invoke<void>(IpcEvents.ENABLE_SECURE_KEYBOARD_ENTRY),
+        disable: () => invoke<void>(IpcEvents.DISABLE_SECURE_KEYBOARD_ENTRY)
     }
 };
