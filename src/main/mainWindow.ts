@@ -13,6 +13,7 @@ import {
     MenuItemConstructorOptions,
     Tray
 } from "electron";
+import { rmdir } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
@@ -22,7 +23,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
+import { DATA_DIR, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
 import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -135,8 +136,8 @@ function initMenuBar(win: BrowserWindow) {
             label: "Clear data",
             async click() {
                 const { response } = await dialog.showMessageBox(win, {
-                    message: "Are you sure you want to clear all web storage?",
-                    detail: "Vencord Desktop will automatically restart after this operation",
+                    message: "Are you sure you want to reset Vencord Desktop?",
+                    detail: "Vencord Desktop will automatically restart after this operation.",
                     buttons: ["Yes", "No"],
                     cancelId: 1,
                     defaultId: 0,
@@ -145,9 +146,12 @@ function initMenuBar(win: BrowserWindow) {
 
                 if (response === 1) return;
 
+                win.close();
+
                 await win.webContents.session.clearStorageData();
                 await win.webContents.session.clearCache();
                 await win.webContents.session.clearCodeCaches({});
+                await rmdir(DATA_DIR);
 
                 app.relaunch();
                 app.quit();
