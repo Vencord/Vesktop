@@ -4,9 +4,10 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, MenuItemConstructorOptions, Tray } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
+import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
@@ -105,72 +106,71 @@ function initTray(win: BrowserWindow) {
 
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
+    const isDarwin = process.platform === "darwin";
     const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
+
+    const subMenu = [
+        {
+            label: "About Vencord Desktop",
+            click: createAboutWindow
+        },
+        {
+            label: "Force Update Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            },
+            toolTip: "Vencord Desktop will automatically restart after this operation"
+        },
+        {
+            label: "Relaunch",
+            accelerator: "CmdOrCtrl+Shift+R",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        isDarwin && {
+            label: "Hide",
+            role: "hide"
+        },
+        isDarwin && {
+            label: "Hide others",
+            role: "hideOthers"
+        },
+        {
+            label: "Quit",
+            accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
+            visible: !isWindows,
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        {
+            label: "Quit",
+            accelerator: isWindows ? "Alt+F4" : void 0,
+            visible: isWindows,
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+        {
+            label: "Zoom in (hidden, hack for Qwertz and others)",
+            accelerator: "CmdOrCtrl+=",
+            role: "zoomIn",
+            visible: false
+        }
+    ] satisfies Array<MenuItemConstructorOptions | false>;
 
     const menu = Menu.buildFromTemplate([
         {
             label: "Vencord Desktop",
             role: "appMenu",
-            submenu: [
-                {
-                    label: "About Vencord Desktop",
-                    click: createAboutWindow
-                },
-                {
-                    label: "Force Update Vencord",
-                    async click() {
-                        await downloadVencordFiles();
-                        app.relaunch();
-                        app.quit();
-                    },
-                    toolTip: "Vencord Desktop will automatically restart after this operation"
-                },
-                {
-                    label: "Relaunch",
-                    accelerator: "CmdOrCtrl+Shift+R",
-                    click() {
-                        app.relaunch();
-                        app.quit();
-                    }
-                },
-                ...(process.platform === "darwin"
-                    ? [
-                          {
-                              label: "Hide",
-                              role: "hide" as const
-                          },
-                          {
-                              label: "Hide others",
-                              role: "hideOthers" as const
-                          }
-                      ]
-                    : []),
-                {
-                    label: "Quit",
-                    accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
-                    visible: !isWindows,
-                    role: "quit",
-                    click() {
-                        app.quit();
-                    }
-                },
-                {
-                    label: "Quit",
-                    accelerator: isWindows ? "Alt+F4" : void 0,
-                    visible: isWindows,
-                    role: "quit",
-                    click() {
-                        app.quit();
-                    }
-                },
-                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-                {
-                    label: "Zoom in (hidden, hack for Qwertz and others)",
-                    accelerator: "CmdOrCtrl+=",
-                    role: "zoomIn",
-                    visible: false
-                }
-            ]
+            submenu: subMenu.filter(isTruthy)
         },
         { role: "fileMenu" },
         { role: "editMenu" },
