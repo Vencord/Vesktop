@@ -262,6 +262,15 @@ function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        ...(Settings.store.transparencyOption !== "none"
+            ? {
+                  backgroundColor: "#00000000",
+                  backgroundMaterial: Settings.store.transparencyOption,
+                  transparent: true
+              }
+            : {
+                  transparent: false
+              }),
         ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency
             ? {

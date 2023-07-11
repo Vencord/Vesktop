@@ -13,6 +13,7 @@ import { useSettings } from "renderer/settings";
 
 export default function SettingsUi() {
     const Settings = useSettings();
+    const supportsWindowsTransparency = VencordDesktopNative.app.supportsWindowsTransparency();
 
     const { autostart } = VencordDesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
@@ -46,7 +47,7 @@ export default function SettingsUi() {
                 Vencord Desktop Settings
             </Text>
 
-            <Forms.FormTitle className={Margins.top16}>Discord Branch</Forms.FormTitle>
+            <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Discord Branch</Forms.FormTitle>
             <Select
                 placeholder="Stable"
                 options={[
@@ -96,6 +97,43 @@ export default function SettingsUi() {
                     {text}
                 </Switch>
             ))}
+
+            {supportsWindowsTransparency && (
+                <>
+                    <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>
+                        Transparency Options
+                    </Forms.FormTitle>
+                    <Forms.FormText className={Margins.bottom8}>
+                        Requires a full restart. You will need a theme that supports transparency for this to work.
+                    </Forms.FormText>
+
+                    <Select
+                        placeholder="None"
+                        options={[
+                            {
+                                label: "None",
+                                value: "none",
+                                default: true
+                            },
+                            {
+                                label: "Mica (incorporates system theme + desktop wallpaper to paint the background)",
+                                value: "mica"
+                            },
+                            { label: "Tabbed (variant of Mica with stronger background tinting)", value: "tabbed" },
+                            {
+                                label: "Acrylic (blurs the window behind Vencord Desktop for a translucent background)",
+                                value: "acrylic"
+                            }
+                        ]}
+                        closeOnSelect={true}
+                        select={v => (Settings.transparencyOption = v)}
+                        isSelected={v => v === Settings.transparencyOption}
+                        serialize={s => s}
+                    />
+
+                    <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+                </>
+            )}
 
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>
