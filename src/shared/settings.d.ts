@@ -7,6 +7,7 @@
 import type { Rectangle } from "electron";
 
 export interface Settings {
+    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;

@@ -274,6 +274,15 @@ function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: VencordSettings.store.frameless !== true,
+        ...(Settings.store.transparencyOption !== "none"
+            ? {
+                  backgroundColor: "#00000000",
+                  backgroundMaterial: Settings.store.transparencyOption,
+                  transparent: true
+              }
+            : {
+                  transparent: false
+              }),
         ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
         ...(VencordSettings.store.macosTranslucency
             ? {
@@ -286,10 +295,13 @@ function createMainWindow() {
     win.setMenuBarVisibility(false);
 
     win.on("close", e => {
-        if (isQuitting || Settings.store.minimizeToTray === false || Settings.store.tray === false) return;
+        const useTray = Settings.store.minimizeToTray && Settings.store.tray;
+        if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
-        win.hide();
+
+        if (process.platform === "darwin") app.hide();
+        else win.hide();
 
         return false;
     });

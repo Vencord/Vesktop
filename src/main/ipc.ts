@@ -7,6 +7,7 @@
 import { app, dialog, ipcMain, session, shell } from "electron";
 import { existsSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
+import { release } from "os";
 import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
@@ -39,6 +40,10 @@ ipcMain.on(IpcEvents.GET_SETTINGS, e => {
 
 ipcMain.on(IpcEvents.GET_VERSION, e => {
     e.returnValue = app.getVersion();
+});
+
+ipcMain.on(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY, e => {
+    e.returnValue = process.platform === "win32" && Number(release().split(".").pop()) >= 22621;
 });
 
 ipcMain.on(IpcEvents.AUTOSTART_ENABLED, e => {
