@@ -11,8 +11,8 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { VesktopNative } from "./VesktopNative";
 
 contextBridge.exposeInMainWorld("VesktopNative", VesktopNative);
-// TODO: remove once main Vencord codebase has migrated and some time has passed
-// contextBridge.exposeInMainWorld("VencordDesktopNative", VesktopNative);
+// TODO: remove legacy alias once main Vencord codebase has migrated and some time has passed
+contextBridge.exposeInMainWorld("VencordDesktopNative", VesktopNative);
 
 require(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_PRELOAD_FILE));
 
