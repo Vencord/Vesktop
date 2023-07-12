@@ -36,7 +36,7 @@ export function registerScreenShareHandler() {
         }));
 
         const choice = await request.frame
-            .executeJavaScript(`VencordDesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
+            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
             .then(e => e as StreamPick)
             .catch(() => null);
 

@@ -23,7 +23,7 @@ export function setBadge() {
     let totalCount = mentionCount + pendingRequests;
     if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-    VencordDesktopNative.app.setBadgeCount(totalCount);
+    VesktopNative.app.setBadgeCount(totalCount);
 }
 
 let toFind = 3;

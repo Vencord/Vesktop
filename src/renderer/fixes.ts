@@ -16,7 +16,7 @@ Object.defineProperty(Notification.prototype, "onclick", {
     set(onClick) {
         originalSetOnClick.call(this, function (this: unknown) {
             onClick.apply(this, arguments);
-            VencordDesktopNative.win.focus();
+            VesktopNative.win.focus();
         });
     },
     configurable: true

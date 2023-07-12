@@ -7,8 +7,8 @@
 import { useEffect, useReducer } from "@vencord/types/webpack/common";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
-export const Settings = new SettingsStore(VencordDesktopNative.settings.get());
-Settings.addGlobalChangeListener((o, p) => VencordDesktopNative.settings.set(o, p));
+export const Settings = new SettingsStore(VesktopNative.settings.get());
+Settings.addGlobalChangeListener((o, p) => VesktopNative.settings.set(o, p));
 
 export function useSettings() {
     const [, update] = useReducer(x => x + 1, 0);

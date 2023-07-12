@@ -13,11 +13,11 @@ Bug reports, feature requests & contributions are highly appreciated!!
 
 ### Windows
 
-Download and run Vencord-Desktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+Download and run Vesktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 ### Mac
 
-Download and run Vencord-Desktop-VERSION.dmg from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+Download and run Vesktop-VERSION.dmg from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 ### Linux
 
@@ -27,15 +27,15 @@ Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop
 
 #### Ubuntu/Debian based
 
-Download Vencord-Desktop-VERSION.deb from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+Download Vesktop-VERSION.deb from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 #### Fedora/RHEL based
 
-Download Vencord-Desktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 #### Other
 
-Either download Vencord-Desktop-VERSION.AppImage and just run it directly or grab Vencord-Desktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
+Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
 
 A flatpak is planned, if you want packages for other repos, feel free to create them and they can be linked as unofficial here
 

@@ -23,7 +23,7 @@ export async function openInviteModal(code: string) {
     const { invite } = await InviteActions.resolveInvite(code, "Desktop Modal");
     if (!invite) return false;
 
-    VencordDesktopNative.win.focus();
+    VesktopNative.win.focus();
 
     FluxDispatcher.dispatch({
         type: "INVITE_MODAL_OPEN",

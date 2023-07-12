@@ -118,7 +118,7 @@ function StreamSettings({
     settings: StreamSettings;
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
 }) {
-    const [thumb] = useAwaiter(() => VencordDesktopNative.capturer.getLargeThumbnail(source.id), {
+    const [thumb] = useAwaiter(() => VesktopNative.capturer.getLargeThumbnail(source.id), {
         fallbackValue: source.url,
         deps: [source.id]
     });

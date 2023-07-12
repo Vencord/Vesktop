@@ -13,9 +13,9 @@ import { useSettings } from "renderer/settings";
 
 export default function SettingsUi() {
     const Settings = useSettings();
-    const supportsWindowsTransparency = VencordDesktopNative.app.supportsWindowsTransparency();
+    const supportsWindowsTransparency = VesktopNative.app.supportsWindowsTransparency();
 
-    const { autostart } = VencordDesktopNative;
+    const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
@@ -79,7 +79,7 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VencordDesktopNative.app.setBadgeCount(0);
+                    else VesktopNative.app.setBadgeCount(0);
                 }}
                 note="Show mention badge on the app icon"
             >
@@ -143,7 +143,7 @@ export default function SettingsUi() {
                         href="about:blank"
                         onClick={e => {
                             e.preventDefault();
-                            VencordDesktopNative.fileManager.showItemInFolder(Settings.vencordDir!);
+                            VesktopNative.fileManager.showItemInFolder(Settings.vencordDir!);
                         }}
                     >
                         {Settings.vencordDir}
@@ -156,7 +156,7 @@ export default function SettingsUi() {
                 <Button
                     size={Button.Sizes.SMALL}
                     onClick={async () => {
-                        const choice = await VencordDesktopNative.fileManager.selectVencordDir();
+                        const choice = await VesktopNative.fileManager.selectVencordDir();
                         switch (choice) {
                             case "cancelled":
                             case "invalid":
