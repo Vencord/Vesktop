@@ -81,6 +81,12 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            label: "Reset app",
+            async click() {
+                await clearData(win);
+            }
+        },
+        {
             type: "separator"
         },
         {
@@ -113,6 +119,29 @@ function initTray(win: BrowserWindow) {
     });
 }
 
+async function clearData(win: BrowserWindow) {
+    const { response } = await dialog.showMessageBox(win, {
+        message: "Are you sure you want to reset Vencord Desktop?",
+        detail: "Vencord Desktop will automatically restart after this operation.",
+        buttons: ["Yes", "No"],
+        cancelId: 1,
+        defaultId: 0,
+        type: "warning"
+    });
+
+    if (response === 1) return;
+
+    win.close();
+
+    await win.webContents.session.clearStorageData();
+    await win.webContents.session.clearCache();
+    await win.webContents.session.clearCodeCaches({});
+    await rmdir(DATA_DIR);
+
+    app.relaunch();
+    app.quit();
+}
+
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
     const isDarwin = process.platform === "darwin";
@@ -133,28 +162,9 @@ function initMenuBar(win: BrowserWindow) {
             toolTip: "Vencord Desktop will automatically restart after this operation"
         },
         {
-            label: "Clear data",
+            label: "Reset app",
             async click() {
-                const { response } = await dialog.showMessageBox(win, {
-                    message: "Are you sure you want to reset Vencord Desktop?",
-                    detail: "Vencord Desktop will automatically restart after this operation.",
-                    buttons: ["Yes", "No"],
-                    cancelId: 1,
-                    defaultId: 0,
-                    type: "warning"
-                });
-
-                if (response === 1) return;
-
-                win.close();
-
-                await win.webContents.session.clearStorageData();
-                await win.webContents.session.clearCache();
-                await win.webContents.session.clearCodeCaches({});
-                await rmdir(DATA_DIR);
-
-                app.relaunch();
-                app.quit();
+                await clearData(win);
             },
             toolTip: "Vencord Desktop will automatically restart after this operation"
         },
