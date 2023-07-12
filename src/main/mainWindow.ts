@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -82,7 +82,7 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
-            label: "Quit Vencord Desktop",
+            label: "Quit Vesktop",
             click() {
                 isQuitting = true;
                 app.quit();
@@ -91,7 +91,7 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
-    tray.setToolTip("Vencord Desktop");
+    tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
 
@@ -111,7 +111,7 @@ function initMenuBar(win: BrowserWindow) {
 
     const subMenu = [
         {
-            label: "About Vencord Desktop",
+            label: "About Vesktop",
             click: createAboutWindow
         },
         {
@@ -121,7 +121,7 @@ function initMenuBar(win: BrowserWindow) {
                 app.relaunch();
                 app.quit();
             },
-            toolTip: "Vencord Desktop will automatically restart after this operation"
+            toolTip: "Vesktop will automatically restart after this operation"
         },
         {
             label: "Relaunch",
@@ -168,7 +168,7 @@ function initMenuBar(win: BrowserWindow) {
 
     const menu = Menu.buildFromTemplate([
         {
-            label: "Vencord Desktop",
+            label: "Vesktop",
             role: "appMenu",
             submenu: subMenu.filter(isTruthy)
         },

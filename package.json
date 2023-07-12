@@ -57,7 +57,7 @@
     },
     "build": {
         "appId": "dev.vencord.desktop",
-        "productName": "Vencord Desktop",
+        "productName": "Vesktop",
         "files": [
             "!*",
             "dist/js",
@@ -67,7 +67,7 @@
         ],
         "linux": {
             "category": "Network",
-            "maintainer": "vendicated+vencord-desktop@riseup.net",
+            "maintainer": "vendicated+vesktop@riseup.net",
             "target": [
                 "deb",
                 "tar.gz",
@@ -75,7 +75,7 @@
                 "AppImage"
             ],
             "desktop": {
-                "Name": "Vencord Desktop",
+                "Name": "Vesktop",
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
