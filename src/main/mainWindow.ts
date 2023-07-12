@@ -262,6 +262,8 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
+    const { staticTitle, transparencyOption } = Settings.store;
+    const { frameless, macosTranslucency } = VencordSettings.store;
     const win = (mainWin = new BrowserWindow({
         show: false,
         webPreferences: {
@@ -273,18 +275,16 @@ function createMainWindow() {
             spellcheck: true
         },
         icon: ICON_PATH,
-        frame: VencordSettings.store.frameless !== true,
-        ...(Settings.store.transparencyOption !== "none"
+        frame: frameless !== true,
+        ...(transparencyOption && transparencyOption !== "none"
             ? {
                   backgroundColor: "#00000000",
                   backgroundMaterial: Settings.store.transparencyOption,
                   transparent: true
               }
-            : {
-                  transparent: false
-              }),
-        ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
-        ...(VencordSettings.store.macosTranslucency
+            : {}),
+        ...(staticTitle ? { title: "Vencord" } : {}),
+        ...(macosTranslucency
             ? {
                   vibrancy: "sidebar",
                   backgroundColor: "#ffffff00"
