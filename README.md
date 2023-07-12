@@ -1,6 +1,6 @@
-# Vencord Desktop
+# Vesktop
 
-Vencord Desktop is a cross platform desktop app aiming to give you a snappier Discord experience with Vencord pre-installed
+Vesktop is a cross platform desktop app aiming to give you a snappier Discord experience with Vencord pre-installed
 
 **Not yet supported**:
 - Global Keybinds
@@ -13,11 +13,11 @@ Bug reports, feature requests & contributions are highly appreciated!!
 
 ### Windows
 
-Download and run Vencord-Desktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Desktop/releases/latest)
+Download and run Vencord-Desktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 ### Mac
 
-Download and run Vencord-Desktop-VERSION.dmg from [releases](https://github.com/Vencord/Desktop/releases/latest)
+Download and run Vencord-Desktop-VERSION.dmg from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 ### Linux
 
@@ -27,11 +27,11 @@ Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop
 
 #### Ubuntu/Debian based
 
-Download Vencord-Desktop-VERSION.deb from [releases](https://github.com/Vencord/Desktop/releases/latest)
+Download Vencord-Desktop-VERSION.deb from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 #### Fedora/RHEL based
 
-Download Vencord-Desktop-VERSION.rpm from [releases](https://github.com/Vencord/Desktop/releases/latest)
+Download Vencord-Desktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 #### Other
 
@@ -44,8 +44,8 @@ A flatpak is planned, if you want packages for other repos, feel free to create 
 Packaging will create builds in the dist/ folder. You can then install them like mentioned above or distribute them
 
 ```sh
-git clone https://github.com/Vencord/Desktop
-cd Desktop
+git clone https://github.com/Vencord/Vesktop
+cd Vesktop
 
 # Install Dependencies
 pnpm i
