@@ -142,8 +142,8 @@ function initMenuBar(win: BrowserWindow) {
         {
             label: "Quit",
             accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
-            role: "quit",
             visible: !isWindows,
+            role: "quit",
             click() {
                 app.quit();
             }
