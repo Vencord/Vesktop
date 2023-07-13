@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -13,17 +13,17 @@ import { useSettings } from "renderer/settings";
 
 export default function SettingsUi() {
     const Settings = useSettings();
-    const supportsWindowsTransparency = VencordDesktopNative.app.supportsWindowsTransparency();
+    const supportsWindowsTransparency = VesktopNative.app.supportsWindowsTransparency();
 
-    const { autostart } = VencordDesktopNative;
+    const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
-        ["tray", "Tray Icon", "Add a tray icon for Vencord Desktop", true],
+        ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         [
             "minimizeToTray",
             "Minimize to tray",
-            "Hitting X will make Vencord Desktop minimize to the tray instead of closing",
+            "Hitting X will make Vesktop minimize to the tray instead of closing",
             true,
             () => Settings.tray ?? true
         ],
@@ -36,7 +36,7 @@ export default function SettingsUi() {
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
-            "Opens links in a new Vencord Desktop window instead of your web browser"
+            "Opens links in a new Vesktop window instead of your web browser"
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vencord" instead of changing to the current page']
     ];
@@ -44,7 +44,7 @@ export default function SettingsUi() {
     return (
         <Forms.FormSection>
             <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
-                Vencord Desktop Settings
+                Vesktop Settings
             </Text>
 
             <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Discord Branch</Forms.FormTitle>
@@ -69,7 +69,7 @@ export default function SettingsUi() {
                     await autostart[v ? "enable" : "disable"]();
                     setAutoStartEnabled(v);
                 }}
-                note="Automatically start Vencord Desktop on computer start-up"
+                note="Automatically start Vesktop on computer start-up"
             >
                 Start With System
             </Switch>
@@ -79,7 +79,7 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VencordDesktopNative.app.setBadgeCount(0);
+                    else VesktopNative.app.setBadgeCount(0);
                 }}
                 note="Show mention badge on the app icon"
             >
@@ -121,7 +121,7 @@ export default function SettingsUi() {
                             },
                             { label: "Tabbed (variant of Mica with stronger background tinting)", value: "tabbed" },
                             {
-                                label: "Acrylic (blurs the window behind Vencord Desktop for a translucent background)",
+                                label: "Acrylic (blurs the window behind Vesktop for a translucent background)",
                                 value: "acrylic"
                             }
                         ]}
@@ -143,7 +143,7 @@ export default function SettingsUi() {
                         href="about:blank"
                         onClick={e => {
                             e.preventDefault();
-                            VencordDesktopNative.fileManager.showItemInFolder(Settings.vencordDir!);
+                            VesktopNative.fileManager.showItemInFolder(Settings.vencordDir!);
                         }}
                     >
                         {Settings.vencordDir}
@@ -156,7 +156,7 @@ export default function SettingsUi() {
                 <Button
                     size={Button.Sizes.SMALL}
                     onClick={async () => {
-                        const choice = await VencordDesktopNative.fileManager.selectVencordDir();
+                        const choice = await VesktopNative.fileManager.selectVencordDir();
                         switch (choice) {
                             case "cancelled":
                             case "invalid":
