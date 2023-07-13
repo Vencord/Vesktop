@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -17,7 +17,7 @@ export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json")
 export const VENCORD_FILES_DIR =
     (require("./settings") as typeof import("./settings")).Settings.store.vencordDir || join(DATA_DIR, "vencordDist");
 
-export const USER_AGENT = `VencordDesktop/${app.getVersion()} (https://github.com/Vencord/Desktop)`;
+export const USER_AGENT = `Vesktop/${app.getVersion()} (https://github.com/Vencord/Vesktop)`;
 
 // dimensions shamelessly stolen from Discord Desktop :3
 export const MIN_WIDTH = 940;
