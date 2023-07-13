@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -74,7 +74,7 @@ function isOutdated(oldVersion: string, newVersion: string) {
 export async function checkUpdates() {
     // if (IS_DEV) return;
     try {
-        const raw = await githubGet("/repos/Vencord/Desktop/releases/latest");
+        const raw = await githubGet("/repos/Vencord/Vesktop/releases/latest");
         const data = JSON.parse(raw.toString("utf-8")) as ReleaseData;
 
         const oldVersion = app.getVersion();

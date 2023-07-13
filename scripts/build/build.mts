@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -54,7 +54,7 @@ await Promise.all([
     }),
     createContext({
         ...CommonOpts,
-        globalName: "VencordDesktop",
+        globalName: "Vesktop",
         entryPoints: ["src/renderer/index.ts"],
         outfile: "dist/js/renderer.js",
         format: "iife",
@@ -65,7 +65,11 @@ await Promise.all([
         tsconfig: "./scripts/build/tsconfig.esbuild.json",
         external: ["@vencord/types/*"],
         plugins: [vencordDep],
-        footer: { js: "//# sourceURL=VCDRenderer" }
+        // TODO: remove legacy name once main Vencord codebase has migrated and some time has passed.
+        // this 0 is very important. we run this script via webFrame.executeJavaScript and the last
+        // expression will be the return value. Without the 0, the return value would be Vesktop which
+        // leads to "An object could not be cloned"
+        footer: { js: ";window.VencordDesktop=Vesktop;0 \n//# sourceURL=VCDRenderer" }
     })
 ]);
 
