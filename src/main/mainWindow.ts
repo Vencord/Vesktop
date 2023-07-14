@@ -13,7 +13,7 @@ import {
     MenuItemConstructorOptions,
     Tray
 } from "electron";
-import { rmdir } from "fs/promises";
+import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
@@ -119,24 +119,30 @@ function initTray(win: BrowserWindow) {
     });
 }
 
+const enum MessageBoxChoice {
+    Default,
+    Cancel
+}
+
 async function clearData(win: BrowserWindow) {
     const { response } = await dialog.showMessageBox(win, {
-        message: "Are you sure you want to reset Vencord Desktop?",
-        detail: "Vencord Desktop will automatically restart after this operation.",
+        message:
+            "Are you sure you want to reset Vesktop? This will log you out, clear caches and reset all your settings",
+        detail: "Vesktop will automatically restart after this operation.",
         buttons: ["Yes", "No"],
-        cancelId: 1,
-        defaultId: 0,
+        cancelId: MessageBoxChoice.Cancel,
+        defaultId: MessageBoxChoice.Default,
         type: "warning"
     });
 
-    if (response === 1) return;
+    if (response === MessageBoxChoice.Cancel) return;
 
     win.close();
 
     await win.webContents.session.clearStorageData();
     await win.webContents.session.clearCache();
     await win.webContents.session.clearCodeCaches({});
-    await rmdir(DATA_DIR);
+    await rm(DATA_DIR, { force: true, recursive: true });
 
     app.relaunch();
     app.quit();
@@ -162,11 +168,11 @@ function initMenuBar(win: BrowserWindow) {
             toolTip: "Vesktop will automatically restart after this operation"
         },
         {
-            label: "Reset app",
+            label: "Reset Vesktop",
             async click() {
                 await clearData(win);
             },
-            toolTip: "Vencord Desktop will automatically restart after this operation"
+            toolTip: "Vesktop will automatically restart after this operation"
         },
         {
             label: "Relaunch",
