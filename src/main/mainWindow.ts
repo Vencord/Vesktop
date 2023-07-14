@@ -81,7 +81,7 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
-            label: "Reset app",
+            label: "Reset Vesktop",
             async click() {
                 await clearData(win);
             }
