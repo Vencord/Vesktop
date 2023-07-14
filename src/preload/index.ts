@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -8,9 +8,11 @@ import { contextBridge, ipcRenderer, webFrame } from "electron";
 import { readFileSync, watch } from "fs";
 
 import { IpcEvents } from "../shared/IpcEvents";
-import { VencordDesktopNative } from "./VencordDesktopNative";
+import { VesktopNative } from "./VesktopNative";
 
-contextBridge.exposeInMainWorld("VencordDesktopNative", VencordDesktopNative);
+contextBridge.exposeInMainWorld("VesktopNative", VesktopNative);
+// TODO: remove legacy alias once main Vencord codebase has migrated and some time has passed
+contextBridge.exposeInMainWorld("VencordDesktopNative", VesktopNative);
 
 require(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_PRELOAD_FILE));
 
@@ -41,4 +43,4 @@ if (IS_DEV) {
 }
 // #endregion
 
-VencordDesktopNative.spellcheck.setLanguages(window.navigator.languages);
+VesktopNative.spellcheck.setLanguages(window.navigator.languages);
