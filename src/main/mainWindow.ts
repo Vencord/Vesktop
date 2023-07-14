@@ -148,10 +148,9 @@ function initMenuBar(win: BrowserWindow) {
                 app.quit();
             }
         },
-        {
+        isWindows && {
             label: "Quit",
-            accelerator: isWindows ? "Alt+F4" : void 0,
-            visible: isWindows,
+            accelerator: "Alt+F4",
             role: "quit",
             click() {
                 app.quit();
