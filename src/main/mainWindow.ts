@@ -4,7 +4,16 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, MenuItemConstructorOptions, Tray } from "electron";
+import {
+    app,
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    dialog,
+    Menu,
+    MenuItemConstructorOptions,
+    Tray
+} from "electron";
+import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
@@ -14,7 +23,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
+import { DATA_DIR, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
 import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -72,6 +81,12 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
+            }
+        },
+        {
             type: "separator"
         },
         {
@@ -104,6 +119,34 @@ function initTray(win: BrowserWindow) {
     });
 }
 
+const enum MessageBoxChoice {
+    Default,
+    Cancel
+}
+
+async function clearData(win: BrowserWindow) {
+    const { response } = await dialog.showMessageBox(win, {
+        message: "Are you sure you want to reset Vesktop?",
+        detail: "This will log you out, clear caches and reset all your settings!\n\nVesktop will automatically restart after this operation.",
+        buttons: ["Yes", "No"],
+        cancelId: MessageBoxChoice.Cancel,
+        defaultId: MessageBoxChoice.Default,
+        type: "warning"
+    });
+
+    if (response === MessageBoxChoice.Cancel) return;
+
+    win.close();
+
+    await win.webContents.session.clearStorageData();
+    await win.webContents.session.clearCache();
+    await win.webContents.session.clearCodeCaches({});
+    await rm(DATA_DIR, { force: true, recursive: true });
+
+    app.relaunch();
+    app.quit();
+}
+
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
     const isDarwin = process.platform === "darwin";
@@ -120,6 +163,13 @@ function initMenuBar(win: BrowserWindow) {
                 await downloadVencordFiles();
                 app.relaunch();
                 app.quit();
+            },
+            toolTip: "Vesktop will automatically restart after this operation"
+        },
+        {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
             },
             toolTip: "Vesktop will automatically restart after this operation"
         },
