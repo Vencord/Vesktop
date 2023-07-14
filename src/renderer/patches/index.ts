@@ -6,3 +6,4 @@
 
 // TODO: Possibly auto generate glob if we have more patches in the future
 import "./spellCheck";
+import "./platformClass";
