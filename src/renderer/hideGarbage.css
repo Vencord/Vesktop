@@ -1,5 +1,0 @@
-/* Download Desktop button in guilds list */
-[class|=listItem]:has([data-list-item-id=guildsnav___app-download-button]),
-[class|=listItem]:has(+ [class|=listItem] [data-list-item-id=guildsnav___app-download-button]) {
-    display: none;
-}
