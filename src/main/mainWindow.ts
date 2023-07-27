@@ -359,7 +359,7 @@ function createMainWindow() {
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
-    if (Settings.store.tray ?? true) initTray(win);
+    if ((Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
