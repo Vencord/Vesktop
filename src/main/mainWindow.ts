@@ -345,7 +345,7 @@ function createMainWindow() {
     win.setMenuBarVisibility(false);
 
     win.on("close", e => {
-        const useTray = Settings.store.minimizeToTray && Settings.store.tray;
+        const useTray = Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
