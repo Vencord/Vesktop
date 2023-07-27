@@ -18,7 +18,7 @@ export default function SettingsUi() {
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
-    const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
+    let switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
         ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         [
             "minimizeToTray",
@@ -40,6 +40,10 @@ export default function SettingsUi() {
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vencord" instead of changing to the current page']
     ];
+
+    if (navigator.platform.startsWith("Mac")) {
+        switches = switches.splice(2);
+    }
 
     return (
         <Forms.FormSection>
