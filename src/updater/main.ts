@@ -35,7 +35,11 @@ ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
                     return portable ? !isSetup : isSetup;
                 })!.browser_download_url;
             case "darwin":
-                return assets.find(a => a.name.endsWith(".dmg"))!.browser_download_url;
+                return assets.find(a =>
+                    process.arch === "arm64"
+                        ? a.name.endsWith("-arm64-mac.zip")
+                        : a.name.endsWith("-mac.zip") && !a.name.includes("arm64")
+                )!.browser_download_url;
             case "linux":
                 return updateData.release.html_url;
             default:
