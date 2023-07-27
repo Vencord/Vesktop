@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -37,12 +37,12 @@ addPatch({
         }
 
         const cb = (w: string, c: string[]) => {
-            VencordDesktopNative.spellcheck.offSpellcheckResult(cb);
+            VesktopNative.spellcheck.offSpellcheckResult(cb);
             word = w;
             corrections = c;
             openMenu();
         };
-        VencordDesktopNative.spellcheck.onSpellcheckResult(cb);
+        VesktopNative.spellcheck.onSpellcheckResult(cb);
     }
 });
 
@@ -57,14 +57,14 @@ addContextMenuPatch("textarea-context", children => () => {
                         <Menu.MenuItem
                             id={"vcd-spellcheck-suggestion-" + c}
                             label={c}
-                            action={() => VencordDesktopNative.spellcheck.replaceMisspelling(c)}
+                            action={() => VesktopNative.spellcheck.replaceMisspelling(c)}
                         />
                     ))}
                     <Menu.MenuSeparator />
                     <Menu.MenuItem
                         id="vcd-spellcheck-learn"
                         label={`Add ${word} to dictionary`}
-                        action={() => VencordDesktopNative.spellcheck.addToDictionary(word)}
+                        action={() => VesktopNative.spellcheck.addToDictionary(word)}
                     />
                 </>
             )}

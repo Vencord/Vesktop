@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -11,6 +11,7 @@ export const enum IpcEvents {
     GET_RENDERER_CSS_FILE = "VCD_GET_RENDERER_CSS_FILE",
 
     GET_VERSION = "VCD_GET_VERSION",
+    SUPPORTS_WINDOWS_TRANSPARENCY = "VCD_SUPPORTS_WINDOWS_TRANSPARENCY",
 
     RELAUNCH = "VCD_RELAUNCH",
     CLOSE = "VCD_CLOSE",

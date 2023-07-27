@@ -1,19 +1,29 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, BrowserWindowConstructorOptions, Menu, Tray } from "electron";
+import {
+    app,
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    dialog,
+    Menu,
+    MenuItemConstructorOptions,
+    Tray
+} from "electron";
+import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
+import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
+import { DATA_DIR, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
 import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -71,6 +81,12 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
+            }
+        },
+        {
             type: "separator"
         },
         {
@@ -81,7 +97,7 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
-            label: "Quit Vencord Desktop",
+            label: "Quit Vesktop",
             click() {
                 isQuitting = true;
                 app.quit();
@@ -90,7 +106,7 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
-    tray.setToolTip("Vencord Desktop");
+    tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
 
@@ -103,62 +119,107 @@ function initTray(win: BrowserWindow) {
     });
 }
 
+const enum MessageBoxChoice {
+    Default,
+    Cancel
+}
+
+async function clearData(win: BrowserWindow) {
+    const { response } = await dialog.showMessageBox(win, {
+        message: "Are you sure you want to reset Vesktop?",
+        detail: "This will log you out, clear caches and reset all your settings!\n\nVesktop will automatically restart after this operation.",
+        buttons: ["Yes", "No"],
+        cancelId: MessageBoxChoice.Cancel,
+        defaultId: MessageBoxChoice.Default,
+        type: "warning"
+    });
+
+    if (response === MessageBoxChoice.Cancel) return;
+
+    win.close();
+
+    await win.webContents.session.clearStorageData();
+    await win.webContents.session.clearCache();
+    await win.webContents.session.clearCodeCaches({});
+    await rm(DATA_DIR, { force: true, recursive: true });
+
+    app.relaunch();
+    app.quit();
+}
+
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
+    const isDarwin = process.platform === "darwin";
     const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
+
+    const subMenu = [
+        {
+            label: "About Vesktop",
+            click: createAboutWindow
+        },
+        {
+            label: "Force Update Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            },
+            toolTip: "Vesktop will automatically restart after this operation"
+        },
+        {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
+            },
+            toolTip: "Vesktop will automatically restart after this operation"
+        },
+        {
+            label: "Relaunch",
+            accelerator: "CmdOrCtrl+Shift+R",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        isDarwin && {
+            label: "Hide",
+            role: "hide"
+        },
+        isDarwin && {
+            label: "Hide others",
+            role: "hideOthers"
+        },
+        {
+            label: "Quit",
+            accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
+            visible: !isWindows,
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        isWindows && {
+            label: "Quit",
+            accelerator: "Alt+F4",
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+        {
+            label: "Zoom in (hidden, hack for Qwertz and others)",
+            accelerator: "CmdOrCtrl+=",
+            role: "zoomIn",
+            visible: false
+        }
+    ] satisfies Array<MenuItemConstructorOptions | false>;
 
     const menu = Menu.buildFromTemplate([
         {
-            label: "Vencord Desktop",
+            label: "Vesktop",
             role: "appMenu",
-            submenu: [
-                {
-                    label: "About Vencord Desktop",
-                    click: createAboutWindow
-                },
-                {
-                    label: "Force Update Vencord",
-                    async click() {
-                        await downloadVencordFiles();
-                        app.relaunch();
-                        app.quit();
-                    },
-                    toolTip: "Vencord Desktop will automatically restart after this operation"
-                },
-                {
-                    label: "Relaunch",
-                    accelerator: "CmdOrCtrl+Shift+R",
-                    click() {
-                        app.relaunch();
-                        app.quit();
-                    }
-                },
-                {
-                    label: "Quit",
-                    accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
-                    visible: !isWindows,
-                    role: "quit",
-                    click() {
-                        app.quit();
-                    }
-                },
-                {
-                    label: "Quit",
-                    accelerator: isWindows ? "Alt+F4" : void 0,
-                    visible: isWindows,
-                    role: "quit",
-                    click() {
-                        app.quit();
-                    }
-                },
-                // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-                {
-                    label: "Zoom in (hidden, hack for Qwertz and others)",
-                    accelerator: "CmdOrCtrl+=",
-                    role: "zoomIn",
-                    visible: false
-                }
-            ]
+            submenu: subMenu.filter(isTruthy)
         },
         { role: "fileMenu" },
         { role: "editMenu" },
@@ -250,6 +311,8 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
+    const { staticTitle, transparencyOption } = Settings.store;
+    const { frameless, macosTranslucency } = VencordSettings.store;
     const win = (mainWin = new BrowserWindow({
         show: false,
         webPreferences: {
@@ -261,23 +324,34 @@ function createMainWindow() {
             spellcheck: true
         },
         icon: ICON_PATH,
-        frame: VencordSettings.store.frameless !== true,
-        ...(Settings.store.staticTitle ? { title: "Vencord" } : {}),
-        ...(VencordSettings.store.macosTranslucency
+        frame: frameless !== true,
+        ...(transparencyOption && transparencyOption !== "none"
+            ? {
+                  backgroundColor: "#00000000",
+                  backgroundMaterial: Settings.store.transparencyOption,
+                  transparent: true
+              }
+            : {}),
+        ...(staticTitle ? { title: "Vencord" } : {}),
+        ...(macosTranslucency
             ? {
                   vibrancy: "sidebar",
                   backgroundColor: "#ffffff00"
               }
             : {}),
+        ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
         ...getWindowBoundsOptions()
     }));
     win.setMenuBarVisibility(false);
 
     win.on("close", e => {
-        if (isQuitting || Settings.store.minimizeToTray === false || Settings.store.tray === false) return;
+        const useTray = Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
+        if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
-        win.hide();
+
+        if (process.platform === "darwin") app.hide();
+        else win.hide();
 
         return false;
     });
@@ -285,7 +359,7 @@ function createMainWindow() {
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
-    if (Settings.store.tray ?? true) initTray(win);
+    if ((Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);

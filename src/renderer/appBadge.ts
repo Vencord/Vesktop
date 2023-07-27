@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
- * Vencord Desktop, a desktop app aiming to give you a snappier Discord Experience
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
@@ -23,7 +23,7 @@ export function setBadge() {
     let totalCount = mentionCount + pendingRequests;
     if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-    VencordDesktopNative.app.setBadgeCount(totalCount);
+    VesktopNative.app.setBadgeCount(totalCount);
 }
 
 let toFind = 3;
