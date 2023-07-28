@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   arrpc:
-    specifier: github:OpenAsar/arrpc#061d473dc742266fc7f61587ed18e666543fed1e
-    version: github.com/OpenAsar/arrpc/061d473dc742266fc7f61587ed18e666543fed1e
+    specifier: github:OpenAsar/arrpc#bfcba7e3d6e6f7301a5699c4a1eb10c968e7b568
+    version: github.com/OpenAsar/arrpc/bfcba7e3d6e6f7301a5699c4a1eb10c968e7b568
 
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
@@ -4356,8 +4356,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  github.com/OpenAsar/arrpc/061d473dc742266fc7f61587ed18e666543fed1e:
-    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/061d473dc742266fc7f61587ed18e666543fed1e}
+  github.com/OpenAsar/arrpc/bfcba7e3d6e6f7301a5699c4a1eb10c968e7b568:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/bfcba7e3d6e6f7301a5699c4a1eb10c968e7b568}
     name: arrpc
     version: 3.1.0
     dependencies:

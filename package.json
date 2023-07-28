@@ -23,7 +23,7 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#061d473dc742266fc7f61587ed18e666543fed1e"
+        "arrpc": "github:OpenAsar/arrpc#bfcba7e3d6e6f7301a5699c4a1eb10c968e7b568"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
