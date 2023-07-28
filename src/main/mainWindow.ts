@@ -298,6 +298,10 @@ function initSettingsListeners(win: BrowserWindow) {
             win.setBackgroundColor("#ffffff");
         }
     });
+
+    addSettingsListener("enableMenu", enabled => {
+        win.setAutoHideMenuBar(enabled ?? false);
+    });
 }
 
 function initSpellCheck(win: BrowserWindow) {
@@ -311,7 +315,7 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu } = Settings.store;
     const { frameless, macosTranslucency } = VencordSettings.store;
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -340,7 +344,8 @@ function createMainWindow() {
               }
             : {}),
         ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
-        ...getWindowBoundsOptions()
+        ...getWindowBoundsOptions(),
+        autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
 

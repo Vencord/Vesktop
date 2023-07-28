@@ -19,6 +19,7 @@ export interface Settings {
     minimizeToTray?: boolean;
     skippedUpdate?: string;
     staticTitle?: boolean;
+    enableMenu?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
 
