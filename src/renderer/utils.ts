@@ -16,3 +16,4 @@ export const isFirstRun = (() => {
 const { platform } = navigator;
 
 export const isWindows = platform.startsWith("Win");
+export const isMac = platform.startsWith("Mac");

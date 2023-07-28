@@ -10,6 +10,8 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
+import { isMac } from "renderer/utils";
+import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
     const Settings = useSettings();
@@ -18,9 +20,9 @@ export default function SettingsUi() {
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
-    const switches: [keyof typeof Settings, string, string, boolean?, (() => boolean)?][] = [
-        ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
-        [
+    const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
+        !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
+        !isMac && [
             "minimizeToTray",
             "Minimize to tray",
             "Hitting X will make Vesktop minimize to the tray instead of closing",
@@ -40,6 +42,8 @@ export default function SettingsUi() {
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vencord" instead of changing to the current page']
     ];
+
+    const switches = allSwitches.filter(isTruthy);
 
     return (
         <Forms.FormSection>
