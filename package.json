@@ -50,7 +50,7 @@
         "type-fest": "^4.1.0",
         "typescript": "^5.1.6"
     },
-    "packageManager": "pnpm@8.1.1",
+    "packageManager": "pnpm@8.6.11",
     "engines": {
         "node": ">=18",
         "pnpm": ">=8"
