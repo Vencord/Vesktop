@@ -336,7 +336,7 @@ function createMainWindow() {
                   transparent: true
               }
             : {}),
-        ...(staticTitle ? { title: "Vencord" } : {}),
+        ...(staticTitle ? { title: "Vesktop" } : {}),
         ...(macosTranslucency
             ? {
                   vibrancy: "sidebar",
