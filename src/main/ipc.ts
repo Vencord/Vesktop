@@ -5,7 +5,7 @@
  */
 
 import { app, dialog, ipcMain, session, shell } from "electron";
-import { existsSync, readFileSync, watch } from "fs";
+import { existsSync, mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
@@ -14,7 +14,7 @@ import { debounce } from "shared/utils/debounce";
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
-import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE } from "./constants";
+import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 
@@ -122,3 +122,12 @@ open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
         }, 50)
     );
 });
+
+mkdirSync(VENCORD_THEMES_DIR, { recursive: true });
+watch(
+    VENCORD_THEMES_DIR,
+    { persistent: false },
+    debounce(() => {
+        mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
+    })
+);
