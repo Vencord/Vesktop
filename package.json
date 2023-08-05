@@ -101,7 +101,8 @@
         "win": {
             "target": [
                 "nsis",
-                "portable"
+                "portable",
+                "zip"
             ]
         },
         "publish": {
