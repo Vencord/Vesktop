@@ -40,7 +40,7 @@ export default function SettingsUi() {
             "Open Links in app (experimental)",
             "Opens links in a new Vesktop window instead of your web browser"
         ],
-        ["staticTitle", "Static Title", 'Makes the window title "Vencord" instead of changing to the current page'],
+        ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."]
     ];
 
