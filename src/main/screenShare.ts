@@ -29,6 +29,16 @@ export function registerScreenShareHandler() {
             }
         });
 
+        const isWayland =
+            process.platform === "linux" &&
+            (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
+        if (isWayland) {
+            const video = sources[0];
+            callback(video ? { video } : {});
+            return;
+        }
+
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
             name,
