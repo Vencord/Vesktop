@@ -10,7 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
-import { isMac } from "renderer/utils";
+import { isMac, isWindows } from "renderer/utils";
 import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
@@ -21,6 +21,11 @@ export default function SettingsUi() {
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
+        isWindows && [
+            "discordWindowsTitleBar",
+            "Discord Titlebar",
+            "Use Discord's custom title bar instead of the Windows one. Requires a full restart."
+        ],
         !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         !isMac && [
             "minimizeToTray",
@@ -35,13 +40,13 @@ export default function SettingsUi() {
             "Disable minimum window size",
             "Allows you to make the window as small as your heart desires"
         ],
+        ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
+        ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
             "Opens links in a new Vesktop window instead of your web browser"
-        ],
-        ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
-        ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."]
+        ]
     ];
 
     const switches = allSwitches.filter(isTruthy);

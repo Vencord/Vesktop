@@ -4,22 +4,27 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Settings } from "renderer/settings";
+
 import { addPatch } from "./shared";
 
-addPatch({
-    patches: [
-        {
-            find: ".wordmarkWindows",
-            replacement: [
-                {
-                    match: /case \i\.\i\.WINDOWS:/,
-                    replace: 'case "WEB":'
-                },
-                ...["close", "minimize", "fullscreen", "maximize"].map(op => ({
-                    match: new RegExp(String.raw`\i\.default\.${op}\b`),
-                    replace: `VesktopNative.win.${op}`
-                }))
-            ]
-        }
-    ]
-});
+if (Settings.store.discordWindowsTitleBar)
+    addPatch({
+        patches: [
+            {
+                find: ".wordmarkWindows",
+                replacement: [
+                    {
+                        // TODO: Fix eslint rule
+                        // eslint-disable-next-line no-useless-escape
+                        match: /case \i\.\i\.WINDOWS:/,
+                        replace: 'case "WEB":'
+                    },
+                    ...["close", "minimize", "maximize"].map(op => ({
+                        match: new RegExp(String.raw`\i\.default\.${op}\b`),
+                        replace: `VesktopNative.win.${op}`
+                    }))
+                ]
+            }
+        ]
+    });

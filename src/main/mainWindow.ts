@@ -315,8 +315,11 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, discordWindowsTitleBar } = Settings.store;
     const { frameless, macosTranslucency } = VencordSettings.store;
+
+    const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
+
     const win = (mainWin = new BrowserWindow({
         show: false,
         webPreferences: {
@@ -328,7 +331,7 @@ function createMainWindow() {
             spellcheck: true
         },
         icon: ICON_PATH,
-        frame: frameless !== true,
+        frame: !noFrame,
         ...(transparencyOption && transparencyOption !== "none"
             ? {
                   backgroundColor: "#00000000",

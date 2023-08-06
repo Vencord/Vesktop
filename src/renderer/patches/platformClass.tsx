@@ -4,6 +4,9 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Settings } from "renderer/settings";
+import { isMac, isWindows } from "renderer/utils";
+
 import { addPatch } from "./shared";
 
 addPatch({
@@ -18,5 +21,9 @@ addPatch({
         }
     ],
 
-    getPlatformClass: () => (navigator.platform.toLowerCase().startsWith("mac") ? "platform-osx" : "platform-web")
+    getPlatformClass() {
+        if (isMac) return "platform-osx";
+        if (isWindows && Settings.store.discordWindowsTitleBar) return "platform-windows";
+        return "platform-web";
+    }
 });

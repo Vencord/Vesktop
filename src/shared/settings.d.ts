@@ -7,21 +7,23 @@
 import type { Rectangle } from "electron";
 
 export interface Settings {
-    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
-    maximized?: boolean;
-    minimized?: boolean;
-    windowBounds?: Rectangle;
     discordBranch?: "stable" | "canary" | "ptb";
-    openLinksWithElectron?: boolean;
     vencordDir?: string;
-    disableMinSize?: boolean;
+    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     minimizeToTray?: boolean;
-    skippedUpdate?: string;
+    openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
+    discordWindowsTitleBar?: boolean;
 
+    maximized?: boolean;
+    minimized?: boolean;
+    windowBounds?: Rectangle;
+    disableMinSize?: boolean;
+
+    skippedUpdate?: string;
     firstLaunch?: boolean;
 }
