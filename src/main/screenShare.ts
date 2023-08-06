@@ -33,17 +33,17 @@ export function registerScreenShareHandler() {
             process.platform === "linux" &&
             (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
-        if (isWayland) {
-            const video = sources[0];
-            callback(video ? { video } : {});
-            return;
-        }
-
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
             name,
             url: thumbnail.toDataURL()
         }));
+
+        if (isWayland) {
+            const video = data[0];
+            callback(video ? { video } : {});
+            return;
+        }
 
         const choice = await request.frame
             .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
