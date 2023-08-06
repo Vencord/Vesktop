@@ -81,11 +81,11 @@ ipcMain.handle(IpcEvents.MINIMIZE, e => {
 });
 
 ipcMain.handle(IpcEvents.MAXIMIZE, e => {
-    mainWin.maximize();
-});
-
-ipcMain.handle(IpcEvents.FULLSCREEN, e => {
-    mainWin.setFullScreen(true);
+    if (mainWin.isMaximized()) {
+        mainWin.unmaximize();
+    } else {
+        mainWin.maximize();
+    }
 });
 
 ipcMain.handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {

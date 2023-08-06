@@ -54,7 +54,6 @@ export const VesktopNative = {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: () => invoke<void>(IpcEvents.CLOSE),
         minimize: () => invoke<void>(IpcEvents.MINIMIZE),
-        fullscreen: () => invoke<void>(IpcEvents.FULLSCREEN),
         maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
     },
     capturer: {
