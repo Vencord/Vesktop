@@ -51,7 +51,11 @@ export const VesktopNative = {
         addToDictionary: (word: string) => invoke<void>(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, word)
     },
     win: {
-        focus: () => invoke<void>(IpcEvents.FOCUS)
+        focus: () => invoke<void>(IpcEvents.FOCUS),
+        close: () => invoke<void>(IpcEvents.CLOSE),
+        minimize: () => invoke<void>(IpcEvents.MINIMIZE),
+        fullscreen: () => invoke<void>(IpcEvents.FULLSCREEN),
+        maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)

@@ -73,7 +73,19 @@ ipcMain.handle(IpcEvents.FOCUS, () => {
 });
 
 ipcMain.handle(IpcEvents.CLOSE, e => {
-    e.sender.close();
+    mainWin.close();
+});
+
+ipcMain.handle(IpcEvents.MINIMIZE, e => {
+    mainWin.minimize();
+});
+
+ipcMain.handle(IpcEvents.MAXIMIZE, e => {
+    mainWin.maximize();
+});
+
+ipcMain.handle(IpcEvents.FULLSCREEN, e => {
+    mainWin.setFullScreen(true);
 });
 
 ipcMain.handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
