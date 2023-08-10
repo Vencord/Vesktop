@@ -13,7 +13,7 @@ import { downloadFile, simpleGet } from "./http";
 
 const API_BASE = "https://api.github.com";
 
-const FILES_TO_DOWNLOAD = ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"];
+const FILES_TO_DOWNLOAD = ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "vencordDesktopRenderer.css"];
 
 export interface ReleaseData {
     name: string;

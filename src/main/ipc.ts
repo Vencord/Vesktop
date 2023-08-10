@@ -111,7 +111,7 @@ ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     if (!res.filePaths.length) return "cancelled";
 
     const dir = res.filePaths[0];
-    for (const file of ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"]) {
+    for (const file of ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "vencordDesktopRenderer.css"]) {
         if (!existsSync(join(dir, file))) return "invalid";
     }
 
