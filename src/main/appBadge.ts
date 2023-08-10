@@ -23,10 +23,16 @@ let lastIndex: null | number = -1;
 
 export function setBadgeCount(count: number) {
     switch (process.platform) {
-        case "darwin":
         case "linux":
             if (count === -1) count = 0;
             app.setBadgeCount(count);
+            break;
+        case "darwin":
+            if (count === 0) {
+                app.dock.setBadge("");
+                break;
+            }
+            app.dock.setBadge(count === -1 ? "•" : count.toString());
             break;
         case "win32":
             const [index, description] = getBadgeIndexAndDescription(count);
