@@ -7,7 +7,7 @@
 import "./settings.css";
 
 import { Margins } from "@vencord/types/utils";
-import { Button, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
+import { Button, Forms, Select, Switch, Text, Toasts, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
@@ -169,8 +169,14 @@ export default function SettingsUi() {
                         const choice = await VesktopNative.fileManager.selectVencordDir();
                         switch (choice) {
                             case "cancelled":
+                                return;
                             case "invalid":
-                                // TODO
+                                Toasts.show({
+                                    message:
+                                        "You did not choose a valid Vencord install. Make sure you're selecting the dist dir!",
+                                    id: Toasts.genId(),
+                                    type: Toasts.Type.FAILURE
+                                });
                                 return;
                         }
                         Settings.vencordDir = choice;
