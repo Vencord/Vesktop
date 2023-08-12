@@ -55,8 +55,12 @@ export async function downloadVencordFiles() {
     );
 }
 
+export function isValidVencordInstall(dir: string) {
+    return FILES_TO_DOWNLOAD.every(f => existsSync(join(dir, f)));
+}
+
 export async function ensureVencordFiles() {
-    if (existsSync(join(VENCORD_FILES_DIR, "vencordDesktopMain.js"))) return;
+    if (isValidVencordInstall(VENCORD_FILES_DIR)) return;
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
     await downloadVencordFiles();
