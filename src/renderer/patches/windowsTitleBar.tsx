@@ -21,7 +21,7 @@ if (Settings.store.discordWindowsTitleBar)
                         replace: 'case "WEB":'
                     },
                     ...["close", "minimize", "maximize"].map(op => ({
-                        match: new RegExp(String.raw`\i\.default\.${op}\b`),
+                        match: new RegExp(String.raw`\i\.\i\.${op}\b`),
                         replace: `VesktopNative.win.${op}`
                     }))
                 ]
