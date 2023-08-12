@@ -13,9 +13,9 @@ import { downloadFile, simpleGet } from "./http";
 
 const API_BASE = "https://api.github.com";
 
-const FILES_TO_DOWNLOAD = [
+export const FILES_TO_DOWNLOAD = [
     "vencordDesktopMain.js",
-    "preload.js",
+    "vencordDesktopPreload.js",
     "vencordDesktopRenderer.js",
     "vencordDesktopRenderer.css"
 ];
