@@ -17,9 +17,10 @@ import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
+import { FILES_TO_DOWNLOAD } from "./utils/vencordLoader";
 
 ipcMain.on(IpcEvents.GET_VENCORD_PRELOAD_FILE, e => {
-    e.returnValue = join(VENCORD_FILES_DIR, "preload.js");
+    e.returnValue = join(VENCORD_FILES_DIR, "vencordDesktopPreload.js");
 });
 
 ipcMain.on(IpcEvents.GET_VENCORD_RENDERER_SCRIPT, e => {
@@ -111,7 +112,7 @@ ipcMain.handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     if (!res.filePaths.length) return "cancelled";
 
     const dir = res.filePaths[0];
-    for (const file of ["vencordDesktopMain.js", "preload.js", "vencordDesktopRenderer.js", "renderer.css"]) {
+    for (const file of FILES_TO_DOWNLOAD) {
         if (!existsSync(join(dir, file))) return "invalid";
     }
 
