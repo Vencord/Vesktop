@@ -23,7 +23,7 @@ addPatch({
 
     getPlatformClass() {
         if (isMac) return "platform-osx";
-        if (isWindows && Settings.store.discordWindowsTitleBar) return "platform-windows";
+        if (isWindows && Settings.store.discordWindowsTitleBar) return "platform-win";
         return "platform-web";
     }
 });
