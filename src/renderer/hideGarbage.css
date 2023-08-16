@@ -3,3 +3,8 @@
 [class|=listItem]:has(+ [class|=listItem] [data-list-item-id=guildsnav___app-download-button]) {
     display: none;
 }
+
+/* FIXME: Remove after 23/08/23 */
+.vc-desktop-settings {
+    display: none;
+}

@@ -14,6 +14,7 @@ export * as Components from "./components";
 import { findByPropsLazy } from "@vencord/types/webpack";
 import { FluxDispatcher } from "@vencord/types/webpack/common";
 
+import SettingsUi from "./components/Settings";
 import { Settings } from "./settings";
 export { Settings };
 
@@ -34,6 +35,17 @@ export async function openInviteModal(code: string) {
 
     return true;
 }
+
+const customSettingsSections = (
+    Vencord.Plugins.plugins.Settings as any as { customSections: ((ID: Record<string, unknown>) => any)[] }
+).customSections;
+
+customSettingsSections.push(() => ({
+    section: "Vesktop",
+    label: "Vesktop Settings",
+    element: SettingsUi,
+    className: "vc-vesktop-settings"
+}));
 
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"];
 
