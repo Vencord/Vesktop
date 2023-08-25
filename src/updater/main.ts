@@ -4,8 +4,9 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, shell } from "electron";
 import { Settings } from "main/settings";
+import { handle } from "main/utils/ipcWrappers";
 import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
@@ -20,8 +21,8 @@ export interface UpdateData {
 
 let updateData: UpdateData;
 
-ipcMain.handle(IpcEvents.UPDATER_GET_DATA, () => updateData);
-ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
+handle(IpcEvents.UPDATER_GET_DATA, () => updateData);
+handle(IpcEvents.UPDATER_DOWNLOAD, () => {
     const portable = !!process.env.PORTABLE_EXECUTABLE_FILE;
 
     const { assets } = updateData.release;
@@ -50,7 +51,7 @@ ipcMain.handle(IpcEvents.UPDATER_DOWNLOAD, () => {
     shell.openExternal(url);
 });
 
-ipcMain.handle(IpcEvents.UPDATE_IGNORE, () => {
+handle(IpcEvents.UPDATE_IGNORE, () => {
     Settings.store.skippedUpdate = updateData.latestVersion;
 });
 

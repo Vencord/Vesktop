@@ -4,12 +4,14 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { desktopCapturer, ipcMain, session, Streams } from "electron";
+import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcEvents } from "shared/IpcEvents";
 
+import { handle } from "./utils/ipcWrappers";
+
 export function registerScreenShareHandler() {
-    ipcMain.handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
+    handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
         const sources = await desktopCapturer.getSources({
             types: ["window", "screen"],
             thumbnailSize: {

@@ -1,0 +1,36 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
+import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebFrameMain } from "electron";
+import { IpcEvents } from "shared/IpcEvents";
+
+export function validateSender(frame: WebFrameMain) {
+    const { hostname, protocol } = new URL(frame.url);
+    if (protocol === "file:") return;
+
+    switch (hostname) {
+        case "discord.com":
+        case "ptb.discord.com":
+        case "canary.discord.com":
+            break;
+        default:
+            throw new Error("ipc: Disallowed host " + hostname);
+    }
+}
+
+export function handleSync(event: IpcEvents, cb: (e: IpcMainEvent, ...args: any[]) => any) {
+    ipcMain.on(event, (e, ...args) => {
+        validateSender(e.senderFrame);
+        e.returnValue = cb(e, ...args);
+    });
+}
+
+export function handle(event: IpcEvents, cb: (e: IpcMainInvokeEvent, ...args: any[]) => any) {
+    ipcMain.handle(event, (e, ...args) => {
+        validateSender(e.senderFrame);
+        return cb(e, ...args);
+    });
+}
