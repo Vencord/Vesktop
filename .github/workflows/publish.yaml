@@ -1,0 +1,14 @@
+name: Publish to WinGet
+on:
+  release:
+    types: [released]
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Publish  to WinGet
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: Vendicated.Vesktop
+          installers-regex: '\.exe$'
+          token: ${{ secrets.GITHUB_TOKEN }}
