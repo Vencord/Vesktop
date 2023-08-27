@@ -26,3 +26,11 @@ jobs:
               with:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE: true
+
+            - name: build exe with silent capabilities
+              if: matrix.os == 'windows-latest'
+              uses: samuelmeuli/action-electron-builder@e4b12cd06ddf023422f1ac4e39632bd76f6e6928
+              with:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                RELEASE: true
+                args: -w -c.nsis.oneClick=true
