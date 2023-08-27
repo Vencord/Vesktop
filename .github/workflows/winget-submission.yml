@@ -1,3 +1,8 @@
+# Based on Microsoft/DevHome Winget CI, modified for use in Vencord/Vesktop.
+#
+# Copyright (c) Microsoft Corporation and Contributors
+# Licensed under the MIT license.
+
 name: Submit to Winget Community Repo
 
 on:
