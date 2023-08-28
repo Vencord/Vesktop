@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Submit package to Winget Community Repo
-        uses: vedantmgoyal2009/winget-releaser@v2
+        uses: vedantmgoyal2009/winget-releaser@688c38a2f42ed9b26438c69da3f96efd7b6ead1d
         with:
           identifier: Vencord.Vesktop
           token: ${{ secrets.WINGET_PAT }}
