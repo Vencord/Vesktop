@@ -79,7 +79,8 @@
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;vencord;electron;chat;"
+                "Keywords": "discord;vencord;electron;chat;",
+                "WMClass": "VencordDesktop"
             }
         },
         "mac": {
