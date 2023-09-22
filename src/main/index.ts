@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow } from "electron";
+import {app, BrowserWindow, systemPreferences} from "electron";
 import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
@@ -50,6 +50,14 @@ function init() {
 
         registerScreenShareHandler();
         bootstrap();
+        
+        //TODO we should only ask these permissions when the user joins a voice chat/video call for the first time
+        //TODO we should also handle the granted result respectively. How does this official client handle permissions?
+        systemPreferences.askForMediaAccess('microphone')
+            .then((granted) => console.log(`microphone permission granted: ${granted}`));
+        systemPreferences.askForMediaAccess('camera')
+            .then((granted) => console.log(`camera permission granted: ${granted}`)); //TODO we should only ask this permission when the user joins a video call for the first time
+
 
         app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
