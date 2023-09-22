@@ -147,6 +147,8 @@ async function clearData(win: BrowserWindow) {
     app.quit();
 }
 
+type MenuItemList = Array<MenuItemConstructorOptions | false>;
+
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
     const isDarwin = process.platform === "darwin";
@@ -181,32 +183,34 @@ function initMenuBar(win: BrowserWindow) {
                 app.quit();
             }
         },
-        isDarwin && {
-            type: "separator"
-        },
-        isDarwin && {
-            label: "Settings",
-            accelerator: "CmdOrCtrl+,",
-            async click() {
-                mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open()")
+        ...(!isDarwin ? [] : [
+            {
+                type: "separator"
+            },
+            {
+                label: "Settings",
+                accelerator: "CmdOrCtrl+,",
+                async click() {
+                    mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open()")
+                }
+            },
+            {
+                type: "separator"
+            },
+            {
+                label: "Hide Vesktop", //Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
+                role: "hide"
+            },
+            {
+                role: "hideOthers"
+            },
+            {
+                role: "unhide",
+            },
+            {
+                type: "separator"
             }
-        },
-        isDarwin && {
-            type: "separator"
-        },
-        isDarwin && {
-            label: "Hide Vesktop", //Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
-            role: "hide"
-        },
-        isDarwin && {
-            role: "hideOthers"
-        },
-        isDarwin && {
-            role: "unhide",
-        },
-        isDarwin && {
-            type: "separator"
-        },
+        ] satisfies MenuItemList),
         {
             label: "Quit",
             accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
@@ -231,7 +235,7 @@ function initMenuBar(win: BrowserWindow) {
             role: "zoomIn",
             visible: false
         }
-    ] satisfies Array<MenuItemConstructorOptions | false>;
+    ] satisfies MenuItemList;
 
     const menu = Menu.buildFromTemplate([
         {
