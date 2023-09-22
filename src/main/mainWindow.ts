@@ -28,6 +28,7 @@ import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { SettingsRouter } from "@vencord/types/webpack/common";
 
 let isQuitting = false;
 let tray: Tray;
@@ -182,12 +183,30 @@ function initMenuBar(win: BrowserWindow) {
             }
         },
         isDarwin && {
-            label: "Hide",
+            type: "separator"
+        },
+        isDarwin && {
+            label: "Settings",
+            accelerator: "CmdOrCtrl+,",
+            async click() {
+                mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open()")
+            }
+        },
+        isDarwin && {
+            type: "separator"
+        },
+        isDarwin && {
+            label: "Hide Vesktop",
             role: "hide"
         },
         isDarwin && {
-            label: "Hide others",
             role: "hideOthers"
+        },
+        isDarwin && {
+            role: "unhide",
+        },
+        isDarwin && {
+            type: "separator"
         },
         {
             label: "Quit",
