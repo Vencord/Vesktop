@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import {app, BrowserWindow, systemPreferences} from "electron";
+import { app, BrowserWindow, systemPreferences } from "electron";
 import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
