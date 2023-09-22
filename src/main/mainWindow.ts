@@ -28,7 +28,6 @@ import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
-import { SettingsRouter } from "@vencord/types/webpack/common";
 
 let isQuitting = false;
 let tray: Tray;
@@ -196,7 +195,7 @@ function initMenuBar(win: BrowserWindow) {
             type: "separator"
         },
         isDarwin && {
-            label: "Hide Vesktop",
+            label: "Hide Vesktop", //Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
             role: "hide"
         },
         isDarwin && {
