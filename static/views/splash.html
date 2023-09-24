@@ -15,6 +15,7 @@
             align-items: center;
             border-radius: 8px;
             border: 1px solid var(--fg-semi-trans);
+            background-color: var(--bg);
         }
 
         p {
@@ -25,17 +26,29 @@
             width: 6em;
             height: 6em;
         }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #282828;
+                --fg: #D3869B;
+                --fg-semi-trans: rgba(212, 212, 212, 0.7);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #D3869B;
+                --fg: #282828;
+                --fg-semi-trans: rgba(30, 30, 30, 0.7);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <img
-            draggable="false"
-            src="https://cdn.discordapp.com/emojis/1024751291504791654.gif?size=512"
-            alt="shiggy"
-            role="presentation"
-        />
+        <img draggable="false" src="https://cdn.discordapp.com/emojis/1024751291504791654.gif?size=512" alt="shiggy"
+            role="presentation" />
         <p>Loading Vesktop...</p>
     </div>
 </body>
