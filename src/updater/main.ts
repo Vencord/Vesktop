@@ -11,7 +11,7 @@ import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
-import { VIEW_DIR } from "shared/paths";
+import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 export interface UpdateData {
     currentVersion: string;
@@ -108,7 +108,8 @@ function openNewUpdateWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: true
-        }
+        },
+        icon: ICON_PATH
     });
 
     makeLinksOpenExternally(win);
