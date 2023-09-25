@@ -7,10 +7,13 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { VIEW_DIR } from "shared/paths";
+import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 export function createSplashWindow() {
-    const splash = new BrowserWindow(SplashProps);
+    const splash = new BrowserWindow({
+        ...SplashProps,
+        icon: ICON_PATH
+    });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
 
