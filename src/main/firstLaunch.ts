@@ -9,7 +9,7 @@ import { BrowserWindow } from "electron/main";
 import { copyFileSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { VIEW_DIR } from "shared/paths";
+import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
@@ -31,7 +31,8 @@ export function createFirstLaunchTour() {
         frame: true,
         autoHideMenuBar: true,
         height: 470,
-        width: 550
+        width: 550,
+        icon: ICON_PATH
     });
 
     makeLinksOpenExternally(win);
