@@ -191,7 +191,7 @@ function initMenuBar(win: BrowserWindow) {
                 label: "Settings",
                 accelerator: "CmdOrCtrl+,",
                 async click() {
-                    mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open()")
+                    mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open('My Account')")
                 }
             },
             {
