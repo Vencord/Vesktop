@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { getAudioFromVirtmic } from "./screenShareAudio";
 import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcEvents } from "shared/IpcEvents";
@@ -57,10 +58,13 @@ export function registerScreenShareHandler() {
         const source = sources.find(s => s.id === choice.id);
         if (!source) return callback({});
 
+        const pwvirtmic = getAudioFromVirtmic();
+
         const streams: Streams = {
             video: source
         };
         if (choice.audio && process.platform === "win32") streams.audio = "loopback";
+        if (choice.audio && process.platform === "linux") streams.audio = ;
 
         callback(streams);
     });
