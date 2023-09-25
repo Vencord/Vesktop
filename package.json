@@ -1,6 +1,6 @@
 {
     "name": "VencordDesktop",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "private": true,
     "description": "",
     "keywords": [],
@@ -23,7 +23,7 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#b47fd7d498e248955c843a7857dd26478b82190a"
+        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
@@ -33,7 +33,7 @@
         "@typescript-eslint/parser": "^6.2.1",
         "@vencord/types": "^0.1.2",
         "dotenv": "^16.3.1",
-        "electron": "^25.4.0",
+        "electron": "^26.2.2",
         "electron-builder": "^24.6.3",
         "esbuild": "^0.18.17",
         "eslint": "^8.46.0",
