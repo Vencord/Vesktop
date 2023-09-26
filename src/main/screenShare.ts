@@ -45,6 +45,7 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
+            getAudioFromVirtmic();
             callback(video ? { video } : {});
             return;
         }

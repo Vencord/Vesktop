@@ -1,9 +1,6 @@
+import { createVirtmic } from "./createVirtmic";
 export function getAudioFromVirtmic() {
-    const getAudioDevice = async (deviceName) => {
-        await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
-        
+    const getAudioDevice = async (deviceName: string|undefined) => {
         await new Promise(r => setTimeout(r, 1000));
         let devices = await navigator.mediaDevices.enumerateDevices();
         let audioDevice = devices.find(({
@@ -14,7 +11,7 @@ export function getAudioFromVirtmic() {
     };
 
     const getDisplayMedia = async () => {
-        var id;
+        var id: string|undefined;
         try {
             let myDiscordAudioSink = await getAudioDevice('virtmic');
             id = myDiscordAudioSink?.deviceId;
@@ -23,16 +20,21 @@ export function getAudioFromVirtmic() {
             id = 'default';
         }
 
-        let captureSystemAudioStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                /*deviceId {
-                    exact: id
-                },
-                autoGainControl: false,
-                echoCancellation: false,
-                noiseSuppression: false
-                channelCount: 2*/
-            }
+        const constraints = {
+            deviceId: {
+                exact: id
+            },
+            autoGainControl: false,
+            echoCancellation: false,
+            noiseSuppression: false,
+            channelCount: 2
+        };
+
+        await navigator.mediaDevices.getUserMedia({
+            audio: true 
+        }).then((MediaStream) => {
+            const audioTrack = MediaStream.getAudioTracks()[0];
+            let captureSystemAudioStream = audioTrack.applyConstraints(constraints);
         });
     };
 };
