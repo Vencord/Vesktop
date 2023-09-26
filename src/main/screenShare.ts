@@ -30,7 +30,8 @@ export function registerScreenShareHandler() {
                 width: 176,
                 height: 99
             }
-        });
+        }).catch(() => null);
+        if (sources === null) return callback({});
 
         const isWayland =
             process.platform === "linux" &&
@@ -58,13 +59,10 @@ export function registerScreenShareHandler() {
         const source = sources.find(s => s.id === choice.id);
         if (!source) return callback({});
 
-        const pwvirtmic = getAudioFromVirtmic();
-
         const streams: Streams = {
             video: source
         };
         if (choice.audio && process.platform === "win32") streams.audio = "loopback";
-        if (choice.audio && process.platform === "linux") streams.audio = ;
 
         callback(streams);
     });

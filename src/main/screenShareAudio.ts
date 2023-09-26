@@ -12,4 +12,27 @@ export function getAudioFromVirtmic() {
         
         return audioDevice;
     };
+
+    const getDisplayMedia = async () => {
+        var id;
+        try {
+            let myDiscordAudioSink = await getAudioDevice('virtmic');
+            id = myDiscordAudioSink?.deviceId;
+        }
+        catch (error) {
+            id = 'default';
+        }
+
+        let captureSystemAudioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                /*deviceId {
+                    exact: id
+                },
+                autoGainControl: false,
+                echoCancellation: false,
+                noiseSuppression: false
+                channelCount: 2*/
+            }
+        });
+    };
 };
