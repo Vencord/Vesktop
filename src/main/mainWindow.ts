@@ -183,34 +183,38 @@ function initMenuBar(win: BrowserWindow) {
                 app.quit();
             }
         },
-        ...(!isDarwin ? [] : [
-            {
-                type: "separator"
-            },
-            {
-                label: "Settings",
-                accelerator: "CmdOrCtrl+,",
-                async click() {
-                    mainWin.webContents.executeJavaScript("Vencord.Webpack.Common.SettingsRouter.open('My Account')")
-                }
-            },
-            {
-                type: "separator"
-            },
-            {
-                label: "Hide Vesktop", //Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
-                role: "hide"
-            },
-            {
-                role: "hideOthers"
-            },
-            {
-                role: "unhide",
-            },
-            {
-                type: "separator"
-            }
-        ] satisfies MenuItemList),
+        ...(!isDarwin
+            ? []
+            : ([
+                  {
+                      type: "separator"
+                  },
+                  {
+                      label: "Settings",
+                      accelerator: "CmdOrCtrl+,",
+                      async click() {
+                          mainWin.webContents.executeJavaScript(
+                              "Vencord.Webpack.Common.SettingsRouter.open('My Account')"
+                          );
+                      }
+                  },
+                  {
+                      type: "separator"
+                  },
+                  {
+                      label: "Hide Vesktop", // Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
+                      role: "hide"
+                  },
+                  {
+                      role: "hideOthers"
+                  },
+                  {
+                      role: "unhide"
+                  },
+                  {
+                      type: "separator"
+                  }
+              ] satisfies MenuItemList)),
         {
             label: "Quit",
             accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
