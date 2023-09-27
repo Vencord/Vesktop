@@ -48,7 +48,7 @@ export function registerScreenShareHandler() {
                     `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([data])}, true)`
                 );
 
-            callback(video ? { video } : {});
+            callback(video ? { video: sources[0] } : {});
             return;
         }
 
