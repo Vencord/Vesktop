@@ -12,8 +12,8 @@ if (isLinux) {
 
         var id: string|undefined;
         try {
-            let myDiscordAudioSink = await getAudioDevice('virtmic');
-            id = myDiscordAudioSink?.deviceId;
+            let vesktopAudioSink = await getAudioDevice('vesktop-virtmic');
+            id = vesktopAudioSink?.deviceId;
         }
         catch (error) {
             id = 'error';
