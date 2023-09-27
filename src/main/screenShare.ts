@@ -55,7 +55,10 @@ export function registerScreenShareHandler() {
         const choice = await request.frame
             .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
             .then(e => e as StreamPick)
-            .catch(() => null);
+            .catch(e => {
+                console.error("Error during screenshare picker", e);
+                return null;
+            });
 
         if (!choice) return callback({});
 
