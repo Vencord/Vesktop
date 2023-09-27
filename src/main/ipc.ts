@@ -4,7 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { RelaunchOptions, app, dialog, session, shell } from "electron";
+import { execFile } from "child_process";
+import { app, dialog, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -19,7 +20,6 @@ import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { isValidVencordInstall } from "./utils/vencordLoader";
-import { execFile } from "child_process";
 
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_FILE, () => join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"));
 handleSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT, () =>
@@ -47,7 +47,7 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
 
 handle(IpcEvents.RELAUNCH, () => {
     const options: RelaunchOptions = {
-        args: process.argv.slice(1).concat(["--relaunch"]),
+        args: process.argv.slice(1).concat(["--relaunch"])
     };
     if (app.isPackaged && process.env.APPIMAGE) {
         execFile(process.env.APPIMAGE, options.args);
