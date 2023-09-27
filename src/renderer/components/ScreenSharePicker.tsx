@@ -70,7 +70,7 @@ addPatch({
     }
 });
 
-export function openScreenSharePicker(screens: Source[]) {
+export function openScreenSharePicker(screens: Source[], skipPicker = false) {
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
             props => (
@@ -82,6 +82,7 @@ export function openScreenSharePicker(screens: Source[]) {
                         props.onClose();
                         reject("Aborted");
                     }}
+                    skipPicker={skipPicker}
                 />
             ),
             {
@@ -191,14 +192,16 @@ function ModalComponent({
     screens,
     modalProps,
     submit,
-    close
+    close,
+    skipPicker
 }: {
     screens: Source[];
     modalProps: any;
     submit: (data: StreamPick) => void;
     close: () => void;
+    skipPicker: boolean;
 }) {
-    const [selected, setSelected] = useState<string>();
+    const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
         resolution: "1080",
         fps: "60",
@@ -259,7 +262,7 @@ function ModalComponent({
                     Go Live
                 </Button>
 
-                {selected ? (
+                {selected && !skipPicker ? (
                     <Button color={Button.Colors.TRANSPARENT} onClick={() => setSelected(void 0)}>
                         Back
                     </Button>

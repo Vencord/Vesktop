@@ -43,6 +43,11 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
+            if (video)
+                await request.frame.executeJavaScript(
+                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([data])}, true)`
+                );
+
             callback(video ? { video } : {});
             return;
         }
