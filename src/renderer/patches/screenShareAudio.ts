@@ -5,7 +5,6 @@ async function getVirtmic() {
         let audioDevice = devices.find(({
             label
         }) => label === deviceName);
-        console.log(audioDevice);
     return audioDevice;
     }    
 
@@ -13,11 +12,9 @@ async function getVirtmic() {
     try {
         let myDiscordAudioSink = await getAudioDevice('virtmic');
         id = myDiscordAudioSink?.deviceId;
-        console.log(id, "connected");
     }
     catch (error) {
         id = 'default';
-        console.log("virtmic failed to connect");
     }
 return id;
 };
