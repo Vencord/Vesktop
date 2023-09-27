@@ -35,11 +35,7 @@ if (isLinux) {
                 } 
             });
             audio.getAudioTracks().forEach(t => stream.addTrack(t));
-        } else {
-            const audio = await navigator.mediaDevices.getUserMedia({ audio: false });
-        
         };
-        
         return stream;
     };
 };
