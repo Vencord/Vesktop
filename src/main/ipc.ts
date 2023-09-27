@@ -4,7 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { app, dialog, session, shell } from "electron";
+import { execFile } from "child_process";
+import { app, dialog, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -45,7 +46,14 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
 });
 
 handle(IpcEvents.RELAUNCH, () => {
-    app.relaunch();
+    const options: RelaunchOptions = {
+        args: process.argv.slice(1).concat(["--relaunch"])
+    };
+    if (app.isPackaged && process.env.APPIMAGE) {
+        execFile(process.env.APPIMAGE, options.args);
+    } else {
+        app.relaunch(options);
+    }
     app.exit();
 });
 
