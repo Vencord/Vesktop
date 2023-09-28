@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { isLinux } from "../utils";
+import { isLinux } from "renderer/utils";
 
 if (isLinux) {
     const original = navigator.mediaDevices.getDisplayMedia;
