@@ -10,6 +10,9 @@ import { IpcEvents } from "shared/IpcEvents";
 
 import { handle } from "./utils/ipcWrappers";
 
+const isWayland =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
         const sources = await desktopCapturer.getSources({
@@ -23,19 +26,22 @@ export function registerScreenShareHandler() {
     });
 
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
-        const sources = await desktopCapturer.getSources({
-            types: ["window", "screen"],
-            thumbnailSize: {
-                width: 176,
-                height: 99
-            }
-        }).catch(() => null);
-        
+        const sources = await desktopCapturer
+            .getSources({
+                types: ["window", "screen"],
+                thumbnailSize: isWayland
+                    ? {
+                          width: 1920,
+                          height: 1080
+                      }
+                    : {
+                          width: 176,
+                          height: 99
+                      }
+            })
+            .catch(() => null);
+
         if (sources === null) return callback({});
-        
-        const isWayland =
-            process.platform === "linux" &&
-            (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
