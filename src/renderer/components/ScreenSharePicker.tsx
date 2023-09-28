@@ -71,7 +71,7 @@ addPatch({
     }
 });
 
-export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
+export async function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     let didSubmit = false;
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
@@ -98,7 +98,7 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                 }
             }
         );
-    });
+    }).catch(null);
 }
 
 function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (id: string) => void }) {

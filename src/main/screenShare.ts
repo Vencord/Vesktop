@@ -52,9 +52,12 @@ export function registerScreenShareHandler() {
         if (isWayland) {
             const video = data[0];
             if (video)
-                await request.frame.executeJavaScript(
-                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
-                );
+                var stream = await request.frame
+                    .executeJavaScript(
+                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
+                    )
+                    .catch(() => null);
+            if (stream === null) return callback({});
 
             callback(video ? { video: sources[0] } : {});
             return;
@@ -71,6 +74,7 @@ export function registerScreenShareHandler() {
         if (!choice) return callback({});
 
         const source = sources.find(s => s.id === choice.id);
+
         if (!source) return callback({});
 
         const streams: Streams = {
