@@ -32,7 +32,10 @@ export function registerScreenShareHandler() {
             }
         }).catch(() => null);
         if (sources === null) return callback({});
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2e5c450b14553561ad6ca505152d2a93766ca138
         const isWayland =
             process.platform === "linux" &&
             (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
@@ -45,15 +48,27 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
+<<<<<<< HEAD
             getAudioFromVirtmic();
             callback(video ? { video } : {});
+=======
+            if (video)
+                await request.frame.executeJavaScript(
+                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
+                );
+
+            callback(video ? { video: sources[0] } : {});
+>>>>>>> 2e5c450b14553561ad6ca505152d2a93766ca138
             return;
         }
 
         const choice = await request.frame
-            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
+            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)}, false)`)
             .then(e => e as StreamPick)
-            .catch(() => null);
+            .catch(e => {
+                console.error("Error during screenshare picker", e);
+                return null;
+            });
 
         if (!choice) return callback({});
 
