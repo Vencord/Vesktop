@@ -11,7 +11,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 import { promisify } from "util";
 
-const BIN = join(STATIC_DIR, "vencord-virtmic");
+const BIN = join(STATIC_DIR, "virtmic/vencord-virtmic");
 const execFileP = promisify(execFile);
 
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, async () => {
