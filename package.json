@@ -66,6 +66,7 @@
             "LICENSE"
         ],
         "linux": {
+            "icon": "build/icon.icns",
             "category": "Network",
             "maintainer": "vendicated+vesktop@riseup.net",
             "target": [
