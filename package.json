@@ -1,8 +1,8 @@
 {
-    "name": "VencordDesktop",
+    "name": "vencorddesktop",
     "version": "0.3.2",
     "private": true,
-    "description": "",
+    "description": "A cross platform electron-based desktop app aiming to give you a snappier Discord experience with Vencord pre-installed.",
     "keywords": [],
     "homepage": "https://vencord.dev/",
     "license": "GPL-3.0",
