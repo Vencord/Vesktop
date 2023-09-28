@@ -23,8 +23,7 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d",
-        "node-pipewire": "^1.0.14"
+        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
