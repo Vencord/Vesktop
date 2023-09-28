@@ -116,7 +116,7 @@ function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScre
     );
 }
 
-function StreamSettings({
+export function StreamSettings({
     source,
     settings,
     setSettings

@@ -45,7 +45,7 @@ export function registerScreenShareHandler() {
             const video = data[0];
             if (video)
                 await request.frame.executeJavaScript(
-                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([data])}, true)`
+                    `Vesktop.Components.ScreenShare.StreamSettings(${JSON.stringify([data])}, true)`
                 );
 
             callback(video ? { video: sources[0] } : {});
