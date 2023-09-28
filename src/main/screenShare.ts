@@ -31,11 +31,9 @@ export function registerScreenShareHandler() {
                 height: 99
             }
         }).catch(() => null);
+        
         if (sources === null) return callback({});
-<<<<<<< HEAD
-
-=======
->>>>>>> 2e5c450b14553561ad6ca505152d2a93766ca138
+        
         const isWayland =
             process.platform === "linux" &&
             (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
@@ -48,17 +46,12 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
-<<<<<<< HEAD
-            getAudioFromVirtmic();
-            callback(video ? { video } : {});
-=======
             if (video)
                 await request.frame.executeJavaScript(
                     `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
                 );
 
             callback(video ? { video: sources[0] } : {});
->>>>>>> 2e5c450b14553561ad6ca505152d2a93766ca138
             return;
         }
 
