@@ -19,8 +19,8 @@ if (isLinux) {
         }
     }
 
-    navigator.mediaDevices.getDisplayMedia = async function () {
-        const stream = await original.apply(this);
+    navigator.mediaDevices.getDisplayMedia = async function (opts) {
+        const stream = await original.call(this, opts);
         const id = await getVirtmic();
 
         if (id) {
