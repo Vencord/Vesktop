@@ -29,8 +29,8 @@ export function registerScreenShareHandler() {
                 width: 176,
                 height: 99
             }
-        });
-
+        }).catch(() => null);
+        if (sources === null) return callback({});
         const isWayland =
             process.platform === "linux" &&
             (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
@@ -45,7 +45,7 @@ export function registerScreenShareHandler() {
             const video = data[0];
             if (video)
                 await request.frame.executeJavaScript(
-                    `Vesktop.Components.ScreenShare.StreamSettings(${JSON.stringify([data])}, true)`
+                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
                 );
 
             callback(video ? { video: sources[0] } : {});
@@ -53,7 +53,7 @@ export function registerScreenShareHandler() {
         }
 
         const choice = await request.frame
-            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
+            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)}, false)`)
             .then(e => e as StreamPick)
             .catch(e => {
                 console.error("Error during screenshare picker", e);
