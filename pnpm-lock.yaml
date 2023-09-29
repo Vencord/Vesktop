@@ -32,8 +32,8 @@ devDependencies:
     specifier: ^16.3.1
     version: 16.3.1
   electron:
-    specifier: ^25.8.2
-    version: 25.8.2
+    specifier: ^27.0.0-beta.8
+    version: 27.0.0-beta.8
   electron-builder:
     specifier: ^24.6.3
     version: 24.6.3
