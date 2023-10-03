@@ -1,6 +1,6 @@
 {
     "name": "VencordDesktop",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "private": true,
     "description": "",
     "keywords": [],
@@ -33,7 +33,7 @@
         "@typescript-eslint/parser": "^6.2.1",
         "@vencord/types": "^0.1.2",
         "dotenv": "^16.3.1",
-        "electron": "^25.8.2",
+        "electron": "^25.8.4",
         "electron-builder": "^24.6.3",
         "esbuild": "^0.18.17",
         "eslint": "^8.46.0",
@@ -66,6 +66,7 @@
             "LICENSE"
         ],
         "linux": {
+            "icon": "build/icon.icns",
             "category": "Network",
             "maintainer": "vendicated+vesktop@riseup.net",
             "target": [
