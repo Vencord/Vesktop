@@ -11,10 +11,10 @@ export function registerMediaPermissionsHandler() {
 
     session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback, details) => {
         if (permission === "media") {
-            if (details.mediaTypes!.includes("audio")) {
+            if (details.mediaTypes?.includes("audio")) {
                 systemPreferences.askForMediaAccess("microphone").then(callback);
             }
-            if (details.mediaTypes!.includes("video")) {
+            if (details.mediaTypes?.includes("video")) {
                 systemPreferences.askForMediaAccess("camera").then(callback);
             }
         }
