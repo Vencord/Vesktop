@@ -22,3 +22,4 @@ jobs:
           token: ${{ secrets.WINGET_PAT }}
           installers-regex: '\.exe$'
           release-tag: ${{ inputs.tag || github.event.release.tag_name }}
+          fork-user: shiggybot
