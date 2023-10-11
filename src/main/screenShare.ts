@@ -26,22 +26,19 @@ export function registerScreenShareHandler() {
     });
 
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
+        // request full resolution on wayland right away because we always only end up with one result anyway
+        const width = isWayland ? 1920 : 176;
         const sources = await desktopCapturer
             .getSources({
                 types: ["window", "screen"],
-                thumbnailSize: isWayland
-                    ? {
-                          width: 1920,
-                          height: 1080
-                      }
-                    : {
-                          width: 176,
-                          height: 99
-                      }
+                thumbnailSize: {
+                    width,
+                    height: width * (9 / 16)
+                }
             })
-            .catch(() => null);
+            .catch(err => console.error("Error during screenshare picker", err));
 
-        if (sources === null) return callback({});
+        if (!sources) return callback({});
 
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
@@ -54,7 +51,7 @@ export function registerScreenShareHandler() {
             if (video) {
                 const stream = await request.frame
                     .executeJavaScript(
-                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])}, true)`
+                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
                     )
                     .catch(() => null);
                 if (stream === null) return callback({});
@@ -65,7 +62,7 @@ export function registerScreenShareHandler() {
         }
 
         const choice = await request.frame
-            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)}, false)`)
+            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
             .then(e => e as StreamPick)
             .catch(e => {
                 console.error("Error during screenshare picker", e);
@@ -75,7 +72,6 @@ export function registerScreenShareHandler() {
         if (!choice) return callback({});
 
         const source = sources.find(s => s.id === choice.id);
-
         if (!source) return callback({});
 
         const streams: Streams = {
