@@ -17,6 +17,6 @@ export function registerMediaPermissionsHandler() {
             if (details.mediaTypes?.includes("video")) {
                 systemPreferences.askForMediaAccess("camera").then(callback);
             }
-        }
+        } else callback(true);
     });
 }
