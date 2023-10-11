@@ -9,14 +9,16 @@ import { session, systemPreferences } from "electron";
 export function registerMediaPermissionsHandler() {
     if (process.platform !== "darwin") return;
 
-    session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback, details) => {
-        if (permission === "media") {
-            if (details.mediaTypes?.includes("audio")) {
-                systemPreferences.askForMediaAccess("microphone").then(callback);
-            }
-            if (details.mediaTypes?.includes("video")) {
-                systemPreferences.askForMediaAccess("camera").then(callback);
-            }
-        } else callback(true);
+    session.defaultSession.setPermissionRequestHandler(async (_webContents, permission, callback, details) => {
+        let granted: boolean = true;
+
+        if (details.mediaTypes?.includes("audio")) {
+            granted = await systemPreferences.askForMediaAccess("microphone");
+        }
+        if (details.mediaTypes?.includes("video")) {
+            granted &&= await systemPreferences.askForMediaAccess("camera");
+        }
+
+        callback(granted);
     });
 }
