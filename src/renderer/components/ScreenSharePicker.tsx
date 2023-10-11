@@ -71,7 +71,7 @@ addPatch({
     }
 });
 
-export function openScreenSharePicker(screens: Source[], skipPicker = false) {
+export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     let didSubmit = false;
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
@@ -119,16 +119,21 @@ function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScre
 function StreamSettings({
     source,
     settings,
-    setSettings
+    setSettings,
+    skipPicker
 }: {
     source: Source;
     settings: StreamSettings;
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
+    skipPicker: boolean;
 }) {
-    const [thumb] = useAwaiter(() => VesktopNative.capturer.getLargeThumbnail(source.id), {
-        fallbackValue: source.url,
-        deps: [source.id]
-    });
+    const [thumb] = useAwaiter(
+        () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
+        {
+            fallbackValue: source.url,
+            deps: [source.id]
+        }
+    );
 
     return (
         <div>
@@ -269,6 +274,7 @@ function ModalComponent({
                         source={screens.find(s => s.id === selected)!}
                         settings={settings}
                         setSettings={setSettings}
+                        skipPicker={skipPicker}
                     />
                 )}
             </Modals.ModalContent>

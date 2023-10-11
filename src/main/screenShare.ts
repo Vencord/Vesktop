@@ -10,6 +10,9 @@ import { IpcEvents } from "shared/IpcEvents";
 
 import { handle } from "./utils/ipcWrappers";
 
+const isWayland =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
         const sources = await desktopCapturer.getSources({
@@ -23,17 +26,19 @@ export function registerScreenShareHandler() {
     });
 
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
-        const sources = await desktopCapturer.getSources({
-            types: ["window", "screen"],
-            thumbnailSize: {
-                width: 176,
-                height: 99
-            }
-        });
+        // request full resolution on wayland right away because we always only end up with one result anyway
+        const width = isWayland ? 1920 : 176;
+        const sources = await desktopCapturer
+            .getSources({
+                types: ["window", "screen"],
+                thumbnailSize: {
+                    width,
+                    height: width * (9 / 16)
+                }
+            })
+            .catch(err => console.error("Error during screenshare picker", err));
 
-        const isWayland =
-            process.platform === "linux" &&
-            (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+        if (!sources) return callback({});
 
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
@@ -43,10 +48,14 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
-            if (video)
-                await request.frame.executeJavaScript(
-                    `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([data])}, true)`
-                );
+            if (video) {
+                const stream = await request.frame
+                    .executeJavaScript(
+                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
+                    )
+                    .catch(() => null);
+                if (stream === null) return callback({});
+            }
 
             callback(video ? { video: sources[0] } : {});
             return;
