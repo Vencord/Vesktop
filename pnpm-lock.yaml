@@ -32,8 +32,8 @@ devDependencies:
     specifier: ^16.3.1
     version: 16.3.1
   electron:
-    specifier: ^25.8.4
-    version: 25.8.4
+    specifier: ^27.0.0
+    version: 27.0.0
   electron-builder:
     specifier: ^24.6.3
     version: 24.6.3
@@ -1766,8 +1766,8 @@ packages:
       - supports-color
     dev: true
 
-  /electron@25.8.4:
-    resolution: {integrity: sha512-hUYS3RGdaa6E1UWnzeGnsdsBYOggwMMg4WGxNGvAoWtmRrr6J1BsjFW/yRq4WsJHJce2HdzQXtz4OGXV6yUCLg==}
+  /electron@27.0.0:
+    resolution: {integrity: sha512-mr3Zoy82l8XKK/TgguE5FeNeHZ9KHXIGIpUMjbjZWIREfAv+X2Q3vdX6RG0Pmi1K23AFAxANXQezIHBA2Eypwg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
