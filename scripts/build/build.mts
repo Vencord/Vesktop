@@ -5,6 +5,7 @@
  */
 
 import { BuildContext, BuildOptions, context } from "esbuild";
+import { copyFile } from "fs/promises";
 
 import vencordDep from "./vencordDep.mjs";
 
@@ -34,6 +35,7 @@ async function createContext(options: BuildOptions) {
 }
 
 await Promise.all([
+    copyFile("./node_modules/venmic/build/Release/venmic-addon.node", "./static/dist/venmic.node"),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

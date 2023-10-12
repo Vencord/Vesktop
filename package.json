@@ -23,7 +23,8 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
+        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d",
+        "venmic": "link:../linux-virtmic"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
