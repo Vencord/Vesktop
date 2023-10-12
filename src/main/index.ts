@@ -12,6 +12,7 @@ import { checkUpdates } from "updater/main";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
+import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings } from "./settings";
 
@@ -49,6 +50,8 @@ function init() {
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
 
         registerScreenShareHandler();
+        registerMediaPermissionsHandler();
+
         bootstrap();
 
         app.on("activate", () => {
