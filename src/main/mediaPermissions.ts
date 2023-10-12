@@ -10,7 +10,7 @@ export function registerMediaPermissionsHandler() {
     if (process.platform !== "darwin") return;
 
     session.defaultSession.setPermissionRequestHandler(async (_webContents, permission, callback, details) => {
-        let granted: boolean = true;
+        let granted = true;
 
         if (details.mediaTypes?.includes("audio")) {
             granted = await systemPreferences.askForMediaAccess("microphone");
