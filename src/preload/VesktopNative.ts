@@ -65,5 +65,10 @@ export const VesktopNative = {
         list: () => invoke<string[] | null>(IpcEvents.VIRT_MIC_LIST),
         start: (target: string) => invoke<void>(IpcEvents.VIRT_MIC_START, target),
         kill: () => invoke<void>(IpcEvents.VIRT_MIC_KILL)
+    },
+    arrpc: {
+        onActivity(cb: (data: string) => void) {
+            ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
+        }
     }
 };

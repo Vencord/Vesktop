@@ -5,6 +5,7 @@
  */
 
 import Server from "arrpc";
+import { IpcEvents } from "shared/IpcEvents";
 
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
@@ -17,11 +18,8 @@ export async function initArRPC() {
     if (server || !Settings.store.arRPC) return;
 
     try {
-        // This module starts a server as a side effect, so it needs to be lazy imported
-        const { send: sendToBridge } = await import("arrpc/src/bridge");
-
         server = await new Server();
-        server.on("activity", sendToBridge);
+        server.on("activity", (data: any) => mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, JSON.stringify(data)));
         server.on("invite", (invite: string, callback: (valid: boolean) => void) => {
             invite = String(invite);
             if (!inviteCodeRegex.test(invite)) return callback(false);
