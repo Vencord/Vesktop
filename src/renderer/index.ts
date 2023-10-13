@@ -47,14 +47,12 @@ customSettingsSections.push(() => ({
     className: "vc-vesktop-settings"
 }));
 
-const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"];
+const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
+    handleEvent(e: MessageEvent): void;
+};
 
-arRPC.required = !!Settings.store.arRPC;
+VesktopNative.arrpc.onActivity(data => {
+    if (!Settings.store.arRPC) return;
 
-Settings.addChangeListener("arRPC", v => {
-    arRPC.required = !!v;
-    if (v && !arRPC.started) Vencord.Plugins.startPlugin(arRPC);
-    else if (arRPC.started) {
-        Vencord.Plugins.stopPlugin(arRPC);
-    }
+    arRPC.handleEvent(new MessageEvent("message", { data }));
 });

@@ -58,5 +58,10 @@ export const VesktopNative = {
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
+    },
+    arrpc: {
+        onActivity(cb: (data: string) => void) {
+            ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
+        }
     }
 };
