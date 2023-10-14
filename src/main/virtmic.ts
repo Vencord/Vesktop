@@ -39,8 +39,8 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
     return obtainVenmic()
         ?.list()
-        ?.filter(s => s["application.process.id"] !== audioPid)
-        ?.map(s => s["node.name"]);
+        .filter(s => s["application.process.id"] !== audioPid)
+        .map(s => s["node.name"]);
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, target: string) => obtainVenmic()?.link("node.name", target, "include"));
