@@ -9,16 +9,28 @@ import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
-const importVenmic = () => require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("venmic");
+let initialized = false;
+let patchBay: import("venmic").PatchBay | undefined;
 
-ipcMain.handle(IpcEvents.VIRT_MIC_LIST, async () =>
-    importVenmic()
-        .list()
-        .map(m => m.name)
+function obtainVenmic() {
+    if (!initialized) {
+        initialized = true;
+        try {
+            const { PatchBay } = require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("venmic");
+            patchBay = new PatchBay();
+        } catch (e) {
+            console.error("Failed to initialise venmic. Make sure you're using pipewire", e);
+        }
+    }
+
+    return patchBay;
+}
+
+ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => obtainVenmic()?.list() ?? []);
+
+ipcMain.handle(
+    IpcEvents.VIRT_MIC_START,
+    (_, target: string, mode: "include" | "exclude") => obtainVenmic()?.link(target, mode)
 );
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, target: string) => {
-    importVenmic().link(target);
-});
-
-ipcMain.handle(IpcEvents.VIRT_MIC_KILL, () => importVenmic().unlink());
+ipcMain.handle(IpcEvents.VIRT_MIC_KILL, () => obtainVenmic()?.unlink());

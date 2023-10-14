@@ -63,7 +63,7 @@ export const VesktopNative = {
     /** only available on Linux. */
     virtmic: {
         list: () => invoke<string[] | null>(IpcEvents.VIRT_MIC_LIST),
-        start: (target: string) => invoke<void>(IpcEvents.VIRT_MIC_START, target),
+        start: (target: string, mode: "include" | "exclude") => invoke<void>(IpcEvents.VIRT_MIC_START, target, mode),
         kill: () => invoke<void>(IpcEvents.VIRT_MIC_KILL)
     },
     arrpc: {

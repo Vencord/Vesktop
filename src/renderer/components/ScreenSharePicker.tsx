@@ -81,7 +81,13 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     modalProps={props}
                     submit={async v => {
                         didSubmit = true;
-                        if (v.audioSource && v.audioSource !== "None") await VesktopNative.virtmic.start(v.audioSource);
+                        if (v.audioSource && v.audioSource !== "None") {
+                            if (v.audioSource === "Entire System") {
+                                await VesktopNative.virtmic.start("Chromium", "exclude");
+                            } else {
+                                await VesktopNative.virtmic.start(v.audioSource, "include");
+                            }
+                        }
                         resolve(v);
                     }}
                     close={() => {
@@ -214,22 +220,22 @@ function AudioSourcePickerLinux({
     setAudioSource(s: string): void;
 }) {
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), { fallbackValue: [] });
-    const sourcesWithNone = sources ? ["None", ...sources] : null;
+    const allSources = sources ? ["None", "Entire System", ...sources] : null;
 
     return (
         <section>
             <Forms.FormTitle>Audio</Forms.FormTitle>
             {loading && <Forms.FormTitle>Loading Audio sources...</Forms.FormTitle>}
-            {sourcesWithNone === null && (
+            {allSources === null && (
                 <Forms.FormTitle>
                     Failed to retrieve Audio Sources. If you would like to stream with Audio, make sure you're using
                     Pipewire, not Pulseaudio
                 </Forms.FormTitle>
             )}
 
-            {sourcesWithNone && (
+            {allSources && (
                 <Select
-                    options={sourcesWithNone.map(s => ({ label: s, value: s, default: s === "None" }))}
+                    options={allSources.map(s => ({ label: s, value: s, default: s === "None" }))}
                     isSelected={s => s === audioSource}
                     select={setAudioSource}
                     serialize={String}
