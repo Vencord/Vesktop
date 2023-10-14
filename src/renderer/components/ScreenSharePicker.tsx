@@ -83,9 +83,9 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                         didSubmit = true;
                         if (v.audioSource && v.audioSource !== "None") {
                             if (v.audioSource === "Entire System") {
-                                await VesktopNative.virtmic.start("Chromium", "exclude");
+                                await VesktopNative.virtmic.startSystem();
                             } else {
-                                await VesktopNative.virtmic.start(v.audioSource, "include");
+                                await VesktopNative.virtmic.start(v.audioSource);
                             }
                         }
                         resolve(v);
