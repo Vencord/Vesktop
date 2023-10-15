@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@vencord/venmic':
-    specifier: ^0.1.1
-    version: 0.1.1
+    specifier: ^1.0.0
+    version: 1.0.0
   arrpc:
     specifier: github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d
     version: github.com/OpenAsar/arrpc/89f4da610ccfac93f461826a446a17cd3b23953d
@@ -958,8 +958,8 @@ packages:
       type-fest: 3.13.1
     dev: true
 
-  /@vencord/venmic@0.1.1:
-    resolution: {integrity: sha512-FkCBy7k0Z/er1qgeCRTzFn0LEQbwbsYjwXyUKdUSTwoBqOgnGibjhIUZvJnWT5Y/cTi25ZKcbeE5h/54f9WGiw==}
+  /@vencord/venmic@1.0.0:
+    resolution: {integrity: sha512-YkcXDv3RLER8TBqoZjUcKBnFP2gOOSyh7KdPsRDXtmCCso7PfAiL6A3jiWs7P63Yqufzi8dYOsXvOuDDoVBdfA==}
     engines: {node: '>=14.15'}
     requiresBuild: true
     dependencies:

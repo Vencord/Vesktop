@@ -23,7 +23,7 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "@vencord/venmic": "^0.1.1",
+        "@vencord/venmic": "^1.0.0",
         "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
     },
     "devDependencies": {
