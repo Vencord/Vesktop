@@ -11,6 +11,7 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
+    nativeTheme,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
@@ -341,7 +342,9 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu, discordWindowsTitleBar } = Settings.store;
+    const { staticTitle, transparencyOption, splashTheming, splashBackground, enableMenu, discordWindowsTitleBar } =
+        Settings.store;
+
     const { frameless, macosTranslucency } = VencordSettings.store;
 
     const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
@@ -361,7 +364,7 @@ function createMainWindow() {
         ...(transparencyOption && transparencyOption !== "none"
             ? {
                   backgroundColor: "#00000000",
-                  backgroundMaterial: Settings.store.transparencyOption,
+                  backgroundMaterial: transparencyOption,
                   transparent: true
               }
             : {}),
@@ -371,7 +374,14 @@ function createMainWindow() {
                   vibrancy: "sidebar",
                   backgroundColor: "#ffffff00"
               }
-            : {}),
+            : {
+                  backgroundColor: splashTheming
+                      ? splashBackground
+                      : nativeTheme.shouldUseDarkColors
+                      ? "#313338"
+                      : "#ffffff",
+                  transparent: false
+              }),
         ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
