@@ -35,7 +35,7 @@ async function createContext(options: BuildOptions) {
 }
 
 await Promise.all([
-    copyFile("./node_modules/venmic/build/Release/venmic-addon.node", "./static/dist/venmic.node"),
+    copyFile("./node_modules/@vencord/venmic/build/Release/venmic-addon.node", "./static/dist/venmic.node"),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
