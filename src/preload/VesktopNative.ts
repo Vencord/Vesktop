@@ -64,7 +64,7 @@ export const VesktopNative = {
         list: () => invoke<string[] | null>(IpcEvents.VIRT_MIC_LIST),
         start: (target: string) => invoke<void>(IpcEvents.VIRT_MIC_START, target),
         startSystem: () => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM),
-        kill: () => invoke<void>(IpcEvents.VIRT_MIC_KILL)
+        stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {
         onActivity(cb: (data: string) => void) {

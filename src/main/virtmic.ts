@@ -50,4 +50,4 @@ ipcMain.handle(
     () => obtainVenmic()?.link("application.process.id", getRendererAudioServicePid(), "exclude")
 );
 
-ipcMain.handle(IpcEvents.VIRT_MIC_KILL, () => obtainVenmic()?.unlink());
+ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());

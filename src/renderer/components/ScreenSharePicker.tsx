@@ -7,8 +7,18 @@
 import "./screenSharePicker.css";
 
 import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
-import { findStoreLazy } from "@vencord/types/webpack";
-import { Button, Card, Forms, Select, Switch, Text, useState } from "@vencord/types/webpack/common";
+import { findStoreLazy, onceReady } from "@vencord/types/webpack";
+import {
+    Button,
+    Card,
+    FluxDispatcher,
+    Forms,
+    Select,
+    Switch,
+    Text,
+    UserStore,
+    useState
+} from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
 import { isLinux, isWindows } from "renderer/utils";
@@ -70,6 +80,17 @@ addPatch({
         });
     }
 });
+
+if (isLinux) {
+    onceReady.then(() => {
+        FluxDispatcher.subscribe("VOICE_STATE_UPDATES", e => {
+            for (const state of e.voiceStates) {
+                if (state.userId === UserStore.getCurrentUser().id && state.oldChannelId && !state.channelId)
+                    VesktopNative.virtmic.stop();
+            }
+        });
+    });
+}
 
 export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     let didSubmit = false;
