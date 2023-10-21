@@ -4,6 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+if (process.platform === "linux") import("./virtmic");
+
 import { execFile } from "child_process";
 import { app, dialog, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";

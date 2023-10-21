@@ -7,11 +7,21 @@
 import "./screenSharePicker.css";
 
 import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
-import { findStoreLazy } from "@vencord/types/webpack";
-import { Button, Card, Forms, Switch, Text, useState } from "@vencord/types/webpack/common";
+import { findStoreLazy, onceReady } from "@vencord/types/webpack";
+import {
+    Button,
+    Card,
+    FluxDispatcher,
+    Forms,
+    Select,
+    Switch,
+    Text,
+    UserStore,
+    useState
+} from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
-import { isWindows } from "renderer/utils";
+import { isLinux, isWindows } from "renderer/utils";
 
 const StreamResolutions = ["480", "720", "1080", "1440"] as const;
 const StreamFps = ["15", "30", "60"] as const;
@@ -25,6 +35,7 @@ interface StreamSettings {
     resolution: StreamResolution;
     fps: StreamFps;
     audio: boolean;
+    audioSource?: string;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -70,18 +81,41 @@ addPatch({
     }
 });
 
-export function openScreenSharePicker(screens: Source[]) {
+if (isLinux) {
+    onceReady.then(() => {
+        FluxDispatcher.subscribe("VOICE_STATE_UPDATES", e => {
+            for (const state of e.voiceStates) {
+                if (state.userId === UserStore.getCurrentUser().id && state.oldChannelId && !state.channelId)
+                    VesktopNative.virtmic.stop();
+            }
+        });
+    });
+}
+
+export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
+    let didSubmit = false;
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
             props => (
                 <ModalComponent
                     screens={screens}
                     modalProps={props}
-                    submit={resolve}
+                    submit={async v => {
+                        didSubmit = true;
+                        if (v.audioSource && v.audioSource !== "None") {
+                            if (v.audioSource === "Entire System") {
+                                await VesktopNative.virtmic.startSystem();
+                            } else {
+                                await VesktopNative.virtmic.start(v.audioSource);
+                            }
+                        }
+                        resolve(v);
+                    }}
                     close={() => {
                         props.onClose();
-                        reject("Aborted");
+                        if (!didSubmit) reject("Aborted");
                     }}
+                    skipPicker={skipPicker}
                 />
             ),
             {
@@ -112,16 +146,21 @@ function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScre
 function StreamSettings({
     source,
     settings,
-    setSettings
+    setSettings,
+    skipPicker
 }: {
     source: Source;
     settings: StreamSettings;
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
+    skipPicker: boolean;
 }) {
-    const [thumb] = useAwaiter(() => VesktopNative.capturer.getLargeThumbnail(source.id), {
-        fallbackValue: source.url,
-        deps: [source.id]
-    });
+    const [thumb] = useAwaiter(
+        () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
+        {
+            fallbackValue: source.url,
+            deps: [source.id]
+        }
+    );
 
     return (
         <div>
@@ -182,8 +221,48 @@ function StreamSettings({
                         Stream With Audio
                     </Switch>
                 )}
+
+                {isLinux && (
+                    <AudioSourcePickerLinux
+                        audioSource={settings.audioSource}
+                        setAudioSource={source => setSettings(s => ({ ...s, audioSource: source }))}
+                    />
+                )}
             </Card>
         </div>
+    );
+}
+
+function AudioSourcePickerLinux({
+    audioSource,
+    setAudioSource
+}: {
+    audioSource?: string;
+    setAudioSource(s: string): void;
+}) {
+    const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), { fallbackValue: [] });
+    const allSources = sources ? ["None", "Entire System", ...sources] : null;
+
+    return (
+        <section>
+            <Forms.FormTitle>Audio</Forms.FormTitle>
+            {loading && <Forms.FormTitle>Loading Audio sources...</Forms.FormTitle>}
+            {allSources === null && (
+                <Forms.FormTitle>
+                    Failed to retrieve Audio Sources. If you would like to stream with Audio, make sure you're using
+                    Pipewire, not Pulseaudio
+                </Forms.FormTitle>
+            )}
+
+            {allSources && (
+                <Select
+                    options={allSources.map(s => ({ label: s, value: s, default: s === "None" }))}
+                    isSelected={s => s === audioSource}
+                    select={setAudioSource}
+                    serialize={String}
+                />
+            )}
+        </section>
     );
 }
 
@@ -191,14 +270,16 @@ function ModalComponent({
     screens,
     modalProps,
     submit,
-    close
+    close,
+    skipPicker
 }: {
     screens: Source[];
     modalProps: any;
     submit: (data: StreamPick) => void;
     close: () => void;
+    skipPicker: boolean;
 }) {
-    const [selected, setSelected] = useState<string>();
+    const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
         resolution: "1080",
         fps: "60",
@@ -220,6 +301,7 @@ function ModalComponent({
                         source={screens.find(s => s.id === selected)!}
                         settings={settings}
                         setSettings={setSettings}
+                        skipPicker={skipPicker}
                     />
                 )}
             </Modals.ModalContent>
@@ -259,7 +341,7 @@ function ModalComponent({
                     Go Live
                 </Button>
 
-                {selected ? (
+                {selected && !skipPicker ? (
                     <Button color={Button.Colors.TRANSPARENT} onClick={() => setSelected(void 0)}>
                         Back
                     </Button>

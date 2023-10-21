@@ -59,6 +59,13 @@ export const VesktopNative = {
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
     },
+    /** only available on Linux. */
+    virtmic: {
+        list: () => invoke<string[] | null>(IpcEvents.VIRT_MIC_LIST),
+        start: (target: string) => invoke<void>(IpcEvents.VIRT_MIC_START, target),
+        startSystem: () => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM),
+        stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
+    },
     arrpc: {
         onActivity(cb: (data: string) => void) {
             ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
