@@ -39,7 +39,7 @@ await Promise.all([
         copyFile(
             "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
             "./static/dist/venmic.node"
-        ).catch(() => {}),
+        ).catch(() => console.warn("Failed to copy venmic. Building without venmic support")),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

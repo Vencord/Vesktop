@@ -38,16 +38,16 @@ function obtainVenmic() {
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
     return obtainVenmic()
-        ?.list(["node.name", "application.process.id", "application.name"])
+        ?.list(["application.process.id", "application.name"])
         .filter(s => s["application.process.id"] !== audioPid)
-        .map(s => s["node.name"]);
+        .map(s => s["application.name"]);
 });
 
 ipcMain.handle(
     IpcEvents.VIRT_MIC_START,
     (_, target: string) =>
         obtainVenmic()?.link({
-            key: "node.name",
+            key: "application.name",
             value: target,
             mode: "include"
         })
