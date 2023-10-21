@@ -10,7 +10,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
 let initialized = false;
-let patchBay: import("venmic").PatchBay | undefined;
+let patchBay: import("@vencord/venmic").PatchBay | undefined;
 
 function getRendererAudioServicePid() {
     return (
@@ -25,7 +25,7 @@ function obtainVenmic() {
     if (!initialized) {
         initialized = true;
         try {
-            const { PatchBay } = require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("venmic");
+            const { PatchBay } = require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("@vencord/venmic");
             patchBay = new PatchBay();
         } catch (e) {
             console.error("Failed to initialise venmic. Make sure you're using pipewire", e);
@@ -38,16 +38,29 @@ function obtainVenmic() {
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
     return obtainVenmic()
-        ?.list()
+        ?.list(["node.name", "application.process.id", "application.name"])
         .filter(s => s["application.process.id"] !== audioPid)
         .map(s => s["node.name"]);
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, target: string) => obtainVenmic()?.link("node.name", target, "include"));
+ipcMain.handle(
+    IpcEvents.VIRT_MIC_START,
+    (_, target: string) =>
+        obtainVenmic()?.link({
+            key: "node.name",
+            value: target,
+            mode: "include"
+        })
+);
 
 ipcMain.handle(
     IpcEvents.VIRT_MIC_START_SYSTEM,
-    () => obtainVenmic()?.link("application.process.id", getRendererAudioServicePid(), "exclude")
+    () =>
+        obtainVenmic()?.link({
+            key: "application.process.id",
+            value: getRendererAudioServicePid(),
+            mode: "exclude"
+        })
 );
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());
