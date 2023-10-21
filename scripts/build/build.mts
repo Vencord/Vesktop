@@ -35,10 +35,11 @@ async function createContext(options: BuildOptions) {
 }
 
 await Promise.all([
-    copyFile(
-        "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
-        "./static/dist/venmic.node"
-    ),
+    process.platform === "linux" &&
+        copyFile(
+            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
+            "./static/dist/venmic.node"
+        ).catch(() => {}),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

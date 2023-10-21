@@ -23,8 +23,10 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "@vencord/venmic": "^1.2.0",
         "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
+    },
+    "optionalDependencies": {
+        "@vencord/venmic": "^1.4.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
