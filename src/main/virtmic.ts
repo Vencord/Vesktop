@@ -40,7 +40,8 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     return obtainVenmic()
         ?.list()
         .filter(s => s["application.process.id"] !== audioPid)
-        .map(s => s["application.name"]);
+        .map(s => s["application.name"])
+        .filter(s => s);
 });
 
 ipcMain.handle(
