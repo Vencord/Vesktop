@@ -25,7 +25,7 @@
         button {
             cursor: pointer;
             padding: 0.5em;
-            color: var(--fg);
+            color: var(--bg);
             border: none;
             border-radius: 3px;
             font-weight: bold;
@@ -38,11 +38,11 @@
         }
 
         .green {
-            background-color: #248046;
+            background-color: var(--button-positive-background, #248046);
         }
 
         .red {
-            background-color: #ed4245;
+            background-color: var(--button-danger-background, #ed4245);
         }
     </style>
 </head>

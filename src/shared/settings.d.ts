@@ -28,6 +28,9 @@ export interface Settings {
     firstLaunch?: boolean;
 
     splashTheming?: boolean;
+
     splashColor?: string;
     splashBackground?: string;
+    splashPositive?: string;
+    splashDanger?: string;
 }
