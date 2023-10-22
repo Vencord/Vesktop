@@ -71,7 +71,7 @@ handle(IpcEvents.FOCUS, () => {
 });
 
 handle(IpcEvents.CLOSE, e => {
-    mainWin.close();
+    e.sender.close();
 });
 
 handle(IpcEvents.MINIMIZE, e => {
