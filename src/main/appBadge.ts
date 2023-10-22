@@ -24,7 +24,8 @@ let lastIndex: null | number = -1;
 export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
-            if (count === -1) count = 0;
+            // used to be if (count === -1)
+            if (count < 0) count = 0;
             app.setBadgeCount(count);
             break;
         case "darwin":
