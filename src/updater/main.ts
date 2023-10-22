@@ -6,6 +6,7 @@
 
 import { app, BrowserWindow, shell } from "electron";
 import { Settings } from "main/settings";
+import { patchVencordView } from "main/splash";
 import { handle } from "main/utils/ipcWrappers";
 import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
@@ -109,10 +110,12 @@ function openNewUpdateWindow() {
             contextIsolation: true,
             sandbox: true
         },
+        ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
         icon: ICON_PATH
     });
 
     makeLinksOpenExternally(win);
+    patchVencordView(win);
 
     win.loadFile(join(VIEW_DIR, "updater.html"));
 }
