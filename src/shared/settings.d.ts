@@ -24,6 +24,7 @@ export interface Settings {
     windowBounds?: Rectangle;
     disableMinSize?: boolean;
 
+    checkUpdates?: boolean;
     skippedUpdate?: string;
     firstLaunch?: boolean;
 
