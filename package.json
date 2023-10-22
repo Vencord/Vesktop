@@ -73,10 +73,34 @@
             "category": "Network",
             "maintainer": "vendicated+vesktop@riseup.net",
             "target": [
-                "deb",
-                "tar.gz",
-                "rpm",
-                "AppImage"
+                {
+                    "target": "deb",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                },
+                {
+                    "target": "tar.gz",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                },
+                {
+                    "target": "rpm",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                },
+                {
+                    "target": "AppImage",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
             ],
             "desktop": {
                 "Name": "Vesktop",
