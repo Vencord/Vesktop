@@ -48,7 +48,6 @@ export function createFirstLaunchTour() {
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.firstLaunch = false;
         Settings.store.arRPC = data.richPresence;
-        Settings.store.checkUpdates = true;
 
         if (data.autoStart) autoStart.enable();
 
