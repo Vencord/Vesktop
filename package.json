@@ -109,6 +109,7 @@
                 "Categories": "Network;InstantMessaging;Chat;",
                 "Keywords": "discord;vencord;electron;chat;",
                 "WMClass": "VencordDesktop"
+                "StartupWMClass": "VencordDesktop"
             }
         },
         "mac": {
