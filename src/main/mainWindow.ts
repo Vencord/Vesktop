@@ -278,6 +278,28 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     return options;
 }
 
+function getDarwinOptions(): BrowserWindowConstructorOptions {
+    const options = {
+        titleBarStyle: "hiddenInset"
+    } as BrowserWindowConstructorOptions;
+
+    const { splashTheming, splashBackground } = Settings.store;
+    const { macosTranslucency } = VencordSettings.store;
+
+    if (macosTranslucency) {
+        options.vibrancy = "sidebar";
+        options.backgroundColor = "#ffffff00";
+    } else {
+        if (splashTheming) {
+            options.backgroundColor = splashBackground;
+        } else {
+            options.backgroundColor = nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
+        }
+    }
+
+    return options;
+}
+
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
         Settings.store.maximized = win.isMaximized();
@@ -342,10 +364,9 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, splashTheming, splashBackground, enableMenu, discordWindowsTitleBar } =
-        Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, discordWindowsTitleBar } = Settings.store;
 
-    const { frameless, macosTranslucency } = VencordSettings.store;
+    const { frameless } = VencordSettings.store;
 
     const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
 
@@ -361,28 +382,14 @@ function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: !noFrame,
-        ...(transparencyOption && transparencyOption !== "none"
-            ? {
-                  backgroundColor: "#00000000",
-                  backgroundMaterial: transparencyOption,
-                  transparent: true
-              }
-            : {}),
-        ...(staticTitle ? { title: "Vesktop" } : {}),
-        ...(macosTranslucency
-            ? {
-                  vibrancy: "sidebar",
-                  backgroundColor: "#ffffff00"
-              }
-            : {
-                  backgroundColor: splashTheming
-                      ? splashBackground
-                      : nativeTheme.shouldUseDarkColors
-                      ? "#313338"
-                      : "#ffffff",
-                  transparent: false
-              }),
-        ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" } : {}),
+        ...(transparencyOption &&
+            transparencyOption !== "none" && {
+                backgroundColor: "#00000000",
+                backgroundMaterial: transparencyOption,
+                transparent: true
+            }),
+        ...(staticTitle && { title: "Vesktop" }),
+        ...(process.platform === "darwin" && getDarwinOptions()),
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
     }));
