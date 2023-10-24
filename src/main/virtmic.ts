@@ -37,10 +37,13 @@ function obtainVenmic() {
 
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
-    return obtainVenmic()
+    const list = obtainVenmic()
         ?.list()
         .filter(s => s["application.process.id"] !== audioPid)
         .map(s => s["application.name"]);
+
+    // Remove duplicates
+    return list && [...new Set(list)];
 });
 
 ipcMain.handle(
