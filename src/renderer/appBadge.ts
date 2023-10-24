@@ -15,15 +15,19 @@ let NotificationSettingsStore: any;
 export function setBadge() {
     if (Settings.store.appBadge === false) return;
 
-    const mentionCount = GuildReadStateStore.getTotalMentionCount();
-    const pendingRequests = RelationshipStore.getPendingCount();
-    const hasUnread = GuildReadStateStore.hasAnyUnread();
-    const disableUnreadBadge = NotificationSettingsStore.getDisableUnreadBadge();
+    try {
+        const mentionCount = GuildReadStateStore.getTotalMentionCount();
+        const pendingRequests = RelationshipStore.getPendingCount();
+        const hasUnread = GuildReadStateStore.hasAnyUnread();
+        const disableUnreadBadge = NotificationSettingsStore.getDisableUnreadBadge();
 
-    let totalCount = mentionCount + pendingRequests;
-    if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
+        let totalCount = mentionCount + pendingRequests;
+        if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-    VesktopNative.app.setBadgeCount(totalCount);
+        VesktopNative.app.setBadgeCount(totalCount);
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 let toFind = 3;
