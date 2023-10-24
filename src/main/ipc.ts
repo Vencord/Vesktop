@@ -7,7 +7,7 @@
 if (process.platform === "linux") import("./virtmic");
 
 import { execFile } from "child_process";
-import { app, dialog, RelaunchOptions, session, shell } from "electron";
+import { app, BrowserWindow, dialog, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -71,7 +71,7 @@ handle(IpcEvents.FOCUS, () => {
 });
 
 handle(IpcEvents.CLOSE, e => {
-    mainWin.close();
+    (BrowserWindow.fromWebContents(e.sender) ?? e.sender).close();
 });
 
 handle(IpcEvents.MINIMIZE, e => {
