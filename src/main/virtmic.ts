@@ -11,6 +11,7 @@ import { STATIC_DIR } from "shared/paths";
 
 let initialized = false;
 let patchBay: import("@vencord/venmic").PatchBay | undefined;
+let isGlibcxxToOld = false;
 
 function getRendererAudioServicePid() {
     return (
@@ -27,8 +28,9 @@ function obtainVenmic() {
         try {
             const { PatchBay } = require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("@vencord/venmic");
             patchBay = new PatchBay();
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to initialise venmic. Make sure you're using pipewire", e);
+            isGlibcxxToOld = (e?.stack || e?.message || "").toLowerCase().includes("glibc");
         }
     }
 
@@ -42,8 +44,9 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
         .filter(s => s["application.process.id"] !== audioPid)
         .map(s => s["application.name"]);
 
-    // Remove duplicates
-    return list && [...new Set(list)];
+    return list
+        ? { ok: true, targets: [...new Set(list)] } // Remove duplicates
+        : { ok: false, isGlibcxxToOld };
 });
 
 ipcMain.handle(

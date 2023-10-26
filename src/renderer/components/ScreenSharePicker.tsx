@@ -240,19 +240,30 @@ function AudioSourcePickerLinux({
     audioSource?: string;
     setAudioSource(s: string): void;
 }) {
-    const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), { fallbackValue: [] });
-    const allSources = sources ? ["None", "Entire System", ...sources] : null;
+    const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
+        fallbackValue: { ok: true, targets: [] }
+    });
+    const allSources = sources.ok ? ["None", "Entire System", ...sources.targets] : null;
 
     return (
         <section>
             <Forms.FormTitle>Audio</Forms.FormTitle>
             {loading && <Forms.FormTitle>Loading Audio sources...</Forms.FormTitle>}
-            {allSources === null && (
-                <Forms.FormTitle>
-                    Failed to retrieve Audio Sources. If you would like to stream with Audio, make sure you're using
-                    Pipewire, not Pulseaudio
-                </Forms.FormTitle>
-            )}
+            {!sources.ok &&
+                (sources.isGlibcxxToOld ? (
+                    <Forms.FormText>
+                        Failed to retrieve Audio Sources because your c++ library is too old to run venmic. If you would
+                        like to stream with Audio, see{" "}
+                        <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
+                            this guide
+                        </a>
+                    </Forms.FormText>
+                ) : (
+                    <Forms.FormText>
+                        Failed to retrieve Audio Sources. If you would like to stream with Audio, make sure you're using
+                        Pipewire, not Pulseaudio
+                    </Forms.FormText>
+                ))}
 
             {allSources && (
                 <Select
