@@ -8,7 +8,7 @@ import "./hideGarbage.css";
 
 import { waitFor } from "@vencord/types/webpack";
 
-import { isFirstRun, localStorage } from "./utils";
+import { isFirstRun, isWindows, localStorage } from "./utils";
 
 // Make clicking Notifications focus the window
 const originalSetOnClick = Object.getOwnPropertyDescriptor(Notification.prototype, "onclick")!.set!;
@@ -31,3 +31,14 @@ if (isFirstRun) {
         m.setDesktopType("all");
     });
 }
+
+// FIXME: Remove eventually.
+// Originally, Vencord always used a Windows user agent. This seems to cause captchas
+// Now, we use a platform specific UA - HOWEVER, discord FOR SOME REASON????? caches
+// device props in localStorage. This code fixes their cache to properly update the platform in SuperProps
+if (!isWindows)
+    try {
+        const deviceProperties = localStorage.getItem("deviceProperties");
+        if (deviceProperties && JSON.parse(deviceProperties).os === "Windows")
+            localStorage.removeItem("deviceProperties");
+    } catch {}

@@ -24,7 +24,15 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
-import { DATA_DIR, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH, VENCORD_FILES_DIR } from "./constants";
+import {
+    DATA_DIR,
+    DEFAULT_HEIGHT,
+    DEFAULT_WIDTH,
+    MIN_HEIGHT,
+    MIN_WIDTH,
+    UserAgent,
+    VENCORD_FILES_DIR
+} from "./constants";
 import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -416,9 +424,7 @@ function createMainWindow() {
     initSettingsListeners(win);
     initSpellCheck(win);
 
-    win.webContents.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-    );
+    win.webContents.setUserAgent(UserAgent);
 
     const subdomain =
         Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
