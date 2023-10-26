@@ -34,12 +34,23 @@ async function createContext(options: BuildOptions) {
     contexts.push(await context(options));
 }
 
-await Promise.all([
-    process.platform === "linux" &&
+async function copyVenmic() {
+    if (process.platform !== "linux") return;
+
+    return Promise.all([
         copyFile(
             "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
-            "./static/dist/venmic.node"
-        ).catch(() => console.warn("Failed to copy venmic. Building without venmic support")),
+            "./static/dist/venmic-x64.node"
+        ),
+        copyFile(
+            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
+            "./static/dist/venmic-arm64.node"
+        )
+    ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
+}
+
+await Promise.all([
+    copyVenmic(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

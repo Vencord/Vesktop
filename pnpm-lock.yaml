@@ -11,8 +11,8 @@ dependencies:
 
 optionalDependencies:
   '@vencord/venmic':
-    specifier: ^1.4.0
-    version: 1.4.0
+    specifier: ^1.6.0
+    version: 1.6.0
 
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
@@ -53,7 +53,7 @@ devDependencies:
     version: 9.0.0(eslint@8.51.0)
   eslint-import-resolver-alias:
     specifier: ^1.1.2
-    version: 1.1.2(eslint-plugin-import@2.28.1)
+    version: 1.1.2(eslint-plugin-import@2.29.0)
   eslint-plugin-license-header:
     specifier: ^0.6.0
     version: 0.6.0
@@ -960,8 +960,8 @@ packages:
       type-fest: 3.13.1
     dev: true
 
-  /@vencord/venmic@1.4.0:
-    resolution: {integrity: sha512-rGmO4oCLrIVSLwhRH4Qib8XWFW6hcELZhSR3+NeXVV4nwVf302g1FwhUaQXk9B//HQOieCsORf2o5e2vEmBA8w==}
+  /@vencord/venmic@1.6.0:
+    resolution: {integrity: sha512-Agh5+gDiHpqsSrrxyazeU+1JmZD286QoKj41t/omw6EmtSS8EPiENQSn7eXmXt/ooSEfa9qoXEG+Hn6hXb3rvw==}
     engines: {node: '>=14.15'}
     os: [linux]
     requiresBuild: true
@@ -2040,13 +2040,13 @@ packages:
       eslint: 8.51.0
     dev: true
 
-  /eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.28.1):
+  /eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.29.0):
     resolution: {integrity: sha512-WdviM1Eu834zsfjHtcGHtGfcu+F30Od3V7I9Fi57uhBEwPkjDcii7/yW8jAT+gOhn4P/vOxxNAXbFAKsrrc15w==}
     engines: {node: '>= 4'}
     peerDependencies:
       eslint-plugin-import: '>=1.4.0'
     dependencies:
-      eslint-plugin-import: 2.28.1(@typescript-eslint/parser@6.7.5)(eslint@8.51.0)
+      eslint-plugin-import: 2.29.0(@typescript-eslint/parser@6.7.5)(eslint@8.51.0)
     dev: true
 
   /eslint-import-resolver-node@0.3.9:
@@ -2088,8 +2088,8 @@ packages:
       - supports-color
     dev: true
 
-  /eslint-plugin-import@2.28.1(@typescript-eslint/parser@6.7.5)(eslint@8.51.0):
-    resolution: {integrity: sha512-9I9hFlITvOV55alzoKBI+K9q74kv0iKMeY6av5+umsNwayt59fz692daGyjR+oStBQgx6nwR9rXldDev3Clw+A==}
+  /eslint-plugin-import@2.29.0(@typescript-eslint/parser@6.7.5)(eslint@8.51.0):
+    resolution: {integrity: sha512-QPOO5NO6Odv5lpoTkddtutccQjysJuFxoPS7fAHO+9m9udNHvTCPSAMW9zGAYj8lAIdr40I8yPCdUYrncXtrwg==}
     engines: {node: '>=4'}
     peerDependencies:
       '@typescript-eslint/parser': '*'
@@ -2108,7 +2108,7 @@ packages:
       eslint: 8.51.0
       eslint-import-resolver-node: 0.3.9
       eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.7.5)(eslint-import-resolver-node@0.3.9)(eslint@8.51.0)
-      has: 1.0.4
+      hasown: 2.0.0
       is-core-module: 2.13.1
       is-glob: 4.0.3
       minimatch: 3.1.2
@@ -2780,6 +2780,7 @@ packages:
   /has@1.0.4:
     resolution: {integrity: sha512-qdSAmqLF6209RFj4VVItywPMbm3vWylknmB3nvNiUIs72xAimcM8nVYxYr7ncvZq5qzk9MKIZR8ijqD/1QuYjQ==}
     engines: {node: '>= 0.4.0'}
+    requiresBuild: true
     dev: true
 
   /hasown@2.0.0:

@@ -26,7 +26,9 @@ function obtainVenmic() {
     if (!initialized) {
         initialized = true;
         try {
-            const { PatchBay } = require(join(STATIC_DIR, "dist/venmic.node")) as typeof import("@vencord/venmic");
+            const { PatchBay } = require(
+                join(STATIC_DIR, `dist/venmic-${process.arch}.node`)
+            ) as typeof import("@vencord/venmic");
             patchBay = new PatchBay();
         } catch (e: any) {
             console.error("Failed to initialise venmic. Make sure you're using pipewire", e);
