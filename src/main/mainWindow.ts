@@ -289,7 +289,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
 function getDarwinOptions(): BrowserWindowConstructorOptions {
     const options = {
         titleBarStyle: "hidden",
-        trafficLightPosition: { x: 9, y: 9 },
+        trafficLightPosition: { x: 9, y: 9 }
     } as BrowserWindowConstructorOptions;
 
     const { splashTheming, splashBackground } = Settings.store;
