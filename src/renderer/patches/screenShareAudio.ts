@@ -6,9 +6,27 @@
 
 import { isLinux } from "renderer/utils";
 
-if (isLinux) {
-    const original = navigator.mediaDevices.getDisplayMedia;
+const original = navigator.mediaDevices.getDisplayMedia;
 
+export const patchAudioWithDevice = (deviceId?: string) => {
+    if (!deviceId) {
+        navigator.mediaDevices.getDisplayMedia = original;
+        return;
+    }
+
+    navigator.mediaDevices.getDisplayMedia = async function (opts) {
+        const stream = await original.call(this, opts);
+        const audio = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: deviceId } } });
+        const tracks = audio.getAudioTracks();
+
+        tracks.forEach(t => stream.addTrack(t));
+        console.log(`Patched stream ${stream.id} with ${tracks.length} audio tracks from ${deviceId}`);
+
+        return stream;
+    };
+};
+
+if (isLinux) {
     async function getVirtmic() {
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();

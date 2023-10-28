@@ -20,6 +20,7 @@ import {
     useState
 } from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
+import { patchAudioWithDevice } from "renderer/patches/screenShareAudio";
 import { addPatch } from "renderer/patches/shared";
 import { isLinux, isWindows } from "renderer/utils";
 
@@ -37,6 +38,7 @@ interface StreamSettings {
     audio: boolean;
     audioSource?: string;
     workaround?: boolean;
+    audioDevice?: string;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -113,6 +115,9 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                                 await VesktopNative.virtmic.start([v.audioSource], v.workaround);
                             }
                         }
+
+                        patchAudioWithDevice(v.audioDevice);
+
                         resolve(v);
                     }}
                     close={() => {
@@ -215,6 +220,11 @@ function StreamSettings({
                     </section>
                 </div>
 
+                <AudioSourceAnyDevice
+                    audioDevice={settings.audioDevice}
+                    setAudioDevice={source => setSettings(s => ({ ...s, audioDevice: source }))}
+                />
+
                 {isWindows && (
                     <Switch
                         value={settings.audio}
@@ -236,6 +246,38 @@ function StreamSettings({
                 )}
             </Card>
         </div>
+    );
+}
+
+function AudioSourceAnyDevice({
+    audioDevice,
+    setAudioDevice
+}: {
+    audioDevice?: string;
+    setAudioDevice(s: string): void;
+}) {
+    const [sources, _, loading] = useAwaiter(
+        () =>
+            navigator.mediaDevices
+                .enumerateDevices()
+                .then(devices => devices.filter(device => device.kind === "audioinput")),
+        { fallbackValue: [] }
+    );
+
+    return (
+        <section>
+            <Forms.FormTitle>Audio</Forms.FormTitle>
+            {loading && <Forms.FormTitle>Loading audio devices...</Forms.FormTitle>}
+
+            {sources.length > 0 && (
+                <Select
+                    options={sources.map((s, idx) => ({ label: s.label, value: s.deviceId, default: idx === 0 }))}
+                    isSelected={s => s === audioDevice}
+                    select={setAudioDevice}
+                    serialize={String}
+                />
+            )}
+        </section>
     );
 }
 
