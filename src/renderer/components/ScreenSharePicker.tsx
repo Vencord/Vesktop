@@ -20,7 +20,7 @@ import {
     useState
 } from "@vencord/types/webpack/common";
 import type { Dispatch, SetStateAction } from "react";
-import { patchAudioWithDevice } from "renderer/patches/screenShareAudio";
+import { patchDisplayMedia } from "renderer/patches/screenSharePatch";
 import { addPatch } from "renderer/patches/shared";
 import { isLinux, isWindows } from "renderer/utils";
 
@@ -43,12 +43,18 @@ interface StreamSettings {
 
 export interface StreamPick extends StreamSettings {
     id: string;
+    cameraId?: string;
 }
 
 interface Source {
     id: string;
     name: string;
     url: string;
+}
+
+interface Camera {
+    id: string;
+    name: string;
 }
 
 let currentSettings: StreamSettings | null = null;
@@ -100,6 +106,7 @@ if (isLinux) {
 
 export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     let didSubmit = false;
+
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
             props => (
@@ -109,16 +116,24 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     submit={async v => {
                         didSubmit = true;
                         if (v.audioSource && v.audioSource !== "None") {
-                            if (v.audioSource === "Entire System") {
-                                await VesktopNative.virtmic.startSystem(v.workaround);
-                            } else {
-                                await VesktopNative.virtmic.start([v.audioSource], v.workaround);
+                            patchDisplayMedia({
+                                audioId: v.audioDevice,
+                                venmic: !!v.audioSource && v.audioSource !== "None",
+                                videoId: v.cameraId
+                            });
+
+                            if (!v.audioDevice && v.audioSource && v.audioSource !== "None") {
+                                if (v.audioSource === "Entire System") {
+                                    await VesktopNative.virtmic.startSystem(v.workaround);
+                                } else {
+                                    await VesktopNative.virtmic.start([v.audioSource], v.workaround);
+                                }
                             }
+
+                            patchAudioWithDevice(v.audioDevice);
+
+                            resolve(v);
                         }
-
-                        patchAudioWithDevice(v.audioDevice);
-
-                        resolve(v);
                     }}
                     close={() => {
                         props.onClose();
@@ -137,18 +152,63 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     });
 }
 
-function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (id: string) => void }) {
+function ScreenPicker({
+    screens,
+    chooseScreen,
+    isDisabled = false
+}: {
+    screens: Source[];
+    chooseScreen: (id: string) => void;
+    isDisabled?: boolean;
+}) {
     return (
         <div className="vcd-screen-picker-grid">
             {screens.map(({ id, name, url }) => (
                 <label key={id}>
-                    <input type="radio" name="screen" value={id} onChange={() => chooseScreen(id)} />
+                    <input
+                        type="radio"
+                        name="screen"
+                        value={id}
+                        onChange={() => chooseScreen(id)}
+                        disabled={isDisabled}
+                    />
 
                     <img src={url} alt="" />
                     <Text variant="text-sm/normal">{name}</Text>
                 </label>
             ))}
         </div>
+    );
+}
+
+function CameraPicker({
+    camera,
+    chooseCamera
+}: {
+    camera: string | undefined;
+    chooseCamera: (id: string | undefined) => void;
+}) {
+    const [cameras] = useAwaiter(
+        () =>
+            navigator.mediaDevices
+                .enumerateDevices()
+                .then(res =>
+                    res
+                        .filter(d => d.kind === "videoinput")
+                        .map(d => ({ id: d.deviceId, name: d.label }) satisfies Camera)
+                ),
+        { fallbackValue: [] }
+    );
+
+    return (
+        <Select
+            clearable={true}
+            options={cameras.map(s => ({ label: s.name, value: s.id }))}
+            isSelected={s => s === camera}
+            select={s => chooseCamera(s)}
+            clear={() => chooseCamera(undefined)}
+            serialize={String}
+        />
     );
 }
 
@@ -174,6 +234,7 @@ function StreamSettings({
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
+
             <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
                 <img src={thumb} alt="" />
                 <Text variant="text-sm/normal">{source.name}</Text>
@@ -256,7 +317,7 @@ function AudioSourceAnyDevice({
     audioDevice?: string;
     setAudioDevice(s: string): void;
 }) {
-    const [sources, _, loading] = useAwaiter(
+    const [sources] = useAwaiter(
         () =>
             navigator.mediaDevices
                 .enumerateDevices()
@@ -358,11 +419,8 @@ function ModalComponent({
     skipPicker: boolean;
 }) {
     const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
-    const [settings, setSettings] = useState<StreamSettings>({
-        resolution: "1080",
-        fps: "60",
-        audio: true
-    });
+    const [camera, setCamera] = useState<string | undefined>(undefined);
+    const [settings, setSettings] = useState<StreamSettings>({ resolution: "1080", fps: "60", audio: true });
 
     return (
         <Modals.ModalRoot {...modalProps}>
@@ -373,7 +431,10 @@ function ModalComponent({
 
             <Modals.ModalContent className="vcd-screen-picker-modal">
                 {!selected ? (
-                    <ScreenPicker screens={screens} chooseScreen={setSelected} />
+                    <>
+                        <ScreenPicker screens={screens} chooseScreen={setSelected} isDisabled={!!camera} />
+                        <CameraPicker camera={camera} chooseCamera={setCamera} />
+                    </>
                 ) : (
                     <StreamSettings
                         source={screens.find(s => s.id === selected)!}
@@ -386,7 +447,7 @@ function ModalComponent({
 
             <Modals.ModalFooter className="vcd-screen-picker-footer">
                 <Button
-                    disabled={!selected}
+                    disabled={!selected && !camera}
                     onClick={() => {
                         currentSettings = settings;
 
@@ -410,6 +471,7 @@ function ModalComponent({
 
                         submit({
                             id: selected!,
+                            cameraId: camera,
                             ...settings
                         });
 
