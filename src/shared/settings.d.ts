@@ -31,4 +31,6 @@ export interface Settings {
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
+
+    steamOSLayoutVersion?: number;
 }
