@@ -37,7 +37,6 @@
     outline: 2px solid var(--brand-experiment);
 }
 
-
 .vcd-screen-picker-grid div {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -98,6 +97,12 @@
 
 .vcd-screen-picker-quality section {
     flex: 1 1 auto;
+}
+
+.vcd-screen-picker-audio {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 }
 
 .vcd-screen-picker-radios {
