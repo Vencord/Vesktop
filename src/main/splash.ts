@@ -11,6 +11,30 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
+export function patchVencordView(view: BrowserWindow) {
+    const { splashBackground, splashColor, splashTheming, splashPositive, splashDanger } = Settings.store;
+
+    if (splashTheming) {
+        if (splashColor) {
+            const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
+
+            view.webContents.insertCSS(`body { --fg: ${splashColor} !important }`);
+            view.webContents.insertCSS(`body { --fg-semi-trans: ${semiTransparentSplashColor} !important }`);
+        }
+
+        if (splashBackground) {
+            view.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
+        }
+
+        if (splashPositive) {
+            view.webContents.insertCSS(`body { --button-positive-background: ${splashPositive} !important }`);
+        }
+        if (splashDanger) {
+            view.webContents.insertCSS(`body { --button-danger-background: ${splashDanger} !important }`);
+        }
+    }
+}
+
 export function createSplashWindow() {
     const splash = new BrowserWindow({
         ...SplashProps,
@@ -18,21 +42,7 @@ export function createSplashWindow() {
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
-
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
-
-    if (splashTheming) {
-        if (splashColor) {
-            const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
-
-            splash.webContents.insertCSS(`body { --fg: ${splashColor} !important }`);
-            splash.webContents.insertCSS(`body { --fg-semi-trans: ${semiTransparentSplashColor} !important }`);
-        }
-
-        if (splashBackground) {
-            splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
-        }
-    }
+    patchVencordView(splash);
 
     return splash;
 }

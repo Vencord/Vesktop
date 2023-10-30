@@ -27,6 +27,8 @@ const updateSplashColors = () => {
 
     const color = bodyStyles.get("--text-normal");
     const backgroundColor = bodyStyles.get("--background-primary");
+    const positive = bodyStyles.get("--button-positive-background");
+    const danger = bodyStyles.get("--button-danger-background");
 
     if (isValidColor(color)) {
         Settings.store.splashColor = resolveColor(color[0]);
@@ -34,6 +36,14 @@ const updateSplashColors = () => {
 
     if (isValidColor(backgroundColor)) {
         Settings.store.splashBackground = resolveColor(backgroundColor[0]);
+    }
+
+    if (isValidColor(positive)) {
+        Settings.store.splashPositive = resolveColor(positive[0]);
+    }
+
+    if (isValidColor(danger)) {
+        Settings.store.splashDanger = resolveColor(danger[0]);
     }
 };
 
