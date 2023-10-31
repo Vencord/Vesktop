@@ -9,10 +9,6 @@
 const fs = require("fs/promises");
 const path = require("path");
 
-const log = (message, dotFormatting = chalk.blue) => {
-    console.log(`  ${dotFormatting("•")} ${message}`);
-};
-
 const afterPackHook = async params => {
     if (process.platform !== "linux") {
         // this fix is only required on linux
