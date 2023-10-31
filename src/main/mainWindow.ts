@@ -28,6 +28,7 @@ import {
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
+    MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
     UserAgent,
@@ -36,10 +37,13 @@ import {
 import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 let tray: Tray;
+
+applyDeckKeyboardFix();
 
 app.on("before-quit", () => {
     isQuitting = true;
@@ -126,11 +130,6 @@ function initTray(win: BrowserWindow) {
     win.on("hide", () => {
         trayMenu.items[0].enabled = true;
     });
-}
-
-const enum MessageBoxChoice {
-    Default,
-    Cancel
 }
 
 async function clearData(win: BrowserWindow) {
@@ -266,6 +265,9 @@ function initMenuBar(win: BrowserWindow) {
 }
 
 function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
+    // We want the default window behaivour to apply in game mode since it expects everything to be fullscreen and maximized.
+    if (isDeckGameMode) return {};
+
     const { x, y, width, height } = Settings.store.windowBounds ?? {};
 
     const options = {
@@ -405,7 +407,7 @@ function createMainWindow() {
     win.setMenuBarVisibility(false);
 
     win.on("close", e => {
-        const useTray = Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
+        const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
@@ -419,7 +421,7 @@ function createMainWindow() {
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
-    if ((Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
@@ -441,18 +443,26 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 
 export async function createWindows() {
     const splash = createSplashWindow();
-
+    // SteamOS letterboxes and scales it terribly, so just full screen it
+    if (isDeckGameMode) splash.setFullScreen(true);
     await ensureVencordFiles();
     runVencordMain();
 
     mainWin = createMainWindow();
 
-    mainWin.once("ready-to-show", () => {
+    mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
         mainWin!.show();
 
-        if (Settings.store.maximized) {
+        if (Settings.store.maximized && !isDeckGameMode) {
             mainWin!.maximize();
+        }
+
+        if (isDeckGameMode) {
+            // always use entire display
+            mainWin!.setFullScreen(true);
+
+            askToApplySteamLayout(mainWin);
         }
     });
 
