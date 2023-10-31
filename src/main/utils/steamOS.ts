@@ -6,11 +6,11 @@
 
 import { exec as callbackExec } from "child_process";
 import { BrowserWindow, dialog } from "electron";
-import { MessageBoxChoice } from "shared/browserWinProperties";
 import { promisify } from "util";
 
+import { sleep } from "../../shared/utils/sleep";
+import { MessageBoxChoice } from "../constants";
 import { Settings } from "../settings";
-import { sleep } from "./sleep";
 
 const exec = promisify(callbackExec);
 
@@ -20,7 +20,7 @@ const layoutVersion = 1;
 const layoutId = "3063409873"; // Vesktop Layout v1
 const numberRegex = /^[0-9]*$/;
 
-export const isDeckGameMode = Boolean(process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1");
+export const isDeckGameMode = process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1";
 
 export function applyDeckKeyboardFix() {
     if (!isDeckGameMode) return;

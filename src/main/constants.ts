@@ -34,3 +34,8 @@ const UserAgents = {
 };
 
 export const UserAgent = UserAgents[process.platform] || UserAgents.windows;
+
+export const enum MessageBoxChoice {
+    Default,
+    Cancel
+}

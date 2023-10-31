@@ -16,7 +16,6 @@ import {
 } from "electron";
 import { rm } from "fs/promises";
 import { join } from "path";
-import { MessageBoxChoice } from "shared/browserWinProperties";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
@@ -29,6 +28,7 @@ import {
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
+    MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
     UserAgent,

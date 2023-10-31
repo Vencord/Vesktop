@@ -16,8 +16,3 @@ export const SplashProps: BrowserWindowConstructorOptions = {
     maximizable: false,
     alwaysOnTop: true
 };
-
-export const enum MessageBoxChoice {
-    Default,
-    Cancel
-}
