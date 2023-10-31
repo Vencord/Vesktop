@@ -42,9 +42,6 @@ devDependencies:
   electron-builder:
     specifier: ^24.6.4
     version: 24.6.4
-  electron-builder-sandbox-fix:
-    specifier: ^1.0.10
-    version: 1.0.10
   esbuild:
     specifier: ^0.19.4
     version: 0.19.4
@@ -1823,12 +1820,6 @@ packages:
     hasBin: true
     dependencies:
       jake: 10.8.7
-    dev: true
-
-  /electron-builder-sandbox-fix@1.0.10:
-    resolution: {integrity: sha512-fxZD8etQFXkXOlxe/nYEbPsDXcKJHhadxzLyXq7IEucELPE0GK8jYnNt1y577FsfRQvuhOAd4oZNdIdICVi5nQ==}
-    dependencies:
-      chalk: 4.1.2
     dev: true
 
   /electron-builder@24.6.4:
