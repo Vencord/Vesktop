@@ -6,9 +6,9 @@
 
 import { exec as callbackExec } from "child_process";
 import { BrowserWindow, dialog } from "electron";
+import { sleep } from "shared/utils/sleep";
 import { promisify } from "util";
 
-import { sleep } from "../../shared/utils/sleep";
 import { MessageBoxChoice } from "../constants";
 import { Settings } from "../settings";
 
@@ -50,7 +50,7 @@ async function showLayout(appId: string) {
     await execSteamURL(`steam://controllerconfig/${appId}/${layoutId}`);
     // because the UI doesn't consistently reload after the data for the config has loaded...
     // HOW HAS NOBODY AT VALVE RUN INTO THIS YET
-    await sleep(300);
+    await sleep(100);
     await execSteamURL(`steam://controllerconfig/${appId}/${layoutId}`);
 }
 
