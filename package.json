@@ -68,7 +68,7 @@
             "package.json",
             "LICENSE"
         ],
-        "afterPack": "scripts/build/fixSandbox.js",
+        "beforePack": "scripts/build/sandboxFix.js",
         "linux": {
             "icon": "build/icon.icns",
             "category": "Network",
