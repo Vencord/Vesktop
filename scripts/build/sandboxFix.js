@@ -28,7 +28,8 @@ const hook = async () => {
             await fs.rm(newPath, {
                 recursive: true
             });
-        } catch (_) {}
+        } catch {}
+
         console.log("Copying to apply appimage fix", oldPath, newPath);
         await fs.cp(oldPath, newPath, {
             recursive: true
@@ -37,17 +38,19 @@ const hook = async () => {
 
         const executable = path.join(newPath, this.packager.executableName);
 
-        const loaderScript = `#!/usr/bin/env bash
-        SCRIPT_DIR="$( cd "$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-        IS_STEAMOS=0
+        const loaderScript = `
+#!/usr/bin/env bash
 
-        if [[ "$SteamOS" == "1" && "$SteamGamepadUI" == "1" ]]; then
-            echo "Running Vesktop on SteamOS, disabling sandbox"
-            IS_STEAMOS=1
-        fi
+SCRIPT_DIR="$( cd "$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+IS_STEAMOS=0
 
-        exec "$SCRIPT_DIR/${this.packager.executableName}.bin" "$([ "$IS_STEAMOS" == 1 ] && echo '--no-sandbox')" "$@"
-                `;
+if [[ "$SteamOS" == "1" && "$SteamGamepadUI" == "1" ]]; then
+    echo "Running Vesktop on SteamOS, disabling sandbox"
+    IS_STEAMOS=1
+fi
+
+exec "$SCRIPT_DIR/${this.packager.executableName}.bin" "$([ "$IS_STEAMOS" == 1 ] && echo '--no-sandbox')" "$@"
+                `.trim();
 
         try {
             await fs.rename(executable, executable + ".bin");
