@@ -10,6 +10,7 @@ import type { LiteralUnion } from "type-fest";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpc";
+import electron from "electron";
 
 type SpellCheckerResultCallback = (word: string, suggestions: string[]) => void;
 
@@ -33,7 +34,8 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
+        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
+        showOpenDialog: (options: electron.OpenDialogOptions) => invoke<string[]>(IpcEvents.SHOW_OPEN_DIALOG, options)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),

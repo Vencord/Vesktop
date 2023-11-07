@@ -4,6 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import * as electron from "electron";
+
 if (process.platform === "linux") import("./virtmic");
 
 import { execFile } from "child_process";
@@ -112,6 +114,13 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     if (!isValidVencordInstall(dir)) return "invalid";
 
     return dir;
+});
+
+handle(IpcEvents.SHOW_OPEN_DIALOG, async (_, options: electron.OpenDialogOptions) => {
+    const res = await dialog.showOpenDialog(mainWin!, options);
+    if (!res.filePaths.length) return [];
+
+    return res.filePaths;
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
