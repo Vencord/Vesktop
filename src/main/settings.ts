@@ -30,7 +30,11 @@ function createSettingsStore<T extends object = any>(file: string, settings: T) 
     const store = new SettingsStore(settings);
     store.addGlobalChangeListener(o => {
         mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, JSON.stringify(o, null, 4));
+        try {
+            writeFileSync(file, JSON.stringify(o, null, 4));
+        } catch (err) {
+            console.error(`Failed to save ${file}`, err);
+        }
     });
 
     return store;
