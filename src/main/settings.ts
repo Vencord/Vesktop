@@ -6,21 +6,22 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
-import type { Settings as TSettings } from "shared/settings";
+import type { Settings as TSettings, State as TState } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
 
 const SETTINGS_FILE = join(DATA_DIR, "settings.json");
+const STATE_FILE = join(DATA_DIR, "state.json");
 
-function loadSettings<T extends object = any>(file: string, name: string) {
+function loadSettings<T extends object = any>(file: string, description: string) {
     let settings = {} as T;
     try {
         const content = readFileSync(file, "utf8");
         try {
             settings = JSON.parse(content);
         } catch (err) {
-            console.error(`Failed to parse ${name} settings.json:`, err);
+            console.error(`Failed to parse ${description}:`, err);
         }
     } catch {}
 
@@ -33,5 +34,6 @@ function loadSettings<T extends object = any>(file: string, name: string) {
     return store;
 }
 
-export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop");
-export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
+export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings.json");
+export const State = loadSettings<TState>(STATE_FILE, "Vesktop state.json");
+export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings.json");

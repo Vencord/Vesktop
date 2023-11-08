@@ -14,7 +14,7 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
-import { Settings } from "./settings";
+import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
 interface Data {
@@ -46,7 +46,7 @@ export function createFirstLaunchTour() {
 
         Settings.store.minimizeToTray = data.minimizeToTray;
         Settings.store.discordBranch = data.discordBranch;
-        Settings.store.firstLaunch = false;
+        State.store.firstLaunch = false;
         Settings.store.arRPC = data.richPresence;
 
         if (data.autoStart) autoStart.enable();

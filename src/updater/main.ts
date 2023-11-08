@@ -5,7 +5,7 @@
  */
 
 import { app, BrowserWindow, shell } from "electron";
-import { Settings } from "main/settings";
+import { Settings, State } from "main/settings";
 import { handle } from "main/utils/ipcWrappers";
 import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
 import { githubGet, ReleaseData } from "main/utils/vencordLoader";
@@ -52,7 +52,7 @@ handle(IpcEvents.UPDATER_DOWNLOAD, () => {
 });
 
 handle(IpcEvents.UPDATE_IGNORE, () => {
-    Settings.store.skippedUpdate = updateData.latestVersion;
+    State.store.skippedUpdate = updateData.latestVersion;
 });
 
 function isOutdated(oldVersion: string, newVersion: string) {
@@ -91,7 +91,7 @@ export async function checkUpdates() {
             release: data
         };
 
-        if (Settings.store.skippedUpdate !== newVersion && isOutdated(oldVersion, newVersion)) {
+        if (State.store.skippedUpdate !== newVersion && isOutdated(oldVersion, newVersion)) {
             openNewUpdateWindow();
         }
     } catch (e) {

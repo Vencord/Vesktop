@@ -34,7 +34,7 @@ import {
     UserAgent,
     VENCORD_FILES_DIR
 } from "./constants";
-import { Settings, VencordSettings } from "./settings";
+import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
@@ -268,7 +268,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     // We want the default window behaivour to apply in game mode since it expects everything to be fullscreen and maximized.
     if (isDeckGameMode) return {};
 
-    const { x, y, width, height } = Settings.store.windowBounds ?? {};
+    const { x, y, width, height } = State.store.windowBounds ?? {};
 
     const options = {
         width: width ?? DEFAULT_WIDTH,
@@ -313,8 +313,8 @@ function getDarwinOptions(): BrowserWindowConstructorOptions {
 
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
-        Settings.store.maximized = win.isMaximized();
-        Settings.store.minimized = win.isMinimized();
+        State.store.maximized = win.isMaximized();
+        State.store.minimized = win.isMinimized();
     };
 
     win.on("maximize", saveState);
@@ -322,7 +322,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("unmaximize", saveState);
 
     const saveBounds = () => {
-        Settings.store.windowBounds = win.getBounds();
+        State.store.windowBounds = win.getBounds();
     };
 
     win.on("resize", saveBounds);
@@ -454,7 +454,7 @@ export async function createWindows() {
         splash.destroy();
         mainWin!.show();
 
-        if (Settings.store.maximized && !isDeckGameMode) {
+        if (State.store.maximized && !isDeckGameMode) {
             mainWin!.maximize();
         }
 
