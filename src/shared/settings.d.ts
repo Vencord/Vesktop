@@ -6,7 +6,8 @@
 
 import type { Rectangle } from "electron";
 
-export interface Settings {
+export interface SettingsV1 {
+    formatVersion: 1;
     discordBranch?: "stable" | "canary" | "ptb";
     vencordDir?: string;
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
@@ -27,7 +28,8 @@ export interface Settings {
     splashBackground?: string;
 }
 
-export interface State {
+export interface StateV1 {
+    formatVersion: 1;
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
