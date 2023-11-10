@@ -106,7 +106,7 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                             if (v.audioSource === "Entire System") {
                                 await VesktopNative.virtmic.startSystem();
                             } else {
-                                await VesktopNative.virtmic.start(v.audioSource);
+                                await VesktopNative.virtmic.start([v.audioSource]);
                             }
                         }
                         resolve(v);

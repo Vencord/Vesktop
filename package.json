@@ -26,7 +26,7 @@
         "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^1.7.0"
+        "@vencord/venmic": "^2.0.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
