@@ -11,7 +11,7 @@ dependencies:
 
 optionalDependencies:
   '@vencord/venmic':
-    specifier: ^2.1.1
+    specifier: ^2.1.2
     version: 2.1.2
 
 devDependencies:
