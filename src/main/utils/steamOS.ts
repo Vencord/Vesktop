@@ -17,7 +17,7 @@ const exec = promisify(callbackExec);
 // Bump this to re-show the prompt
 const layoutVersion = 2;
 // Get this from "show details" on the profile after exporting as a shared personal layout or using share with community
-const layoutId = "3080264545"; // Vesktop Layout v1
+const layoutId = "3080264545"; // Vesktop Layout v2
 const numberRegex = /^[0-9]*$/;
 
 export const isDeckGameMode = process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1";
