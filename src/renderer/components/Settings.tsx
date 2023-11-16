@@ -34,7 +34,7 @@ export default function SettingsUi() {
             true,
             () => Settings.tray ?? true
         ],
-        !isMac && ["middleClickScroll", "Middle Click Scroll", "Middle clicking scrolls instead of pastes", false],
+        !isMac && ["middleClickAutoscroll", "Middle Click Autoscroll", "Middle-clicking scrolls instead of pasting content from PRIMARY (Requires a full restart)", false],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
