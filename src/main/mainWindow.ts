@@ -389,7 +389,8 @@ function createMainWindow() {
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
-            spellcheck: true
+            spellcheck: true,
+            ...(Settings.store.middleClickScroll && {enableBlinkFeatures: 'MiddleClickAutoscroll'}) 
         },
         icon: ICON_PATH,
         frame: !noFrame,
@@ -405,6 +406,8 @@ function createMainWindow() {
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
+
+    if(Settings.store.middleClickScroll) 
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
