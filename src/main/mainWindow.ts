@@ -453,7 +453,7 @@ export async function createWindows() {
 
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
-        !startMinimized && mainWin!.show();
+        if (!startMinimized) mainWin!.show();
 
         if (Settings.store.maximized && !isDeckGameMode) {
             mainWin!.maximize();
