@@ -18,6 +18,7 @@ export interface Settings {
     arRPC?: boolean;
     appBadge?: boolean;
     discordWindowsTitleBar?: boolean;
+    startMinimized?: boolean;
 
     maximized?: boolean;
     minimized?: boolean;
