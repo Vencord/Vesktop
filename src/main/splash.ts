@@ -11,7 +11,7 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
-export function createSplashWindow(startMinimized: boolean = false) {
+export function createSplashWindow(startMinimized = false) {
     const splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
