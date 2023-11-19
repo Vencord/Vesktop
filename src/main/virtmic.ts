@@ -53,10 +53,9 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
 
 ipcMain.handle(
     IpcEvents.VIRT_MIC_START,
-    (_, target: string) =>
+    (_, targets: string[]) =>
         obtainVenmic()?.link({
-            key: "application.name",
-            value: target,
+            props: targets.map(target => ({ key: "application.name", value: target })),
             mode: "include"
         })
 );
@@ -65,8 +64,12 @@ ipcMain.handle(
     IpcEvents.VIRT_MIC_START_SYSTEM,
     () =>
         obtainVenmic()?.link({
-            key: "application.process.id",
-            value: getRendererAudioServicePid(),
+            props: [
+                {
+                    key: "application.process.id",
+                    value: getRendererAudioServicePid()
+                }
+            ],
             mode: "exclude"
         })
 );
