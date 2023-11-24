@@ -15,6 +15,7 @@ export interface Settings {
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
+    disableSmoothScroll?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
     discordWindowsTitleBar?: boolean;
