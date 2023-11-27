@@ -10,7 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, Toasts, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { isMac, isWindows, isLinux } from "renderer/utils";
 import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
@@ -34,7 +34,7 @@ export default function SettingsUi() {
             true,
             () => Settings.tray ?? true
         ],
-        !isMac && ["middleClickAutoscroll", "Middle Click Autoscroll", "Middle-clicking scrolls instead of pasting content from PRIMARY (Requires a full restart)", false],
+        isLinux && ["middleClickAutoscroll", "Middle Click Autoscroll", "Enables middle-click scrolling (Requires a full restart)", false],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
