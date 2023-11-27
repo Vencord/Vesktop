@@ -103,7 +103,6 @@ function openNewUpdateWindow() {
     const win = new BrowserWindow({
         width: 500,
         autoHideMenuBar: true,
-        alwaysOnTop: true,
         webPreferences: {
             preload: join(__dirname, "updaterPreload.js"),
             nodeIntegration: false,

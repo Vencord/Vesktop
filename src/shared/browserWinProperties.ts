@@ -13,6 +13,5 @@ export const SplashProps: BrowserWindowConstructorOptions = {
     width: 300,
     center: true,
     resizable: false,
-    maximizable: false,
-    alwaysOnTop: true
+    maximizable: false
 };
