@@ -28,26 +28,6 @@ export default function SettingsUi() {
             "Discord Titlebar",
             "Use Discord's custom title bar instead of the Windows one. Requires a full restart."
         ],
-        !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
-        !isMac && [
-            "minimizeToTray",
-            "Minimize to tray",
-            "Hitting X will make Vesktop minimize to the tray instead of closing",
-            true,
-            () => Settings.tray ?? true
-        ],
-        !isMac && [
-            "trayBadge",
-            "Tray Notification Badge",
-            "Show mention badge on the tray icon",
-            false,
-            () => Settings.tray ?? true,
-            v => {
-                Settings.trayBadge = v;
-                if (v) setBadge();
-                else VesktopNative.app.setBadgeCount(0, true);
-            }
-        ],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
@@ -107,18 +87,56 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VesktopNative.app.setBadgeCount(0, Settings.trayBadge);
+                    else VesktopNative.app.setBadgeCount(0, true, false);
                 }}
                 note="Show mention badge on the app (taskbar/panel) icon"
             >
                 Notification Badge
             </Switch>
 
-            {switches.map(([key, text, note, def, predicate, onChange]) => (
+            {!isMac && (
+                <>
+                    <Switch
+                        value={Settings.tray ?? true}
+                        onChange={v => {
+                            Settings.tray = v;
+                            if (v && Settings.trayBadge) setBadge();
+                        }}
+                        note="Add a tray icon for Vesktop"
+                        key="tray"
+                    >
+                        Tray Icon
+                    </Switch>
+                    <Switch
+                        value={Settings.minimizeToTray ?? true}
+                        onChange={v => (Settings.minimizeToTray = v)}
+                        disabled={!(Settings.tray ?? true)}
+                        note="Hitting X will make Vesktop minimize to the tray instead of closing"
+                        key="minimizeToTray"
+                    >
+                        Minimize to Tray
+                    </Switch>
+                    <Switch
+                        value={Settings.trayBadge ?? true}
+                        onChange={v => {
+                            Settings.trayBadge = v;
+                            if (v) setBadge();
+                            else VesktopNative.app.setBadgeCount(0, false, true);
+                        }}
+                        disabled={!(Settings.tray ?? true)}
+                        note="Show mention badge on the tray icon"
+                        key="trayBadge"
+                    >
+                        Tray Notification Badge
+                    </Switch>
+                </>
+            )}
+
+            {switches.map(([key, text, note, def, predicate]) => (
                 <Switch
                     value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
                     disabled={predicate && !predicate()}
-                    onChange={onChange ?? (v => (Settings[key as any] = v))}
+                    onChange={v => (Settings[key as any] = v)}
                     note={note}
                     key={key}
                 >

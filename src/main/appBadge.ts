@@ -31,12 +31,14 @@ function loadTrayIcon(index: number) {
 
 let lastIndex: null | number = -1;
 
-export function setBadgeCount(count: number, tray: boolean = false) {
+export function setBadgeCount(count: number, native: boolean = true, tray: boolean = false) {
     const [index, description] = getBadgeIndexAndDescription(count);
 
     if (tray) {
         globals.tray?.setImage(loadTrayIcon(index ?? 0));
     }
+
+    if (!native) return;
 
     switch (process.platform) {
         case "linux":

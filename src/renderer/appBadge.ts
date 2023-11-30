@@ -23,7 +23,7 @@ export function setBadge() {
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
         if (Settings.store.appBadge || Settings.store.trayBadge)
-            VesktopNative.app.setBadgeCount(totalCount, Settings.store.trayBadge);
+            VesktopNative.app.setBadgeCount(totalCount, Settings.store.appBadge, Settings.store.trayBadge);
     } catch (e) {
         console.error(e);
     }
