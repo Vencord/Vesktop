@@ -23,7 +23,7 @@ export const VesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
-        setAppBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
+        setBadgeCount: (count: number, tray: boolean = false) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count, tray),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY)
     },
     autostart: {

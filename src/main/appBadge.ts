@@ -7,8 +7,7 @@
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR, TRAY_ICON_DIR, TRAY_ICON_PATH } from "shared/paths";
-import { trayContainer } from "./mainWindow";
-import { Settings } from "./settings";
+import type { VencordBrowserWindow } from "./mainWindow";
 
 const imgCache = new Map<string, NativeImage>();
 
@@ -32,17 +31,24 @@ function loadTrayIcon(index: number) {
 
 let lastIndex: null | number = -1;
 
-export function setBadgeCount(count: number) {
+let mainWin: null | VencordBrowserWindow;
+function getMainWin() {
+    if (mainWin != null) return mainWin;
+    return (mainWin = (require("./mainWindow") as typeof import("./mainWindow")).mainWin);
+}
+
+export function setBadgeCount(count: number, tray: boolean = false) {
     const [index, description] = getBadgeIndexAndDescription(count);
 
-    if (Settings?.store.trayBadge) {
-        trayContainer.tray?.setImage(loadTrayIcon(index ?? 0));
+    if (tray) {
+        getMainWin()._vencord_tray?.setImage(loadTrayIcon(index ?? 0));
     }
 
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
             app.setBadgeCount(count); // Only works if libunity is installed
+            break;
         case "darwin":
             if (count === 0) {
                 app.dock.setBadge("");
@@ -56,7 +62,7 @@ export function setBadgeCount(count: number) {
             lastIndex = index;
 
             // circular import shenanigans
-            const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
+            const mainWin = getMainWin();
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }

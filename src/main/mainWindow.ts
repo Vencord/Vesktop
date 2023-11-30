@@ -41,9 +41,6 @@ import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./u
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-export const trayContainer: { tray: Tray | null } = {
-    tray: null
-};
 
 applyDeckKeyboardFix();
 
@@ -51,7 +48,11 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
-export let mainWin: BrowserWindow;
+type VencordBrowserWindow = BrowserWindow & {
+    _vencord_tray?: Tray;
+};
+
+export let mainWin: VencordBrowserWindow;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -74,7 +75,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-function initTray(win: BrowserWindow) {
+function initTray(win: VencordBrowserWindow) {
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
@@ -120,7 +121,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    const tray = (trayContainer.tray = new Tray(TRAY_ICON_PATH));
+    const tray = new Tray(TRAY_ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
@@ -331,10 +332,10 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("move", saveBounds);
 }
 
-function initSettingsListeners(win: BrowserWindow) {
+function initSettingsListeners(win: VencordBrowserWindow) {
     addSettingsListener("tray", enable => {
         if (enable) initTray(win);
-        else trayContainer.tray?.destroy();
+        else win._vencord_tray?.destroy();
     });
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
@@ -372,7 +373,7 @@ function initSpellCheck(win: BrowserWindow) {
     });
 }
 
-function createMainWindow() {
+function createMainWindow(): VencordBrowserWindow {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();

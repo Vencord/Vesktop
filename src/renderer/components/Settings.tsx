@@ -20,7 +20,9 @@ export default function SettingsUi() {
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
-    const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
+    const allSwitches: Array<
+        false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?, ((value: boolean) => void)?]
+    > = [
         isWindows && [
             "discordWindowsTitleBar",
             "Discord Titlebar",
@@ -33,6 +35,18 @@ export default function SettingsUi() {
             "Hitting X will make Vesktop minimize to the tray instead of closing",
             true,
             () => Settings.tray ?? true
+        ],
+        !isMac && [
+            "trayBadge",
+            "Tray Notification Badge",
+            "Show mention badge on the tray icon",
+            false,
+            () => Settings.tray ?? true,
+            v => {
+                Settings.trayBadge = v;
+                if (v) setBadge();
+                else VesktopNative.app.setBadgeCount(0, true);
+            }
         ],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
@@ -93,32 +107,18 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VesktopNative.app.setAppBadgeCount(0);
+                    else VesktopNative.app.setBadgeCount(0, Settings.trayBadge);
                 }}
                 note="Show mention badge on the app (taskbar/panel) icon"
             >
                 Notification Badge
             </Switch>
 
-            {Settings.tray && (
-                <Switch
-                    value={Settings.trayBadge ?? true}
-                    onChange={v => {
-                        Settings.trayBadge = v;
-                        if (v) setBadge();
-                        else VesktopNative.app.setAppBadgeCount(0);
-                    }}
-                    note="Show mention badge on the tray icon"
-                >
-                    Tray Notification Badge
-                </Switch>
-            )}
-
-            {switches.map(([key, text, note, def, predicate]) => (
+            {switches.map(([key, text, note, def, predicate, onChange]) => (
                 <Switch
                     value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
                     disabled={predicate && !predicate()}
-                    onChange={v => (Settings[key as any] = v)}
+                    onChange={onChange ?? (v => (Settings[key as any] = v))}
                     note={note}
                     key={key}
                 >

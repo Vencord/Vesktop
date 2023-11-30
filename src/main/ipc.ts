@@ -114,7 +114,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     return dir;
 });
 
-handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
+handle(IpcEvents.SET_BADGE_COUNT, (_, count: number, tray: boolean) => setBadgeCount(count, tray));
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
