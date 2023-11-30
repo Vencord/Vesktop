@@ -93,12 +93,26 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VesktopNative.app.setBadgeCount(0);
+                    else VesktopNative.app.setAppBadgeCount(0);
                 }}
-                note="Show mention badge on the app icon"
+                note="Show mention badge on the app (taskbar/panel) icon"
             >
                 Notification Badge
             </Switch>
+
+            {Settings.tray && (
+                <Switch
+                    value={Settings.trayBadge ?? true}
+                    onChange={v => {
+                        Settings.trayBadge = v;
+                        if (v) setBadge();
+                        else VesktopNative.app.setAppBadgeCount(0);
+                    }}
+                    note="Show mention badge on the tray icon"
+                >
+                    Tray Notification Badge
+                </Switch>
+            )}
 
             {switches.map(([key, text, note, def, predicate]) => (
                 <Switch

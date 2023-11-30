@@ -8,6 +8,7 @@ import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
 import vencordDep from "./vencordDep.mjs";
+import { composeTrayIcons } from "./composeTrayIcons.mts";
 
 const isDev = process.argv.includes("--dev");
 
@@ -51,6 +52,12 @@ async function copyVenmic() {
 
 await Promise.all([
     copyVenmic(),
+    composeTrayIcons({
+        icon: "./static/icon.png",
+        badges: "./static/badges/*",
+        outDir: "./static/dist/tray_icons",
+        createEmpty: true
+    }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

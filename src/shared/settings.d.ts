@@ -11,6 +11,7 @@ export interface Settings {
     vencordDir?: string;
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
+    trayBadge?: boolean;
     minimizeToTray?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;

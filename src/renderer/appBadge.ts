@@ -13,7 +13,9 @@ let GuildReadStateStore: any;
 let NotificationSettingsStore: any;
 
 export function setBadge() {
-    if (Settings.store.appBadge === false) return;
+    const { appBadge, trayBadge } = Settings.store;
+
+    if (appBadge === false && trayBadge === false) return;
 
     try {
         const mentionCount = GuildReadStateStore.getTotalMentionCount();
@@ -24,7 +26,7 @@ export function setBadge() {
         let totalCount = mentionCount + pendingRequests;
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-        VesktopNative.app.setBadgeCount(totalCount);
+        if (appBadge || trayBadge) VesktopNative.app.setAppBadgeCount(totalCount);
     } catch (e) {
         console.error(e);
     }
