@@ -24,6 +24,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 import { ICON_PATH, TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
+import { Settings, VencordSettings } from "./settings";
 import {
     DATA_DIR,
     DEFAULT_HEIGHT,
@@ -34,7 +35,6 @@ import {
     UserAgent,
     VENCORD_FILES_DIR
 } from "./constants";
-import { Settings, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
@@ -48,11 +48,11 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
-type VencordBrowserWindow = BrowserWindow & {
-    _vencord_tray?: Tray;
+// Fixes circular dependency issues with export const
+export const globals = {
+    tray: <null | Tray>null,
+    mainWin: <null | BrowserWindow>null
 };
-
-export let mainWin: VencordBrowserWindow;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -75,7 +75,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-function initTray(win: VencordBrowserWindow) {
+function initTray(win: BrowserWindow) {
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
@@ -121,7 +121,7 @@ function initTray(win: VencordBrowserWindow) {
         }
     ]);
 
-    const tray = new Tray(TRAY_ICON_PATH);
+    const tray = (globals.tray = new Tray(TRAY_ICON_PATH));
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
@@ -204,7 +204,7 @@ function initMenuBar(win: BrowserWindow) {
                       label: "Settings",
                       accelerator: "CmdOrCtrl+,",
                       async click() {
-                          mainWin.webContents.executeJavaScript(
+                          globals.mainWin!.webContents.executeJavaScript(
                               "Vencord.Webpack.Common.SettingsRouter.open('My Account')"
                           );
                       }
@@ -332,10 +332,14 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("move", saveBounds);
 }
 
-function initSettingsListeners(win: VencordBrowserWindow) {
+function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
-        if (enable) initTray(win);
-        else win._vencord_tray?.destroy();
+        if (enable) {
+            initTray(win);
+        } else if (globals.tray) {
+            globals.tray.destroy();
+            globals.tray = null;
+        }
     });
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
@@ -373,7 +377,7 @@ function initSpellCheck(win: BrowserWindow) {
     });
 }
 
-function createMainWindow(): VencordBrowserWindow {
+function createMainWindow(): BrowserWindow {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
@@ -384,7 +388,7 @@ function createMainWindow(): VencordBrowserWindow {
 
     const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
 
-    const win = (mainWin = new BrowserWindow({
+    const win = (globals.mainWin = new BrowserWindow({
         show: false,
         webPreferences: {
             nodeIntegration: false,
@@ -452,7 +456,7 @@ export async function createWindows() {
     await ensureVencordFiles();
     runVencordMain();
 
-    mainWin = createMainWindow();
+    const mainWin = (globals.mainWin = createMainWindow());
 
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();

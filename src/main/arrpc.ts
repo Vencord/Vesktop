@@ -7,7 +7,7 @@
 import Server from "arrpc";
 import { IpcEvents } from "shared/IpcEvents";
 
-import { mainWin } from "./mainWindow";
+import { globals } from "./mainWindow";
 import { Settings } from "./settings";
 
 let server: any;
@@ -19,12 +19,13 @@ export async function initArRPC() {
 
     try {
         server = await new Server();
-        server.on("activity", (data: any) => mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, JSON.stringify(data)));
+        const { mainWin } = globals;
+        server.on("activity", (data: any) => mainWin!.webContents.send(IpcEvents.ARRPC_ACTIVITY, JSON.stringify(data)));
         server.on("invite", (invite: string, callback: (valid: boolean) => void) => {
             invite = String(invite);
             if (!inviteCodeRegex.test(invite)) return callback(false);
 
-            mainWin.webContents
+            mainWin!.webContents
                 // Safety: Result of JSON.stringify should always be safe to equal
                 // Also, just to be super super safe, invite is regex validated above
                 .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)

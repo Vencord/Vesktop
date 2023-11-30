@@ -15,10 +15,11 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
-import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin } from "./mainWindow";
+import { globals } from "./mainWindow";
+// !!IMPORTANT!! ./appBadge import must occur after ./mainWindow
+import { setBadgeCount } from "./appBadge";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { isValidVencordInstall } from "./utils/vencordLoader";
@@ -64,6 +65,8 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 });
 
 handle(IpcEvents.FOCUS, () => {
+    const mainWin = globals.mainWin!;
+
     if (process.platform === "win32") mainWin.minimize(); // Windows is weird
 
     mainWin.restore();
@@ -75,14 +78,14 @@ handle(IpcEvents.CLOSE, e => {
 });
 
 handle(IpcEvents.MINIMIZE, e => {
-    mainWin.minimize();
+    globals.mainWin!.minimize();
 });
 
 handle(IpcEvents.MAXIMIZE, e => {
-    if (mainWin.isMaximized()) {
-        mainWin.unmaximize();
+    if (globals.mainWin!.isMaximized()) {
+        globals.mainWin!.unmaximize();
     } else {
-        mainWin.maximize();
+        globals.mainWin!.maximize();
     }
 });
 
@@ -103,7 +106,7 @@ handle(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, (e, word: string) => {
 });
 
 handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
-    const res = await dialog.showOpenDialog(mainWin!, {
+    const res = await dialog.showOpenDialog(globals.mainWin!, {
         properties: ["openDirectory"]
     });
     if (!res.filePaths.length) return "cancelled";
@@ -126,7 +129,7 @@ open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
         VENCORD_QUICKCSS_FILE,
         { persistent: false },
         debounce(async () => {
-            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
+            globals.mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
         }, 50)
     );
 });
@@ -136,6 +139,6 @@ watch(
     VENCORD_THEMES_DIR,
     { persistent: false },
     debounce(() => {
-        mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
+        globals.mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
     })
 );

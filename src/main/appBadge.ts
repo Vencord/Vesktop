@@ -7,7 +7,7 @@
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR, TRAY_ICON_DIR, TRAY_ICON_PATH } from "shared/paths";
-import type { VencordBrowserWindow } from "./mainWindow";
+import { globals } from "./mainWindow";
 
 const imgCache = new Map<string, NativeImage>();
 
@@ -31,17 +31,11 @@ function loadTrayIcon(index: number) {
 
 let lastIndex: null | number = -1;
 
-let mainWin: null | VencordBrowserWindow;
-function getMainWin() {
-    if (mainWin != null) return mainWin;
-    return (mainWin = (require("./mainWindow") as typeof import("./mainWindow")).mainWin);
-}
-
 export function setBadgeCount(count: number, tray: boolean = false) {
     const [index, description] = getBadgeIndexAndDescription(count);
 
     if (tray) {
-        getMainWin()._vencord_tray?.setImage(loadTrayIcon(index ?? 0));
+        globals.tray?.setImage(loadTrayIcon(index ?? 0));
     }
 
     switch (process.platform) {
@@ -61,9 +55,7 @@ export function setBadgeCount(count: number, tray: boolean = false) {
 
             lastIndex = index;
 
-            // circular import shenanigans
-            const mainWin = getMainWin();
-            mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
+            globals.mainWin?.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
 }
