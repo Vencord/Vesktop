@@ -1,5 +1,5 @@
 # Allow static/dist to contain empty folders
-./dist
+/dist/
 
 node_modules
 .env
