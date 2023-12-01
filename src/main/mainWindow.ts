@@ -121,7 +121,13 @@ function initTray(win: BrowserWindow) {
     tray = new Tray(ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
-    tray.on("click", () => win.show());
+    tray.on("click", () => {
+        if (win.isFocused()) {
+            win.hide();
+        } else {
+            win.show();
+        }
+    });
 
     win.on("show", () => {
         trayMenu.items[0].enabled = false;
