@@ -12,8 +12,8 @@ type ResolvePropDeep<T, P> = P extends `${infer Pre}.${infer Suf}`
         ? ResolvePropDeep<T[Pre], Suf>
         : any
     : P extends keyof T
-    ? T[P]
-    : any;
+      ? T[P]
+      : any;
 
 /**
  * The SettingsStore allows you to easily create a mutable store that
