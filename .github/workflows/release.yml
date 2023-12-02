@@ -22,7 +22,15 @@ jobs:
                   node-version: 18
 
             - name: Run Electron Builder
-              uses: samuelmeuli/action-electron-builder@e4b12cd06ddf023422f1ac4e39632bd76f6e6928
-              with:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASE: true
+              run: |
+                  case "${{ matrix.os }}" in
+                      macos-latest) platform=mac ;;
+                      ubuntu-latest) platform=linux ;;
+                      windows-latest) platform=windows ;;
+                  esac
+
+                  pnpm install
+                  pnpm build
+                  pnpm electron-builder --$platform --publish always
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
