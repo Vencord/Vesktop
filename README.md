@@ -7,7 +7,9 @@ Vesktop is a cross platform desktop app aiming to give you a snappier Discord ex
 
 Bug reports, feature requests & contributions are highly appreciated!!
 
-![image](https://user-images.githubusercontent.com/45497981/235024615-94565eaf-f412-4384-a3f5-d8cde7458f6d.png)
+![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
+![grafik](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
+
 
 ## Installing
 

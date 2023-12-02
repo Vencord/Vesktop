@@ -1,6 +1,6 @@
 {
     "name": "VencordDesktop",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "private": true,
     "description": "",
     "keywords": [],
@@ -23,23 +23,23 @@
         "watch": "pnpm build --watch"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#89f4da610ccfac93f461826a446a17cd3b23953d"
+        "arrpc": "github:OpenAsar/arrpc#3e22fd776273afaa4a80c51deb86077ffdd4d2ae"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^2.1.2"
+        "@vencord/venmic": "^2.1.3"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@types/node": "^20.8.4",
-        "@types/react": "^18.2.28",
-        "@typescript-eslint/eslint-plugin": "^6.7.5",
-        "@typescript-eslint/parser": "^6.7.5",
+        "@types/node": "^20.10.0",
+        "@types/react": "^18.2.39",
+        "@typescript-eslint/eslint-plugin": "^6.13.1",
+        "@typescript-eslint/parser": "^6.13.1",
         "@vencord/types": "^0.1.2",
         "dotenv": "^16.3.1",
-        "electron": "^27.0.0",
-        "electron-builder": "^24.6.4",
-        "esbuild": "^0.19.4",
-        "eslint": "^8.51.0",
+        "electron": "^27.1.2",
+        "electron-builder": "^24.9.1",
+        "esbuild": "^0.19.8",
+        "eslint": "^8.54.0",
         "eslint-config-prettier": "^9.0.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-license-header": "^0.6.0",
@@ -47,13 +47,13 @@
         "eslint-plugin-prettier": "^5.0.1",
         "eslint-plugin-simple-import-sort": "^10.0.0",
         "eslint-plugin-unused-imports": "^3.0.0",
-        "prettier": "^3.0.3",
+        "prettier": "^3.1.0",
         "source-map-support": "^0.5.21",
-        "tsx": "^3.13.0",
-        "type-fest": "^4.4.0",
-        "typescript": "^5.2.2"
+        "tsx": "^4.6.0",
+        "type-fest": "^4.8.2",
+        "typescript": "^5.3.2"
     },
-    "packageManager": "pnpm@8.6.11",
+    "packageManager": "pnpm@8.11.0",
     "engines": {
         "node": ">=18",
         "pnpm": ">=8"
@@ -109,7 +109,6 @@
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
                 "Keywords": "discord;vencord;electron;chat;",
-                "WMClass": "VencordDesktop",
                 "StartupWMClass": "VencordDesktop"
             }
         },
