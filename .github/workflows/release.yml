@@ -12,6 +12,13 @@ jobs:
         strategy:
             matrix:
                 os: [macos-latest, ubuntu-latest, windows-latest]
+                include:
+                    - os: macos-latest
+                      platform: mac
+                    - os: ubuntu-latest
+                      platform: linux
+                    - os: windows-latest
+                      platform: windows
 
         steps:
             - uses: actions/checkout@v3
@@ -31,12 +38,6 @@ jobs:
 
             - name: Run Electron Builder
               run: |
-                  case "${{ matrix.os }}" in
-                      macos-latest) platform=mac ;;
-                      ubuntu-latest) platform=linux ;;
-                      windows-latest) platform=windows ;;
-                  esac
-
-                  pnpm electron-builder --$platform --publish always
+                  pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
