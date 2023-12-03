@@ -396,8 +396,7 @@ function createMainWindow() {
         ...(transparencyOption &&
             transparencyOption !== "none" && {
                 backgroundColor: "#00000000",
-                backgroundMaterial: transparencyOption,
-                transparent: true
+                backgroundMaterial: transparencyOption
             }),
         ...(staticTitle && { title: "Vesktop" }),
         ...(process.platform === "darwin" && getDarwinOptions()),
