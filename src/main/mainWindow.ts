@@ -48,7 +48,8 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
-// Fixes circular dependency issues with export const
+// Export a container object of objects that are used by other modules
+// but won't be initialized at import time.
 export const globals = {
     tray: <null | Tray>null,
     mainWin: <null | BrowserWindow>null
