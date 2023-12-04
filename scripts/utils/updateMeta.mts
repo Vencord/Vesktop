@@ -27,7 +27,7 @@ function generateDescription(description: string, descriptionNode: Element) {
             descriptionNode.appendChild(pNode);
         } else if (line.startsWith("* ")) {
             const liNode = descriptionNode.ownerDocument.createElement("li");
-            liNode.textContent = line.slice(2);
+            liNode.textContent = line.slice(2).split("in https://github.com")[0].trim(); // don't include links to github
 
             if (!currentList) {
                 currentList = descriptionNode.ownerDocument.createElement("ul");
@@ -82,7 +82,7 @@ generateDescription(latestReleaseInformation.body, description);
 
 release.appendChild(description);
 
-releaseList.insertBefore(release, releaseList.childNodes[2]);
+releaseList.insertBefore(release, releaseList.childNodes[0]);
 
 const output = xmlFormat(new XMLSerializer().serializeToString(parser), {
     lineSeparator: "\n",
