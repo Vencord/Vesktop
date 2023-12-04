@@ -82,10 +82,11 @@ handle(IpcEvents.MINIMIZE, e => {
 });
 
 handle(IpcEvents.MAXIMIZE, e => {
-    if (globals.mainWin!.isMaximized()) {
-        globals.mainWin!.unmaximize();
+    const mainWin = globals.mainWin!;
+    if (mainWin.isMaximized()) {
+        mainWin.unmaximize();
     } else {
-        globals.mainWin!.maximize();
+        mainWin.maximize();
     }
 });
 
