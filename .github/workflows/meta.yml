@@ -9,8 +9,6 @@ on:
 jobs:
     update:
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
 
         steps:
         - uses: actions/checkout@v3
@@ -27,10 +25,14 @@ jobs:
         - name: Update metainfo
           run: pnpm updateMeta
 
-        - name: Commit and push changes
+        - name: Commit and merge in changes
           run: |
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git checkout -b ci/meta-update
               git add meta/dev.vencord.Vesktop.metainfo.xml
               git commit -m "Insert release changes for ${{ github.event.release.tag_name }} [skip ci]"
-              git push
+              gh pr create -B main -H ci/meta-update -t "Update metainfo for release ${{ github.event.release.tag_name }}"
+              gh pr merge --admin -d -r
+          env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
