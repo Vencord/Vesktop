@@ -28,6 +28,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.4.4" date="2023-12-02" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v0.4.4</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>improve venmic system compatibility by @Curve</li>
+          <li>Update steamdeck controller layout by @AAGaming00</li>
+          <li>feat: Add option to disable smooth scrolling by @ZirixCZ</li>
+          <li>unblur shiggy in splash screen by @viacoro</li>
+          <li>update electron &amp; arrpc @D3SOX</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.3" date="2023-11-01" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v0.4.3</url>
     </release>
