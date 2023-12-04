@@ -126,6 +126,7 @@ function initTray(win: BrowserWindow) {
             win.hide();
         } else {
             win.show();
+            win.focus();
         }
     });
 
