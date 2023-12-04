@@ -31,9 +31,9 @@ jobs:
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
               git checkout -b ci/meta-update
               git add meta/dev.vencord.Vesktop.metainfo.xml
-              git commit -m "Insert release changes for ${{ github.event.release.tag_name }} [skip ci]"
+              git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
               git push origin ci/meta-update
               gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}."
-              gh pr merge --admin -d -r
+              gh pr merge --auto -d -r
           env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
