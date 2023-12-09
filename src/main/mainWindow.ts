@@ -457,6 +457,7 @@ export async function createWindows() {
 
         if (Settings.store.maximized && !isDeckGameMode) {
             mainWin!.maximize();
+            if (startMinimized) mainWin!.hide();
         }
 
         if (isDeckGameMode) {
