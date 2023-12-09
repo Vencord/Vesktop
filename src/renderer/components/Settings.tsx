@@ -49,8 +49,7 @@ export default function SettingsUi() {
             "Open Links in app (experimental)",
             "Opens links in a new Vesktop window instead of your web browser"
         ],
-        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true],
-        ["startMinimized", "Start minimized", "Vesktop remains in minimized mode on start", false]
+        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true]
     ];
 
     const switches = allSwitches.filter(isTruthy);
