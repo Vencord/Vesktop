@@ -46,7 +46,7 @@ const autoStartWindowsMac: AutoStart = {
     isEnabled: () => app.getLoginItemSettings().openAtLogin,
     wasAutoStarted: () => app.getLoginItemSettings().wasOpenedAtLogin,
     enable: () => app.setLoginItemSettings({ openAtLogin: true }),
-    disable: () => app.setLoginItemSettings({ openAtLogin: false }),
+    disable: () => app.setLoginItemSettings({ openAtLogin: false })
 };
 
 export const autoStart = process.platform === "linux" ? makeAutoStartLinux() : autoStartWindowsMac;

@@ -24,6 +24,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
+import { autoStart } from "./autoStart";
 import {
     DATA_DIR,
     DEFAULT_HEIGHT,
@@ -39,7 +40,6 @@ import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
-import { autoStart } from "./autoStart";
 
 let isQuitting = false;
 let tray: Tray;
