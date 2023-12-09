@@ -15,16 +15,20 @@ interface AutoStart {
     disable(): void;
 }
 
+const isFlatpak = process.env.FLATPAK_ID !== undefined;
+
 function makeAutoStartLinux(): AutoStart {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
     const file = join(dir, "vencord.desktop");
 
     return {
-        isEnabled: () => existsSync(file),
+        isEnabled: () => existsSync(file), // TODO: flatpak
         wasAutoStarted: () => process.argv.includes("--autostart"),
         enable() {
-            const desktopFile = `
+            if (isFlatpak) {
+            } else {
+                const desktopFile = `
 [Desktop Entry]
 Type=Application
 Version=1.0
@@ -35,10 +39,16 @@ Terminal=false
 StartupNotify=false
 `.trim();
 
-            mkdirSync(dir, { recursive: true });
-            writeFileSync(file, desktopFile);
+                mkdirSync(dir, { recursive: true });
+                writeFileSync(file, desktopFile);
+            }
         },
-        disable: () => rmSync(file, { force: true })
+        disable: () => {
+            if (isFlatpak) {
+            } else {
+                rmSync(file, { force: true });
+            }
+        }
     };
 }
 
