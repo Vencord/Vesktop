@@ -7,6 +7,7 @@
 import { BrowserWindow, shell } from "electron";
 
 import { Settings } from "../settings";
+import { execSteamURL, isDeckGameMode, openURL } from "./steamOS";
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url }) => {
@@ -30,9 +31,20 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
                 }
             // eslint-disable-next-line no-fallthrough
             case "mailto:":
-            case "steam:":
             case "spotify:":
-                shell.openExternal(url);
+                if (isDeckGameMode) {
+                    openURL(url);
+                } else {
+                    shell.openExternal(url);
+                }
+                break;
+            case "steam:":
+                if (isDeckGameMode) {
+                    execSteamURL(url);
+                } else {
+                    shell.openExternal(url);
+                }
+                break;
         }
 
         return { action: "deny" };
