@@ -23,6 +23,8 @@ Download and run Vesktop-VERSION.dmg from [releases](https://github.com/Vencord/
 
 ### Linux
 
+[![](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
+
 #### Arch based
 
 Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop-git) from the AUR using your favourite AUR helper, for example [yay](https://github.com/Jguer/yay)
@@ -39,7 +41,7 @@ Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/
 
 Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
 
-A flatpak is planned, if you want packages for other repos, feel free to create them and they can be linked as unofficial here
+If other packages are created, feel free to open an issue and we'll link them here.
 
 ## Building
 

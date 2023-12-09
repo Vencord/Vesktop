@@ -20,7 +20,8 @@
         "start:watch": "pnpm build:dev && tsx scripts/startWatch.mts",
         "test": "pnpm lint && pnpm testTypes",
         "testTypes": "tsc --noEmit",
-        "watch": "pnpm build --watch"
+        "watch": "pnpm build --watch",
+        "updateMeta": "tsx scripts/utils/updateMeta.mts"
     },
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#3e22fd776273afaa4a80c51deb86077ffdd4d2ae"
@@ -51,7 +52,8 @@
         "source-map-support": "^0.5.21",
         "tsx": "^4.6.0",
         "type-fest": "^4.8.2",
-        "typescript": "^5.3.2"
+        "typescript": "^5.3.2",
+        "xml-formatter": "^3.6.0"
     },
     "packageManager": "pnpm@8.11.0",
     "engines": {
