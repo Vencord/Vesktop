@@ -7,7 +7,7 @@
 import { BrowserWindow, shell } from "electron";
 
 import { Settings } from "../settings";
-import { execSteamURL, isDeckGameMode, openURL } from "./steamOS";
+import { execSteamURL, isDeckGameMode, steamOpenURL } from "./steamOS";
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url }) => {
@@ -33,7 +33,7 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
             case "mailto:":
             case "spotify:":
                 if (isDeckGameMode) {
-                    openURL(url);
+                    steamOpenURL(url);
                 } else {
                     shell.openExternal(url);
                 }

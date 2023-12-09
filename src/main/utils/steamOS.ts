@@ -49,7 +49,7 @@ export async function execSteamURL(url: string): Promise<void> {
     );
 }
 
-export async function openURL(url: string) {
+export async function steamOpenURL(url: string) {
     await execSteamURL(`steam://openurl/${url}`);
 }
 
