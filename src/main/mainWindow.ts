@@ -453,18 +453,20 @@ export async function createWindows() {
 
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
-        if (!startMinimized) mainWin!.show();
 
-        if (Settings.store.maximized && !isDeckGameMode) {
-            mainWin!.maximize();
-            if (startMinimized) mainWin!.hide();
-        }
+        if (!startMinimized || isDeckGameMode) mainWin!.show();
 
         if (isDeckGameMode) {
             // always use entire display
             mainWin!.setFullScreen(true);
 
             askToApplySteamLayout(mainWin);
+        }
+    });
+
+    mainWin.once("show", () => {
+        if (Settings.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
+            mainWin!.maximize();
         }
     });
 
