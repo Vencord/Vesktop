@@ -10,6 +10,7 @@ import { join } from "path";
 
 interface AutoStart {
     isEnabled(): boolean;
+    wasAutoStarted(): boolean;
     enable(): void;
     disable(): void;
 }
@@ -21,6 +22,7 @@ function makeAutoStartLinux(): AutoStart {
 
     return {
         isEnabled: () => existsSync(file),
+        wasAutoStarted: () => process.argv.includes("--autostart"),
         enable() {
             const desktopFile = `
 [Desktop Entry]
@@ -28,7 +30,7 @@ Type=Application
 Version=1.0
 Name=Vencord
 Comment=Vencord autostart script
-Exec=${process.execPath}
+Exec=${process.execPath} --autostart
 Terminal=false
 StartupNotify=false
 `.trim();
@@ -42,8 +44,9 @@ StartupNotify=false
 
 const autoStartWindowsMac: AutoStart = {
     isEnabled: () => app.getLoginItemSettings().openAtLogin,
+    wasAutoStarted: () => app.getLoginItemSettings().wasOpenedAtLogin,
     enable: () => app.setLoginItemSettings({ openAtLogin: true }),
-    disable: () => app.setLoginItemSettings({ openAtLogin: false })
+    disable: () => app.setLoginItemSettings({ openAtLogin: false }),
 };
 
 export const autoStart = process.platform === "linux" ? makeAutoStartLinux() : autoStartWindowsMac;

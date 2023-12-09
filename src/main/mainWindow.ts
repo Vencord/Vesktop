@@ -39,6 +39,7 @@ import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { autoStart } from "./autoStart";
 
 let isQuitting = false;
 let tray: Tray;
@@ -442,8 +443,8 @@ function createMainWindow() {
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
 export async function createWindows() {
-    const { startMinimized } = Settings.store;
-    const splash = createSplashWindow(startMinimized);
+    const shouldStartMinimized = Settings.store.startMinimized && autoStart.wasAutoStarted();
+    const splash = createSplashWindow(shouldStartMinimized);
     // SteamOS letterboxes and scales it terribly, so just full screen it
     if (isDeckGameMode) splash.setFullScreen(true);
     await ensureVencordFiles();
@@ -454,7 +455,7 @@ export async function createWindows() {
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
 
-        if (!startMinimized || isDeckGameMode) mainWin!.show();
+        if (!shouldStartMinimized || isDeckGameMode) mainWin!.show();
 
         if (isDeckGameMode) {
             // always use entire display
