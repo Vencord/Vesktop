@@ -17,6 +17,8 @@ const layoutVersion = 2;
 const layoutId = "3080264545"; // Vesktop Layout v2
 const numberRegex = /^[0-9]*$/;
 
+const steamosPipeQueue = Promise.resolve();
+
 export const isDeckGameMode = process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1";
 
 export function applyDeckKeyboardFix() {
@@ -39,18 +41,20 @@ function getAppId(): string | null {
     return null;
 }
 
-export async function execSteamURL(url: string): Promise<void> {
+export function execSteamURL(url: string) {
     // This doesn't allow arbitrary execution despite the weird syntax.
-    await writeFile(
-        join(process.env.HOME || "/home/deck", ".steam", "steam.pipe"),
-        // replace ' to prevent argument injection
-        `'${process.env.HOME}/.local/share/Steam/ubuntu12_32/steam' '-ifrunning' '${url.replaceAll("'", "%27")}'\n`,
-        "utf-8"
+    steamosPipeQueue.then(() =>
+        writeFile(
+            join(process.env.HOME || "/home/deck", ".steam", "steam.pipe"),
+            // replace ' to prevent argument injection
+            `'${process.env.HOME}/.local/share/Steam/ubuntu12_32/steam' '-ifrunning' '${url.replaceAll("'", "%27")}'\n`,
+            "utf-8"
+        )
     );
 }
 
-export async function steamOpenURL(url: string) {
-    await execSteamURL(`steam://openurl/${url}`);
+export function steamOpenURL(url: string) {
+    execSteamURL(`steam://openurl/${url}`);
 }
 
 export async function showGamePage() {
