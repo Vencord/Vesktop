@@ -17,7 +17,7 @@ const layoutVersion = 2;
 const layoutId = "3080264545"; // Vesktop Layout v2
 const numberRegex = /^[0-9]*$/;
 
-const steamosPipeQueue = Promise.resolve();
+let steamPipeQueue = Promise.resolve();
 
 export const isDeckGameMode = process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1";
 
@@ -43,7 +43,7 @@ function getAppId(): string | null {
 
 export function execSteamURL(url: string) {
     // This doesn't allow arbitrary execution despite the weird syntax.
-    steamosPipeQueue.then(() =>
+    steamPipeQueue = steamPipeQueue.then(() =>
         writeFile(
             join(process.env.HOME || "/home/deck", ".steam", "steam.pipe"),
             // replace ' to prevent argument injection
