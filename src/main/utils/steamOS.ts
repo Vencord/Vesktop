@@ -4,15 +4,12 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { exec as callbackExec } from "child_process";
 import { BrowserWindow, dialog } from "electron";
-import { sleep } from "shared/utils/sleep";
-import { promisify } from "util";
+import { writeFile } from "fs/promises";
+import { join } from "path";
 
 import { MessageBoxChoice } from "../constants";
 import { Settings } from "../settings";
-
-const exec = promisify(callbackExec);
 
 // Bump this to re-show the prompt
 const layoutVersion = 2;
@@ -42,16 +39,28 @@ function getAppId(): string | null {
     return null;
 }
 
-async function execSteamURL(url: string): Promise<void> {
-    await exec(`steam -ifrunning ${url}`);
+export async function execSteamURL(url: string): Promise<void> {
+    // This doesn't allow arbitrary execution despite the weird syntax.
+    await writeFile(
+        join(process.env.HOME || "/home/deck", ".steam", "steam.pipe"),
+        // replace ' to prevent argument injection
+        `'${process.env.HOME}/.local/share/Steam/ubuntu12_32/steam' '-ifrunning' '${url.replaceAll("'", "%27")}'\n`,
+        "utf-8"
+    );
+}
+
+export async function steamOpenURL(url: string) {
+    await execSteamURL(`steam://openurl/${url}`);
+}
+
+export async function showGamePage() {
+    const appId = getAppId();
+    if (!appId) return;
+    await execSteamURL(`steam://nav/games/details/${appId}`);
 }
 
 async function showLayout(appId: string) {
-    await execSteamURL(`steam://controllerconfig/${appId}/${layoutId}`);
-    // because the UI doesn't consistently reload after the data for the config has loaded...
-    // HOW HAS NOBODY AT VALVE RUN INTO THIS YET
-    await sleep(100);
-    await execSteamURL(`steam://controllerconfig/${appId}/${layoutId}`);
+    execSteamURL(`steam://controllerconfig/${appId}/${layoutId}`);
 }
 
 export async function askToApplySteamLayout(win: BrowserWindow) {
