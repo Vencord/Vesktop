@@ -6,6 +6,7 @@
 
 if (process.platform === "linux") import("./virtmic");
 
+// eslint-disable-next-line simple-import-sort/imports
 import { execFile } from "child_process";
 import { app, BrowserWindow, dialog, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
@@ -17,8 +18,9 @@ import { debounce } from "shared/utils/debounce";
 import { IpcEvents } from "../shared/IpcEvents";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { globals } from "./mainWindow";
+import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
+import { setBadgeCount } from "./appBadge";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
@@ -67,8 +69,6 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 });
 
 handle(IpcEvents.FOCUS, () => {
-    const mainWin = globals.mainWin!;
-
     if (process.platform === "win32") mainWin.minimize(); // Windows is weird
 
     mainWin.restore();
@@ -80,11 +80,10 @@ handle(IpcEvents.CLOSE, e => {
 });
 
 handle(IpcEvents.MINIMIZE, e => {
-    globals.mainWin!.minimize();
+    mainWin.minimize();
 });
 
 handle(IpcEvents.MAXIMIZE, e => {
-    const mainWin = globals.mainWin!;
     if (mainWin.isMaximized()) {
         mainWin.unmaximize();
     } else {
@@ -109,7 +108,7 @@ handle(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, (e, word: string) => {
 });
 
 handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
-    const res = await dialog.showOpenDialog(globals.mainWin!, {
+    const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openDirectory"]
     });
     if (!res.filePaths.length) return "cancelled";
@@ -120,9 +119,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     return dir;
 });
 
-handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => {
-    (require("./appBadge") as typeof import("./appBadge")).setBadgeCount(count);
-});
+handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
@@ -134,7 +131,7 @@ open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
         VENCORD_QUICKCSS_FILE,
         { persistent: false },
         debounce(async () => {
-            globals.mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
+            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
         }, 50)
     );
 });
@@ -144,6 +141,6 @@ watch(
     VENCORD_THEMES_DIR,
     { persistent: false },
     debounce(() => {
-        globals.mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
+        mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
     })
 );

@@ -48,12 +48,8 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
-// Export a container object of objects that are used by other modules
-// but won't be initialized at import time.
-export const globals = {
-    tray: <null | Tray>null,
-    mainWin: <null | BrowserWindow>null
-};
+export let mainWin: BrowserWindow;
+export let tray: Tray | null = null;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -122,7 +118,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    const tray = (globals.tray = new Tray(TRAY_ICON_PATH));
+    tray = new Tray(TRAY_ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
@@ -205,7 +201,7 @@ function initMenuBar(win: BrowserWindow) {
                       label: "Settings",
                       accelerator: "CmdOrCtrl+,",
                       async click() {
-                          globals.mainWin!.webContents.executeJavaScript(
+                          mainWin.webContents.executeJavaScript(
                               "Vencord.Webpack.Common.SettingsRouter.open('My Account')"
                           );
                       }
@@ -337,9 +333,9 @@ function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
         if (enable) {
             initTray(win);
-        } else if (globals.tray) {
-            globals.tray.destroy();
-            globals.tray = null;
+        } else if (tray) {
+            tray.destroy();
+            tray = null;
         }
     });
     addSettingsListener("disableMinSize", disable => {
@@ -378,7 +374,7 @@ function initSpellCheck(win: BrowserWindow) {
     });
 }
 
-function createMainWindow(): BrowserWindow {
+function createMainWindow() {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
@@ -389,7 +385,7 @@ function createMainWindow(): BrowserWindow {
 
     const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
 
-    const win = (globals.mainWin = new BrowserWindow({
+    const win = (mainWin = new BrowserWindow({
         show: false,
         webPreferences: {
             nodeIntegration: false,
@@ -457,7 +453,7 @@ export async function createWindows() {
     await ensureVencordFiles();
     runVencordMain();
 
-    const mainWin = (globals.mainWin = createMainWindow());
+    mainWin = createMainWindow();
 
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();

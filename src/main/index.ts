@@ -11,7 +11,7 @@ import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, globals } from "./mainWindow";
+import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings } from "./settings";
@@ -43,7 +43,6 @@ function init() {
     );
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        const { mainWin } = globals;
         if (data.IS_DEV) app.quit();
         else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
