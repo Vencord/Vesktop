@@ -22,8 +22,9 @@ export function setBadge() {
         let totalCount = mentionCount + pendingRequests;
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-        if (Settings.store.appBadge || Settings.store.trayBadge)
-            VesktopNative.app.setBadgeCount(totalCount, Settings.store.appBadge, Settings.store.trayBadge);
+        if (Settings.store.appBadge || Settings.store.trayBadge) {
+            VesktopNative.app.setBadgeCount(totalCount);
+        }
     } catch (e) {
         console.error(e);
     }

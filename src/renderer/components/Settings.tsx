@@ -87,7 +87,7 @@ export default function SettingsUi() {
                 onChange={v => {
                     Settings.appBadge = v;
                     if (v) setBadge();
-                    else VesktopNative.app.setBadgeCount(0, true, false);
+                    else VesktopNative.app.setBadgeCount(0);
                 }}
                 note="Show mention badge on the app (taskbar/panel) icon"
             >
@@ -121,7 +121,7 @@ export default function SettingsUi() {
                         onChange={v => {
                             Settings.trayBadge = v;
                             if (v) setBadge();
-                            else VesktopNative.app.setBadgeCount(0, false, true);
+                            else VesktopNative.app.setBadgeCount(0);
                         }}
                         disabled={!(Settings.tray ?? true)}
                         note="Show mention badge on the tray icon"

@@ -1,7 +1,14 @@
-import sharp, { OutputInfo } from "sharp";
-import fastGlob from "fast-glob";
-import type { ImageData } from "sharp-ico";
-import { parse as pathParse, format as pathFormat } from "node:path";
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
+import { readdir, stat } from "node:fs/promises";
+import { format as pathFormat, join, parse as pathParse } from "node:path";
+
+import sharp from "sharp";
+import { type ImageData, sharpsFromIco } from "sharp-ico";
 
 interface BadgePosition {
     left?: number;
@@ -30,7 +37,7 @@ const DEFAULT_BADGE_OPTIONS: Required<BadgeOptions> = {
 
 export async function composeTrayIcons({
     icon: iconPath,
-    badges: badgeGlob,
+    badgeDir,
     outDir,
     outExt = ".png",
     createEmpty = false,
@@ -38,16 +45,19 @@ export async function composeTrayIcons({
     badgeOptions = undefined
 }: {
     icon: string | Buffer | sharp.Sharp;
-    badges: string;
+    badgeDir: string;
     outDir: string;
     outExt?: string;
     createEmpty?: boolean;
     iconOptions?: ImageDim;
     badgeOptions?: BadgeOptions;
 }) {
-    const badges = await fastGlob.glob(badgeGlob);
-    if (!badges.length) {
-        throw new Error(`No badges matching glob '${badgeGlob}' found!`);
+    const badges: string[] = [];
+    for (const filename of await readdir(badgeDir)) {
+        const path = join(badgeDir, filename);
+        if (!(await stat(path)).isDirectory()) {
+            badges.push(path);
+        }
     }
 
     const badgeOptionsFilled = { ...DEFAULT_BADGE_OPTIONS, ...badgeOptions };
@@ -73,7 +83,7 @@ export async function composeTrayIcons({
             ext: outExt,
             base: undefined
         });
-        let out = composeTrayIcon(iconData, iconInfo, badgeData, badgeInfo, badgeOptionsFilled);
+        const out = composeTrayIcon(iconData, iconInfo, badgeData, badgeInfo, badgeOptionsFilled);
         const outputInfo = await out.toFile(savePath);
         return {
             iconInfo,
@@ -115,7 +125,7 @@ async function loadFromImageOrIco(
     sizeOptions?: ImageDim & { resizeICO?: boolean }
 ): Promise<sharp.Sharp> {
     if (typeof path === "string" && path.endsWith(".ico")) {
-        const icos = (await import("sharp-ico")).sharpsFromIco(path, undefined, true) as unknown as ImageData[];
+        const icos = sharpsFromIco(path, undefined, true) as unknown as ImageData[];
         let icoInfo;
         if (sizeOptions == null) {
             icoInfo = icos[icos.length - 1];

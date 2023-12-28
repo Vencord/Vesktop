@@ -15,11 +15,11 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
+// !!IMPORTANT!! ./appBadge import must occur after ./mainWindow
+import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { globals } from "./mainWindow";
-// !!IMPORTANT!! ./appBadge import must occur after ./mainWindow
-import { setBadgeCount } from "./appBadge";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -122,9 +122,9 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     return dir;
 });
 
-handle(IpcEvents.SET_BADGE_COUNT, (_, count: number, native: boolean, tray: boolean) =>
-    setBadgeCount(count, native, tray)
-);
+handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => {
+    setBadgeCount(count);
+});
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");

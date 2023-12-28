@@ -7,7 +7,9 @@
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR, TRAY_ICON_DIR, TRAY_ICON_PATH } from "shared/paths";
+
 import { globals } from "./mainWindow";
+import { Settings } from "./settings";
 
 const imgCache = new Map<string, NativeImage>();
 
@@ -31,14 +33,14 @@ function loadTrayIcon(index: number) {
 
 let lastIndex: null | number = -1;
 
-export function setBadgeCount(count: number, native: boolean = true, tray: boolean = false) {
+export function setBadgeCount(count: number) {
     const [index, description] = getBadgeIndexAndDescription(count);
 
-    if (tray) {
+    if (Settings.store.trayBadge) {
         globals.tray?.setImage(loadTrayIcon(index ?? 0));
     }
 
-    if (!native) return;
+    if (!Settings.store.appBadge) return;
 
     switch (process.platform) {
         case "linux":

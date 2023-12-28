@@ -9,12 +9,12 @@ import "./ipc";
 import { app, BrowserWindow } from "electron";
 import { checkUpdates } from "updater/main";
 
-import { Settings } from "./settings";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, globals } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
+import { Settings } from "./settings";
 
 if (IS_DEV) {
     require("source-map-support").install();
@@ -43,9 +43,9 @@ function init() {
     );
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        let mainWin;
+        const { mainWin } = globals;
         if (data.IS_DEV) app.quit();
-        else if ((mainWin = globals.mainWin)) {
+        else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
             if (!mainWin.isVisible()) mainWin.show();
             mainWin.focus();
