@@ -1,4 +1,3 @@
-# Allow static/dist to contain empty folders
 /dist/
 
 node_modules
