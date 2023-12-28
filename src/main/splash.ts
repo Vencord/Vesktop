@@ -11,11 +11,10 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
-export function createSplashWindow(startMinimized = false) {
+export function createSplashWindow() {
     const splash = new BrowserWindow({
         ...SplashProps,
-        icon: ICON_PATH,
-        show: !startMinimized
+        icon: ICON_PATH
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
