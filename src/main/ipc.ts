@@ -22,6 +22,7 @@ import { globals } from "./mainWindow";
 import { setBadgeCount } from "./appBadge";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
+import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_FILE, () => join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"));
@@ -48,11 +49,14 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
     Settings.setData(settings, path);
 });
 
-handle(IpcEvents.RELAUNCH, () => {
+handle(IpcEvents.RELAUNCH, async () => {
     const options: RelaunchOptions = {
         args: process.argv.slice(1).concat(["--relaunch"])
     };
-    if (app.isPackaged && process.env.APPIMAGE) {
+    if (isDeckGameMode) {
+        // We can't properly relaunch when running under gamescope, but we can at least navigate to our page in Steam.
+        await showGamePage();
+    } else if (app.isPackaged && process.env.APPIMAGE) {
         execFile(process.env.APPIMAGE, options.args);
     } else {
         app.relaunch(options);
