@@ -442,6 +442,11 @@ function createMainWindow() {
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
 export async function createWindows() {
+    if (isDeckGameMode) {
+        // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
+        nativeTheme.themeSource = "dark";
+    }
+
     const { startMinimized } = Settings.store;
     const splash = createSplashWindow(startMinimized);
     // SteamOS letterboxes and scales it terribly, so just full screen it
