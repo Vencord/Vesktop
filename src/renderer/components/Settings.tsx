@@ -42,13 +42,15 @@ export default function SettingsUi() {
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
+        ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
             "Opens links in a new Vesktop window instead of your web browser"
         ],
-        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true]
+        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true],
+        ["startMinimized", "Start minimized", "Vesktop remains in minimized mode on start", false]
     ];
 
     const switches = allSwitches.filter(isTruthy);
