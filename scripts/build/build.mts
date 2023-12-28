@@ -53,7 +53,7 @@ async function copyVenmic() {
 async function composeTrayIconsIfSupported() {
     if (process.platform === "darwin") return;
 
-    await composeTrayIcons({
+    return composeTrayIcons({
         icon: "./static/icon.png",
         badgeDir: "./static/badges/",
         outDir: "./static/dist/tray_icons",

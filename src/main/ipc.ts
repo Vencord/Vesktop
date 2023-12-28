@@ -15,8 +15,6 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
-// !!IMPORTANT!! ./appBadge import must occur after ./mainWindow
-import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { globals } from "./mainWindow";
@@ -123,7 +121,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => {
-    setBadgeCount(count);
+    (require("./appBadge") as typeof import("./appBadge")).setBadgeCount(count);
 });
 
 function readCss() {
