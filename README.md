@@ -23,6 +23,8 @@ Download and run Vesktop-VERSION.dmg from [releases](https://github.com/Vencord/
 
 ### Linux
 
+[![](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
+
 #### Arch based
 
 Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop-git) from the AUR using your favourite AUR helper, for example [yay](https://github.com/Jguer/yay)
@@ -39,7 +41,7 @@ Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/
 
 Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
 
-A flatpak is planned, if you want packages for other repos, feel free to create them and they can be linked as unofficial here
+If other packages are created, feel free to open an issue and we'll link them here.
 
 ## Building
 
@@ -66,7 +68,3 @@ pnpm package:dir
 ## Motivation
 
 The official Discord Desktop app is very resource heavy compared to Discord in your Browser. There are multiple alternative Electron apps (ArmCord, WebCord, probably more) that prove how much of a performance gain you can gain by using a custom app. ArmCord already supports Vencord but makes it pretty limited for us. Making our own standalone app gives us much more control.
-
-This is just a random idea I (V) got, and might not actually ever be finished heh
-
-Gluon also seems very attractive for this because of how lightweight it can be and because unlike electron, streaming just works out of the box like in any chromium browser. However, at the time of writing this, it still lacks some features necessary to make it work (synchronous ipc or a way to get node process variables into the onLoad function for instance, plus onLoad seems to load a little too late sometimes)
