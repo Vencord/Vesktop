@@ -43,6 +43,12 @@ export default function SettingsUi() {
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
+        [
+            "disableHardwareAcceleration",
+            "Disable Hardware Acceleration",
+            "Disables hardware acceleration in Vesktop",
+            false
+        ],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
         [
             "openLinksWithElectron",
