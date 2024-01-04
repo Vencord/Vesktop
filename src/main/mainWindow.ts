@@ -398,6 +398,11 @@ function createMainWindow() {
                 backgroundColor: "#00000000",
                 backgroundMaterial: transparencyOption
             }),
+        // Fix transparencyOption for custom discord titlebar
+        ...(discordWindowsTitleBar && transparencyOption &&
+            transparencyOption !== "none" && {
+                transparent: true
+            }),
         ...(staticTitle && { title: "Vesktop" }),
         ...(process.platform === "darwin" && getDarwinOptions()),
         ...getWindowBoundsOptions(),
