@@ -16,7 +16,7 @@ export interface Settings {
     staticTitle?: boolean;
     enableMenu?: boolean;
     disableSmoothScroll?: boolean;
-    disableHardwareAcceleration?: boolean;
+    hardwareAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
     discordWindowsTitleBar?: boolean;
