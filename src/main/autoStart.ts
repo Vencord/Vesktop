@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { spawnSync } from "child_process";
 import { app } from "electron";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -14,7 +15,37 @@ interface AutoStart {
     disable(): void;
 }
 
-function makeAutoStartLinux(): AutoStart {
+function requestBackgroundPortal(autostart: boolean, commandline: string[]) {
+    const commandlineString = commandline.map(a => `'${a.replaceAll("'", "\\'")}'`).join(", ");
+
+    const { status } = spawnSync(
+        "gdbus",
+        [
+            "call",
+            "--session",
+            "--dest",
+            "org.freedesktop.portal.Desktop",
+            "--object-path",
+            "/org/freedesktop/portal/desktop",
+            "--method",
+            "org.freedesktop.portal.Background.RequestBackground",
+            "",
+            `{'autostart':<${autostart}>,'commandline':<[${commandlineString}]>}`
+        ],
+        { encoding: "utf-8", stdio: "inherit" }
+    );
+
+    return status === 0;
+}
+
+// todo: only apply start-minimized if setting is enabled
+const LinuxAutoStartPortal = {
+    isEnabled: () => "dunno",
+    enable: () => requestBackgroundPortal(true, [process.execPath, "--start-minimized"]),
+    disable: () => requestBackgroundPortal(false, [])
+};
+
+const makeLinuxAutoStartDesktopFile = () => {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
     const file = join(dir, "vencord.desktop");
@@ -28,7 +59,7 @@ Type=Application
 Version=1.0
 Name=Vencord
 Comment=Vencord autostart script
-Exec=${process.execPath}
+Exec=${process.execPath} --start-minimized
 Terminal=false
 StartupNotify=false
 `.trim();
@@ -37,6 +68,20 @@ StartupNotify=false
             writeFileSync(file, desktopFile);
         },
         disable: () => rmSync(file, { force: true })
+    };
+};
+
+function makeAutoStartLinux(): AutoStart {
+    const autoStartDesktop = makeLinuxAutoStartDesktopFile();
+    const autoStartPortal = LinuxAutoStartPortal;
+
+    return {
+        isEnabled: () => autoStartDesktop.isEnabled(),
+        enable: () => autoStartPortal.enable() || autoStartDesktop.enable(),
+        disable: () => {
+            autoStartPortal.disable();
+            autoStartDesktop.disable();
+        }
     };
 }
 
