@@ -24,9 +24,9 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const { disableSmoothScroll, disableHardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
-    if (disableHardwareAcceleration) app.disableHardwareAcceleration();
+    if (hardwareAcceleration === false) app.disableHardwareAcceleration();
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
