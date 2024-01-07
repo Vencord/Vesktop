@@ -210,7 +210,6 @@ function initMenuBar(win: BrowserWindow) {
                       type: "separator"
                   },
                   {
-                      label: "Hide Vesktop", // Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
                       role: "hide"
                   },
                   {
