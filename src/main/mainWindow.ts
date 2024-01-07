@@ -459,6 +459,9 @@ export async function createWindows() {
         splash.destroy();
 
         if (!startMinimized) mainWin!.show();
+        else if (State.store.maximized && !isDeckGameMode) {
+            mainWin!.maximize();
+        }
 
         if (isDeckGameMode) {
             // always use entire display
