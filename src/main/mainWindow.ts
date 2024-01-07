@@ -399,7 +399,7 @@ function createMainWindow() {
                 backgroundMaterial: transparencyOption
             }),
         // Fix transparencyOption for custom discord titlebar
-        ...(discordWindowsTitleBar && 
+        ...(discordWindowsTitleBar &&
             transparencyOption &&
             transparencyOption !== "none" && {
                 transparent: true
