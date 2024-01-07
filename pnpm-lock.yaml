@@ -11,8 +11,8 @@ dependencies:
 
 optionalDependencies:
   '@vencord/venmic':
-    specifier: ^2.1.3
-    version: 2.1.4
+    specifier: ^3.2.0
+    version: 3.2.0
 
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
@@ -793,8 +793,8 @@ packages:
       type-fest: 3.13.1
     dev: true
 
-  /@vencord/venmic@2.1.4:
-    resolution: {integrity: sha512-Or//CHB9QtMcUXoDagkq0IF/7R8r7IABCaLIPtG8HCKSuOOFgBJ54PItnPXCliNKXWpwsUxj5z1WlZ4/VdwZHg==}
+  /@vencord/venmic@3.2.0:
+    resolution: {integrity: sha512-z+Lgmr6IgjkPEIfFZ3ZwVV4aP/OFjnB6k6Ll5YpBPuDZOyqCbKTNLADApbZa/WxMfm7YpZ22g46X4FfizuprEQ==}
     engines: {node: '>=14.15'}
     os: [linux]
     requiresBuild: true

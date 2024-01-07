@@ -3,13 +3,13 @@
 Vesktop is a cross platform desktop app aiming to give you a snappier Discord experience with [Vencord](https://github.com/Vendicated/Vencord) pre-installed
 
 **Not yet supported**:
-- Global Keybinds
+
+-   Global Keybinds
 
 Bug reports, feature requests & contributions are highly appreciated!!
 
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
 ![grafik](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
-
 
 ## Installing
 
@@ -39,7 +39,7 @@ Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/
 
 #### Other
 
-Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
+Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vesktop`.
 
 If other packages are created, feel free to open an issue and we'll link them here.
 

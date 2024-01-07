@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, nativeTheme } from "electron";
 import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
@@ -14,7 +14,8 @@ import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
-import { Settings } from "./settings";
+import { Settings, State } from "./settings";
+import { isDeckGameMode } from "./utils/steamOS";
 
 if (IS_DEV) {
     require("source-map-support").install();
@@ -43,6 +44,9 @@ function init() {
         "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering"
     );
 
+    // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
+    if (isDeckGameMode) nativeTheme.themeSource = "dark";
+
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
         else if (mainWin) {
@@ -54,7 +58,7 @@ function init() {
 
     app.whenReady().then(async () => {
         checkUpdates();
-        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
+        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
@@ -80,7 +84,7 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
 }
 
 async function bootstrap() {
-    if (!Object.hasOwn(Settings.store, "firstLaunch")) {
+    if (!Object.hasOwn(State.store, "firstLaunch")) {
         createFirstLaunchTour();
     } else {
         createWindows();

@@ -34,7 +34,7 @@ import {
     UserAgent,
     VENCORD_FILES_DIR
 } from "./constants";
-import { Settings, VencordSettings } from "./settings";
+import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
@@ -210,7 +210,6 @@ function initMenuBar(win: BrowserWindow) {
                       type: "separator"
                   },
                   {
-                      label: "Hide Vesktop", // Should probably remove the label, but it says "Hide VencordDesktop" instead of "Hide Vesktop"
                       role: "hide"
                   },
                   {
@@ -268,7 +267,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     // We want the default window behaivour to apply in game mode since it expects everything to be fullscreen and maximized.
     if (isDeckGameMode) return {};
 
-    const { x, y, width, height } = Settings.store.windowBounds ?? {};
+    const { x, y, width, height } = State.store.windowBounds ?? {};
 
     const options = {
         width: width ?? DEFAULT_WIDTH,
@@ -313,8 +312,8 @@ function getDarwinOptions(): BrowserWindowConstructorOptions {
 
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
-        Settings.store.maximized = win.isMaximized();
-        Settings.store.minimized = win.isMinimized();
+        State.store.maximized = win.isMaximized();
+        State.store.minimized = win.isMinimized();
     };
 
     win.on("maximize", saveState);
@@ -322,7 +321,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("unmaximize", saveState);
 
     const saveBounds = () => {
-        Settings.store.windowBounds = win.getBounds();
+        State.store.windowBounds = win.getBounds();
     };
 
     win.on("resize", saveBounds);
@@ -396,7 +395,12 @@ function createMainWindow() {
         ...(transparencyOption &&
             transparencyOption !== "none" && {
                 backgroundColor: "#00000000",
-                backgroundMaterial: transparencyOption,
+                backgroundMaterial: transparencyOption
+            }),
+        // Fix transparencyOption for custom discord titlebar
+        ...(discordWindowsTitleBar &&
+            transparencyOption &&
+            transparencyOption !== "none" && {
                 transparent: true
             }),
         ...(staticTitle && { title: "Vesktop" }),
@@ -454,7 +458,9 @@ export async function createWindows() {
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
 
-        if (!startMinimized || isDeckGameMode) mainWin!.show();
+        if (State.store.maximized && !isDeckGameMode) {
+            mainWin!.maximize();
+        }
 
         if (isDeckGameMode) {
             // always use entire display
@@ -464,7 +470,7 @@ export async function createWindows() {
         }
 
         mainWin.once("show", () => {
-            if (Settings.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
+            if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
                 mainWin!.maximize();
             }
         });
