@@ -58,7 +58,7 @@ function init() {
 
     app.whenReady().then(async () => {
         checkUpdates();
-        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.desktop");
+        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
