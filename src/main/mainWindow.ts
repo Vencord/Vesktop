@@ -458,7 +458,7 @@ export async function createWindows() {
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
 
-        if (!startMinimized || isDeckGameMode) mainWin!.show();
+        if (!startMinimized) mainWin!.show();
 
         if (isDeckGameMode) {
             // always use entire display
