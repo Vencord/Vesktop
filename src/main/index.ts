@@ -14,7 +14,7 @@ import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
-import { Settings } from "./settings";
+import { Settings, State } from "./settings";
 import { isDeckGameMode } from "./utils/steamOS";
 
 if (IS_DEV) {
@@ -84,7 +84,7 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
 }
 
 async function bootstrap() {
-    if (!Object.hasOwn(Settings.store, "firstLaunch")) {
+    if (!Object.hasOwn(State.store, "firstLaunch")) {
         createFirstLaunchTour();
     } else {
         createWindows();

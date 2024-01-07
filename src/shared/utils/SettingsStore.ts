@@ -144,4 +144,11 @@ export class SettingsStore<T extends object> {
         listeners.delete(cb);
         if (!listeners.size) this.pathListeners.delete(path as string);
     }
+
+    /**
+     * Call all global change listeners
+     */
+    public markAsChanged() {
+        this.globalListeners.forEach(cb => cb(this.plain, ""));
+    }
 }

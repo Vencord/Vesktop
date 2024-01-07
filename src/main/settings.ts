@@ -4,14 +4,15 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
-import type { Settings as TSettings } from "shared/settings";
+import type { Settings as TSettings, State as TState } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
 
 const SETTINGS_FILE = join(DATA_DIR, "settings.json");
+const STATE_FILE = join(DATA_DIR, "state.json");
 
 function loadSettings<T extends object = any>(file: string, name: string) {
     let settings = {} as T;
@@ -20,7 +21,7 @@ function loadSettings<T extends object = any>(file: string, name: string) {
         try {
             settings = JSON.parse(content);
         } catch (err) {
-            console.error(`Failed to parse ${name} settings.json:`, err);
+            console.error(`Failed to parse ${name}.json:`, err);
         }
     } catch {}
 
@@ -33,5 +34,25 @@ function loadSettings<T extends object = any>(file: string, name: string) {
     return store;
 }
 
-export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop");
-export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord");
+export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
+export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings");
+
+if (Object.hasOwn(Settings.store, "firstLaunch") && !existsSync(STATE_FILE)) {
+    console.warn("legacy state in settings.json detected. migrating to state.json");
+    const state = {} as TState;
+    for (const prop of [
+        "firstLaunch",
+        "maximized",
+        "minimized",
+        "skippedUpdate",
+        "steamOSLayoutVersion",
+        "windowBounds"
+    ]) {
+        state[prop] = Settings.plain[prop];
+        delete Settings.plain[prop];
+    }
+    Settings.markAsChanged();
+    writeFileSync(STATE_FILE, JSON.stringify(state, null, 4));
+}
+
+export const State = loadSettings<TState>(STATE_FILE, "Vesktop state");
