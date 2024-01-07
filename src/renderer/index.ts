@@ -21,7 +21,7 @@ export { Settings };
 
 const InviteActions = findByPropsLazy("resolveInvite");
 
-export const keybindCallbacks: { [id: string]: Function } = {};
+export const keybindCallbacks: { [id: number]: Function } = {};
 
 export async function openInviteModal(code: string) {
     const { invite } = await InviteActions.resolveInvite(code, "Desktop Modal");

@@ -147,15 +147,15 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
 
 const registered_keybinds = {};
 
-handle(IpcEvents.KEYBIND_REGISTER, (_, id: string, shortcut: string) => {
+handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string, options: any) => {
     globalShortcut.register(shortcut, () => {
         // false here implies `keyup`
         // electron's global shortcut system doesn't really register keyup or down as far as i can tell
-        mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks["${id}"](false)`);
+        mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${id}](false)`);
     });
     registered_keybinds[id] = shortcut;
 });
-handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: string) => {
+handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
     globalShortcut.unregister(registered_keybinds[id]);
 });
 
