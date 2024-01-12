@@ -17,23 +17,26 @@ export interface Settings {
     staticTitle?: boolean;
     enableMenu?: boolean;
     disableSmoothScroll?: boolean;
+    hardwareAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
     discordWindowsTitleBar?: boolean;
-    startMinimized?: boolean;
-
-    maximized?: boolean;
-    minimized?: boolean;
-    windowBounds?: Rectangle;
     disableMinSize?: boolean;
 
     checkUpdates?: boolean;
-    skippedUpdate?: string;
-    firstLaunch?: boolean;
 
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
+}
+
+export interface State {
+    maximized?: boolean;
+    minimized?: boolean;
+    windowBounds?: Rectangle;
+
+    skippedUpdate?: string;
+    firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
 }

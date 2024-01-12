@@ -55,22 +55,17 @@ ipcMain.handle(
     IpcEvents.VIRT_MIC_START,
     (_, targets: string[]) =>
         obtainVenmic()?.link({
-            props: targets.map(target => ({ key: "application.name", value: target })),
-            mode: "include"
+            include: targets.map(target => ({ key: "application.name", value: target })),
+            exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
         })
 );
 
 ipcMain.handle(
     IpcEvents.VIRT_MIC_START_SYSTEM,
     () =>
+        // @ts-expect-error venmic types are wrong. include is actually optional but typed as required in vemic
         obtainVenmic()?.link({
-            props: [
-                {
-                    key: "application.process.id",
-                    value: getRendererAudioServicePid()
-                }
-            ],
-            mode: "exclude"
+            exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
         })
 );
 
