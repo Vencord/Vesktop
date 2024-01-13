@@ -71,5 +71,9 @@ export const VesktopNative = {
         onActivity(cb: (data: string) => void) {
             ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
         }
+    },
+    clipboard: {
+        copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
+            invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
     }
 };

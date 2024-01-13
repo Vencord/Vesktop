@@ -7,7 +7,7 @@
 if (process.platform === "linux") import("./virtmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, dialog, RelaunchOptions, session, shell } from "electron";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -119,6 +119,13 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
+
+handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {
+    clipboard.write({
+        html: `<img src="${src.replaceAll('"', '\\"')}">`,
+        image: nativeImage.createFromBuffer(Buffer.from(buf))
+    });
+});
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
