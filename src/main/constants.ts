@@ -18,6 +18,10 @@ if (existsSync(LEGACY_DATA_DIR)) {
             renameSync(join(LEGACY_DATA_DIR, file), join(DATA_DIR, file));
         }
         rmdirSync(LEGACY_DATA_DIR);
+        renameSync(
+            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
+            join(DATA_DIR, "sessionData", "IndexedDB")
+        );
     } catch (e) {
         console.error("Migration failed", e);
     }
