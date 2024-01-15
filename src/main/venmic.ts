@@ -63,7 +63,6 @@ ipcMain.handle(
 ipcMain.handle(
     IpcEvents.VIRT_MIC_START_SYSTEM,
     () =>
-        // @ts-expect-error venmic types are wrong. include is actually optional but typed as required in vemic
         obtainVenmic()?.link({
             exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
         })
