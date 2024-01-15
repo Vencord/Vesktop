@@ -9,19 +9,21 @@ import { BrowserWindow, shell } from "electron";
 import { Settings } from "../settings";
 import { execSteamURL, isDeckGameMode, steamOpenURL } from "./steamOS";
 
+const DISCORD_HOSTNAMES = ["discord.com", "canary.discord.com", "ptb.discord.com"];
 export function makeLinksOpenExternally(win: BrowserWindow) {
-    win.webContents.setWindowOpenHandler(({ url }) => {
-        switch (url) {
-            case "about:blank":
-            case "https://discord.com/popout":
-                return { action: "allow" };
-        }
-
+    win.webContents.setWindowOpenHandler(({ url, frameName }) => {
         try {
-            var { protocol } = new URL(url);
+            var { protocol, hostname, pathname } = new URL(url);
         } catch {
             return { action: "deny" };
         }
+
+        if (
+            url === "about:blank" ||
+            (pathname === "/popout" && DISCORD_HOSTNAMES.includes(hostname)) ||
+            (frameName === "authorize" && DISCORD_HOSTNAMES.includes(hostname))
+        )
+            return { action: "allow" };
 
         switch (protocol) {
             case "http:":
