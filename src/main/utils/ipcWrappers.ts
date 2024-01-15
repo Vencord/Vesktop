@@ -5,20 +5,14 @@
  */
 
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebFrameMain } from "electron";
+import { DISCORD_HOSTNAMES } from "main/constants";
 import { IpcEvents } from "shared/IpcEvents";
 
 export function validateSender(frame: WebFrameMain) {
     const { hostname, protocol } = new URL(frame.url);
     if (protocol === "file:") return;
 
-    switch (hostname) {
-        case "discord.com":
-        case "ptb.discord.com":
-        case "canary.discord.com":
-            break;
-        default:
-            throw new Error("ipc: Disallowed host " + hostname);
-    }
+    if (!DISCORD_HOSTNAMES.includes(hostname)) throw new Error("ipc: Disallowed host " + hostname);
 }
 
 export function handleSync(event: IpcEvents, cb: (e: IpcMainEvent, ...args: any[]) => any) {
