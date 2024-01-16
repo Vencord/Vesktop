@@ -374,11 +374,11 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu, discordWindowsTitleBar } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
 
     const { frameless } = VencordSettings.store;
 
-    const noFrame = frameless === true || (process.platform === "win32" && discordWindowsTitleBar === true);
+    const noFrame = frameless === true || customTitleBar === true;
 
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -398,7 +398,7 @@ function createMainWindow() {
                 backgroundMaterial: transparencyOption
             }),
         // Fix transparencyOption for custom discord titlebar
-        ...(discordWindowsTitleBar &&
+        ...(customTitleBar &&
             transparencyOption &&
             transparencyOption !== "none" && {
                 transparent: true

@@ -5,7 +5,7 @@
  */
 
 import { Settings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { isMac } from "renderer/utils";
 
 import { addPatch } from "./shared";
 
@@ -22,8 +22,8 @@ addPatch({
     ],
 
     getPlatformClass() {
+        if (Settings.store.customTitleBar) return "platform-win";
         if (isMac) return "platform-osx";
-        if (isWindows && Settings.store.discordWindowsTitleBar) return "platform-win";
         return "platform-web";
     }
 });
