@@ -5,9 +5,29 @@
  */
 
 import { app } from "electron";
+import { existsSync, readdirSync, renameSync, rmdirSync } from "fs";
 import { join } from "path";
 
-export const DATA_DIR = process.env.VENCORD_USER_DATA_DIR || join(app.getPath("userData"), "VencordDesktop");
+const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
+export const DATA_DIR = process.env.VENCORD_USER_DATA_DIR || join(app.getPath("userData"));
+// TODO: remove eventually
+if (existsSync(LEGACY_DATA_DIR)) {
+    try {
+        console.warn("Detected legacy settings dir", LEGACY_DATA_DIR + ".", "migrating to", DATA_DIR);
+        for (const file of readdirSync(LEGACY_DATA_DIR)) {
+            renameSync(join(LEGACY_DATA_DIR, file), join(DATA_DIR, file));
+        }
+        rmdirSync(LEGACY_DATA_DIR);
+        renameSync(
+            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
+            join(DATA_DIR, "sessionData", "IndexedDB")
+        );
+    } catch (e) {
+        console.error("Migration failed", e);
+    }
+}
+app.setPath("sessionData", join(DATA_DIR, "sessionData"));
+
 export const VENCORD_SETTINGS_DIR = join(DATA_DIR, "settings");
 export const VENCORD_QUICKCSS_FILE = join(VENCORD_SETTINGS_DIR, "quickCss.css");
 export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json");
@@ -25,6 +45,8 @@ export const MIN_WIDTH = 940;
 export const MIN_HEIGHT = 500;
 export const DEFAULT_WIDTH = 1280;
 export const DEFAULT_HEIGHT = 720;
+
+export const DISCORD_HOSTNAMES = ["discord.com", "canary.discord.com", "ptb.discord.com"];
 
 const UserAgents = {
     darwin: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",

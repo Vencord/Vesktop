@@ -10,7 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, Toasts, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { isMac } from "renderer/utils";
 import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
@@ -21,10 +21,10 @@ export default function SettingsUi() {
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
-        isWindows && [
-            "discordWindowsTitleBar",
+        [
+            "customTitleBar",
             "Discord Titlebar",
-            "Use Discord's custom title bar instead of the Windows one. Requires a full restart."
+            "Use Discord's custom title bar instead of the native system one. Requires a full restart."
         ],
         !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         !isMac && [

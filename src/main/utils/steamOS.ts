@@ -9,7 +9,7 @@ import { writeFile } from "fs/promises";
 import { join } from "path";
 
 import { MessageBoxChoice } from "../constants";
-import { Settings } from "../settings";
+import { State } from "../settings";
 
 // Bump this to re-show the prompt
 const layoutVersion = 2;
@@ -70,8 +70,8 @@ async function showLayout(appId: string) {
 export async function askToApplySteamLayout(win: BrowserWindow) {
     const appId = getAppId();
     if (!appId) return;
-    if (Settings.store.steamOSLayoutVersion === layoutVersion) return;
-    const update = Boolean(Settings.store.steamOSLayoutVersion);
+    if (State.store.steamOSLayoutVersion === layoutVersion) return;
+    const update = Boolean(State.store.steamOSLayoutVersion);
 
     // Touch screen breaks in some menus when native touch mode is enabled on latest SteamOS beta, remove most of the update specific text once that's fixed.
     const { response } = await dialog.showMessageBox(win, {
@@ -87,8 +87,8 @@ ${update ? "Click" : "Tap"} no to keep your current layout.`,
         type: "question"
     });
 
-    if (Settings.store.steamOSLayoutVersion !== layoutVersion) {
-        Settings.store.steamOSLayoutVersion = layoutVersion;
+    if (State.store.steamOSLayoutVersion !== layoutVersion) {
+        State.store.steamOSLayoutVersion = layoutVersion;
     }
 
     if (response === MessageBoxChoice.Cancel) return;

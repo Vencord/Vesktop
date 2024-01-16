@@ -51,22 +51,17 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
         : { ok: false, isGlibcxxToOld };
 });
 
-ipcMain.handle(
-    IpcEvents.VIRT_MIC_START,
-    (_, targets: string[]) =>
-        obtainVenmic()?.link({
-            include: targets.map(target => ({ key: "application.name", value: target })),
-            exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
-        })
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[]) =>
+    obtainVenmic()?.link({
+        include: targets.map(target => ({ key: "application.name", value: target })),
+        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
+    })
 );
 
-ipcMain.handle(
-    IpcEvents.VIRT_MIC_START_SYSTEM,
-    () =>
-        // @ts-expect-error venmic types are wrong. include is actually optional but typed as required in vemic
-        obtainVenmic()?.link({
-            exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
-        })
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () =>
+    obtainVenmic()?.link({
+        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
+    })
 );
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());

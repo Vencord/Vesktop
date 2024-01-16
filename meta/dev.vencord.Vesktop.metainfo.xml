@@ -28,6 +28,22 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.0" date="2024-01-16" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.0</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>fully renamed to Vesktop. You will likely have to login to Discord again. You might have to re-create your vesktop shortcut</li>
+          <li>added option to disable smooth scrolling by @ZirixCZ</li>
+          <li>added setting to disable hardware acceleration by @zt64</li>
+          <li>fixed adding connections</li>
+          <li>fixed / improved discord popouts</li>
+          <li>you can now use the custom discord titlebar on linux/mac</li>
+          <li>the splash window is now draggable</li>
+          <li>now signed on mac</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.4" date="2023-12-02" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v0.4.4</url>
       <description>
