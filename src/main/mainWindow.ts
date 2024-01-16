@@ -78,8 +78,7 @@ function initTray(win: BrowserWindow) {
             label: "Open",
             click() {
                 win.show();
-            },
-            enabled: false
+            }
         },
         {
             label: "About",
@@ -122,14 +121,6 @@ function initTray(win: BrowserWindow) {
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
-
-    win.on("show", () => {
-        trayMenu.items[0].enabled = false;
-    });
-
-    win.on("hide", () => {
-        trayMenu.items[0].enabled = true;
-    });
 }
 
 async function clearData(win: BrowserWindow) {
