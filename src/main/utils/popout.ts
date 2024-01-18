@@ -5,6 +5,7 @@
  */
 
 import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import { Settings } from "main/settings";
 
 import { handleExternalUrl } from "./makeLinksOpenExternally";
 
@@ -36,7 +37,7 @@ const DEFAULT_POPOUT_OPTIONS: BrowserWindowConstructorOptions = {
     backgroundColor: "#2f3136",
     minWidth: MIN_POPOUT_WIDTH,
     minHeight: MIN_POPOUT_HEIGHT,
-    frame: process.platform === "linux",
+    frame: Settings.store.customTitleBar !== true,
     titleBarStyle: process.platform === "darwin" ? "hidden" : undefined,
     trafficLightPosition:
         process.platform === "darwin"
