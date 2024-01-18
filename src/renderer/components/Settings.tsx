@@ -16,7 +16,7 @@ import { isTruthy } from "shared/utils/guards";
 export default function SettingsUi() {
     const Settings = useSettings();
     const supportsWindowsTransparency = VesktopNative.app.supportsWindowsTransparency();
-    const isWindows = process.platform === "win32";
+    const isWindows = VesktopNative.app.isWindows();
 
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());

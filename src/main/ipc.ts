@@ -40,6 +40,11 @@ handleSync(
     () => process.platform === "win32" && Number(release().split(".").pop()) >= 22621
 );
 
+handleSync(
+    IpcEvents.IS_WINDOWS,
+    () => process.platform === "win32"
+);
+
 handleSync(IpcEvents.AUTOSTART_ENABLED, () => autoStart.isEnabled());
 handle(IpcEvents.ENABLE_AUTOSTART, autoStart.enable);
 handle(IpcEvents.DISABLE_AUTOSTART, autoStart.disable);
