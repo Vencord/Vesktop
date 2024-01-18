@@ -49,7 +49,8 @@ const DEFAULT_POPOUT_OPTIONS: BrowserWindowConstructorOptions = {
     webPreferences: {
         nodeIntegration: false,
         contextIsolation: true
-    }
+    },
+    autoHideMenuBar: Settings.store.enableMenu
 };
 
 export const PopoutWindows = new Map<string, BrowserWindow>();
@@ -98,6 +99,8 @@ export function createOrFocusPopup(key: string, features: string) {
 }
 
 export function setupPopout(win: BrowserWindow, key: string) {
+    win.setMenuBarVisibility(false);
+
     PopoutWindows.set(key, win);
 
     /* win.webContents.on("will-navigate", (evt, url) => {

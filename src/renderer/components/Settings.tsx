@@ -41,7 +41,11 @@ export default function SettingsUi() {
             "Allows you to make the window as small as your heart desires"
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
-        ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
+        [
+            "enableMenu",
+            "Enable Menu Bar",
+            "Enables the application menu bar. Press ALT to toggle visibility. Incompatible with 'Discord Titlebar'"
+        ],
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
         ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
