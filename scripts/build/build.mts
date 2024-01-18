@@ -78,8 +78,6 @@ await Promise.all([
         inject: ["./scripts/build/injectReact.mjs"],
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
-        // Work around https://github.com/evanw/esbuild/issues/2460
-        tsconfig: "./scripts/build/tsconfig.esbuild.json",
         external: ["@vencord/types/*"],
         plugins: [vencordDep],
         footer: { js: "//# sourceURL=VCDRenderer" }

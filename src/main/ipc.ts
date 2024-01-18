@@ -4,10 +4,10 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-if (process.platform === "linux") import("./virtmic");
+if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, dialog, RelaunchOptions, session, shell } from "electron";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -21,6 +21,7 @@ import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
+import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_FILE, () => join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"));
@@ -47,11 +48,14 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
     Settings.setData(settings, path);
 });
 
-handle(IpcEvents.RELAUNCH, () => {
+handle(IpcEvents.RELAUNCH, async () => {
     const options: RelaunchOptions = {
         args: process.argv.slice(1).concat(["--relaunch"])
     };
-    if (app.isPackaged && process.env.APPIMAGE) {
+    if (isDeckGameMode) {
+        // We can't properly relaunch when running under gamescope, but we can at least navigate to our page in Steam.
+        await showGamePage();
+    } else if (app.isPackaged && process.env.APPIMAGE) {
         execFile(process.env.APPIMAGE, options.args);
     } else {
         app.relaunch(options);
@@ -115,6 +119,13 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
+
+handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {
+    clipboard.write({
+        html: `<img src="${src.replaceAll('"', '\\"')}">`,
+        image: nativeImage.createFromBuffer(Buffer.from(buf))
+    });
+});
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");

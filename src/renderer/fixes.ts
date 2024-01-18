@@ -6,9 +6,7 @@
 
 import "./hideGarbage.css";
 
-import { waitFor } from "@vencord/types/webpack";
-
-import { isFirstRun, isWindows, localStorage } from "./utils";
+import { isWindows, localStorage } from "./utils";
 
 // Make clicking Notifications focus the window
 const originalSetOnClick = Object.getOwnPropertyDescriptor(Notification.prototype, "onclick")!.set!;
@@ -22,15 +20,8 @@ Object.defineProperty(Notification.prototype, "onclick", {
     configurable: true
 });
 
-if (isFirstRun) {
-    // Hide "Download Discord Desktop now!!!!" banner
-    localStorage.setItem("hideNag", "true");
-
-    // Enable Desktop Notifications by default
-    waitFor("setDesktopType", m => {
-        m.setDesktopType("all");
-    });
-}
+// Hide "Download Discord Desktop now!!!!" banner
+localStorage.setItem("hideNag", "true");
 
 // FIXME: Remove eventually.
 // Originally, Vencord always used a Windows user agent. This seems to cause captchas

@@ -8,7 +8,7 @@ import { Settings } from "renderer/settings";
 
 import { addPatch } from "./shared";
 
-if (Settings.store.discordWindowsTitleBar)
+if (Settings.store.customTitleBar)
     addPatch({
         patches: [
             {

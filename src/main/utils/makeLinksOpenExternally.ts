@@ -5,36 +5,67 @@
  */
 
 import { BrowserWindow, shell } from "electron";
+import { DISCORD_HOSTNAMES } from "main/constants";
 
 import { Settings } from "../settings";
+import { createOrFocusPopup, setupPopout } from "./popout";
+import { execSteamURL, isDeckGameMode, steamOpenURL } from "./steamOS";
+
+export function handleExternalUrl(url: string, protocol?: string): { action: "deny" | "allow" } {
+    if (protocol == null) {
+        try {
+            protocol = new URL(url).protocol;
+        } catch {
+            return { action: "deny" };
+        }
+    }
+
+    switch (protocol) {
+        case "http:":
+        case "https:":
+            if (Settings.store.openLinksWithElectron) {
+                return { action: "allow" };
+            }
+        // eslint-disable-next-line no-fallthrough
+        case "mailto:":
+        case "spotify:":
+            if (isDeckGameMode) {
+                steamOpenURL(url);
+            } else {
+                shell.openExternal(url);
+            }
+            break;
+        case "steam:":
+            if (isDeckGameMode) {
+                execSteamURL(url);
+            } else {
+                shell.openExternal(url);
+            }
+            break;
+    }
+
+    return { action: "deny" };
+}
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
-    win.webContents.setWindowOpenHandler(({ url }) => {
-        switch (url) {
-            case "about:blank":
-            case "https://discord.com/popout":
-                return { action: "allow" };
-        }
-
+    win.webContents.setWindowOpenHandler(({ url, frameName, features }) => {
         try {
-            var { protocol } = new URL(url);
+            var { protocol, hostname, pathname } = new URL(url);
         } catch {
             return { action: "deny" };
         }
 
-        switch (protocol) {
-            case "http:":
-            case "https:":
-                if (Settings.store.openLinksWithElectron) {
-                    return { action: "allow" };
-                }
-            // eslint-disable-next-line no-fallthrough
-            case "mailto:":
-            case "steam:":
-            case "spotify:":
-                shell.openExternal(url);
+        if (frameName.startsWith("DISCORD_") && pathname === "/popout" && DISCORD_HOSTNAMES.includes(hostname)) {
+            return createOrFocusPopup(frameName, features);
         }
 
-        return { action: "deny" };
+        if (url === "about:blank" || (frameName === "authorize" && DISCORD_HOSTNAMES.includes(hostname)))
+            return { action: "allow" };
+
+        return handleExternalUrl(url, protocol);
+    });
+
+    win.webContents.on("did-create-window", (win, { frameName }) => {
+        if (frameName.startsWith("DISCORD_")) setupPopout(win, frameName);
     });
 }

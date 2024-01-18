@@ -51,27 +51,17 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
         : { ok: false, isGlibcxxToOld };
 });
 
-ipcMain.handle(
-    IpcEvents.VIRT_MIC_START,
-    (_, targets: string[]) =>
-        obtainVenmic()?.link({
-            props: targets.map(target => ({ key: "application.name", value: target })),
-            mode: "include"
-        })
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[]) =>
+    obtainVenmic()?.link({
+        include: targets.map(target => ({ key: "application.name", value: target })),
+        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
+    })
 );
 
-ipcMain.handle(
-    IpcEvents.VIRT_MIC_START_SYSTEM,
-    () =>
-        obtainVenmic()?.link({
-            props: [
-                {
-                    key: "application.process.id",
-                    value: getRendererAudioServicePid()
-                }
-            ],
-            mode: "exclude"
-        })
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () =>
+    obtainVenmic()?.link({
+        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
+    })
 );
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());

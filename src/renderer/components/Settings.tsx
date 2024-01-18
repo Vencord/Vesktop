@@ -10,7 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, Toasts, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
-import { isMac, isWindows, isLinux } from "renderer/utils";
+import { isMac } from "renderer/utils";
 import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
@@ -21,10 +21,10 @@ export default function SettingsUi() {
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
     const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
-        isWindows && [
-            "discordWindowsTitleBar",
+        [
+            "customTitleBar",
             "Discord Titlebar",
-            "Use Discord's custom title bar instead of the Windows one. Requires a full restart."
+            "Use Discord's custom title bar instead of the native system one. Requires a full restart."
         ],
         !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         !isMac && [
@@ -34,7 +34,7 @@ export default function SettingsUi() {
             true,
             () => Settings.tray ?? true
         ],
-        isLinux && ["middleClickAutoscroll", "Middle Click Autoscroll", "Enables middle-click scrolling (Requires a full restart)", false],
+        !isMac && ["middleClickAutoscroll", "Middle Click Autoscroll", "Enables middle-click scrolling (Requires a full restart)", false],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
@@ -44,6 +44,7 @@ export default function SettingsUi() {
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
+        ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
         [
             "openLinksWithElectron",

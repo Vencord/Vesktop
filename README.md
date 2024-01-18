@@ -3,11 +3,13 @@
 Vesktop is a cross platform desktop app aiming to give you a snappier Discord experience with [Vencord](https://github.com/Vendicated/Vencord) pre-installed
 
 **Not yet supported**:
-- Global Keybinds
+
+-   Global Keybinds
 
 Bug reports, feature requests & contributions are highly appreciated!!
 
-![image](https://user-images.githubusercontent.com/45497981/235024615-94565eaf-f412-4384-a3f5-d8cde7458f6d.png)
+![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
+![grafik](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
 
 ## Installing
 
@@ -20,6 +22,8 @@ Download and run Vesktop-Setup-VERSION.exe from [releases](https://github.com/Ve
 Download and run Vesktop-VERSION.dmg from [releases](https://github.com/Vencord/Vesktop/releases/latest)
 
 ### Linux
+
+[![](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
 
 #### Arch based
 
@@ -35,9 +39,9 @@ Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/
 
 #### Other
 
-Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vencorddesktop`.
+Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vesktop`.
 
-A flatpak is planned, if you want packages for other repos, feel free to create them and they can be linked as unofficial here
+If other packages are created, feel free to open an issue and we'll link them here.
 
 ## Building
 
@@ -64,7 +68,3 @@ pnpm package:dir
 ## Motivation
 
 The official Discord Desktop app is very resource heavy compared to Discord in your Browser. There are multiple alternative Electron apps (ArmCord, WebCord, probably more) that prove how much of a performance gain you can gain by using a custom app. ArmCord already supports Vencord but makes it pretty limited for us. Making our own standalone app gives us much more control.
-
-This is just a random idea I (V) got, and might not actually ever be finished heh
-
-Gluon also seems very attractive for this because of how lightweight it can be and because unlike electron, streaming just works out of the box like in any chromium browser. However, at the time of writing this, it still lacks some features necessary to make it work (synchronous ipc or a way to get node process variables into the onLoad function for instance, plus onLoad seems to load a little too late sometimes)
