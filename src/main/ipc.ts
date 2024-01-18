@@ -69,10 +69,8 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 });
 
 handle(IpcEvents.FOCUS, () => {
-    if (process.platform === "win32") mainWin.minimize(); // Windows is weird
-
-    mainWin.restore();
     mainWin.show();
+    mainWin.setSkipTaskbar(false);
 });
 
 handle(IpcEvents.CLOSE, (e, key?: string) => {
