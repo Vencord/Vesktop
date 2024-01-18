@@ -21,6 +21,7 @@ import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
+import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 
@@ -74,8 +75,12 @@ handle(IpcEvents.FOCUS, () => {
     mainWin.show();
 });
 
-handle(IpcEvents.CLOSE, e => {
-    (BrowserWindow.fromWebContents(e.sender) ?? e.sender).close();
+handle(IpcEvents.CLOSE, (e, key?: string) => {
+    const popout = PopoutWindows.get(key!);
+    if (popout) return popout.close();
+
+    const win = BrowserWindow.fromWebContents(e.sender) ?? e.sender;
+    win.close();
 });
 
 handle(IpcEvents.MINIMIZE, e => {

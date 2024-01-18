@@ -52,7 +52,7 @@ const DEFAULT_POPOUT_OPTIONS: BrowserWindowConstructorOptions = {
     }
 };
 
-const PopoutWindows = new Map<string, BrowserWindow>();
+export const PopoutWindows = new Map<string, BrowserWindow>();
 
 function focusWindow(window: BrowserWindow) {
     window.setAlwaysOnTop(true);
