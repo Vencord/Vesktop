@@ -16,6 +16,7 @@ import { isTruthy } from "shared/utils/guards";
 export default function SettingsUi() {
     const Settings = useSettings();
     const supportsWindowsTransparency = VesktopNative.app.supportsWindowsTransparency();
+    const isWindows = process.platform === "win32";
 
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
@@ -99,6 +100,21 @@ export default function SettingsUi() {
             >
                 Notification Badge
             </Switch>
+
+            {!isWindows && (
+                <>
+                <Switch
+                    value={Settings.transparencyOption!="none"}
+                    onChange={v => {
+                        //just set it to a random value that isn't none to keep consistency with Windows
+                        Settings.transparencyOption=v ? "acrylic":"none";
+                    }}
+                    note="Requires a full restart. You will need a theme that supports transparency for this to work."
+                >
+                    Transparency
+                </Switch>
+                </>
+            )}
 
             {switches.map(([key, text, note, def, predicate]) => (
                 <Switch

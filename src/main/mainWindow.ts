@@ -370,6 +370,7 @@ function createMainWindow() {
     const { frameless } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
+    const isWindows = process.platform === "win32";
 
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -388,8 +389,8 @@ function createMainWindow() {
                 backgroundColor: "#00000000",
                 backgroundMaterial: transparencyOption
             }),
-        // Fix transparencyOption for custom discord titlebar
-        ...(customTitleBar &&
+        // Fix transparencyOption for custom discord titlebar on Windows
+        ...((customTitleBar || !isWindows) &&
             transparencyOption &&
             transparencyOption !== "none" && {
                 transparent: true
