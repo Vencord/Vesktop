@@ -35,6 +35,8 @@ If you don't know the difference, pick amd64
 
 [![Download on Flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
 
+If you don't know the difference, pick amd64.
+
 - amd64 / x86_64
   - [AppImage](https://vencord.dev/download/vesktop/amd64/appimage)
   - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/amd64/deb)
