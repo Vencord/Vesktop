@@ -1,51 +1,61 @@
 # Vesktop
 
-Vesktop is a cross platform desktop app aiming to give you a snappier Discord experience with [Vencord](https://github.com/Vendicated/Vencord) pre-installed
+Vesktop is a custom Discord desktop app
+
+**Main features**:
+- Vencord preinstalled
+- Much more lightweight and faster than the official Discord app
+- Linux Screenshare with sound & wayland
+- Much better privacy, since Discord has no access to your system
 
 **Not yet supported**:
-
--   Global Keybinds
-
-Bug reports, feature requests & contributions are highly appreciated!!
+- Global Keybinds
+- see the [Roadmap](https://github.com/Vencord/Vesktop/issues/324)
 
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
-![grafik](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
+![](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
 
 ## Installing
 
 ### Windows
 
-Download and run Vesktop-Setup-VERSION.exe from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+If you don't know the difference, pick the Installer.
+
+- [Installer](https://vencord.dev/download/vesktop/amd64/windows)
+- [Portable](https://vencord.dev/download/vesktop/amd64/windows-portable)
 
 ### Mac
 
-Download and run Vesktop-VERSION.dmg from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+If you don't know the difference, pick amd64
+
+- [amd64 / x86_64](https://vencord.dev/download/vesktop/amd64/dmg)
+- [arm64 / aarch64](https://vencord.dev/download/vesktop/arm64/dmg)
 
 ### Linux
 
-[![](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
+[![Download on Flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
 
-#### Arch based
+- amd64 / x86_64
+  - [AppImage](https://vencord.dev/download/vesktop/amd64/appimage)
+  - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/amd64/deb)
+  - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/amd64/rpm)
+  - [tarball](https://vencord.dev/download/vesktop/amd64/tar)
+- arm64 / aarch64
+  - [AppImage](https://vencord.dev/download/vesktop/arm64/appimage)
+  - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/arm64/deb)
+  - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/arm64/rpm)
+  - [tarball](https://vencord.dev/download/vesktop/arm64/tar)
 
-Install [vencord-desktop-git](https://aur.archlinux.org/packages/vencord-desktop-git) from the AUR using your favourite AUR helper, for example [yay](https://github.com/Jguer/yay)
+#### Community packages
 
-#### Ubuntu/Debian based
+Below you can find unofficial packages created by the community. They are not officially supported by us, so before reporting issues, please first confirm the issue also happens on official builds. When in doubt, consult with their packager first. The flatpak and AppImage should work on any distro that [supports them](https://flatpak.org/setup/), so I recommend you just use those instead!
 
-Download Vesktop-VERSION.deb from [releases](https://github.com/Vencord/Vesktop/releases/latest)
+- Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
+- NixOS: https://nixos.wiki/wiki/Discord#Vesktop
 
-#### Fedora/RHEL based
+## Building from Source
 
-Download Vesktop-VERSION.rpm from [releases](https://github.com/Vencord/Vesktop/releases/latest)
-
-#### Other
-
-Either download Vesktop-VERSION.AppImage and just run it directly or grab Vesktop-VERSION.tar.gz, extract it somewhere and run `vesktop`.
-
-If other packages are created, feel free to open an issue and we'll link them here.
-
-## Building
-
-Packaging will create builds in the dist/ folder. You can then install them like mentioned above or distribute them
+Packaging will create builds in the dist/ folder
 
 ```sh
 git clone https://github.com/Vencord/Vesktop
@@ -64,7 +74,3 @@ pnpm package --linux pacman
 # Or package to a directory only
 pnpm package:dir
 ```
-
-## Motivation
-
-The official Discord Desktop app is very resource heavy compared to Discord in your Browser. There are multiple alternative Electron apps (ArmCord, WebCord, probably more) that prove how much of a performance gain you can gain by using a custom app. ArmCord already supports Vencord but makes it pretty limited for us. Making our own standalone app gives us much more control.
