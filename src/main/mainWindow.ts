@@ -367,7 +367,7 @@ function createMainWindow() {
 
     const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
 
-    const { frameless } = VencordSettings.store;
+    const { frameless, transparent } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
 
@@ -383,6 +383,10 @@ function createMainWindow() {
         },
         icon: ICON_PATH,
         frame: !noFrame,
+        ...(transparent && {
+            transparent: true,
+            backgroundColor: "#00000000"
+        }),
         ...(transparencyOption &&
             transparencyOption !== "none" && {
                 backgroundColor: "#00000000",
