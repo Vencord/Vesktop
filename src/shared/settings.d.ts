@@ -20,8 +20,11 @@ export interface Settings {
     hardwareAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
-    discordWindowsTitleBar?: boolean;
     disableMinSize?: boolean;
+
+    /** @deprecated use customTitleBar */
+    discordWindowsTitleBar?: boolean;
+    customTitleBar?: boolean;
 
     checkUpdates?: boolean;
 

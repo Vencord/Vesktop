@@ -18,6 +18,10 @@ if (existsSync(LEGACY_DATA_DIR)) {
             renameSync(join(LEGACY_DATA_DIR, file), join(DATA_DIR, file));
         }
         rmdirSync(LEGACY_DATA_DIR);
+        renameSync(
+            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
+            join(DATA_DIR, "sessionData", "IndexedDB")
+        );
     } catch (e) {
         console.error("Migration failed", e);
     }
@@ -41,6 +45,8 @@ export const MIN_WIDTH = 940;
 export const MIN_HEIGHT = 500;
 export const DEFAULT_WIDTH = 1280;
 export const DEFAULT_HEIGHT = 720;
+
+export const DISCORD_HOSTNAMES = ["discord.com", "canary.discord.com", "ptb.discord.com"];
 
 const UserAgents = {
     darwin: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",

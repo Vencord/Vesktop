@@ -4,11 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-if (process.platform === "linux") import("./virtmic");
+if (process.platform === "linux") import("./venmic");
 
 // eslint-disable-next-line simple-import-sort/imports
 import { execFile } from "child_process";
-import { app, BrowserWindow, dialog, RelaunchOptions, session, shell } from "electron";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -22,6 +22,7 @@ import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import { setBadgeCount } from "./appBadge";
 import { handle, handleSync } from "./utils/ipcWrappers";
+import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 
@@ -69,14 +70,16 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 });
 
 handle(IpcEvents.FOCUS, () => {
-    if (process.platform === "win32") mainWin.minimize(); // Windows is weird
-
-    mainWin.restore();
     mainWin.show();
+    mainWin.setSkipTaskbar(false);
 });
 
-handle(IpcEvents.CLOSE, e => {
-    (BrowserWindow.fromWebContents(e.sender) ?? e.sender).close();
+handle(IpcEvents.CLOSE, (e, key?: string) => {
+    const popout = PopoutWindows.get(key!);
+    if (popout) return popout.close();
+
+    const win = BrowserWindow.fromWebContents(e.sender) ?? e.sender;
+    win.close();
 });
 
 handle(IpcEvents.MINIMIZE, e => {
@@ -120,6 +123,13 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
+
+handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {
+    clipboard.write({
+        html: `<img src="${src.replaceAll('"', '\\"')}">`,
+        image: nativeImage.createFromBuffer(Buffer.from(buf))
+    });
+});
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");

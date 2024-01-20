@@ -10,7 +10,7 @@ import { Margins } from "@vencord/types/utils";
 import { Button, Forms, Select, Switch, Text, Toasts, useState } from "@vencord/types/webpack/common";
 import { setBadge } from "renderer/appBadge";
 import { useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { isMac } from "renderer/utils";
 import { isTruthy } from "shared/utils/guards";
 
 export default function SettingsUi() {
@@ -20,13 +20,11 @@ export default function SettingsUi() {
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
-    const allSwitches: Array<
-        false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?, ((value: boolean) => void)?]
-    > = [
-        isWindows && [
-            "discordWindowsTitleBar",
+    const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
+        [
+            "customTitleBar",
             "Discord Titlebar",
-            "Use Discord's custom title bar instead of the Windows one. Requires a full restart."
+            "Use Discord's custom title bar instead of the native system one. Requires a full restart."
         ],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
@@ -35,7 +33,11 @@ export default function SettingsUi() {
             "Allows you to make the window as small as your heart desires"
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
-        ["enableMenu", "Enable Menu Bar", "Enables the application menu bar. Press ALT to toggle visibility."],
+        [
+            "enableMenu",
+            "Enable Menu Bar",
+            "Enables the application menu bar. Press ALT to toggle visibility. Incompatible with 'Discord Titlebar'"
+        ],
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
         ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],

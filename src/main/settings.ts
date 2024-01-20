@@ -35,9 +35,15 @@ function loadSettings<T extends object = any>(file: string, name: string) {
 }
 
 export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
+if (Object.hasOwn(Settings.plain, "discordWindowsTitleBar")) {
+    Settings.plain.customTitleBar = Settings.plain.discordWindowsTitleBar;
+    delete Settings.plain.discordWindowsTitleBar;
+    Settings.markAsChanged();
+}
+
 export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings");
 
-if (Object.hasOwn(Settings.store, "firstLaunch") && !existsSync(STATE_FILE)) {
+if (Object.hasOwn(Settings.plain, "firstLaunch") && !existsSync(STATE_FILE)) {
     console.warn("legacy state in settings.json detected. migrating to state.json");
     const state = {} as TState;
     for (const prop of [
@@ -47,7 +53,7 @@ if (Object.hasOwn(Settings.store, "firstLaunch") && !existsSync(STATE_FILE)) {
         "skippedUpdate",
         "steamOSLayoutVersion",
         "windowBounds"
-    ]) {
+    ] as const) {
         state[prop] = Settings.plain[prop];
         delete Settings.plain[prop];
     }

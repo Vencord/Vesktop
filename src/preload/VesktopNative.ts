@@ -52,7 +52,7 @@ export const VesktopNative = {
     },
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS),
-        close: () => invoke<void>(IpcEvents.CLOSE),
+        close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
         minimize: () => invoke<void>(IpcEvents.MINIMIZE),
         maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
     },
@@ -71,5 +71,9 @@ export const VesktopNative = {
         onActivity(cb: (data: string) => void) {
             ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
         }
+    },
+    clipboard: {
+        copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
+            invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
     }
 };

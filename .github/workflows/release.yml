@@ -37,8 +37,16 @@ jobs:
               run: pnpm build
 
             - name: Run Electron Builder
+              if: ${{ matrix.platform != 'mac' }}
               run: |
                   pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  CSC_LINK: ${{ matrix.platform == "mac" && secrets.APPLE_SIGNING_CERT }}
+                  
+            - name: Run Electron Builder
+              if: ${{ matrix.platform == 'mac' }}
+              run: |
+                  pnpm electron-builder --${{ matrix.platform }} --publish always
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  CSC_LINK: ${{ secrets.APPLE_SIGNING_CERT }}
