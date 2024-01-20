@@ -83,11 +83,14 @@ addPatch({
 
 if (isLinux) {
     onceReady.then(() => {
-        FluxDispatcher.subscribe("VOICE_STATE_UPDATES", e => {
-            for (const state of e.voiceStates) {
-                if (state.userId === UserStore.getCurrentUser().id && state.oldChannelId && !state.channelId)
-                    VesktopNative.virtmic.stop();
+        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
+            const owner = streamKey.split(":").at(-1);
+
+            if (owner !== UserStore.getCurrentUser().id) {
+                return;
             }
+
+            VesktopNative.virtmic.stop();
         });
     });
 }
@@ -252,7 +255,7 @@ function AudioSourcePickerLinux({
             {!sources.ok &&
                 (sources.isGlibcxxToOld ? (
                     <Forms.FormText>
-                        Failed to retrieve Audio Sources because your c++ library is too old to run venmic. If you would
+                        Failed to retrieve Audio Sources because your C++ library is too old to run venmic. If you would
                         like to stream with Audio, see{" "}
                         <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
                             this guide
