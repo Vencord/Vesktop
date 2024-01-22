@@ -12,6 +12,11 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 import { Settings } from "./settings";
 
 export function createSplashWindow(startMinimized = false) {
+    const { splashBackground, splashColor, splashTheming, disableSplashAnimation } = Settings.store;
+
+    if (disableSplashAnimation) {
+        SplashProps.height = 150;
+    }
     const splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
@@ -19,8 +24,6 @@ export function createSplashWindow(startMinimized = false) {
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
-
-    const { splashBackground, splashColor, splashTheming, disableSplashAnimation } = Settings.store;
 
     if (splashTheming) {
         if (splashColor) {
