@@ -28,7 +28,7 @@ export interface Settings {
     checkUpdates?: boolean;
 
     splashTheming?: boolean;
-    disableSplashAnimation?: boolean;
+    splashAnimationPath?: string;
     splashColor?: string;
     splashBackground?: string;
 }

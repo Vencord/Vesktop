@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow, nativeTheme } from "electron";
+import { app, BrowserWindow, nativeTheme, protocol } from "electron";
 import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
@@ -62,6 +62,12 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+
+        //register file handler so we can load the custom splash animation from the user's filesystem
+        protocol.registerFileProtocol("image", (request, callback) => {
+            const url = request.url.substring(8);
+            callback({path: url});
+        });
 
         bootstrap();
 

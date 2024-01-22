@@ -49,7 +49,6 @@ export default function SettingsUi() {
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
         ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
-        ["disableSplashAnimation", "Disable splash animation", "Disable the animation on the splash window", false],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
@@ -153,6 +152,45 @@ export default function SettingsUi() {
                     <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
                 </>
             )}
+
+            <Forms.FormTitle>Custom Spash Animation</Forms.FormTitle>
+            <Forms.FormText>
+                The animation on the splash window is loaded from{" "}
+                {Settings.splashAnimationPath ? (
+                    <a
+                        href="about:blank"
+                        onClick={e => {
+                            e.preventDefault();
+                            VesktopNative.fileManager.showItemInFolder(Settings.splashAnimationPath!);
+                        }}
+                    >
+                        {Settings.splashAnimationPath}
+                    </a>
+                ) : (
+                    "the default location"
+                )}
+            </Forms.FormText>
+            <div className="vcd-location-btns" style={{marginBottom: 20}}>
+                <Button
+                    size={Button.Sizes.SMALL}
+                    onClick={async () => {
+                        console.log("test");
+                        const choice = await VesktopNative.fileManager.selectImagePath();
+                        console.log(choice);
+                        if (choice === "cancelled") return;
+                        Settings.splashAnimationPath = choice;
+                    }}
+                >
+                    Change
+                </Button>
+                <Button
+                    size={Button.Sizes.SMALL}
+                    color={Button.Colors.RED}
+                    onClick={() => (Settings.splashAnimationPath = void 0)}
+                >
+                    Reset
+                </Button>
+            </div>
 
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>

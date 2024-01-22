@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { BrowserWindow } from "electron";
+import { BrowserWindow, webContents } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";
@@ -12,17 +12,14 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 import { Settings } from "./settings";
 
 export function createSplashWindow(startMinimized = false) {
-    const { splashBackground, splashColor, splashTheming, disableSplashAnimation } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath } = Settings.store;
 
-    if (disableSplashAnimation) {
-        SplashProps.height = 150;
-    }
     const splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
         show: !startMinimized
     });
-
+    
     splash.loadFile(join(VIEW_DIR, "splash.html"));
 
     if (splashTheming) {
@@ -37,9 +34,17 @@ export function createSplashWindow(startMinimized = false) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
     }
-
-    if (!disableSplashAnimation) {
-        splash.webContents.insertCSS(`img {display: block !important}`);
+    
+    if (splashAnimationPath) {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "image://${splashAnimationPath}";
+        `);
+    }
+    else {
+        splash.webContents.insertCSS(`img {image-rendering: pixelated}`)
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "../shiggy.gif";
+        `);
     }
 
     return splash;
