@@ -24,14 +24,16 @@
 
         img {
             width: 128px;
-            height: 128px;
+            height: 128px
         }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <img id="animation" draggable="false" alt="animation" role="presentation" />
+        <!-- the data url is here to ensure there isn't an empty frame before the image is loaded -->
+        <img id="animation" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+            draggable="false" alt="animation" role="presentation" />
         <p>Loading Vesktop...</p>
     </div>
 </body>
