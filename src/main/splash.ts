@@ -20,7 +20,7 @@ export function createSplashWindow(startMinimized = false) {
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
 
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, disableSplashAnimation } = Settings.store;
 
     if (splashTheming) {
         if (splashColor) {
@@ -33,6 +33,10 @@ export function createSplashWindow(startMinimized = false) {
         if (splashBackground) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
+    }
+
+    if (!disableSplashAnimation) {
+        splash.webContents.insertCSS(`img {display: block !important}`);
     }
 
     return splash;

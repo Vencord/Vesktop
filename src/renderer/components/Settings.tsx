@@ -49,6 +49,7 @@ export default function SettingsUi() {
         ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
         ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
         ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
+        ["disableSplashAnimation", "Disable splash animation", "Disable the animation on the splash window", false],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
