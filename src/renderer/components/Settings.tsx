@@ -174,9 +174,7 @@ export default function SettingsUi() {
                 <Button
                     size={Button.Sizes.SMALL}
                     onClick={async () => {
-                        console.log("test");
                         const choice = await VesktopNative.fileManager.selectImagePath();
-                        console.log(choice);
                         if (choice === "cancelled") return;
                         Settings.splashAnimationPath = choice;
                     }}
