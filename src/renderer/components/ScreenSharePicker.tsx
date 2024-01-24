@@ -6,7 +6,7 @@
 
 import "./screenSharePicker.css";
 
-import { closeModal, Modals, openModal, useAwaiter } from "@vencord/types/utils";
+import { closeModal, Margins, Modals, openModal, useAwaiter } from "@vencord/types/utils";
 import { findStoreLazy, onceReady } from "@vencord/types/webpack";
 import {
     Button,
@@ -36,6 +36,7 @@ interface StreamSettings {
     fps: StreamFps;
     audio: boolean;
     audioSource?: string;
+    workaround?: boolean;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -107,9 +108,9 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                         didSubmit = true;
                         if (v.audioSource && v.audioSource !== "None") {
                             if (v.audioSource === "Entire System") {
-                                await VesktopNative.virtmic.startSystem();
+                                await VesktopNative.virtmic.startSystem(v.workaround);
                             } else {
-                                await VesktopNative.virtmic.start([v.audioSource]);
+                                await VesktopNative.virtmic.start([v.audioSource], v.workaround);
                             }
                         }
                         resolve(v);
@@ -228,7 +229,9 @@ function StreamSettings({
                 {isLinux && (
                     <AudioSourcePickerLinux
                         audioSource={settings.audioSource}
+                        workaround={settings.workaround}
                         setAudioSource={source => setSettings(s => ({ ...s, audioSource: source }))}
+                        setWorkaround={workaround => setSettings(s => ({ ...s, workaround: workaround }))}
                     />
                 )}
             </Card>
@@ -238,10 +241,14 @@ function StreamSettings({
 
 function AudioSourcePickerLinux({
     audioSource,
-    setAudioSource
+    workaround,
+    setAudioSource,
+    setWorkaround
 }: {
     audioSource?: string;
+    workaround?: boolean;
     setAudioSource(s: string): void;
+    setWorkaround(b: boolean): void;
 }) {
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
         fallbackValue: { ok: true, targets: [] }
@@ -276,6 +283,21 @@ function AudioSourcePickerLinux({
                     serialize={String}
                 />
             )}
+
+            <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
+
+            <Switch
+                onChange={setWorkaround}
+                value={workaround ?? false}
+                note={
+                    <>
+                        Work around an issue that causes the microphone to be shared instead of the correct audio. Only
+                        enable if you're experiencing this issue.
+                    </>
+                }
+            >
+                Microphone Workaround
+            </Switch>
         </section>
     );
 }
