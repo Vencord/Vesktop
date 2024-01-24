@@ -37,7 +37,7 @@ export function createSplashWindow(startMinimized = false) {
     
     if (splashAnimationPath) {
         splash.webContents.executeJavaScript(`
-            document.getElementById("animation").src = "image://${splashAnimationPath}";
+            document.getElementById("animation").src = "splash-animation://img";
         `);
     }
     else {

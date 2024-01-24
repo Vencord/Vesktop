@@ -25,7 +25,7 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
 
     if (hardwareAcceleration === false) app.disableHardwareAcceleration();
     if (disableSmoothScroll) {
@@ -64,9 +64,8 @@ function init() {
         registerMediaPermissionsHandler();
 
         //register file handler so we can load the custom splash animation from the user's filesystem
-        protocol.registerFileProtocol("image", (request, callback) => {
-            const url = request.url.substring(8);
-            callback({path: url});
+        protocol.registerFileProtocol("splash-animation", (request, callback) => {
+            callback({path: splashAnimationPath});
         });
 
         bootstrap();
