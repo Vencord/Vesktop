@@ -32,12 +32,21 @@
 
 <body>
     <div class="wrapper">
-        <img
-            draggable="false"
-            src="../shiggy.gif"
-            alt="shiggy"
-            role="presentation"
-        />
+        <img id="platformImage" draggable="false" src="../shiggy.gif" alt="shiggy" role="presentation" />
         <p>Loading Vesktop...</p>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var platform = navigator.platform.toLowerCase();
+                var imageSource = (platform.includes("linux")) ? "../tux.gif" : "../shiggy.gif";
+        
+                // Update the src attribute of the existing img tag
+                var imageElement = document.getElementById("platformImage");
+                if (imageElement) {
+                    imageElement.src = imageSource;
+                } else {
+                    console.error("Image element not found");
+                }
+            });
+        </script>
     </div>
 </body>
