@@ -63,8 +63,8 @@ export const VesktopNative = {
     virtmic: {
         list: () =>
             invoke<{ ok: false; isGlibcxxToOld: boolean } | { ok: true; targets: string[] }>(IpcEvents.VIRT_MIC_LIST),
-        start: (targets: string[]) => invoke<void>(IpcEvents.VIRT_MIC_START, targets),
-        startSystem: () => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM),
+        start: (targets: string[], workaround?: boolean) => invoke<void>(IpcEvents.VIRT_MIC_START, targets, workaround),
+        startSystem: (workaround?: boolean) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, workaround),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {
