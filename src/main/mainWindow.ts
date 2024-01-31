@@ -468,6 +468,7 @@ function handleZoomOut() {
 function resetZoom() {
     Settings.setData({ zoomFactor: 1 });
     mainWin.webContents.setZoomFactor(1);
+    mainWin.webContents.send("zoomChanged", 1);
 }
 
 export async function createWindows() {
