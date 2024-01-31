@@ -9,6 +9,7 @@ import {
     BrowserWindow,
     BrowserWindowConstructorOptions,
     dialog,
+    globalShortcut,
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
@@ -229,14 +230,14 @@ function initMenuBar(win: BrowserWindow) {
             click() {
                 app.quit();
             }
-        },
-        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-        {
-            label: "Zoom in (hidden, hack for Qwertz and others)",
-            accelerator: "CmdOrCtrl+=",
-            role: "zoomIn",
-            visible: false
         }
+        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+        // {
+        //     label: "Zoom in (hidden, hack for Qwertz and others)",
+        //     accelerator: "CmdOrCtrl+=",
+        //     role: "zoomIn",
+        //     visible: false
+        // }
     ] satisfies MenuItemList;
 
     const menu = Menu.buildFromTemplate([
@@ -440,6 +441,35 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
+const allowedZoomFactors = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+
+function handleZoomIn() {
+    const zoomFactor = Settings.store.zoomFactor ?? 1;
+    const currentIndex = allowedZoomFactors.indexOf(zoomFactor);
+    if (currentIndex < allowedZoomFactors.length - 1) {
+        const newZoomFactor = allowedZoomFactors[currentIndex + 1];
+        Settings.setData({ zoomFactor: newZoomFactor });
+        mainWin.webContents.setZoomFactor(newZoomFactor);
+        mainWin.webContents.send("zoomChanged", newZoomFactor);
+    }
+}
+
+function handleZoomOut() {
+    const zoomFactor = Settings.store.zoomFactor ?? 1;
+    const currentIndex = allowedZoomFactors.indexOf(zoomFactor);
+    if (currentIndex > 0) {
+        const newZoomFactor = allowedZoomFactors[currentIndex - 1];
+        Settings.setData({ zoomFactor: newZoomFactor });
+        mainWin.webContents.setZoomFactor(newZoomFactor);
+        mainWin.webContents.send("zoomChanged", newZoomFactor);
+    }
+}
+
+function resetZoom() {
+    Settings.setData({ zoomFactor: 1 });
+    mainWin.webContents.setZoomFactor(1);
+}
+
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
     const splash = createSplashWindow(startMinimized);
@@ -452,6 +482,8 @@ export async function createWindows() {
 
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
+
+        mainWin.webContents.setZoomFactor(Settings.store.zoomFactor ?? 1);
 
         if (!startMinimized) {
             mainWin!.show();
@@ -469,6 +501,32 @@ export async function createWindows() {
             if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
                 mainWin!.maximize();
             }
+        });
+
+        mainWin.on("focus", () => {
+            globalShortcut.register("CommandOrControl+0", () => {
+                resetZoom();
+            });
+            globalShortcut.register("CommandOrControl+plus", () => {
+                handleZoomIn();
+            });
+            globalShortcut.register("CommandOrControl+=", () => {
+                handleZoomIn();
+            });
+            globalShortcut.register("CommandOrControl+-", () => {
+                handleZoomOut();
+            });
+            globalShortcut.register("CommandOrControl+_", () => {
+                handleZoomOut();
+            });
+        });
+
+        mainWin.on("blur", () => {
+            globalShortcut.unregister("CommandOrControl+0");
+            globalShortcut.unregister("CommandOrControl+plus");
+            globalShortcut.unregister("CommandOrControl+=");
+            globalShortcut.unregister("CommandOrControl+-");
+            globalShortcut.unregister("CommandOrControl+_");
         });
     });
 
