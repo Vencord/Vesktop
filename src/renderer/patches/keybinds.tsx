@@ -34,12 +34,16 @@ addPatch({
 
 onceReady.then(() => {
     // register keybinds on load
-    toggleAllKeybinds(true);
+    registerAllKeybinds();
 
     // we only need this event as this gets fired when the keybinds page is opened/closed and this is the only place where we need to adjust our keybinds
     FluxDispatcher.subscribe("KEYBINDS_ENABLE_ALL_KEYBINDS", ({ enable }: { enable: boolean }) => {
         console.log("keybinds enable all keybinds", enable);
-        toggleAllKeybinds(enable);
+        if (enable) {
+            registerAllKeybinds();
+        } else {
+            VesktopNative.keybinds.unregister();
+        }
     });
 });
 
@@ -63,20 +67,15 @@ function getKeybindHandler(action: Keybind["action"]) {
     };
 }
 
-function toggleAllKeybinds(enable: boolean) {
+function registerAllKeybinds() {
     const keybinds = KeybindsStore.getState();
     for (const keybind of Object.values(keybinds)) {
-        const { id, shortcut, action } = keybind;
         if (!shouldAllowKeybind(keybind)) {
             continue;
         }
 
-        if (enable) {
-            VesktopNative.keybinds.register(id, shortcut, getKeybindHandler(action));
-            console.log("keybind registered", action);
-        } else {
-            VesktopNative.keybinds.unregister(id);
-            console.log("keybind unregistered", action);
-        }
+        const { id, shortcut, action } = keybind;
+        VesktopNative.keybinds.register(id, shortcut, getKeybindHandler(action));
+        console.log("keybind registered", action);
     }
 }

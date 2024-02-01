@@ -62,7 +62,7 @@ export const VesktopNative = {
     keybinds: {
         register: (id: string, shortcut: number[][], callback: () => void) =>
             invoke<void>(IpcEvents.KEYBIND_REGISTER, id, shortcut, callback),
-        unregister: (id: string) => invoke<void>(IpcEvents.KEYBIND_UNREGISTER, id)
+        unregister: () => invoke<void>(IpcEvents.KEYBIND_UNREGISTER)
     },
     /** only available on Linux. */
     virtmic: {

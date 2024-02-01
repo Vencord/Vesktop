@@ -9,25 +9,19 @@ import { globalShortcut } from "electron";
 import { IpcEvents } from "../shared/IpcEvents";
 import { handle } from "./utils/ipcWrappers";
 
-// mapping the discord ids to the electron accelerators
-const registeredKeybinds = new Map<string, string>();
+// saving the registered keybinds to unregister them when needed
+const registeredKeybinds: string[] = [];
 
 export function registerKeybindsHandler() {
     handle(IpcEvents.KEYBIND_REGISTER, async (_, id: string, shortcut: number[][], callback: () => void) => {
         const accelerator = discordShortcutToElectronAccelerator(shortcut);
         globalShortcut.register(accelerator, callback);
-        registeredKeybinds.set(id, accelerator);
+        registeredKeybinds.push(accelerator);
         console.log("Registered keybind", id, shortcut, accelerator);
     });
-    handle(IpcEvents.KEYBIND_UNREGISTER, async (_, id: string) => {
-        const keybind = registeredKeybinds.get(id);
-        if (keybind) {
-            globalShortcut.unregister(keybind);
-            registeredKeybinds.delete(id);
-            console.log("Unregistered keybind", id, keybind);
-        } else {
-            console.warn("Tried to unregister keybind", id, "but it was not registered");
-        }
+    handle(IpcEvents.KEYBIND_UNREGISTER, async () => {
+        registeredKeybinds.forEach(keybind => globalShortcut.unregister(keybind));
+        console.log("Unregistered keybinds");
     });
 }
 
