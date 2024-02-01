@@ -59,6 +59,10 @@ export const VesktopNative = {
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
     },
+    keybind: {
+        register: (id: string, shortcut: string) => invoke<void>(IpcEvents.KEYBIND_REGISTER, id, shortcut),
+        unregister: (id: string) => invoke<void>(IpcEvents.KEYBIND_UNREGISTER, id)
+    },
     /** only available on Linux. */
     virtmic: {
         list: () =>
