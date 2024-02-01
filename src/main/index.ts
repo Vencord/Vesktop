@@ -11,12 +11,12 @@ import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { registerKeybindsHandler } from "./keybinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { isDeckGameMode } from "./utils/steamOS";
-import { registerKeybindsHandler } from "./keybinds";
 
 if (IS_DEV) {
     require("source-map-support").install();

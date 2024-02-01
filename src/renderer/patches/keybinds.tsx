@@ -24,7 +24,8 @@ addPatch({
             find: "Messages.KEYBIND_IN_BROSWER_NOTICE",
             replacement: [
                 {
-                    match: /(\i)\.isPlatformEmbedded/,
+                    // eslint-disable-next-line no-useless-escape
+                    match: /\i\.isPlatformEmbedded/,
                     replace: "true"
                 }
             ]
