@@ -16,6 +16,7 @@ import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { isDeckGameMode } from "./utils/steamOS";
+import { registerKeybindsHandler } from "./keybinds";
 
 if (IS_DEV) {
     require("source-map-support").install();
@@ -62,6 +63,7 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        registerKeybindsHandler();
 
         bootstrap();
 

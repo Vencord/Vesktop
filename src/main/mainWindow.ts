@@ -454,20 +454,20 @@ export async function createWindows() {
         splash.destroy();
 
         if (!startMinimized) {
-            mainWin!.show();
-            if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
+            mainWin.show();
+            if (State.store.maximized && !isDeckGameMode) mainWin.maximize();
         }
 
         if (isDeckGameMode) {
             // always use entire display
-            mainWin!.setFullScreen(true);
+            mainWin.setFullScreen(true);
 
             askToApplySteamLayout(mainWin);
         }
 
         mainWin.once("show", () => {
-            if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
-                mainWin!.maximize();
+            if (State.store.maximized && !mainWin.isMaximized() && !isDeckGameMode) {
+                mainWin.maximize();
             }
         });
     });
