@@ -32,7 +32,7 @@ export default function SettingsUi() {
             undefined,
             "User Interface"
         ],
-        !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
+        !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true, undefined, "Notifications"],
         !isMac && [
             "minimizeToTray",
             "Minimize to tray",
@@ -50,7 +50,14 @@ export default function SettingsUi() {
             undefined,
             undefined
         ],
-        ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
+        [
+            "staticTitle",
+            "Static Title",
+            'Makes the window title "Vesktop" instead of changing to the current page',
+            undefined,
+            undefined,
+            "User Interface"
+        ],
         [
             "enableMenu",
             "Enable Menu Bar",
