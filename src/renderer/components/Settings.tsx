@@ -20,11 +20,17 @@ export default function SettingsUi() {
     const { autostart } = VesktopNative;
     const [autoStartEnabled, setAutoStartEnabled] = useState(autostart.isEnabled());
 
-    const allSwitches: Array<false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?]> = [
+    type SettingsCategory = "System" | "Performance" | "User Interface" | "Notifications";
+    const allSwitches: Array<
+        false | [keyof typeof Settings, string, string, boolean?, (() => boolean)?, SettingsCategory?]
+    > = [
         [
             "customTitleBar",
             "Discord Titlebar",
-            "Use Discord's custom title bar instead of the native system one. Requires a full restart."
+            "Use Discord's custom title bar instead of the native system one. Requires a full restart.",
+            undefined,
+            undefined,
+            "User Interface"
         ],
         !isMac && ["tray", "Tray Icon", "Add a tray icon for Vesktop", true],
         !isMac && [
@@ -32,29 +38,57 @@ export default function SettingsUi() {
             "Minimize to tray",
             "Hitting X will make Vesktop minimize to the tray instead of closing",
             true,
-            () => Settings.tray ?? true
+            () => Settings.tray ?? true,
+            "User Interface"
         ],
         ["arRPC", "Rich Presence", "Enables Rich Presence via arRPC", false],
         [
             "disableMinSize",
             "Disable minimum window size",
-            "Allows you to make the window as small as your heart desires"
+            "Allows you to make the window as small as your heart desires",
+            undefined,
+            undefined,
+            undefined
         ],
         ["staticTitle", "Static Title", 'Makes the window title "Vesktop" instead of changing to the current page'],
         [
             "enableMenu",
             "Enable Menu Bar",
-            "Enables the application menu bar. Press ALT to toggle visibility. Incompatible with 'Discord Titlebar'"
+            "Enables the application menu bar. Press ALT to toggle visibility. Incompatible with 'Discord Titlebar'",
+            undefined,
+            undefined,
+            "User Interface"
         ],
-        ["disableSmoothScroll", "Disable smooth scrolling", "Disables smooth scrolling in Vesktop", false],
-        ["hardwareAcceleration", "Hardware Acceleration", "Enable hardware acceleration", true],
-        ["splashTheming", "Splash theming", "Adapt the splash window colors to your custom theme", false],
+        [
+            "disableSmoothScroll",
+            "Disable smooth scrolling",
+            "Disables smooth scrolling in Vesktop",
+            false,
+            undefined,
+            "User Interface"
+        ],
+        [
+            "hardwareAcceleration",
+            "Hardware Acceleration",
+            "Enable hardware acceleration",
+            true,
+            undefined,
+            "Performance"
+        ],
+        [
+            "splashTheming",
+            "Splash theming",
+            "Adapt the splash window colors to your custom theme",
+            false,
+            undefined,
+            "User Interface"
+        ],
         [
             "openLinksWithElectron",
             "Open Links in app (experimental)",
             "Opens links in a new Vesktop window instead of your web browser"
         ],
-        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true]
+        ["checkUpdates", "Check for updates", "Automatically check for Vesktop updates", true, undefined, "System"]
     ];
 
     const switches = allSwitches.filter(isTruthy);
@@ -81,6 +115,15 @@ export default function SettingsUi() {
 
             <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
 
+            <Text
+                variant="heading-lg/semibold"
+                className={Margins.top20 + " " + Margins.bottom20}
+                style={{ color: "var(--header-primary)" }}
+                tag="h3"
+            >
+                System Startup & Performance
+            </Text>
+
             <Switch
                 value={autoStartEnabled}
                 onChange={async v => {
@@ -91,6 +134,52 @@ export default function SettingsUi() {
             >
                 Start With System
             </Switch>
+
+            {switches
+                .filter(item => item[5] === "System" || item[5] === "Performance")
+                .map(([key, text, note, def, predicate]) => (
+                    <Switch
+                        value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
+                        disabled={predicate && !predicate()}
+                        onChange={v => (Settings[key as any] = v)}
+                        note={note}
+                        key={key}
+                    >
+                        {text}
+                    </Switch>
+                ))}
+
+            <Text
+                variant="heading-lg/semibold"
+                className={Margins.top20 + " " + Margins.bottom20}
+                style={{ color: "var(--header-primary)" }}
+                tag="h3"
+            >
+                User Interface & Experience
+            </Text>
+
+            {switches
+                .filter(item => item[5] === "User Interface")
+                .map(([key, text, note, def, predicate]) => (
+                    <Switch
+                        value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
+                        disabled={predicate && !predicate()}
+                        onChange={v => (Settings[key as any] = v)}
+                        note={note}
+                        key={key}
+                    >
+                        {text}
+                    </Switch>
+                ))}
+
+            <Text
+                variant="heading-lg/semibold"
+                className={Margins.top20 + " " + Margins.bottom20}
+                style={{ color: "var(--header-primary)" }}
+                tag="h3"
+            >
+                Notifications & Updates
+            </Text>
 
             <Switch
                 value={Settings.appBadge ?? true}
@@ -103,18 +192,6 @@ export default function SettingsUi() {
             >
                 Notification Badge
             </Switch>
-
-            {switches.map(([key, text, note, def, predicate]) => (
-                <Switch
-                    value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
-                    disabled={predicate && !predicate()}
-                    onChange={v => (Settings[key as any] = v)}
-                    note={note}
-                    key={key}
-                >
-                    {text}
-                </Switch>
-            ))}
 
             {supportsWindowsTransparency && (
                 <>
@@ -152,6 +229,43 @@ export default function SettingsUi() {
                     <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
                 </>
             )}
+
+            {switches
+                .filter(item => item[5] === "Notifications")
+                .map(([key, text, note, def, predicate]) => (
+                    <Switch
+                        value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
+                        disabled={predicate && !predicate()}
+                        onChange={v => (Settings[key as any] = v)}
+                        note={note}
+                        key={key}
+                    >
+                        {text}
+                    </Switch>
+                ))}
+
+            <Text
+                variant="heading-lg/semibold"
+                className={Margins.top20 + " " + Margins.bottom20}
+                style={{ color: "var(--header-primary)" }}
+                tag="h3"
+            >
+                Miscellaneous
+            </Text>
+
+            {switches
+                .filter(item => item[5] === undefined)
+                .map(([key, text, note, def, predicate]) => (
+                    <Switch
+                        value={(Settings[key as any] ?? def ?? false) && predicate?.() !== false}
+                        disabled={predicate && !predicate()}
+                        onChange={v => (Settings[key as any] = v)}
+                        note={note}
+                        key={key}
+                    >
+                        {text}
+                    </Switch>
+                ))}
 
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>
