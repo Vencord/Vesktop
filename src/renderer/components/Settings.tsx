@@ -153,6 +153,43 @@ export default function SettingsUi() {
                 </>
             )}
 
+            <Forms.FormTitle>Custom Spash Animation</Forms.FormTitle>
+            <Forms.FormText>
+                The animation on the splash window is loaded from{" "}
+                {Settings.splashAnimationPath ? (
+                    <a
+                        href="about:blank"
+                        onClick={e => {
+                            e.preventDefault();
+                            VesktopNative.fileManager.showItemInFolder(Settings.splashAnimationPath!);
+                        }}
+                    >
+                        {Settings.splashAnimationPath}
+                    </a>
+                ) : (
+                    "the default location"
+                )}
+            </Forms.FormText>
+            <div className="vcd-location-btns" style={{marginBottom: 20}}>
+                <Button
+                    size={Button.Sizes.SMALL}
+                    onClick={async () => {
+                        const choice = await VesktopNative.fileManager.selectImagePath();
+                        if (choice === "cancelled") return;
+                        Settings.splashAnimationPath = choice;
+                    }}
+                >
+                    Change
+                </Button>
+                <Button
+                    size={Button.Sizes.SMALL}
+                    color={Button.Colors.RED}
+                    onClick={() => (Settings.splashAnimationPath = void 0)}
+                >
+                    Reset
+                </Button>
+            </div>
+
             <Forms.FormTitle>Vencord Location</Forms.FormTitle>
             <Forms.FormText>
                 Vencord files are loaded from{" "}
