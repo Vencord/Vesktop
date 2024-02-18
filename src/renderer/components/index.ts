@@ -5,4 +5,3 @@
  */
 
 export * as ScreenShare from "./ScreenSharePicker";
-export { default as Settings } from "./Settings";
