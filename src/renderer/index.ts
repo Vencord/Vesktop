@@ -15,7 +15,7 @@ export * as Components from "./components";
 import { findByPropsLazy } from "@vencord/types/webpack";
 import { FluxDispatcher } from "@vencord/types/webpack/common";
 
-import SettingsUi from "./components/Settings";
+import SettingsUi from "./components/settings/Settings";
 import { Settings } from "./settings";
 export { Settings };
 
