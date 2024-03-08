@@ -50,6 +50,6 @@ addPatch({
     },
     unregisterKeybind: function (id) {
         delete keybindCallbacks[id];
-        VesktopNative.keybind.uregister(id);
+        VesktopNative.keybind.unregister(id);
     }
 });

@@ -7,17 +7,7 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import {
-    app,
-    BrowserWindow,
-    clipboard,
-    dialog,
-    globalShortcut,
-    nativeImage,
-    RelaunchOptions,
-    session,
-    shell
-} from "electron";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -148,15 +138,11 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
 const registered_keybinds = {};
 
 handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string, options: any) => {
-    globalShortcut.register(shortcut, () => {
-        // false here implies `keyup`
-        // electron's global shortcut system doesn't really register keyup or down as far as i can tell
-        mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${id}](false)`);
-    });
     registered_keybinds[id] = shortcut;
+    console.log(registered_keybinds);
 });
 handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
-    globalShortcut.unregister(registered_keybinds[id]);
+    delete registered_keybinds[id];
 });
 
 function readCss() {
