@@ -359,6 +359,14 @@ function initSpellCheck(win: BrowserWindow) {
         win.webContents.send(IpcEvents.SPELLCHECK_RESULT, data.misspelledWord, data.dictionarySuggestions);
     });
 }
+function initMaximizedHook(win: BrowserWindow) {
+    win.on("maximize", () => {
+        win.webContents.send(IpcEvents.MAXIMIZED, true);
+    });
+    win.on("unmaximize", () => {
+        win.webContents.send(IpcEvents.MAXIMIZED, false);
+    });
+}
 
 function createMainWindow() {
     // Clear up previous settings listeners
@@ -425,6 +433,7 @@ function createMainWindow() {
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
+    initMaximizedHook(win);
 
     win.webContents.setUserAgent(UserAgent);
 

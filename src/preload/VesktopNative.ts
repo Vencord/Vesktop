@@ -19,6 +19,14 @@ ipcRenderer.on(IpcEvents.SPELLCHECK_RESULT, (_, w: string, s: string[]) => {
     spellCheckCallbacks.forEach(cb => cb(w, s));
 });
 
+type MaximizedCallback = (isMaximized: boolean) => void;
+
+const maximizedCallbacks = new Set<MaximizedCallback>();
+
+ipcRenderer.on(IpcEvents.MAXIMIZED, (_, v: boolean) => {
+    maximizedCallbacks.forEach(cb => cb(v));
+});
+
 export const VesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
@@ -54,7 +62,14 @@ export const VesktopNative = {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
         minimize: () => invoke<void>(IpcEvents.MINIMIZE),
-        maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
+        maximize: () => invoke<void>(IpcEvents.MAXIMIZE),
+        isMaximized: () => sendSync<boolean>(IpcEvents.IS_MAXIMIZED),
+        onMaximized(cb: MaximizedCallback) {
+            maximizedCallbacks.add(cb);
+        },
+        offMaximized(cb: MaximizedCallback) {
+            maximizedCallbacks.delete(cb);
+        }
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
