@@ -20,7 +20,12 @@ export async function downloadFile(url: string, file: string, options: RequestOp
     );
 }
 
-export function simpleReq(url: string, options: RequestOptions = {}): Promise<IncomingMessage> {
+export function simpleReq(
+    url: string,
+    options: RequestOptions = {},
+    retries = 0,
+    backoffDelay = 1000
+): Promise<IncomingMessage> {
     return new Promise<IncomingMessage>((resolve, reject) => {
         get(url, options, res => {
             const { statusCode, statusMessage, headers } = res;
@@ -30,7 +35,11 @@ export function simpleReq(url: string, options: RequestOptions = {}): Promise<In
             }
             resolve(res);
         }).on("error", err => {
-            reject(new Error(`Network error: ${err.message}`));
+            if (retries > 10) {
+                reject(err);
+            } else {
+                setTimeout(() => resolve(simpleReq(url, options, retries + 1, backoffDelay * 2)), backoffDelay);
+            }
         });
     });
 }

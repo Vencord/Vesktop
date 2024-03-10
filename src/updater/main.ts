@@ -81,6 +81,11 @@ export async function checkUpdates() {
 
     try {
         const raw = await githubGet("/repos/Vencord/Vesktop/releases/latest");
+
+        if (!raw) {
+            throw new Error("Failed to retrieve update data.");
+        }
+
         const data = JSON.parse(raw.toString("utf-8")) as ReleaseData;
 
         const oldVersion = app.getVersion();
