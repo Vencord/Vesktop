@@ -29,10 +29,8 @@ export function simpleReq(
     return new Promise<IncomingMessage>((resolve, reject) => {
         get(url, options, res => {
             const { statusCode, statusMessage, headers } = res;
-            if (statusCode && statusCode >= 400) return reject(new Error(`${statusCode}: ${statusMessage} - ${url}`));
-            if (statusCode && statusCode >= 300 && headers.location) {
-                return simpleReq(headers.location, options).then(resolve).catch(reject);
-            }
+            if (statusCode! >= 400) return void reject(`${statusCode}: ${statusMessage} - ${url}`);
+            if (statusCode! >= 300) return simpleReq(headers.location!, options).then(resolve).catch(reject);
             resolve(res);
         }).on("error", err => {
             if (retries > 10) {
