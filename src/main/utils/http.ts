@@ -54,6 +54,6 @@ export async function simpleGet(url: string, options: RequestOptions = {}) {
             res.once("end", () => resolve(Buffer.concat(chunks)));
         });
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 }
