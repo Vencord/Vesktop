@@ -23,7 +23,7 @@ export async function downloadFile(url: string, file: string, options: RequestOp
 export function simpleReq(
     url: string,
     options: RequestOptions = {},
-    retries = 0,
+    retries = 10,
     backoffDelay = 1000
 ): Promise<IncomingMessage> {
     return new Promise<IncomingMessage>((resolve, reject) => {
@@ -33,10 +33,10 @@ export function simpleReq(
             if (statusCode! >= 300) return simpleReq(headers.location!, options).then(resolve).catch(reject);
             resolve(res);
         }).on("error", err => {
-            if (retries > 10) {
+            if (retries < 0) {
                 reject(err);
             } else {
-                setTimeout(() => resolve(simpleReq(url, options, retries + 1, backoffDelay * 2)), backoffDelay);
+                setTimeout(() => resolve(simpleReq(url, options, retries - 1, backoffDelay * 2)), backoffDelay);
             }
         });
     });
