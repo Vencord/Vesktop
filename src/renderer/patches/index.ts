@@ -10,3 +10,4 @@ import "./platformClass";
 import "./screenShareAudio";
 import "./spellCheck";
 import "./windowsTitleBar";
+import "./keybinds";
