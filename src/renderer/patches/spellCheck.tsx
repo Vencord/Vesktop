@@ -6,7 +6,7 @@
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
 import { findStoreLazy } from "@vencord/types/webpack";
-import { ContextMenu, FluxDispatcher, Menu } from "@vencord/types/webpack/common";
+import { FluxDispatcher, Menu, useStateFromStores } from "@vencord/types/webpack/common";
 
 import { addPatch } from "./shared";
 
@@ -46,7 +46,8 @@ addPatch({
     }
 });
 
-addContextMenuPatch("textarea-context", children => () => {
+addContextMenuPatch("textarea-context", children => {
+    const spellCheckEnabled = useStateFromStores([SpellCheckStore], () => SpellCheckStore.isEnabled());
     const hasCorrections = Boolean(word && corrections?.length);
 
     children.push(
@@ -71,11 +72,9 @@ addContextMenuPatch("textarea-context", children => () => {
             <Menu.MenuCheckboxItem
                 id="vcd-spellcheck-enabled"
                 label="Enable Spellcheck"
-                checked={SpellCheckStore.isEnabled()}
+                checked={spellCheckEnabled}
                 action={() => {
                     FluxDispatcher.dispatch({ type: "SPELLCHECK_TOGGLE" });
-                    // Haven't found a good way to update state, so just close for now 🤷‍♀️
-                    ContextMenu.close();
                 }}
             />
         </Menu.MenuGroup>
