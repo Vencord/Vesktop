@@ -54,6 +54,7 @@ Below you can find unofficial packages created by the community. They are not of
 
 - Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
 - NixOS: https://nixos.wiki/wiki/Discord#Vesktop
+- Windows - Scoop: https://scoop.sh/#/apps?q=Vesktop
 
 ## Building from Source
 

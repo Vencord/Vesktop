@@ -81,7 +81,7 @@ export async function checkUpdates() {
 
     try {
         const raw = await githubGet("/repos/Vencord/Vesktop/releases/latest");
-        const data = JSON.parse(raw.toString("utf-8")) as ReleaseData;
+        const data: ReleaseData = await raw.json();
 
         const oldVersion = app.getVersion();
         const newVersion = data.tag_name.replace(/^v/, "");
