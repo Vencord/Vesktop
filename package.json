@@ -7,6 +7,7 @@
     "homepage": "https://vencord.dev/",
     "license": "GPL-3.0",
     "author": "Vendicated <vendicated@riseup.net>",
+    "desktopName": "vencorddesktop.desktop",
     "main": "dist/js/main.js",
     "scripts": {
         "build": "tsx scripts/build/build.mts",
