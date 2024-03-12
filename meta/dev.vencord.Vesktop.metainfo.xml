@@ -162,11 +162,7 @@
     <control>voice</control>
     <display_length compare="ge">760</display_length>
     <display_length compare="le">1200</display_length>
-    <internet>always</internet>
   </recommends>
-  <supports>
-    <internet>always</internet>
-  </supports>
   <content_rating type="oars-1.1">
     <content_attribute id="social-chat">intense</content_attribute>
     <content_attribute id="social-audio">intense</content_attribute>
