@@ -93,6 +93,10 @@ handle(IpcEvents.MAXIMIZE, e => {
     }
 });
 
+handle(IpcEvents.SET_ZOOM, (e, zoom: number) => {
+    mainWin.webContents.setZoomFactor(zoom);
+});
+
 handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
     const ses = session.defaultSession;
 

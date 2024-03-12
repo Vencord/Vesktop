@@ -17,6 +17,10 @@ require(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_PRELOAD_FILE));
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT));
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_RENDERER_SCRIPT));
 
+ipcRenderer.on("zoomChanged", (event, newZoomFactor) => {
+    window.dispatchEvent(new CustomEvent("zoomChanged", { detail: newZoomFactor }));
+});
+
 // #region css
 const rendererCss = ipcRenderer.sendSync(IpcEvents.GET_RENDERER_CSS_FILE);
 
