@@ -4,10 +4,13 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import type { PatchBay } from "@vencord/venmic";
 import { app, ipcMain } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
+
+type LinkData = Parameters<PatchBay["link"]>[0];
 
 let initialized = false;
 let patchBay: import("@vencord/venmic").PatchBay | undefined;
@@ -51,17 +54,39 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
         : { ok: false, isGlibcxxToOld };
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[]) =>
-    obtainVenmic()?.link({
-        include: targets.map(target => ({ key: "application.name", value: target })),
-        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
-    })
-);
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[], workaround?: boolean) => {
+    const pid = getRendererAudioServicePid();
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () =>
-    obtainVenmic()?.link({
-        exclude: [{ key: "application.process.id", value: getRendererAudioServicePid() }]
-    })
-);
+    const data: LinkData = {
+        include: targets.map(target => ({ key: "application.name", value: target })),
+        exclude: [{ key: "application.process.id", value: pid }]
+    };
+
+    if (workaround) {
+        data.workaround = [
+            { key: "application.process.id", value: pid },
+            { key: "media.name", value: "RecordStream" }
+        ];
+    }
+
+    return obtainVenmic()?.link(data);
+});
+
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, workaround?: boolean) => {
+    const pid = getRendererAudioServicePid();
+
+    const data: LinkData = {
+        exclude: [{ key: "application.process.id", value: pid }]
+    };
+
+    if (workaround) {
+        data.workaround = [
+            { key: "application.process.id", value: pid },
+            { key: "media.name", value: "RecordStream" }
+        ];
+    }
+
+    return obtainVenmic()?.link(data);
+});
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());

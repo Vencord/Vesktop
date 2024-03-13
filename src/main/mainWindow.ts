@@ -25,13 +25,13 @@ import { ICON_PATH, TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
+    BrowserUserAgent,
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
-    UserAgent,
     VENCORD_FILES_DIR
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
@@ -430,7 +430,7 @@ function createMainWindow() {
     initSettingsListeners(win);
     initSpellCheck(win);
 
-    win.webContents.setUserAgent(UserAgent);
+    win.webContents.setUserAgent(BrowserUserAgent);
 
     const subdomain =
         Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"

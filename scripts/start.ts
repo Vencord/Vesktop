@@ -8,4 +8,4 @@ import "./utils/dotenv";
 
 import { spawnNodeModuleBin } from "./utils/spawn.mjs";
 
-spawnNodeModuleBin("electron", [".", ...(process.env.ELECTRON_LAUNCH_FLAGS?.split(" ") ?? [])]);
+spawnNodeModuleBin("electron", [process.cwd(), ...(process.env.ELECTRON_LAUNCH_FLAGS?.split(" ") ?? [])]);
