@@ -7,6 +7,7 @@
 import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
+import { composeTrayIcons } from "./composeTrayIcons.mts";
 import vencordDep from "./vencordDep.mjs";
 
 const isDev = process.argv.includes("--dev");
@@ -49,8 +50,20 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function composeTrayIconsIfSupported() {
+    if (process.platform === "darwin") return;
+
+    return composeTrayIcons({
+        icon: "./static/icon.png",
+        badgeDir: "./static/badges/",
+        outDir: "./static/dist/tray_icons",
+        createEmpty: true
+    });
+}
+
 await Promise.all([
     copyVenmic(),
+    composeTrayIconsIfSupported(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

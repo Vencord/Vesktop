@@ -21,7 +21,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
+import { ICON_PATH, TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -41,7 +41,6 @@ import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./u
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -50,6 +49,7 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
+export let tray: Tray | null = null;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -117,7 +117,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(ICON_PATH);
+    tray = new Tray(TRAY_ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", () => win.show());
@@ -321,8 +321,12 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
 function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
-        if (enable) initTray(win);
-        else tray?.destroy();
+        if (enable) {
+            initTray(win);
+        } else if (tray) {
+            tray.destroy();
+            tray = null;
+        }
     });
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
