@@ -28,6 +28,15 @@ function init() {
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     if (hardwareAcceleration === false) app.disableHardwareAcceleration();
+    else {
+        app.commandLine.appendSwitch("use-gl", "angle");
+        app.commandLine.appendSwitch("use-angle", "gl");
+        // app.commandLine.appendSwitch("ozone-platform", "wayland");
+        app.commandLine.appendSwitch(
+            "enable-features",
+            "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder"
+        );
+    }
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
