@@ -85,8 +85,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         {
             key: "clickTrayToShowHide",
-            title: "Hide/Show on tray left click",
-            description: "Left clicking on tray will hide or show the vesktop window. Requires a full restart.",
+            title: "Hide/Show on tray click",
+            description: "Left clicking tray icon will toggle the vesktop window visibility.",
             defaultValue: false
         },
         {
