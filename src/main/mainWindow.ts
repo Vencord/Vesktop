@@ -73,6 +73,10 @@ const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpe
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
 function initTray(win: BrowserWindow) {
+    const onTrayClick = () => {
+        if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
+        else win.show();
+    };
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
@@ -120,7 +124,7 @@ function initTray(win: BrowserWindow) {
     tray = new Tray(ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
-    tray.on("click", () => win.show());
+    tray.on("click", onTrayClick);
 }
 
 async function clearData(win: BrowserWindow) {
