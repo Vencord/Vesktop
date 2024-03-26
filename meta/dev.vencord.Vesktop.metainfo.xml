@@ -28,6 +28,24 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.1" date="2024-03-12" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.1</url>
+      <description>
+        <p>New Features</p>
+        <ul>
+          <li>Added categories to Vesktop settings to reduce visual clutter by @justin13888</li>
+          <li>Added support for Vencord's transparent window options</li>
+        </ul>
+        <p>Fixes</p>
+        <ul>
+          <li>Fixed ugly error popups when starting Vesktop without working internet connection</li>
+          <li>Fixed popout title bars on Windows</li>
+          <li>Fixed spellcheck entries</li>
+          <li>Fixed screenshare audio using microphone on debian, by @Curve</li>
+          <li>Fixed a bug where autostart on Linux won't preserve command line flags</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.0" date="2024-01-16" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.0</url>
       <description>

@@ -5,11 +5,10 @@
  */
 
 import { existsSync, mkdirSync } from "fs";
-import type { RequestOptions } from "https";
 import { join } from "path";
 
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
-import { downloadFile, simpleGet } from "./http";
+import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";
 
@@ -31,27 +30,29 @@ export interface ReleaseData {
 }
 
 export async function githubGet(endpoint: string) {
-    const opts: RequestOptions = {
+    const opts: RequestInit = {
         headers: {
             Accept: "application/vnd.github+json",
             "User-Agent": USER_AGENT
         }
     };
 
-    if (process.env.GITHUB_TOKEN) opts.headers!.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    if (process.env.GITHUB_TOKEN) (opts.headers! as any).Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 
-    return simpleGet(API_BASE + endpoint, opts);
+    return fetchie(API_BASE + endpoint, opts, { retryOnNetworkError: true });
 }
 
 export async function downloadVencordFiles() {
     const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
 
-    const { assets } = JSON.parse(release.toString("utf-8")) as ReleaseData;
+    const { assets }: ReleaseData = await release.json();
 
     await Promise.all(
         assets
             .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
-            .map(({ name, browser_download_url }) => downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name)))
+            .map(({ name, browser_download_url }) =>
+                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
+            )
     );
 }
 
