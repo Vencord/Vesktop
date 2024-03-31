@@ -34,7 +34,30 @@ function init() {
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-
+    app.commandLine.appendSwitch(
+        "enable-features",
+        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder,WebRTCPipeWireCapturer,VaapiVideoDecoder,CanvasOopRasterization,Vulkan"
+    );
+    app.commandLine.appendSwitch("use-vulkan");
+    app.commandLine.appendSwitch("use-gl", "angle");
+    app.commandLine.appendSwitch("use-angle", "gl");
+    app.commandLine.appendSwitch("enable-gpu-rasterization");
+    app.commandLine.appendSwitch("enable-gpu");
+    app.commandLine.appendSwitch("enable-unsafe-webgpu");
+    app.commandLine.appendSwitch("enable-oop-rasterization");
+    app.commandLine.appendSwitch("enable-native-gpu-memory-buffers");
+    app.commandLine.appendSwitch("enable-accelerated-video");
+    app.commandLine.appendSwitch("enable-zero-copy");
+    app.commandLine.appendSwitch("ignore-gpu-blocklist");
+    app.commandLine.appendSwitch("ozone-platform-hint", "wayland");
+    // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
+    // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
+    //
+    // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
+    app.commandLine.appendSwitch(
+        "disable-features",
+        "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering,UseChromeOSDirectVideoDecoder"
+    );
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
