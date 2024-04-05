@@ -36,7 +36,7 @@ function init() {
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
     app.commandLine.appendSwitch(
         "enable-features",
-        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder,WebRTCPipeWireCapturer,VaapiVideoDecoder,CanvasOopRasterization,Vulkan"
+        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,WebRTCPipeWireCapturer,VaapiVideoDecoder,CanvasOopRasterization,Vulkan"
     );
     app.commandLine.appendSwitch("use-vulkan");
     app.commandLine.appendSwitch("use-gl", "angle");
