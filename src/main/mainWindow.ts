@@ -473,6 +473,4 @@ export async function createWindows() {
     });
 
     initArRPC();
-    const w = new BrowserWindow();
-    w.loadURL("chrome://webrtc-internals");
 }
