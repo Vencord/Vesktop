@@ -37,7 +37,7 @@
         "@typescript-eslint/parser": "^7.2.0",
         "@vencord/types": "^0.1.2",
         "dotenv": "^16.4.5",
-        "electron": "29.1.6",
+        "electron": "^29.1.1",
         "electron-builder": "^24.13.3",
         "esbuild": "^0.20.1",
         "eslint": "^8.57.0",
