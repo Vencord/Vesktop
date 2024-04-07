@@ -63,8 +63,15 @@ addPatch({
         {
             find: "x-google-max-bitrate",
             replacement: {
-                match: /"x-google-max-bitrate=".concat\(u\);a===S.Codecs.H264&&\(A\+=";/,
-                replace: '"x-google-max-bitrate=".concat("80_000");a===S.Codecs.H264&&(A+=";b=AS:800000;'
+                match: /"x-google-max-bitrate=".concat\(*\)/,
+                replace: '"x-google-max-bitrate=".concat("80_000")'
+            }
+        },
+        {
+            find: "x-google-max-bitrate",
+            replacement: {
+                match: /;level-asymmetry-allowed=1/,
+                replace: ";b=AS:800000;level-asymmetry-allowed=1"
             }
         }
     ],
