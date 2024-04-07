@@ -34,22 +34,15 @@ function init() {
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-    app.commandLine.appendSwitch(
-        "enable-features",
-        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,WebRTCPipeWireCapturer,VaapiVideoDecoder"
-    );
-    app.commandLine.appendSwitch("use-vulkan");
-    app.commandLine.appendSwitch("use-gl", "angle");
-    app.commandLine.appendSwitch("use-angle", "gl");
-    app.commandLine.appendSwitch("ignore-gpu-blocklist");
-    app.commandLine.appendSwitch("ozone-platform-hint", "wayland");
+    app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
+    app.commandLine.appendSwitch("ozone-platform-hint", "auto");
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
     app.commandLine.appendSwitch(
         "disable-features",
-        "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering,UseChromeOSDirectVideoDecoder"
+        "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering"
     );
 
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
