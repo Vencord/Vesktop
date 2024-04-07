@@ -59,6 +59,13 @@ addPatch({
                 match: /this.localWant=/,
                 replace: "$self.patchStreamQuality(this);$&"
             }
+        },
+        {
+            find: "x-google-max-bitrate",
+            replacement: {
+                match: /"x-google-max-bitrate=".concat\(u\);a===S.Codecs.H264&&\(A\+=";/,
+                replace: '"x-google-max-bitrate=".concat("80_000");a===S.Codecs.H264&&(A+=";b=AS:800000;'
+            }
         }
     ],
     patchStreamQuality(opts: any) {
