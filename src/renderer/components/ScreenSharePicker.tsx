@@ -63,7 +63,7 @@ addPatch({
         {
             find: "x-google-max-bitrate",
             replacement: {
-                match: /"x-google-max-bitrate=".concat\(*\)/,
+                match: /"x-google-max-bitrate=".concat\([a-zA-Z]+\)/,
                 replace: '"x-google-max-bitrate=".concat("80_000")'
             }
         },
