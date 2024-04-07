@@ -36,18 +36,11 @@ function init() {
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
     app.commandLine.appendSwitch(
         "enable-features",
-        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,WebRTCPipeWireCapturer,VaapiVideoDecoder,CanvasOopRasterization,Vulkan"
+        "UseOzonePlatform,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,WebRTCPipeWireCapturer,VaapiVideoDecoder"
     );
     app.commandLine.appendSwitch("use-vulkan");
     app.commandLine.appendSwitch("use-gl", "angle");
     app.commandLine.appendSwitch("use-angle", "gl");
-    app.commandLine.appendSwitch("enable-gpu-rasterization");
-    app.commandLine.appendSwitch("enable-gpu");
-    app.commandLine.appendSwitch("enable-unsafe-webgpu");
-    app.commandLine.appendSwitch("enable-oop-rasterization");
-    app.commandLine.appendSwitch("enable-native-gpu-memory-buffers");
-    app.commandLine.appendSwitch("enable-accelerated-video");
-    app.commandLine.appendSwitch("enable-zero-copy");
     app.commandLine.appendSwitch("ignore-gpu-blocklist");
     app.commandLine.appendSwitch("ozone-platform-hint", "wayland");
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
