@@ -63,6 +63,7 @@ addPatch({
         {
             find: "x-google-max-bitrate",
             replacement: {
+                // eslint-disable-next-line no-useless-escape
                 match: /"x-google-max-bitrate=".concat\(\i\)/,
                 replace: '"x-google-max-bitrate=".concat("80_000")'
             }
