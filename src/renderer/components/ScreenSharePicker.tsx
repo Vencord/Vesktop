@@ -88,6 +88,7 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
+        // I DONT KNOW WHY THIS HAS TO BE HERE BUT WITHOUT IT NOTHING WORKS RIGHT ( BITRATE GETS SET TO 4000KBPS )
         Object.assign(opts.capture, {
             framerate,
             width,
@@ -239,7 +240,7 @@ function StreamSettings({
                                     type="radio"
                                     name="contenthint"
                                     value="motion"
-                                    checked={settings.contentHint === "moiton"}
+                                    checked={settings.contentHint === "motion"}
                                     onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
                                 />
                             </label>
@@ -398,30 +399,33 @@ function ModalComponent({
                         // If there are 2 connections, the second one is the existing stream.
                         // In that case, we patch its quality
                         const conn = [...MediaEngineStore.getMediaEngine().connections][1];
-                        if (conn && conn.videoStreamParameters.length > 0) {
-                            const track = conn.input.stream.getVideoTracks()[0];
-                            const frameRate = Number(settings.fps);
-                            const height = Number(settings.resolution);
-                            const width = Math.round(height * (16 / 9));
-                            var constraints = track.getConstraints();
-                            const newConstraints = {
-                                ...constraints,
-                                frameRate,
-                                width: { ideal: width },
-                                height: { ideal: height },
-                                advanced: [{ width: width, height: height }]
-                            };
-
-                            track.applyConstraints(newConstraints).then(() => {
-                                console.log("Applied constraints successfully");
-                                console.log("New settings:", track.getSettings());
-                            });
+                        try {
+                            if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                                const track = conn.input.stream.getVideoTracks()[0];
+                                const frameRate = Number(settings.fps);
+                                const height = Number(settings.resolution);
+                                const width = Math.round(height * (16 / 9));
+                                var constraints = track.getConstraints();
+                                const newConstraints = {
+                                    ...constraints,
+                                    frameRate,
+                                    advanced: [{ width: width, height: height }]
+                                };
+                                track.applyConstraints(newConstraints).then(() => {
+                                    console.log("Applied constraints from ScreenSharePicker successfully.");
+                                    console.log("New constraints:", track.getConstraints());
+                                });
+                            }
+                        } catch {
+                            console.log("No current stream.");
                         }
 
-                        submit({
-                            id: selected!,
-                            ...settings
-                        });
+                        if (!conn) {
+                            submit({
+                                id: selected!,
+                                ...settings
+                            });
+                        }
 
                         close();
                     }}

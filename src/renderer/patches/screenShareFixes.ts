@@ -34,14 +34,12 @@ if (isLinux) {
         const newConstraints = {
             ...constraints,
             frameRate,
-            width: { ideal: width },
-            height: { ideal: height },
             advanced: [{ width: width, height: height }]
         };
 
         track.applyConstraints(newConstraints).then(() => {
-            console.log("Applied constraints successfully");
-            console.log("New settings:", track.getSettings());
+            console.log("Applied constraints from ScreenShareFixes successfully.");
+            console.log("New constraints:", track.getConstraints());
         });
 
         if (id) {
