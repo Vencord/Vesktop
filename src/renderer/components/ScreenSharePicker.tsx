@@ -36,6 +36,7 @@ interface StreamSettings {
     fps: StreamFps;
     audio: boolean;
     audioSource?: string;
+    contentHint?: string;
     workaround?: boolean;
 }
 
@@ -49,7 +50,7 @@ interface Source {
     url: string;
 }
 
-let currentSettings: StreamSettings | null = null;
+export let currentSettings: StreamSettings | null = null;
 
 addPatch({
     patches: [
@@ -179,7 +180,7 @@ function StreamSettings({
             deps: [source.id]
         }
     );
-
+    // the source's name is not properly being displayed
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
@@ -228,7 +229,39 @@ function StreamSettings({
                         </div>
                     </section>
                 </div>
-
+                <section>
+                    <Forms.FormTitle>Content Type</Forms.FormTitle>
+                    <div>
+                        <div className="vcd-screen-picker-radios">
+                            <label className="vcd-screen-picker-radio" data-checked={settings.contentHint === "motion"}>
+                                <Text variant="text-sm/bold">Prefer Smoothness</Text>
+                                <input
+                                    type="radio"
+                                    name="contenthint"
+                                    value="motion"
+                                    checked={settings.contentHint === "moiton"}
+                                    onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
+                                />
+                            </label>
+                            <label className="vcd-screen-picker-radio" data-checked={settings.contentHint === "detail"}>
+                                <Text variant="text-sm/bold">Prefer Clarity</Text>
+                                <input
+                                    type="radio"
+                                    name="contenthint"
+                                    value="detail"
+                                    checked={settings.contentHint === "detail"}
+                                    onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
+                                />
+                            </label>
+                        </div>
+                        <div className="vcd-screen-picker-hint-description">
+                            <p>
+                                Choosing "Prefer Clarity" will significantly lower framerate in exchange for a clearer
+                                image.
+                            </p>
+                        </div>
+                    </div>
+                </section>
                 {isWindows && (
                     <Switch
                         value={settings.audio}
@@ -333,6 +366,7 @@ function ModalComponent({
     const [settings, setSettings] = useState<StreamSettings>({
         resolution: "1080",
         fps: "60",
+        contentHint: "motion",
         audio: true
     });
 
@@ -361,22 +395,26 @@ function ModalComponent({
                     disabled={!selected}
                     onClick={() => {
                         currentSettings = settings;
-
                         // If there are 2 connections, the second one is the existing stream.
                         // In that case, we patch its quality
                         const conn = [...MediaEngineStore.getMediaEngine().connections][1];
                         if (conn && conn.videoStreamParameters.length > 0) {
+                            const track = conn.input.stream.getVideoTracks()[0];
+                            const frameRate = Number(settings.fps);
                             const height = Number(settings.resolution);
                             const width = Math.round(height * (16 / 9));
-                            Object.assign(conn.videoStreamParameters[0], {
-                                maxFrameRate: Number(settings.fps),
-                                maxPixelCount: width * height,
-                                maxBitrate: 8000000,
-                                maxResolution: {
-                                    type: "fixed",
-                                    width,
-                                    height
-                                }
+                            var constraints = track.getConstraints();
+                            const newConstraints = {
+                                ...constraints,
+                                frameRate,
+                                width: { ideal: width },
+                                height: { ideal: height },
+                                advanced: [{ width: width, height: height }]
+                            };
+
+                            track.applyConstraints(newConstraints).then(() => {
+                                console.log("Applied constraints successfully");
+                                console.log("New settings:", track.getSettings());
                             });
                         }
 

@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { currentSettings } from "renderer/components/ScreenSharePicker";
 import { isLinux } from "renderer/utils";
 
 if (isLinux) {
@@ -22,6 +23,26 @@ if (isLinux) {
     navigator.mediaDevices.getDisplayMedia = async function (opts) {
         const stream = await original.call(this, opts);
         const id = await getVirtmic();
+
+        const frameRate = Number(currentSettings?.fps);
+        const height = Number(currentSettings?.resolution);
+        const width = Math.round(height * (16 / 9));
+        var track = stream.getVideoTracks()[0];
+
+        track.contentHint = String(currentSettings?.contentHint);
+        var constraints = track.getConstraints();
+        const newConstraints = {
+            ...constraints,
+            frameRate,
+            width: { ideal: width },
+            height: { ideal: height },
+            advanced: [{ width: width, height: height }]
+        };
+
+        track.applyConstraints(newConstraints).then(() => {
+            console.log("Applied constraints successfully");
+            console.log("New settings:", track.getSettings());
+        });
 
         if (id) {
             const audio = await navigator.mediaDevices.getUserMedia({
