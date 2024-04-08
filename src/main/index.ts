@@ -34,7 +34,7 @@ function init() {
         // app.commandLine.appendSwitch("ozone-platform", process.env.WAYLAND_DISPLAY ? "wayland" : "x11");
         app.commandLine.appendSwitch(
             "enable-features",
-            "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder"
+            "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder"
         );
     }
     if (disableSmoothScroll) {
@@ -43,7 +43,6 @@ function init() {
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
