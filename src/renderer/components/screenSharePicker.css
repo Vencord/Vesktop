@@ -125,7 +125,7 @@
 
 .vcd-screen-picker-hint-description {
     font-size: 14px;
-    color: var(--interactive-active);
+    color: var(--header-secondary);
     width: 100%;
-    
+
 }
