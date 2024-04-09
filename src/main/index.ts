@@ -28,13 +28,15 @@ function init() {
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     if (hardwareAcceleration === false) app.disableHardwareAcceleration();
+    if (hardwareAcceleration === true) {
+        app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
+    }
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-    app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
