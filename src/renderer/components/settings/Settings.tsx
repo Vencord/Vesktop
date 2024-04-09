@@ -84,6 +84,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             disabled: () => Settings.store.tray === false
         },
         {
+            key: "clickTrayToShowHide",
+            title: "Hide/Show on tray click",
+            description: "Left clicking tray icon will toggle the vesktop window visibility.",
+            defaultValue: false
+        },
+        {
             key: "disableMinSize",
             title: "Disable minimum window size",
             description: "Allows you to make the window as small as your heart desires",
