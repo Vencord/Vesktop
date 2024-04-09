@@ -257,8 +257,8 @@ function StreamSettings({
                         </div>
                         <div className="vcd-screen-picker-hint-description">
                             <p>
-                                Choosing "Prefer Clarity" will significantly lower framerate in exchange for a clearer
-                                image.
+                                Choosing "Prefer Clarity" will result in a significantly lower framerate in exchange for
+                                a much sharper and clearer image.
                             </p>
                         </div>
                     </div>
