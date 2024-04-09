@@ -34,7 +34,8 @@ if (isLinux) {
         const newConstraints = {
             ...constraints,
             frameRate,
-            advanced: [{ width: width, height: height }]
+            advanced: [{ width: width, height: height }],
+            resizeMode: "none"
         };
 
         track.applyConstraints(newConstraints).then(() => {
