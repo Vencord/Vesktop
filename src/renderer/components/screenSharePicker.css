@@ -1,3 +1,13 @@
+.vcd-screen-picker {
+    display: flex;
+    flex-direction: row;
+}
+
+.vcd-screen-picker-content {
+    margin: 1em;
+    align-self: center;
+}
+
 .vcd-screen-picker-modal {
     padding: 1em;
 }
@@ -125,7 +135,10 @@
 
 .vcd-screen-picker-hint-description {
     font-size: 14px;
-    color: var(--header-secondary);
+    color: var(--text-normal);
     width: 100%;
-
+    font-weight: 400;
+}
+.vcd-screen-picker-hints {
+    white-space: nowrap;
 }

@@ -183,106 +183,117 @@ function StreamSettings({
     );
     // the source's name is not properly being displayed
     return (
-        <div>
-            <Forms.FormTitle>What you're streaming</Forms.FormTitle>
-            <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
-                <img src={thumb} alt="" />
-                <Text variant="text-sm/normal">{source.name}</Text>
-            </Card>
+        <div className="vcd-screen-picker">
+            <div className="vcd-screen-picker-content">
+                <Forms.FormTitle>What you're streaming</Forms.FormTitle>
+                <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
+                    <img src={thumb} alt="" />
+                    <Text variant="text-sm/normal">{source.name}</Text>
+                </Card>
+            </div>
+            <div className="vcd-screen-picker-content">
+                <Forms.FormTitle>Stream Settings</Forms.FormTitle>
+                <Card className="vcd-screen-picker-card">
+                    <div className="vcd-screen-picker-quality">
+                        <section>
+                            <Forms.FormTitle>Resolution</Forms.FormTitle>
+                            <div className="vcd-screen-picker-radios">
+                                {StreamResolutions.map(res => (
+                                    <label
+                                        className="vcd-screen-picker-radio"
+                                        data-checked={settings.resolution === res}
+                                    >
+                                        <Text variant="text-sm/bold">{res}</Text>
+                                        <input
+                                            type="radio"
+                                            name="resolution"
+                                            value={res}
+                                            checked={settings.resolution === res}
+                                            onChange={() => setSettings(s => ({ ...s, resolution: res }))}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                        </section>
 
-            <Forms.FormTitle>Stream Settings</Forms.FormTitle>
-
-            <Card className="vcd-screen-picker-card">
-                <div className="vcd-screen-picker-quality">
-                    <section>
-                        <Forms.FormTitle>Resolution</Forms.FormTitle>
-                        <div className="vcd-screen-picker-radios">
-                            {StreamResolutions.map(res => (
-                                <label className="vcd-screen-picker-radio" data-checked={settings.resolution === res}>
-                                    <Text variant="text-sm/bold">{res}</Text>
-                                    <input
-                                        type="radio"
-                                        name="resolution"
-                                        value={res}
-                                        checked={settings.resolution === res}
-                                        onChange={() => setSettings(s => ({ ...s, resolution: res }))}
-                                    />
-                                </label>
-                            ))}
-                        </div>
-                    </section>
-
-                    <section>
-                        <Forms.FormTitle>Frame Rate</Forms.FormTitle>
-                        <div className="vcd-screen-picker-radios">
-                            {StreamFps.map(fps => (
-                                <label className="vcd-screen-picker-radio" data-checked={settings.fps === fps}>
-                                    <Text variant="text-sm/bold">{fps}</Text>
-                                    <input
-                                        type="radio"
-                                        name="fps"
-                                        value={fps}
-                                        checked={settings.fps === fps}
-                                        onChange={() => setSettings(s => ({ ...s, fps }))}
-                                    />
-                                </label>
-                            ))}
-                        </div>
-                    </section>
-                </div>
-                <section>
-                    <Forms.FormTitle>Content Type</Forms.FormTitle>
-                    <div>
-                        <div className="vcd-screen-picker-radios">
-                            <label className="vcd-screen-picker-radio" data-checked={settings.contentHint === "motion"}>
-                                <Text variant="text-sm/bold">Prefer Smoothness</Text>
-                                <input
-                                    type="radio"
-                                    name="contenthint"
-                                    value="motion"
-                                    checked={settings.contentHint === "motion"}
-                                    onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
-                                />
-                            </label>
-                            <label className="vcd-screen-picker-radio" data-checked={settings.contentHint === "detail"}>
-                                <Text variant="text-sm/bold">Prefer Clarity</Text>
-                                <input
-                                    type="radio"
-                                    name="contenthint"
-                                    value="detail"
-                                    checked={settings.contentHint === "detail"}
-                                    onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
-                                />
-                            </label>
-                        </div>
-                        <div className="vcd-screen-picker-hint-description">
-                            <p>
-                                Choosing "Prefer Clarity" will result in a significantly lower framerate in exchange for
-                                a much sharper and clearer image.
-                            </p>
-                        </div>
+                        <section>
+                            <Forms.FormTitle>Frame Rate</Forms.FormTitle>
+                            <div className="vcd-screen-picker-radios">
+                                {StreamFps.map(fps => (
+                                    <label className="vcd-screen-picker-radio" data-checked={settings.fps === fps}>
+                                        <Text variant="text-sm/bold">{fps}</Text>
+                                        <input
+                                            type="radio"
+                                            name="fps"
+                                            value={fps}
+                                            checked={settings.fps === fps}
+                                            onChange={() => setSettings(s => ({ ...s, fps }))}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                        </section>
                     </div>
-                </section>
-                {isWindows && (
-                    <Switch
-                        value={settings.audio}
-                        onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
-                        hideBorder
-                        className="vcd-screen-picker-audio"
-                    >
-                        Stream With Audio
-                    </Switch>
-                )}
+                    <section>
+                        <Forms.FormTitle>Content Type</Forms.FormTitle>
+                        <div>
+                            <div className="vcd-screen-picker-radios vcd-screen-picker-hints">
+                                <label
+                                    className="vcd-screen-picker-radio"
+                                    data-checked={settings.contentHint === "motion"}
+                                >
+                                    <Text variant="text-sm/bold">Prefer Smoothness</Text>
+                                    <input
+                                        type="radio"
+                                        name="contenthint"
+                                        value="motion"
+                                        checked={settings.contentHint === "motion"}
+                                        onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
+                                    />
+                                </label>
+                                <label
+                                    className="vcd-screen-picker-radio"
+                                    data-checked={settings.contentHint === "detail"}
+                                >
+                                    <Text variant="text-sm/bold">Prefer Clarity</Text>
+                                    <input
+                                        type="radio"
+                                        name="contenthint"
+                                        value="detail"
+                                        checked={settings.contentHint === "detail"}
+                                        onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
+                                    />
+                                </label>
+                            </div>
+                            <div className="vcd-screen-picker-hint-description">
+                                <p>
+                                    Choosing "Prefer Clarity" will result in a significantly lower framerate in exchange
+                                    for a much sharper and clearer image.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                    {isWindows && (
+                        <Switch
+                            value={settings.audio}
+                            onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
+                            hideBorder
+                            className="vcd-screen-picker-audio"
+                        >
+                            Stream With Audio
+                        </Switch>
+                    )}
 
-                {isLinux && (
-                    <AudioSourcePickerLinux
-                        audioSource={settings.audioSource}
-                        workaround={settings.workaround}
-                        setAudioSource={source => setSettings(s => ({ ...s, audioSource: source }))}
-                        setWorkaround={workaround => setSettings(s => ({ ...s, workaround: workaround }))}
-                    />
-                )}
-            </Card>
+                    {isLinux && (
+                        <AudioSourcePickerLinux
+                            audioSource={settings.audioSource}
+                            workaround={settings.workaround}
+                            setAudioSource={source => setSettings(s => ({ ...s, audioSource: source }))}
+                            setWorkaround={workaround => setSettings(s => ({ ...s, workaround: workaround }))}
+                        />
+                    )}
+                </Card>
+            </div>
         </div>
     );
 }
@@ -370,9 +381,13 @@ function ModalComponent({
         contentHint: "motion",
         audio: true
     });
+    const newModalProps = {
+        ...modalProps,
+        size: "large"
+    };
 
     return (
-        <Modals.ModalRoot {...modalProps}>
+        <Modals.ModalRoot {...newModalProps}>
             <Modals.ModalHeader className="vcd-screen-picker-header">
                 <Forms.FormTitle tag="h2">ScreenShare</Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
