@@ -88,6 +88,7 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
+        console.log("opts: ", opts);
 //         Object.assign(opts.encode, {
 //             framerate,
 //             pixelCount: height * width
@@ -95,7 +96,8 @@ addPatch({
         Object.assign(opts.capture, {
             framerate,
             width,
-            height
+            height,
+            pixelCount: height * width
         });
     }
 });
@@ -447,11 +449,12 @@ function ModalComponent({
                             console.log("No current stream.");
                         }
                         try {
-                            submit({
-                                id: selected!,
-                                ...settings
-                            });
-                            if (conn) {
+                            if(!conn) {
+                                submit({
+                                    id: selected!,
+                                    ...settings
+                                });
+                            } else {
                                 console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
                                 console.log(track);
