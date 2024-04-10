@@ -415,10 +415,19 @@ function ModalComponent({
                         currentSettings = settings;
                         // If there are 2 connections, the second one is the existing stream.
                         // In that case, we patch its quality
-                        const conn = [...MediaEngineStore.getMediaEngine().connections][1];
+                        try {
+                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                connection => connection.streamUserId === UserStore.getCurrentUser().id
+                            );
+                        } catch {
+                            console.log("No current stream.");
+                        }
+                        console.log([...MediaEngineStore.getMediaEngine().connections]);
                         try {
                             if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                                console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
+                                console.log(track);
                                 const frameRate = Number(settings.fps);
                                 const height = Number(settings.resolution);
                                 const width = Math.round(height * (16 / 9));
@@ -437,12 +446,32 @@ function ModalComponent({
                         } catch {
                             console.log("No current stream.");
                         }
-
-                        if (!conn) {
+                        try {
                             submit({
                                 id: selected!,
                                 ...settings
                             });
+                            if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                                console.log(conn);
+                                const track = conn.input.stream.getVideoTracks()[0];
+                                console.log(track);
+                                const frameRate = Number(settings.fps);
+                                const height = Number(settings.resolution);
+                                const width = Math.round(height * (16 / 9));
+                                var constraints = track.getConstraints();
+                                const newConstraints = {
+                                    ...constraints,
+                                    frameRate,
+                                    advanced: [{ width: width, height: height }],
+                                    resizeMode: "none"
+                                };
+                                track.applyConstraints(newConstraints).then(() => {
+                                    console.log("Applied constraints from ScreenSharePicker successfully.");
+                                    console.log("New constraints:", track.getConstraints());
+                                });
+                            }
+                        } catch {
+                            console.log("Unable to start stream.");
                         }
 
                         close();
