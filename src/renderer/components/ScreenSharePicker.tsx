@@ -88,10 +88,10 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
-        Object.assign(opts.encode, {
-            framerate,
-            pixelCount: height * width
-        });
+//         Object.assign(opts.encode, {
+//             framerate,
+//             pixelCount: height * width
+//         });
         Object.assign(opts.capture, {
             framerate,
             width,
@@ -424,7 +424,7 @@ function ModalComponent({
                         }
                         console.log([...MediaEngineStore.getMediaEngine().connections]);
                         try {
-                            if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                            if (conn) {
                                 console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
                                 console.log(track);
@@ -451,7 +451,7 @@ function ModalComponent({
                                 id: selected!,
                                 ...settings
                             });
-                            if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                            if (conn) {
                                 console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
                                 console.log(track);
