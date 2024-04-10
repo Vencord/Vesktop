@@ -89,10 +89,12 @@ addPatch({
             bitrateTarget: 600000
         });
         console.log("opts: ", opts);
-//         Object.assign(opts.encode, {
-//             framerate,
-//             pixelCount: height * width
-//         });
+        if(opts?.encode) {
+            Object.assign(opts.encode, {
+                framerate,
+                pixelCount: height * width
+            });
+        }
         Object.assign(opts.capture, {
             framerate,
             width,
@@ -449,12 +451,14 @@ function ModalComponent({
                             console.log("No current stream.");
                         }
                         try {
-                            if(!conn) {
-                                submit({
+                            submit({
                                     id: selected!,
                                     ...settings
                                 });
-                            } else {
+
+                            //reapply contraints after some time to let discord resubmit stream
+                            //i believe there MUST be way to do it cleaner..
+                            setTimeout(() => {
                                 console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
                                 console.log(track);
@@ -472,7 +476,8 @@ function ModalComponent({
                                     console.log("Applied constraints from ScreenSharePicker successfully.");
                                     console.log("New constraints:", track.getConstraints());
                                 });
-                            }
+                            }, 100);
+
                         } catch {
                             console.log("Unable to start stream.");
                         }
