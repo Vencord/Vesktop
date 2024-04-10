@@ -88,12 +88,14 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
-        // I DONT KNOW WHY THIS HAS TO BE HERE BUT WITHOUT IT NOTHING WORKS RIGHT ( BITRATE GETS SET TO 4000KBPS )
+        Object.assign(opts.encode, {
+            framerate,
+            pixelCount: height * width
+        });
         Object.assign(opts.capture, {
             framerate,
             width,
-            height,
-            pixelCount: height * width
+            height
         });
     }
 });
