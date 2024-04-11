@@ -187,31 +187,27 @@ function StreamSettings({
             deps: [source.id]
         }
     );
-    const notVisible = false;
-    function setVisible() {
-        return !notVisible;
-    }
+    const [visible, setVisible] = useState(false);
     // the source's name is not properly being displayed
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
-            <Switch
-                onChange={setVisible}
-                value={notVisible ?? false}
-                className="vcd-screen-picker-audio vcd-screen-picker-preview-switch"
-            >
-                Show Preview
-            </Switch>
-            <Card
-                className={
-                    notVisible
-                        ? "vcd-screen-picker-card vcd-screen-picker-preview not-visible"
-                        : "vcd-screen-picker-card vcd-screen-picker-preview"
-                }
-            >
-                <img src={thumb} alt="stream preview" />
-                <Text variant="text-sm/normal">{source.name}</Text>
-            </Card>
+            <section>
+                <Card className={"vcd-screen-picker-card vcd-screen-picker-preview-buttons"}>
+                    <button
+                        className="vcd-screen-picker-subtle-button"
+                        onClick={() => {
+                            setVisible(!visible);
+                        }}
+                    >
+                        Show Preview
+                    </button>
+                    <button className="vcd-screen-picker-button">Change</button>
+                </Card>
+                <Card className={visible ? "vcd-screen-picker-card vcd-screen-picker-preview fade-in" : "not-visible"}>
+                    <img src={thumb} alt="stream preview" />
+                </Card>
+            </section>
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
             <Card className="vcd-screen-picker-card">
                 <div className="vcd-screen-picker-quality">
