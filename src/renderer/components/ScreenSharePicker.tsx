@@ -89,7 +89,7 @@ addPatch({
             bitrateTarget: 600000
         });
         console.log("opts: ", opts);
-        if(opts?.encode) {
+        if (opts?.encode) {
             Object.assign(opts.encode, {
                 framerate,
                 pixelCount: height * width
@@ -452,12 +452,12 @@ function ModalComponent({
                         }
                         try {
                             submit({
-                                    id: selected!,
-                                    ...settings
-                                });
+                                id: selected!,
+                                ...settings
+                            });
 
-                            //reapply contraints after some time to let discord resubmit stream
-                            //i believe there MUST be way to do it cleaner..
+                            // reapply contraints after some time to let discord resubmit stream
+                            // i believe there MUST be way to do it cleaner..
                             setTimeout(() => {
                                 console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
@@ -477,7 +477,6 @@ function ModalComponent({
                                     console.log("New constraints:", track.getConstraints());
                                 });
                             }, 100);
-
                         } catch {
                             console.log("Unable to start stream.");
                         }
