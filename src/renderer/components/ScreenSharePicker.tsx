@@ -442,6 +442,11 @@ function ModalComponent({
                                     console.log("Applied constraints from ScreenSharePicker successfully.");
                                     console.log("New constraints:", track.getConstraints());
                                 });
+
+                                // changing stream quality description
+                                conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
+                                conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
+                                conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
                             }
                         } catch {
                             console.log("No current stream.");
@@ -454,25 +459,32 @@ function ModalComponent({
 
                             // reapply contraints after some time to let discord resubmit stream
                             // i believe there MUST be way to do it cleaner..
-                            setTimeout(() => {
-                                console.log(conn);
-                                const track = conn.input.stream.getVideoTracks()[0];
-                                console.log(track);
-                                const frameRate = Number(settings.fps);
-                                const height = Number(settings.resolution);
-                                const width = Math.round(height * (16 / 9));
-                                var constraints = track.getConstraints();
-                                const newConstraints = {
-                                    ...constraints,
-                                    frameRate,
-                                    advanced: [{ width: width, height: height }],
-                                    resizeMode: "none"
-                                };
-                                track.applyConstraints(newConstraints).then(() => {
-                                    console.log("Applied constraints from ScreenSharePicker successfully.");
-                                    console.log("New constraints:", track.getConstraints());
-                                });
-                            }, 100);
+                            if (conn) {
+                                setTimeout(() => {
+                                    console.log(conn);
+                                    const track = conn.input.stream.getVideoTracks()[0];
+                                    console.log(track);
+                                    const frameRate = Number(settings.fps);
+                                    const height = Number(settings.resolution);
+                                    const width = Math.round(height * (16 / 9));
+                                    var constraints = track.getConstraints();
+                                    const newConstraints = {
+                                        ...constraints,
+                                        frameRate,
+                                        advanced: [{ width: width, height: height }],
+                                        resizeMode: "none"
+                                    };
+                                    track.applyConstraints(newConstraints).then(() => {
+                                        console.log("Applied constraints from ScreenSharePicker successfully.");
+                                        console.log("New constraints:", track.getConstraints());
+                                    });
+
+                                    // changing stream quality description
+                                    conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
+                                    conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
+                                    conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
+                                }, 100);
+                            }
                         } catch {
                             console.log("Unable to start stream.");
                         }
