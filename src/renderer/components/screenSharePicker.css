@@ -8,7 +8,6 @@
 
 .vcd-screen-picker-footer {
     display: flex;
-    justify-content: space-between;
     gap: 1em;
 }
 
@@ -53,16 +52,17 @@
     box-sizing: border-box;
 }
 
+.vcd-screen-picker-preview img {
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+
 .vcd-screen-picker-preview {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 1em;
-    top: 105%;
-}
-
-.vcd-screen-picker-preview img {
-    width: 50%;
 }
 
 .vcd-screen-picker-radio input {
@@ -130,17 +130,29 @@
     font-weight: 400;
 }
 
+.vcd-screen-picker-preview-switch {
+    margin-top: 1em;
+}
+
 .not-visible {
     display: none;
 }
 
-.vcd-screen-picker-tooltip {
+.vcd-screen-picker-preview-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: var(--background-secondary);
+    margin-bottom: 1em;
+}
+
+.vcd-screen-picker-subtle-button {
     background-color: transparent;
-    color: var(--text-normal);
+    color: var(--primary-500);
     font-weight: 500;
     font-size: 14px;
-    display: flex;
-    justify-content: center;
+    font-style: bold;
+    text-transform: uppercase;
 }
 
 .vcd-screen-picker-button{
@@ -151,23 +163,19 @@
     border-radius: 3px;
 }
 
-.vcd-screen-picker-cancel {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    justify-content: space-around;
+.fade-in { 
+    animation-name: fade-in; 
+    animation-duration: .25s;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
-
-.vcd-screen-picker-startbuttons {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+  
+  @keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0, 0);
 }
-
-.vcd-screen-picker-footerbuttons {
-    box-sizing: border-box;
-    margin-left: none;
-    justify-content: space-between;
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
+100% {
+    opacity: 1;
+    transform: scale(1, 1);
+    }
 }
