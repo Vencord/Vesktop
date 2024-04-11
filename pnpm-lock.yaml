@@ -1118,7 +1118,7 @@ packages:
       read-config-file: 6.3.2
       sanitize-filename: 1.6.3
       semver: 7.6.0
-      tar: 6.2.0
+      tar: 6.2.1
       temp-file: 3.4.0
     transitivePeerDependencies:
       - supports-color
@@ -1585,7 +1585,7 @@ packages:
       npmlog: 6.0.2
       rc: 1.2.8
       semver: 7.6.0
-      tar: 6.2.0
+      tar: 6.2.1
       url-join: 4.0.1
       which: 2.0.2
       yargs: 17.7.2
@@ -4395,8 +4395,8 @@ packages:
       readable-stream: 3.6.2
     dev: true
 
-  /tar@6.2.0:
-    resolution: {integrity: sha512-/Wo7DcT0u5HUV486xg675HtjNd3BXZ6xDbzsCUZPt5iw8bTQ63bP0Raut3mvro9u+CUyq7YQd8Cx55fsZXxqLQ==}
+  /tar@6.2.1:
+    resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
     dependencies:
       chownr: 2.0.0
