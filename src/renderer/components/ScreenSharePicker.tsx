@@ -88,14 +88,18 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
-        Object.assign(opts.encode, {
-            framerate,
-            pixelCount: height * width
-        });
+        console.log("opts: ", opts);
+        if (opts?.encode) {
+            Object.assign(opts.encode, {
+                framerate,
+                pixelCount: height * width
+            });
+        }
         Object.assign(opts.capture, {
             framerate,
             width,
-            height
+            height,
+            pixelCount: height * width
         });
     }
 });
@@ -183,31 +187,27 @@ function StreamSettings({
             deps: [source.id]
         }
     );
-    const notVisible = false;
-    function setVisible() {
-        return !notVisible;
-    }
+    const [visible, setVisible] = useState(false);
     // the source's name is not properly being displayed
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
-            <Switch
-                onChange={setVisible}
-                value={notVisible ?? false}
-                className="vcd-screen-picker-audio vcd-screen-picker-preview-switch"
-            >
-                Show Preview
-            </Switch>
-            <Card
-                className={
-                    notVisible
-                        ? "vcd-screen-picker-card vcd-screen-picker-preview not-visible"
-                        : "vcd-screen-picker-card vcd-screen-picker-preview"
-                }
-            >
-                <img src={thumb} alt="stream preview" />
-                <Text variant="text-sm/normal">{source.name}</Text>
-            </Card>
+            <section>
+                <Card className={"vcd-screen-picker-card vcd-screen-picker-preview-buttons"}>
+                    <button
+                        className="vcd-screen-picker-subtle-button"
+                        onClick={() => {
+                            setVisible(!visible);
+                        }}
+                    >
+                        Show Preview
+                    </button>
+                    <button className="vcd-screen-picker-button">Change</button>
+                </Card>
+                <Card className={visible ? "vcd-screen-picker-card vcd-screen-picker-preview fade-in" : "not-visible"}>
+                    <img src={thumb} alt="stream preview" />
+                </Card>
+            </section>
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
             <Card className="vcd-screen-picker-card">
                 <div className="vcd-screen-picker-quality">
@@ -415,10 +415,19 @@ function ModalComponent({
                         currentSettings = settings;
                         // If there are 2 connections, the second one is the existing stream.
                         // In that case, we patch its quality
-                        const conn = [...MediaEngineStore.getMediaEngine().connections][1];
                         try {
-                            if (conn.streamUserId === UserStore.getCurrentUser().id) {
+                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                connection => connection.streamUserId === UserStore.getCurrentUser().id
+                            );
+                        } catch {
+                            console.log("No current stream.");
+                        }
+                        console.log([...MediaEngineStore.getMediaEngine().connections]);
+                        try {
+                            if (conn) {
+                                console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
+                                console.log(track);
                                 const frameRate = Number(settings.fps);
                                 const height = Number(settings.resolution);
                                 const width = Math.round(height * (16 / 9));
@@ -437,12 +446,35 @@ function ModalComponent({
                         } catch {
                             console.log("No current stream.");
                         }
-
-                        if (!conn) {
+                        try {
                             submit({
                                 id: selected!,
                                 ...settings
                             });
+
+                            // reapply contraints after some time to let discord resubmit stream
+                            // i believe there MUST be way to do it cleaner..
+                            setTimeout(() => {
+                                console.log(conn);
+                                const track = conn.input.stream.getVideoTracks()[0];
+                                console.log(track);
+                                const frameRate = Number(settings.fps);
+                                const height = Number(settings.resolution);
+                                const width = Math.round(height * (16 / 9));
+                                var constraints = track.getConstraints();
+                                const newConstraints = {
+                                    ...constraints,
+                                    frameRate,
+                                    advanced: [{ width: width, height: height }],
+                                    resizeMode: "none"
+                                };
+                                track.applyConstraints(newConstraints).then(() => {
+                                    console.log("Applied constraints from ScreenSharePicker successfully.");
+                                    console.log("New constraints:", track.getConstraints());
+                                });
+                            }, 100);
+                        } catch {
+                            console.log("Unable to start stream.");
                         }
 
                         close();
