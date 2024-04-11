@@ -16,6 +16,7 @@ import {
     Select,
     Switch,
     Text,
+    Tooltip,
     UserStore,
     useState
 } from "@vencord/types/webpack/common";
@@ -187,26 +188,40 @@ function StreamSettings({
             deps: [source.id]
         }
     );
-    const [visible, setVisible] = useState(false);
+    const preview = (
+        <div className="vcd-screen-picker-preview">
+            <img src={thumb} alt="stream preview" />;
+        </div>
+    );
     // the source's name is not properly being displayed
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
             <section>
-                <Card className={"vcd-screen-picker-card vcd-screen-picker-preview-buttons"}>
-                    <button
-                        className="vcd-screen-picker-subtle-button"
-                        onClick={() => {
-                            setVisible(!visible);
-                        }}
-                    >
-                        Show Preview
-                    </button>
-                    <button className="vcd-screen-picker-button">Change</button>
-                </Card>
-                <Card className={visible ? "vcd-screen-picker-card vcd-screen-picker-preview fade-in" : "not-visible"}>
-                    <img src={thumb} alt="stream preview" />
-                </Card>
+                <div className="vcd-screen-picker-tooltip">
+                    <Card className={"vcd-screen-picker-card"}>
+                        <Tooltip text={preview}>
+                            {({ onMouseEnter, onMouseLeave }) => (
+                                <div
+                                    className="vcd-screen-picker-tooltip"
+                                    onMouseEnter={onMouseEnter}
+                                    onMouseLeave={onMouseLeave}
+                                >
+                                    Show Preview
+                                </div>
+                            )}
+                        </Tooltip>
+                        <Button
+                            color={Button.Colors.TRANSPARENT}
+                            className="vcd-screen-picker-startbuttons"
+                            onClick={() => {
+                                navigator.mediaDevices.getDisplayMedia();
+                            }}
+                        >
+                            Go Back
+                        </Button>
+                    </Card>
+                </div>
             </section>
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
             <Card className="vcd-screen-picker-card">

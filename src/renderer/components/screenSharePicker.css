@@ -138,21 +138,13 @@
     display: none;
 }
 
-.vcd-screen-picker-preview-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background-color: var(--background-secondary);
-    margin-bottom: 1em;
-}
-
-.vcd-screen-picker-subtle-button {
+.vcd-screen-picker-tooltip {
     background-color: transparent;
-    color: var(--primary-500);
+    color: var(--text-normal);
     font-weight: 500;
     font-size: 14px;
-    font-style: bold;
-    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
 }
 
 .vcd-screen-picker-button{
@@ -161,21 +153,4 @@
     font-weight: 500;
     font-size: 14px;
     border-radius: 3px;
-}
-
-.fade-in { 
-    animation-name: fade-in; 
-    animation-duration: .25s;
-    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-  
-  @keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: scale(0, 0);
-}
-100% {
-    opacity: 1;
-    transform: scale(1, 1);
-    }
 }
