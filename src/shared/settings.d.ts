@@ -21,7 +21,7 @@ export interface Settings {
     appBadge?: boolean;
     disableMinSize?: boolean;
     zoomFactor?: number;
-
+    clickTrayToShowHide?: boolean;
     /** @deprecated use customTitleBar */
     discordWindowsTitleBar?: boolean;
     customTitleBar?: boolean;
