@@ -16,6 +16,7 @@ import {
     Select,
     Switch,
     Text,
+    Tooltip,
     UserStore,
     useState
 } from "@vencord/types/webpack/common";
@@ -187,26 +188,31 @@ function StreamSettings({
             deps: [source.id]
         }
     );
-    const [visible, setVisible] = useState(false);
+    const preview = (
+        <div className="vcd-screen-picker-preview">
+            <img src={thumb} alt="stream preview" />;
+        </div>
+    );
     // the source's name is not properly being displayed
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
             <section>
-                <Card className={"vcd-screen-picker-card vcd-screen-picker-preview-buttons"}>
-                    <button
-                        className="vcd-screen-picker-subtle-button"
-                        onClick={() => {
-                            setVisible(!visible);
-                        }}
-                    >
-                        Show Preview
-                    </button>
-                    <button className="vcd-screen-picker-button">Change</button>
-                </Card>
-                <Card className={visible ? "vcd-screen-picker-card vcd-screen-picker-preview fade-in" : "not-visible"}>
-                    <img src={thumb} alt="stream preview" />
-                </Card>
+                <div className="vcd-screen-picker-tooltip">
+                    <Card className={"vcd-screen-picker-card"}>
+                        <Tooltip text={preview}>
+                            {({ onMouseEnter, onMouseLeave }) => (
+                                <div
+                                    className="vcd-screen-picker-tooltip"
+                                    onMouseEnter={onMouseEnter}
+                                    onMouseLeave={onMouseLeave}
+                                >
+                                    Show Preview
+                                </div>
+                            )}
+                        </Tooltip>
+                    </Card>
+                </div>
             </section>
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
             <Card className="vcd-screen-picker-card">
@@ -409,58 +415,34 @@ function ModalComponent({
             </Modals.ModalContent>
 
             <Modals.ModalFooter className="vcd-screen-picker-footer">
-                <Button
-                    disabled={!selected}
-                    onClick={() => {
-                        currentSettings = settings;
-                        // If there are 2 connections, the second one is the existing stream.
-                        // In that case, we patch its quality
-                        try {
-                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                connection => connection.streamUserId === UserStore.getCurrentUser().id
-                            );
-                        } catch {
-                            console.log("No current stream.");
-                        }
-                        console.log([...MediaEngineStore.getMediaEngine().connections]);
-                        try {
-                            if (conn) {
-                                console.log(conn);
-                                const track = conn.input.stream.getVideoTracks()[0];
-                                console.log(track);
-                                const frameRate = Number(settings.fps);
-                                const height = Number(settings.resolution);
-                                const width = Math.round(height * (16 / 9));
-                                var constraints = track.getConstraints();
-                                const newConstraints = {
-                                    ...constraints,
-                                    frameRate,
-                                    advanced: [{ width: width, height: height }],
-                                    resizeMode: "none"
-                                };
-                                track.applyConstraints(newConstraints).then(() => {
-                                    console.log("Applied constraints from ScreenSharePicker successfully.");
-                                    console.log("New constraints:", track.getConstraints());
-                                });
-
-                                // changing stream quality description
-                                conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
-                                conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
-                                conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
+                <div className="vcd-screen-picker-footerbuttons">
+                    <Button
+                        color={Button.Colors.TRANSPARENT}
+                        className="vcd-screen-picker-startbuttons"
+                        onClick={() => {
+                            close();
+                            navigator.mediaDevices.getDisplayMedia();
+                        }}
+                    >
+                        Go Back
+                    </Button>
+                    <Button
+                        className="vcd-screen-picker-startbuttons"
+                        disabled={!selected}
+                        onClick={() => {
+                            currentSettings = settings;
+                            // If there are 2 connections, the second one is the existing stream.
+                            // In that case, we patch its quality
+                            try {
+                                var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
+                                );
+                            } catch {
+                                console.log("No current stream.");
                             }
-                        } catch {
-                            console.log("No current stream.");
-                        }
-                        try {
-                            submit({
-                                id: selected!,
-                                ...settings
-                            });
-
-                            // reapply contraints after some time to let discord resubmit stream
-                            // i believe there MUST be way to do it cleaner..
-                            if (conn) {
-                                setTimeout(() => {
+                            console.log([...MediaEngineStore.getMediaEngine().connections]);
+                            try {
+                                if (conn) {
                                     console.log(conn);
                                     const track = conn.input.stream.getVideoTracks()[0];
                                     console.log(track);
@@ -483,27 +465,69 @@ function ModalComponent({
                                     conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
                                     conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
                                     conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
-                                }, 100);
+                                }
+                            } catch {
+                                console.log("No current stream.");
                             }
-                        } catch {
-                            console.log("Unable to start stream.");
-                        }
+                            try {
+                                submit({
+                                    id: selected!,
+                                    ...settings
+                                });
 
-                        close();
-                    }}
-                >
-                    Go Live
-                </Button>
+                                // reapply contraints after some time to let discord resubmit stream
+                                // i believe there MUST be way to do it cleaner..
+                                if (conn) {
+                                    setTimeout(() => {
+                                        console.log(conn);
+                                        const track = conn.input.stream.getVideoTracks()[0];
+                                        console.log(track);
+                                        const frameRate = Number(settings.fps);
+                                        const height = Number(settings.resolution);
+                                        const width = Math.round(height * (16 / 9));
+                                        var constraints = track.getConstraints();
+                                        const newConstraints = {
+                                            ...constraints,
+                                            frameRate,
+                                            advanced: [{ width: width, height: height }],
+                                            resizeMode: "none"
+                                        };
+                                        track.applyConstraints(newConstraints).then(() => {
+                                            console.log("Applied constraints from ScreenSharePicker successfully.");
+                                            console.log("New constraints:", track.getConstraints());
+                                        });
 
-                {selected && !skipPicker ? (
-                    <Button color={Button.Colors.TRANSPARENT} onClick={() => setSelected(void 0)}>
-                        Back
+                                        // changing stream quality description
+                                        conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
+                                        conn.videoStreamParameters[0].maxResolution.height = Number(
+                                            settings.resolution
+                                        );
+                                        conn.videoStreamParameters[0].maxResolution.width = Math.round(
+                                            height * (16 / 9)
+                                        );
+                                    }, 100);
+                                }
+                            } catch {
+                                console.log("Unable to start stream.");
+                            }
+
+                            close();
+                        }}
+                    >
+                        Go Live
                     </Button>
-                ) : (
-                    <Button color={Button.Colors.TRANSPARENT} onClick={close}>
-                        Cancel
-                    </Button>
-                )}
+                </div>
+                <div className="vcd-screen-picker-cancel">
+                    {selected && !skipPicker ? (
+                        <Button color={Button.Colors.TRANSPARENT} onClick={() => setSelected(void 0)}>
+                            Back
+                        </Button>
+                    ) : (
+                        <Button color={Button.Colors.TRANSPARENT} onClick={close}>
+                            Cancel
+                        </Button>
+                    )}
+                </div>
             </Modals.ModalFooter>
         </Modals.ModalRoot>
     );
