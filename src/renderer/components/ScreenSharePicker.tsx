@@ -93,6 +93,8 @@ addPatch({
         if (opts?.encode) {
             Object.assign(opts.encode, {
                 framerate,
+                width,
+                height,
                 pixelCount: height * width
             });
         }
