@@ -452,6 +452,8 @@ function ModalComponent({
                                 const newConstraints = {
                                     ...constraints,
                                     frameRate,
+                                    width,
+                                    height,
                                     advanced: [{ width: width, height: height }],
                                     resizeMode: "none"
                                 };
@@ -488,6 +490,8 @@ function ModalComponent({
                                     const newConstraints = {
                                         ...constraints,
                                         frameRate,
+                                        width,
+                                        height,
                                         advanced: [{ width: width, height: height }],
                                         resizeMode: "none"
                                     };

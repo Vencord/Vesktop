@@ -34,6 +34,8 @@ if (isLinux) {
         const newConstraints = {
             ...constraints,
             frameRate,
+            width,
+            height,
             advanced: [{ width: width, height: height }],
             resizeMode: "none"
         };
