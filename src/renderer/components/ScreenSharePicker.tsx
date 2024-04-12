@@ -461,25 +461,8 @@ function ModalComponent({
                                     console.log("Applied constraints from ScreenSharePicker successfully.");
                                     console.log("New constraints:", track.getConstraints());
                                 });
-                                conn.videoQualityManager.options.desktopBitrate = {
-                                    max: 8000000,
-                                    min: 500000
-                                };
-                                conn.videoQualityManager.options.videoBitrate = {
-                                    max: 8000000,
-                                    min: 500000
-                                };
-                                conn.videoQualityManager.options.videoBudget = {
-                                    width,
-                                    height,
-                                    framerate: frameRate
-                                };
-                                conn.videoQualityManager.options.videoCapture = {
-                                    width,
-                                    height,
-                                    framerate: frameRate
-                                };
-                                // changing stream quality descriptions
+
+                                // changing stream quality description
                                 conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
                                 conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
                                 conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
