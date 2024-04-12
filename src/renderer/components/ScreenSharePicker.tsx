@@ -329,7 +329,8 @@ function AudioSourcePickerLinux({
                     value={onlyDefaultSpeakers ?? true}
                     note={
                         <>
-                            When sharing desktop audio, restrict to those applications that play to the default speakers
+                            When sharing entire desktop audio, restrict to applications that play to the default
+                            speakers.
                         </>
                     }
                 >
