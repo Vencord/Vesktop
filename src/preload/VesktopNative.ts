@@ -64,8 +64,8 @@ export const VesktopNative = {
         list: () =>
             invoke<{ ok: false; isGlibcxxToOld: boolean } | { ok: true; targets: string[] }>(IpcEvents.VIRT_MIC_LIST),
         start: (targets: string[], workaround?: boolean) => invoke<void>(IpcEvents.VIRT_MIC_START, targets, workaround),
-        startSystem: (workaround?: boolean, only_default_speakers?: boolean) =>
-            invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, workaround, only_default_speakers),
+        startSystem: (workaround?: boolean, onlyDefaultSpeakers?: boolean) =>
+            invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, workaround, onlyDefaultSpeakers),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {
