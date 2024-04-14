@@ -449,8 +449,6 @@ function ModalComponent({
                     disabled={!selected}
                     onClick={() => {
                         currentSettings = settings;
-                        // If there are 2 connections, the second one is the existing stream.
-                        // In that case, we patch its quality
                         try {
                             var conn = [...MediaEngineStore.getMediaEngine().connections].find(
                                 connection => connection.streamUserId === UserStore.getCurrentUser().id
