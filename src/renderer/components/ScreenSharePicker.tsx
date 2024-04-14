@@ -243,6 +243,47 @@ function StreamSettings({
                             </div>
                         </section>
                     </div>
+                    <div className="vcd-screen-picker-quality">
+                        <section>
+                            <Forms.FormTitle>Content Type</Forms.FormTitle>
+                            <div>
+                                <div className="vcd-screen-picker-radios">
+                                    <label
+                                        className="vcd-screen-picker-radio"
+                                        data-checked={settings.contentHint === "motion"}
+                                    >
+                                        <Text variant="text-sm/bold">Prefer Smoothness</Text>
+                                        <input
+                                            type="radio"
+                                            name="contenthint"
+                                            value="motion"
+                                            checked={settings.contentHint === "motion"}
+                                            onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
+                                        />
+                                    </label>
+                                    <label
+                                        className="vcd-screen-picker-radio"
+                                        data-checked={settings.contentHint === "detail"}
+                                    >
+                                        <Text variant="text-sm/bold">Prefer Clarity</Text>
+                                        <input
+                                            type="radio"
+                                            name="contenthint"
+                                            value="detail"
+                                            checked={settings.contentHint === "detail"}
+                                            onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
+                                        />
+                                    </label>
+                                </div>
+                                <div className="vcd-screen-picker-hint-description">
+                                    <p>
+                                        Choosing "Prefer Clarity" will result in a significantly lower framerate in
+                                        exchange for a much sharper and clearer image.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
                 </Card>
             </div>
 

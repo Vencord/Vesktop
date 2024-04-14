@@ -128,3 +128,10 @@
 .vcd-screen-picker-audio {
     margin-bottom: 0;
 }
+
+.vcd-screen-picker-hint-description {
+    color: var(--header-secondary);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+}
