@@ -27,10 +27,12 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 function init() {
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
-    if (hardwareAcceleration === false) app.disableHardwareAcceleration();
-    if (hardwareAcceleration === true) {
+    if (hardwareAcceleration === false) {
+        app.disableHardwareAcceleration();
+    } else {
         app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
     }
+
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
