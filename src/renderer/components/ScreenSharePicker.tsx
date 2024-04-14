@@ -468,6 +468,8 @@ function ModalComponent({
                                 const newConstraints = {
                                     ...constraints,
                                     frameRate,
+                                    width: { min: 640, ideal: width, max: 2560 },
+                                    height: { min: 480, ideal: height, max: 1440 },
                                     advanced: [{ width: width, height: height }],
                                     resizeMode: "none"
                                 };
@@ -502,6 +504,8 @@ function ModalComponent({
                                     const newConstraints = {
                                         ...constraints,
                                         frameRate,
+                                        width: { min: 640, ideal: width, max: 2560 },
+                                        height: { min: 480, ideal: height, max: 1440 },
                                         advanced: [{ width: width, height: height }],
                                         resizeMode: "none"
                                     };
