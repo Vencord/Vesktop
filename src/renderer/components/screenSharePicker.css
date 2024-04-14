@@ -11,6 +11,12 @@
     gap: 1em;
 }
 
+.vcd-screen-picker-settings-grid {
+    gap: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .vcd-screen-picker-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
