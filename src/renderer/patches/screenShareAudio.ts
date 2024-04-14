@@ -7,11 +7,12 @@
 import { isLinux } from "renderer/utils";
 
 if (isLinux) {
-    const original = navigator.mediaDevices.getDisplayMedia;
+    const originalMedia = navigator.mediaDevices.getDisplayMedia;
+    const originalDevices = navigator.mediaDevices.enumerateDevices;
 
     async function getVirtmic() {
         try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
+            const devices = await originalDevices();
             const audioDevice = devices.find(({ label }) => label === "vencord-screen-share");
             return audioDevice?.deviceId;
         } catch (error) {
@@ -19,8 +20,13 @@ if (isLinux) {
         }
     }
 
+    navigator.mediaDevices.enumerateDevices = async function () {
+        const result = await originalDevices.call(this);
+        return result.filter(x => x.label !== "vencord-screen-share");
+    };
+
     navigator.mediaDevices.getDisplayMedia = async function (opts) {
-        const stream = await original.call(this, opts);
+        const stream = await originalMedia.call(this, opts);
         const id = await getVirtmic();
 
         if (id) {
