@@ -89,7 +89,6 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
-        console.log("opts: ", opts);
         if (opts?.encode) {
             Object.assign(opts.encode, {
                 framerate,
@@ -459,12 +458,9 @@ function ModalComponent({
                         } catch {
                             console.log("No current stream.");
                         }
-                        console.log([...MediaEngineStore.getMediaEngine().connections]);
                         try {
                             if (conn) {
-                                console.log(conn);
                                 const track = conn.input.stream.getVideoTracks()[0];
-                                console.log(track);
                                 const frameRate = Number(settings.fps);
                                 const height = Number(settings.resolution);
                                 const width = Math.round(height * (16 / 9));
@@ -498,9 +494,7 @@ function ModalComponent({
                             // i believe there MUST be way to do it cleaner..
                             if (conn) {
                                 setTimeout(() => {
-                                    console.log(conn);
                                     const track = conn.input.stream.getVideoTracks()[0];
-                                    console.log(track);
                                     const frameRate = Number(settings.fps);
                                     const height = Number(settings.resolution);
                                     const width = Math.round(height * (16 / 9));
