@@ -4,17 +4,53 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { PatchBay } from "@vencord/venmic";
+import type { PatchBay as PatchBayType } from "@vencord/venmic";
 import { app, ipcMain } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
-type LinkData = Parameters<PatchBay["link"]>[0];
+type LinkData = Parameters<PatchBayType["link"]>[0];
 
+let PatchBay: typeof PatchBayType | undefined;
+let patchBayInstance: PatchBayType | undefined;
+
+let imported = false;
 let initialized = false;
-let patchBay: import("@vencord/venmic").PatchBay | undefined;
-let isGlibcxxToOld = false;
+
+let hasPipewirePulse = false;
+let isGlibCxxOutdated = false;
+
+function importVenmic() {
+    if (imported) {
+        return;
+    }
+
+    imported = true;
+
+    try {
+        PatchBay = (require(join(STATIC_DIR, `dist/venmic-${process.arch}.node`)) as typeof import("@vencord/venmic"))
+            .PatchBay;
+
+        hasPipewirePulse = PatchBay.hasPipeWire();
+    } catch (e: any) {
+        console.error("Failed to import venmic", e);
+        isGlibCxxOutdated = (e?.stack || e?.message || "").toLowerCase().includes("glibc");
+    }
+}
+
+function obtainVenmic() {
+    if (!imported) {
+        importVenmic();
+    }
+
+    if (PatchBay && !initialized) {
+        initialized = true;
+        patchBayInstance = new PatchBay();
+    }
+
+    return patchBayInstance;
+}
 
 function getRendererAudioServicePid() {
     return (
@@ -25,33 +61,17 @@ function getRendererAudioServicePid() {
     );
 }
 
-function obtainVenmic() {
-    if (!initialized) {
-        initialized = true;
-        try {
-            const { PatchBay } = require(
-                join(STATIC_DIR, `dist/venmic-${process.arch}.node`)
-            ) as typeof import("@vencord/venmic");
-            patchBay = new PatchBay();
-        } catch (e: any) {
-            console.error("Failed to initialise venmic. Make sure you're using pipewire", e);
-            isGlibcxxToOld = (e?.stack || e?.message || "").toLowerCase().includes("glibc");
-        }
-    }
-
-    return patchBay;
-}
-
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
+
     const list = obtainVenmic()
         ?.list()
         .filter(s => s["application.process.id"] !== audioPid)
         .map(s => s["application.name"]);
 
-    return list
-        ? { ok: true, targets: [...new Set(list)] } // Remove duplicates
-        : { ok: false, isGlibcxxToOld };
+    const uniqueTargets = [...new Set(list)];
+
+    return list ? { ok: true, targets: uniqueTargets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[], workaround?: boolean) => {

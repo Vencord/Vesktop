@@ -265,7 +265,7 @@ function AudioSourcePickerLinux({
     setOnlyDefaultSpeakers(b: boolean): void;
 }) {
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
-        fallbackValue: { ok: true, targets: [] }
+        fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
     });
     const allSources = sources.ok ? ["None", "Entire System", ...sources.targets] : null;
 
