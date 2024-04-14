@@ -46,7 +46,12 @@ function obtainVenmic() {
 
     if (PatchBay && !initialized) {
         initialized = true;
-        patchBayInstance = new PatchBay();
+
+        try {
+            patchBayInstance = new PatchBay();
+        } catch (e: any) {
+            console.error("Failed to instantiate venmic", e);
+        }
     }
 
     return patchBayInstance;
