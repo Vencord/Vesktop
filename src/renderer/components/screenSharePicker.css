@@ -11,6 +11,12 @@
     gap: 1em;
 }
 
+.vcd-screen-picker-settings-grid {
+    gap: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .vcd-screen-picker-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -124,33 +130,8 @@
 }
 
 .vcd-screen-picker-hint-description {
+    color: var(--header-secondary);
     font-size: 14px;
-    color: var(--text-normal);
-    width: 100%;
+    line-height: 20px;
     font-weight: 400;
-}
-
-.vcd-screen-picker-preview-switch {
-    margin-top: 1em;
-}
-
-.not-visible {
-    display: none;
-}
-
-.vcd-screen-picker-tooltip {
-    background-color: transparent;
-    color: var(--text-normal);
-    font-weight: 500;
-    font-size: 14px;
-    display: flex;
-    justify-content: center;
-}
-
-.vcd-screen-picker-button{
-    background-color: var(--primary-500);
-    color: var(--text-normal);
-    font-weight: 500;
-    font-size: 14px;
-    border-radius: 3px;
 }
