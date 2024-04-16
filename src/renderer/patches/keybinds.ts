@@ -26,7 +26,7 @@ addPatch({
                 },
                 {
                     // WHY IS THE RADIX SPEICIFIED
-                    match: /(inputEventUnregister\(parseInt\((.{1,2}),10\)\);else\{)/,
+                    match: /(inputEventUnregister\(parseInt\((.{1,2}),10\)\);else if\(\i\[\i\]\)\{)/,
                     replace: "$1$self.unregisterKeybind($2);return;"
                 }
             ]
