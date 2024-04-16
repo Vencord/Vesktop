@@ -72,11 +72,12 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[], workaround?: boo
     return obtainVenmic()?.link(data);
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, workaround?: boolean) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, workaround?: boolean, onlyDefaultSpeakers?: boolean) => {
     const pid = getRendererAudioServicePid();
 
     const data: LinkData = {
-        exclude: [{ key: "application.process.id", value: pid }]
+        exclude: [{ key: "application.process.id", value: pid }],
+        only_default_speakers: onlyDefaultSpeakers
     };
 
     if (workaround) {
