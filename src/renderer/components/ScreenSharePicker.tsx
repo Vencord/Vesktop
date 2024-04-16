@@ -53,6 +53,9 @@ interface Source {
 
 export let currentSettings: StreamSettings | null = null;
 
+const logger = new Vencord.Util.Logger("VesktopScreenShare");
+var isOverloaded = false;
+
 addPatch({
     patches: [
         {
@@ -450,76 +453,43 @@ function ModalComponent({
                     onClick={() => {
                         currentSettings = settings;
                         try {
-                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                connection => connection.streamUserId === UserStore.getCurrentUser().id
-                            );
-                        } catch {
-                            console.log("No current stream.");
-                        }
-                        try {
-                            if (conn) {
-                                const track = conn.input.stream.getVideoTracks()[0];
-                                const frameRate = Number(settings.fps);
-                                const height = Number(settings.resolution);
-                                const width = Math.round(height * (16 / 9));
-                                var constraints = track.getConstraints();
-                                const newConstraints = {
-                                    ...constraints,
-                                    frameRate,
-                                    width: { min: 640, ideal: width, max: 2560 },
-                                    height: { min: 480, ideal: height, max: 1440 },
-                                    advanced: [{ width: width, height: height }],
-                                    resizeMode: "none"
-                                };
-                                track.applyConstraints(newConstraints).then(() => {
-                                    console.log("Applied constraints from ScreenSharePicker successfully.");
-                                    console.log("New constraints:", track.getConstraints());
-                                });
-
-                                // changing stream quality description
-                                conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
-                                conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
-                                conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
-                            }
-                        } catch {
-                            console.log("No current stream.");
-                        }
-                        try {
                             submit({
                                 id: selected!,
                                 ...settings
-                            });
-
-                            // reapply contraints after some time to let discord resubmit stream
-                            // i believe there MUST be way to do it cleaner..
-                            if (conn) {
+                            }).then(() => {
                                 setTimeout(() => {
-                                    const track = conn.input.stream.getVideoTracks()[0];
-                                    const frameRate = Number(settings.fps);
-                                    const height = Number(settings.resolution);
-                                    const width = Math.round(height * (16 / 9));
-                                    var constraints = track.getConstraints();
-                                    const newConstraints = {
-                                        ...constraints,
-                                        frameRate,
-                                        width: { min: 640, ideal: width, max: 2560 },
-                                        height: { min: 480, ideal: height, max: 1440 },
-                                        advanced: [{ width: width, height: height }],
-                                        resizeMode: "none"
-                                    };
-                                    track.applyConstraints(newConstraints).then(() => {
-                                        console.log("Applied constraints from ScreenSharePicker successfully.");
-                                        console.log("New constraints:", track.getConstraints());
-                                    });
+                                    var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                        connection => connection.streamUserId === UserStore.getCurrentUser().id
+                                    );
+                                    if (conn) {
+                                        const track = conn.input.stream.getVideoTracks()[0];
+                                        const frameRate = Number(settings.fps);
+                                        const height = Number(settings.resolution);
+                                        const width = Math.round(height * (16 / 9));
+                                        var constraints = track.getConstraints();
+                                        const newConstraints = {
+                                            ...constraints,
+                                            frameRate,
+                                            width: { min: 640, ideal: width, max: width },
+                                            height: { min: 480, ideal: height, max: height },
+                                            advanced: [{ width: width, height: height }],
+                                            resizeMode: "none"
+                                        };
+                                        track.applyConstraints(newConstraints).then(() => {
+                                            logger.log(
+                                                "Applied constraints successfully. New constraints: ",
+                                                track.getConstraints()
+                                            );
+                                        });
 
-                                    // changing stream quality description
-                                    conn.videoStreamParameters[0].maxFrameRate = Number(settings.fps);
-                                    conn.videoStreamParameters[0].maxResolution.height = Number(settings.resolution);
-                                    conn.videoStreamParameters[0].maxResolution.width = Math.round(height * (16 / 9));
+                                        conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                                        conn.videoStreamParameters[0].maxResolution.height = height;
+                                        conn.videoStreamParameters[0].maxResolution.width = width;
+                                    }
                                 }, 100);
-                            }
-                        } catch {
-                            console.log("Unable to start stream.");
+                            });
+                        } catch (error) {
+                            logger.error("Error while submitting stream.", error);
                         }
 
                         close();

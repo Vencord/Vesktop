@@ -7,6 +7,8 @@
 import { currentSettings } from "renderer/components/ScreenSharePicker";
 import { isLinux } from "renderer/utils";
 
+const logger = new Vencord.Util.Logger("VesktopScreenFixes");
+
 if (isLinux) {
     const original = navigator.mediaDevices.getDisplayMedia;
 
@@ -34,15 +36,14 @@ if (isLinux) {
         const newConstraints = {
             ...constraints,
             frameRate,
-            width: { min: 640, ideal: width, max: 2560 },
-            height: { min: 480, ideal: height, max: 1440 },
+            width: { min: 640, ideal: width, max: width },
+            height: { min: 480, ideal: height, max: height },
             advanced: [{ width: width, height: height }],
             resizeMode: "none"
         };
 
         track.applyConstraints(newConstraints).then(() => {
-            console.log("Applied constraints from ScreenShareFixes successfully.");
-            console.log("New constraints:", track.getConstraints());
+            logger.log("Applied constraints successfully. New constraints: ", track.getConstraints());
         });
 
         if (id) {
