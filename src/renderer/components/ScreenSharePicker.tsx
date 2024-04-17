@@ -54,7 +54,6 @@ interface Source {
 export let currentSettings: StreamSettings | null = null;
 
 const logger = new Vencord.Util.Logger("VesktopScreenShare");
-var isOverloaded = false;
 
 addPatch({
     patches: [
@@ -453,19 +452,28 @@ function ModalComponent({
                     onClick={() => {
                         currentSettings = settings;
                         try {
+                            const frameRate = Number(settings.fps);
+                            const height = Number(settings.resolution);
+                            const width = Math.round(height * (16 / 9));
+                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                connection => connection.streamUserId === UserStore.getCurrentUser().id
+                            );
+                            if (conn) {
+                                conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                                conn.videoStreamParameters[0].maxResolution.height = height;
+                                conn.videoStreamParameters[0].maxResolution.width = width;
+                            }
                             submit({
                                 id: selected!,
                                 ...settings
                             }).then(() => {
                                 setTimeout(() => {
-                                    var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                    conn = [...MediaEngineStore.getMediaEngine().connections].find(
                                         connection => connection.streamUserId === UserStore.getCurrentUser().id
                                     );
                                     if (conn) {
                                         const track = conn.input.stream.getVideoTracks()[0];
-                                        const frameRate = Number(settings.fps);
-                                        const height = Number(settings.resolution);
-                                        const width = Math.round(height * (16 / 9));
+
                                         var constraints = track.getConstraints();
                                         const newConstraints = {
                                             ...constraints,
@@ -481,10 +489,6 @@ function ModalComponent({
                                                 track.getConstraints()
                                             );
                                         });
-
-                                        conn.videoStreamParameters[0].maxFrameRate = frameRate;
-                                        conn.videoStreamParameters[0].maxResolution.height = height;
-                                        conn.videoStreamParameters[0].maxResolution.width = width;
                                     }
                                 }, 100);
                             });
