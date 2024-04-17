@@ -30,7 +30,7 @@ if (isLinux) {
         const frameRate = Number(currentSettings?.fps);
         const height = Number(currentSettings?.resolution);
         const width = Math.round(height * (16 / 9));
-        var track = stream.getVideoTracks()[0];
+        const track = stream.getVideoTracks()[0];
 
         track.contentHint = String(currentSettings?.contentHint);
 
