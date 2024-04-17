@@ -466,32 +466,32 @@ function ModalComponent({
                             submit({
                                 id: selected!,
                                 ...settings
-                            }).then(() => {
-                                setTimeout(() => {
-                                    conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                        connection => connection.streamUserId === UserStore.getCurrentUser().id
-                                    );
-                                    if (conn) {
-                                        const track = conn.input.stream.getVideoTracks()[0];
-
-                                        var constraints = track.getConstraints();
-                                        const newConstraints = {
-                                            ...constraints,
-                                            frameRate,
-                                            width: { min: 640, ideal: width, max: width },
-                                            height: { min: 480, ideal: height, max: height },
-                                            advanced: [{ width: width, height: height }],
-                                            resizeMode: "none"
-                                        };
-                                        track.applyConstraints(newConstraints).then(() => {
-                                            logger.log(
-                                                "Applied constraints successfully. New constraints: ",
-                                                track.getConstraints()
-                                            );
-                                        });
-                                    }
-                                }, 100);
                             });
+
+                            setTimeout(() => {
+                                conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
+                                );
+                                if (conn) {
+                                    const track = conn.input.stream.getVideoTracks()[0];
+
+                                    var constraints = track.getConstraints();
+                                    const newConstraints = {
+                                        ...constraints,
+                                        frameRate,
+                                        width: { min: 640, ideal: width, max: width },
+                                        height: { min: 480, ideal: height, max: height },
+                                        advanced: [{ width: width, height: height }],
+                                        resizeMode: "none"
+                                    };
+                                    track.applyConstraints(newConstraints).then(() => {
+                                        logger.log(
+                                            "Applied constraints successfully. New constraints: ",
+                                            track.getConstraints()
+                                        );
+                                    });
+                                }
+                            }, 100);
                         } catch (error) {
                             logger.error("Error while submitting stream.", error);
                         }
