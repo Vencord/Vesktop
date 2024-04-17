@@ -4,10 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Logger } from "@vencord/types/utils";
 import { currentSettings } from "renderer/components/ScreenSharePicker";
 import { isLinux } from "renderer/utils";
 
-const logger = new Vencord.Util.Logger("VesktopScreenFixes");
+const logger = new Logger("VesktopStreamFixes");
 
 if (isLinux) {
     const original = navigator.mediaDevices.getDisplayMedia;
@@ -32,9 +33,9 @@ if (isLinux) {
         var track = stream.getVideoTracks()[0];
 
         track.contentHint = String(currentSettings?.contentHint);
-        var constraints = track.getConstraints();
-        const newConstraints = {
-            ...constraints,
+
+        const constraints = {
+            ...track.getConstraints(),
             frameRate,
             width: { min: 640, ideal: width, max: width },
             height: { min: 480, ideal: height, max: height },
@@ -42,9 +43,12 @@ if (isLinux) {
             resizeMode: "none"
         };
 
-        track.applyConstraints(newConstraints).then(() => {
-            logger.log("Applied constraints successfully. New constraints: ", track.getConstraints());
-        });
+        track
+            .applyConstraints(constraints)
+            .then(() => {
+                logger.info("Applied constraints successfully. New constraints: ", track.getConstraints());
+            })
+            .catch(e => logger.error("Failed to apply constraints.", e));
 
         if (id) {
             const audio = await navigator.mediaDevices.getUserMedia({

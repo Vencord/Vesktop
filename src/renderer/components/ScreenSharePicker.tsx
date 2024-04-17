@@ -6,7 +6,7 @@
 
 import "./screenSharePicker.css";
 
-import { closeModal, Margins, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
+import { closeModal, Logger, Margins, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
 import { findStoreLazy, onceReady } from "@vencord/types/webpack";
 import {
     Button,
@@ -53,7 +53,7 @@ interface Source {
 
 export let currentSettings: StreamSettings | null = null;
 
-const logger = new Vencord.Util.Logger("VesktopScreenShare");
+const logger = new Logger("VesktopScreenShare");
 
 addPatch({
     patches: [
@@ -455,41 +455,48 @@ function ModalComponent({
                             const frameRate = Number(settings.fps);
                             const height = Number(settings.resolution);
                             const width = Math.round(height * (16 / 9));
-                            var conn = [...MediaEngineStore.getMediaEngine().connections].find(
+
+                            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
                                 connection => connection.streamUserId === UserStore.getCurrentUser().id
                             );
+
                             if (conn) {
                                 conn.videoStreamParameters[0].maxFrameRate = frameRate;
                                 conn.videoStreamParameters[0].maxResolution.height = height;
                                 conn.videoStreamParameters[0].maxResolution.width = width;
                             }
+
                             submit({
                                 id: selected!,
                                 ...settings
                             });
 
-                            setTimeout(() => {
-                                conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                            setTimeout(async () => {
+                                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
                                     connection => connection.streamUserId === UserStore.getCurrentUser().id
                                 );
-                                if (conn) {
-                                    const track = conn.input.stream.getVideoTracks()[0];
+                                if (!conn) return;
 
-                                    var constraints = track.getConstraints();
-                                    const newConstraints = {
-                                        ...constraints,
-                                        frameRate,
-                                        width: { min: 640, ideal: width, max: width },
-                                        height: { min: 480, ideal: height, max: height },
-                                        advanced: [{ width: width, height: height }],
-                                        resizeMode: "none"
-                                    };
-                                    track.applyConstraints(newConstraints).then(() => {
-                                        logger.log(
-                                            "Applied constraints successfully. New constraints: ",
-                                            track.getConstraints()
-                                        );
-                                    });
+                                const track = conn.input.stream.getVideoTracks()[0];
+
+                                const constraints = {
+                                    ...track.getConstraints(),
+                                    frameRate,
+                                    width: { min: 640, ideal: width, max: width },
+                                    height: { min: 480, ideal: height, max: height },
+                                    advanced: [{ width: width, height: height }],
+                                    resizeMode: "none"
+                                };
+
+                                try {
+                                    await track.applyConstraints(constraints);
+
+                                    logger.info(
+                                        "Applied constraints successfully. New constraints:",
+                                        track.getConstraints()
+                                    );
+                                } catch (e) {
+                                    logger.error("Failed to apply constraints.", e);
                                 }
                             }, 100);
                         } catch (error) {
