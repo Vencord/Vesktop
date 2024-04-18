@@ -6,7 +6,7 @@
 
 import "./screenSharePicker.css";
 
-import { closeModal, Margins, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
+import { closeModal, Logger, Margins, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
 import { findStoreLazy, onceReady } from "@vencord/types/webpack";
 import {
     Button,
@@ -36,6 +36,7 @@ interface StreamSettings {
     fps: StreamFps;
     audio: boolean;
     audioSource?: string;
+    contentHint?: string;
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
 }
@@ -50,7 +51,9 @@ interface Source {
     url: string;
 }
 
-let currentSettings: StreamSettings | null = null;
+export let currentSettings: StreamSettings | null = null;
+
+const logger = new Logger("VesktopScreenShare");
 
 addPatch({
     patches: [
@@ -60,6 +63,20 @@ addPatch({
                 match: /this.localWant=/,
                 replace: "$self.patchStreamQuality(this);$&"
             }
+        },
+        {
+            find: "x-google-max-bitrate",
+            replacement: [
+                {
+                    // eslint-disable-next-line no-useless-escape
+                    match: /"x-google-max-bitrate=".concat\(\i\)/,
+                    replace: '"x-google-max-bitrate=".concat("80_000")'
+                },
+                {
+                    match: /;level-asymmetry-allowed=1/,
+                    replace: ";b=AS:800000;level-asymmetry-allowed=1"
+                }
+            ]
         }
     ],
     patchStreamQuality(opts: any) {
@@ -74,6 +91,14 @@ addPatch({
             bitrateMax: 8000000,
             bitrateTarget: 600000
         });
+        if (opts?.encode) {
+            Object.assign(opts.encode, {
+                framerate,
+                width,
+                height,
+                pixelCount: height * width
+            });
+        }
         Object.assign(opts.capture, {
             framerate,
             width,
@@ -216,6 +241,47 @@ function StreamSettings({
                                         />
                                     </label>
                                 ))}
+                            </div>
+                        </section>
+                    </div>
+                    <div className="vcd-screen-picker-quality">
+                        <section>
+                            <Forms.FormTitle>Content Type</Forms.FormTitle>
+                            <div>
+                                <div className="vcd-screen-picker-radios">
+                                    <label
+                                        className="vcd-screen-picker-radio"
+                                        data-checked={settings.contentHint === "motion"}
+                                    >
+                                        <Text variant="text-sm/bold">Prefer Smoothness</Text>
+                                        <input
+                                            type="radio"
+                                            name="contenthint"
+                                            value="motion"
+                                            checked={settings.contentHint === "motion"}
+                                            onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
+                                        />
+                                    </label>
+                                    <label
+                                        className="vcd-screen-picker-radio"
+                                        data-checked={settings.contentHint === "detail"}
+                                    >
+                                        <Text variant="text-sm/bold">Prefer Clarity</Text>
+                                        <input
+                                            type="radio"
+                                            name="contenthint"
+                                            value="detail"
+                                            checked={settings.contentHint === "detail"}
+                                            onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
+                                        />
+                                    </label>
+                                </div>
+                                <div className="vcd-screen-picker-hint-description">
+                                    <p>
+                                        Choosing "Prefer Clarity" will result in a significantly lower framerate in
+                                        exchange for a much sharper and clearer image.
+                                    </p>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -368,6 +434,7 @@ function ModalComponent({
     const [settings, setSettings] = useState<StreamSettings>({
         resolution: "1080",
         fps: "60",
+        contentHint: "motion",
         audio: true
     });
 
@@ -377,7 +444,6 @@ function ModalComponent({
                 <Forms.FormTitle tag="h2">ScreenShare</Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
-
             <Modals.ModalContent className="vcd-screen-picker-modal">
                 {!selected ? (
                     <ScreenPicker screens={screens} chooseScreen={setSelected} />
@@ -390,35 +456,62 @@ function ModalComponent({
                     />
                 )}
             </Modals.ModalContent>
-
             <Modals.ModalFooter className="vcd-screen-picker-footer">
                 <Button
                     disabled={!selected}
                     onClick={() => {
                         currentSettings = settings;
-
-                        // If there are 2 connections, the second one is the existing stream.
-                        // In that case, we patch its quality
-                        const conn = [...MediaEngineStore.getMediaEngine().connections][1];
-                        if (conn && conn.videoStreamParameters.length > 0) {
+                        try {
+                            const frameRate = Number(settings.fps);
                             const height = Number(settings.resolution);
                             const width = Math.round(height * (16 / 9));
-                            Object.assign(conn.videoStreamParameters[0], {
-                                maxFrameRate: Number(settings.fps),
-                                maxPixelCount: width * height,
-                                maxBitrate: 8000000,
-                                maxResolution: {
-                                    type: "fixed",
-                                    width,
-                                    height
-                                }
-                            });
-                        }
 
-                        submit({
-                            id: selected!,
-                            ...settings
-                        });
+                            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                connection => connection.streamUserId === UserStore.getCurrentUser().id
+                            );
+
+                            if (conn) {
+                                conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                                conn.videoStreamParameters[0].maxResolution.height = height;
+                                conn.videoStreamParameters[0].maxResolution.width = width;
+                            }
+
+                            submit({
+                                id: selected!,
+                                ...settings
+                            });
+
+                            setTimeout(async () => {
+                                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
+                                );
+                                if (!conn) return;
+
+                                const track = conn.input.stream.getVideoTracks()[0];
+
+                                const constraints = {
+                                    ...track.getConstraints(),
+                                    frameRate,
+                                    width: { min: 640, ideal: width, max: width },
+                                    height: { min: 480, ideal: height, max: height },
+                                    advanced: [{ width: width, height: height }],
+                                    resizeMode: "none"
+                                };
+
+                                try {
+                                    await track.applyConstraints(constraints);
+
+                                    logger.info(
+                                        "Applied constraints successfully. New constraints:",
+                                        track.getConstraints()
+                                    );
+                                } catch (e) {
+                                    logger.error("Failed to apply constraints.", e);
+                                }
+                            }, 100);
+                        } catch (error) {
+                            logger.error("Error while submitting stream.", error);
+                        }
 
                         close();
                     }}

@@ -8,6 +8,6 @@
 import "./enableNotificationsByDefault";
 import "./platformClass";
 import "./hideSwitchDevice";
-import "./screenShareAudio";
+import "./screenShareFixes";
 import "./spellCheck";
 import "./windowsTitleBar";
