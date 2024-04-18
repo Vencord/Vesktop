@@ -27,16 +27,12 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 function init() {
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
-    if (hardwareAcceleration === false) app.disableHardwareAcceleration();
-    else {
-        app.commandLine.appendSwitch("use-gl", "angle");
-        app.commandLine.appendSwitch("use-angle", "gl");
-        // app.commandLine.appendSwitch("ozone-platform", process.env.WAYLAND_DISPLAY ? "wayland" : "x11");
-        app.commandLine.appendSwitch(
-            "enable-features",
-            "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder,VaapiVP8Encoder,VaapiVP9Encoder,VaapiAV1Encoder"
-        );
+    if (hardwareAcceleration === false) {
+        app.disableHardwareAcceleration();
+    } else {
+        app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
     }
+
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
