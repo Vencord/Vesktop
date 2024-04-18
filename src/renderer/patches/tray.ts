@@ -7,8 +7,6 @@
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
-const logger = new Vencord.Util.Logger("VesktopTray");
-
 const muteActions = findByPropsLazy("isSelfMute");
 const deafActions = findByPropsLazy("isSelfDeaf");
 
