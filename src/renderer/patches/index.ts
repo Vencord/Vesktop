@@ -11,3 +11,4 @@ import "./hideSwitchDevice";
 import "./screenShareFixes";
 import "./spellCheck";
 import "./windowsTitleBar";
+import "./tray";

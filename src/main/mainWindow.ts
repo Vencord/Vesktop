@@ -21,7 +21,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
+import { ICON_PATH, SPEAKING_ICON_PATH, MUTED_ICON_PATH, DEAFENED_ICON_PATH, IDLE_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -39,6 +39,9 @@ import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+
+import { fluxDispatcher } from "@vencord/types/webpack/common";
+import { onceReady } from "@vencord/types/webpack";
 
 let isQuitting = false;
 let tray: Tray;
@@ -477,4 +480,24 @@ export async function createWindows() {
     });
 
     initArRPC();
+}
+
+export async function setTrayIcon(iconName) {
+    if (!tray) return;
+    switch (iconName) {
+        case "speaking":
+            tray.setImage(SPEAKING_ICON_PATH);
+            break;
+        case "muted":
+            tray.setImage(MUTED_ICON_PATH);
+            break;
+        case "deafened":
+            tray.setImage(DEAFENED_ICON_PATH);
+            break;
+        case "idle":
+            tray.setImage(IDLE_ICON_PATH);
+            break;
+        default:
+            tray.setImage(ICON_PATH);
+    }
 }
