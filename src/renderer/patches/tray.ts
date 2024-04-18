@@ -10,8 +10,6 @@ import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 const muteActions = findByPropsLazy("isSelfMute");
 const deafActions = findByPropsLazy("isSelfDeaf");
 
-export var isInVC = false;
-
 onceReady.then(() => {
     const userID = UserStore.getCurrentUser().id;
 
@@ -51,7 +49,6 @@ onceReady.then(() => {
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
-            isInVC = true;
             if (deafActions.isSelfDeaf()) {
                 VesktopNative.app.setTrayIcon("deafened");
             } else if (muteActions.isSelfMute()) {
@@ -60,7 +57,6 @@ onceReady.then(() => {
                 VesktopNative.app.setTrayIcon("idle");
             }
         } else if (params.state === "RTC_DISCONNECTED") {
-            isInVC = false;
             VesktopNative.app.setTrayIcon("main");
         }
     });

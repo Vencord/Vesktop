@@ -8,7 +8,6 @@ import { filters, waitFor } from "@vencord/types/webpack";
 import { RelationshipStore } from "@vencord/types/webpack/common";
 
 import { Settings } from "./settings";
-import { isInVC } from "./patches/tray";
 
 let GuildReadStateStore: any;
 let NotificationSettingsStore: any;
@@ -24,12 +23,8 @@ export function setBadge() {
 
         let totalCount = mentionCount + pendingRequests;
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
+
         VesktopNative.app.setBadgeCount(totalCount);
-        if(totalCount > 0 && !isInVC) {
-            VesktopNative.app.setTrayIcon("unread");
-        } else if (!isInVC) {
-            VesktopNative.app.setTrayIcon("main");
-        }
     } catch (e) {
         console.error(e);
     }
