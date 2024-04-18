@@ -40,9 +40,6 @@ import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
-import { fluxDispatcher } from "@vencord/types/webpack/common";
-import { onceReady } from "@vencord/types/webpack";
-
 let isQuitting = false;
 let tray: Tray;
 
