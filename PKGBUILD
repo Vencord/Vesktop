@@ -1,7 +1,7 @@
 _pkgname="vesktop"
 pkgname="$_pkgname-git"
 pkgdesc="A standalone Electron app that loads Discord & Vencord"
-pkgver=0.4.1.r109.ga6ff7b4c
+pkgver=0.4.1.r112.g9ed696e8
 pkgrel=1
 url="https://github.com/D3SOX/Vesktop"
 license=('GPL-3.0-only')
@@ -39,7 +39,7 @@ build() {
   export SYSTEM_ELECTRON_VERSION=$(</usr/lib/electron29/version)
   export ELECTRONVERSION=${SYSTEM_ELECTRON_VERSION%%.*}
 
-  sed -E -e 's&^(\s*)("electron"): "(.*)"(,?)$&\1\2: "'"$SYSTEM_ELECTRON_VERSION"'"\4&' -i "$_pkgsrc/package.json"
+  sed -E -e 's&^(\s*)("electron"): "(.*)"(,?)$&\1\2: "'"$SYSTEM_ELECTRON_VERSION"'"\4&' -e '/linux/s&^&"electronDist": "/usr/lib/electron29",\n&' -i "$_pkgsrc/package.json"
 
   cd "$_pkgsrc"
   pnpm i
