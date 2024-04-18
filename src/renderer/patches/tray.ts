@@ -49,7 +49,13 @@ onceReady.then(() => {
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
-            VesktopNative.app.setTrayIcon("idle");
+            if (deafActions.isSelfDeaf()) {
+                VesktopNative.app.setTrayIcon("deafened");
+            } else if (muteActions.isSelfMute()) {
+                VesktopNative.app.setTrayIcon("muted");
+            } else {
+                VesktopNative.app.setTrayIcon("idle");
+            }
         } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("main");
         }
