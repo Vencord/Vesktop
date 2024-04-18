@@ -21,7 +21,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { DEAFENED_ICON_PATH, ICON_PATH, IDLE_ICON_PATH, MUTED_ICON_PATH, SPEAKING_ICON_PATH } from "../shared/paths";
+import { DEAFENED_ICON_PATH, ICON_PATH, IDLE_ICON_PATH, MUTED_ICON_PATH, SPEAKING_ICON_PATH, UNREAD_ICON_PATH } from "shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -490,6 +490,9 @@ export async function setTrayIcon(iconName) {
             break;
         case "deafened":
             tray.setImage(DEAFENED_ICON_PATH);
+            break;
+        case "unread":
+            tray.setImage(UNREAD_ICON_PATH);
             break;
         case "idle":
             tray.setImage(IDLE_ICON_PATH);

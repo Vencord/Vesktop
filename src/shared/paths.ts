@@ -14,3 +14,4 @@ export const SPEAKING_ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "speaking.png
 export const MUTED_ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "muted.png");
 export const DEAFENED_ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "deafened.png");
 export const IDLE_ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "idle.png");
+export const UNREAD_ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "unread.png");
