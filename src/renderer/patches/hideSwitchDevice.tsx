@@ -11,6 +11,7 @@ addPatch({
         {
             find: "lastOutputSystemDevice.justChanged",
             replacement: {
+                // eslint-disable-next-line no-useless-escape
                 match: /(\i)\.default\.getState\(\).neverShowModal/,
                 replace: "$& || $self.shouldIgnore($1)"
             }
