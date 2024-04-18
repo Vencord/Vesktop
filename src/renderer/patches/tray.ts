@@ -1,10 +1,10 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2024 Vendicated and Vencord contributors
+ * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { findByPropsLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
+import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
 const logger = new Vencord.Util.Logger("VesktopTray");
@@ -50,9 +50,9 @@ onceReady.then(() => {
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
-        if (params.state == "RTC_CONNECTED") {
+        if (params.state === "RTC_CONNECTED") {
             VesktopNative.app.setTrayIcon("idle");
-        } else if (params.state == "RTC_DISCONNECTED") {
+        } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("main");
         }
     });

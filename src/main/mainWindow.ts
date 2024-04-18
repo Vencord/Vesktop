@@ -21,7 +21,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH, SPEAKING_ICON_PATH, MUTED_ICON_PATH, DEAFENED_ICON_PATH, IDLE_ICON_PATH } from "../shared/paths";
+import { DEAFENED_ICON_PATH, ICON_PATH, IDLE_ICON_PATH, MUTED_ICON_PATH, SPEAKING_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
