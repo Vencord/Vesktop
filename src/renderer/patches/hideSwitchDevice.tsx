@@ -12,7 +12,7 @@ addPatch({
             find: "lastOutputSystemDevice.justChanged",
             replacement: {
                 match: /(\i)\.default\.getState\(\).neverShowModal/,
-                replace: "$1 || $self.shouldIgnore($2)"
+                replace: "$& || $self.shouldIgnore($1)"
             }
         }
     ],
