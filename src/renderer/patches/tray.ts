@@ -45,7 +45,7 @@ onceReady.then(() => {
         if (params.state === "RTC_CONNECTED") {
             setCurrentState();
         } else if (params.state === "RTC_DISCONNECTED") {
-            VesktopNative.app.setTrayIcon("main");
+            VesktopNative.app.setTrayIcon("icon");
         }
     });
 });

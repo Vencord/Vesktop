@@ -482,11 +482,11 @@ export async function createWindows() {
 export async function setTrayIcon(iconName: string) {
     if (!tray) return;
 
-    const Icons = new Set(["speaking", "muted", "deafened", "idle", "main"]);
+    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
 
     if (!Icons.has(iconName)) {
         console.warn("setTrayIcon: Invalid icon name", iconName);
-        iconName = "main";
+        iconName = "icon";
     }
     tray.setImage(join(STATIC_DIR, iconName + ".png"));
 }
