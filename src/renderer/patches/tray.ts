@@ -10,6 +10,16 @@ import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 const muteActions = findByPropsLazy("isSelfMute");
 const deafActions = findByPropsLazy("isSelfDeaf");
 
+function setCurrentState() {
+    if (deafActions.isSelfDeaf()) {
+        VesktopNative.app.setTrayIcon("deafened");
+    } else if (muteActions.isSelfMute()) {
+        VesktopNative.app.setTrayIcon("muted");
+    } else {
+        VesktopNative.app.setTrayIcon("idle");
+    }
+}
+
 onceReady.then(() => {
     const userID = UserStore.getCurrentUser().id;
 
@@ -18,44 +28,22 @@ onceReady.then(() => {
             if (params.speakingFlags) {
                 VesktopNative.app.setTrayIcon("speaking");
             } else {
-                if (deafActions.isSelfDeaf()) {
-                    VesktopNative.app.setTrayIcon("deafened");
-                } else if (muteActions.isSelfMute()) {
-                    VesktopNative.app.setTrayIcon("muted");
-                } else {
-                    VesktopNative.app.setTrayIcon("idle");
-                }
+                setCurrentState();
             }
         }
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", () => {
-        if (deafActions.isSelfDeaf()) {
-            VesktopNative.app.setTrayIcon("deafened");
-        } else if (muteActions.isSelfMute()) {
-            VesktopNative.app.setTrayIcon("muted");
-        } else {
-            VesktopNative.app.setTrayIcon("idle");
-        }
+        setCurrentState();
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", () => {
-        if (muteActions.isSelfMute()) {
-            VesktopNative.app.setTrayIcon("muted");
-        } else {
-            VesktopNative.app.setTrayIcon("idle");
-        }
+        setCurrentState();
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
-            if (deafActions.isSelfDeaf()) {
-                VesktopNative.app.setTrayIcon("deafened");
-            } else if (muteActions.isSelfMute()) {
-                VesktopNative.app.setTrayIcon("muted");
-            } else {
-                VesktopNative.app.setTrayIcon("idle");
-            }
+            setCurrentState();
         } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("main");
         }

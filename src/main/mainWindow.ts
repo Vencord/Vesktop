@@ -21,7 +21,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { DEAFENED_ICON_PATH, ICON_PATH, IDLE_ICON_PATH, MUTED_ICON_PATH, SPEAKING_ICON_PATH } from "../shared/paths";
+import { ICON_PATH, STATIC_DIR } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -479,22 +479,14 @@ export async function createWindows() {
     initArRPC();
 }
 
-export async function setTrayIcon(iconName) {
+export async function setTrayIcon(iconName: string) {
     if (!tray) return;
-    switch (iconName) {
-        case "speaking":
-            tray.setImage(SPEAKING_ICON_PATH);
-            break;
-        case "muted":
-            tray.setImage(MUTED_ICON_PATH);
-            break;
-        case "deafened":
-            tray.setImage(DEAFENED_ICON_PATH);
-            break;
-        case "idle":
-            tray.setImage(IDLE_ICON_PATH);
-            break;
-        default:
-            tray.setImage(ICON_PATH);
+
+    const Icons = new Set(["speaking", "muted", "deafened", "idle", "main"]);
+
+    if (!Icons.has(iconName)) {
+        console.warn("setTrayIcon: Invalid icon name", iconName);
+        iconName = "main";
     }
+    tray.setImage(join(STATIC_DIR, iconName + ".png"));
 }
