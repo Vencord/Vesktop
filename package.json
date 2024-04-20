@@ -24,7 +24,7 @@
         "updateMeta": "tsx scripts/utils/updateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#98879cae0565e6fce34e4cb6f544bf42c6a7e7c8"
+        "arrpc": "github:OpenAsar/arrpc#6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^3.4.2"

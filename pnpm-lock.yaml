@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   arrpc:
-    specifier: github:OpenAsar/arrpc#98879cae0565e6fce34e4cb6f544bf42c6a7e7c8
-    version: github.com/OpenAsar/arrpc/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8
+    specifier: github:OpenAsar/arrpc#6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
+    version: github.com/OpenAsar/arrpc/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
 
 optionalDependencies:
   '@vencord/venmic':
@@ -4783,10 +4783,10 @@ packages:
       readable-stream: 3.6.2
     dev: true
 
-  github.com/OpenAsar/arrpc/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8:
-    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8}
+  github.com/OpenAsar/arrpc/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c}
     name: arrpc
-    version: 3.2.0
+    version: 3.3.1
     hasBin: true
     dependencies:
       ws: 8.13.0
