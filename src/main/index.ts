@@ -27,10 +27,12 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 function init() {
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
+    const enableFeatures: string[] = [];
+
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
     } else {
-        app.commandLine.appendSwitch("enable-features", "VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,VaapiVideoDecoder");
+        enableFeatures.push("VaapiVideoDecodeLinuxGL", "VaapiVideoEncoder", "VaapiVideoDecoder");
     }
 
     if (disableSmoothScroll) {
@@ -47,6 +49,11 @@ function init() {
         "disable-features",
         "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering"
     );
+
+    // don't overwrite command-line supplied switches
+    if (!app.commandLine.hasSwitch("enable-features")) {
+        app.commandLine.appendSwitch("enable-features", enableFeatures.join(","));
+    }
 
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
