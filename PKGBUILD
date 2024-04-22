@@ -1,8 +1,10 @@
+# Maintainer:
+
 _pkgname="vesktop"
 pkgname="$_pkgname-git"
 pkgdesc="A standalone Electron app that loads Discord & Vencord"
-pkgver=0.4.1.r112.g9ed696e8
-pkgrel=1
+pkgver=0.4.1.r115.g1c2960ee
+pkgrel=2
 url="https://github.com/D3SOX/Vesktop"
 license=('GPL-3.0-only')
 arch=("any")
@@ -65,7 +67,7 @@ Name=Vesktop
 GenericName=Internet Messenger
 Comment=$pkgdesc
 Type=Application
-Exec=$_pkgname --ozone-platform-hint=auto %U
+Exec=$_pkgname --ozone-platform-hint=x11 %U
 Icon=$_pkgname
 Categories=Network;InstantMessaging;
 StartupWMClass=Vesktop;
