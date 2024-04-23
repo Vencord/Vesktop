@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import "./hideGarbage.css";
+import "./fixes.css";
 
 import { isWindows, localStorage } from "./utils";
 
