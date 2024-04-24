@@ -28,7 +28,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin } from "./mainWindow";
+import { mainWin, setTrayIcon } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -177,3 +177,5 @@ watch(
         mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
     })
 );
+
+handle(IpcEvents.SET_TRAY_ICON, (_, iconName: string) => setTrayIcon(iconName));
