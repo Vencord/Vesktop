@@ -3,3 +3,9 @@
 [class^=listItem_]:has(+ [class^=listItem_] [data-list-item-id=guildsnav___app-download-button]) {
     display: none;
 }
+
+/* FIXME: remove this once Discord fixes their css to not explode scrollbars on chromium >=121 */
+* {
+    scrollbar-width: unset !important;
+    scrollbar-color: unset !important;
+}

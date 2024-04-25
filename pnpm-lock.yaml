@@ -6,13 +6,13 @@ settings:
 
 dependencies:
   arrpc:
-    specifier: github:OpenAsar/arrpc#98879cae0565e6fce34e4cb6f544bf42c6a7e7c8
-    version: github.com/OpenAsar/arrpc/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8
+    specifier: github:OpenAsar/arrpc#6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
+    version: github.com/OpenAsar/arrpc/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
 
 optionalDependencies:
   '@vencord/venmic':
-    specifier: ^3.3.2
-    version: 3.3.2
+    specifier: ^3.4.2
+    version: 3.4.2
 
 devDependencies:
   '@fal-works/esbuild-plugin-global-externals':
@@ -1000,14 +1000,14 @@ packages:
       type-fest: 3.13.1
     dev: true
 
-  /@vencord/venmic@3.3.2:
-    resolution: {integrity: sha512-fwGr5v+Xe4EisKxxhTDlUDamBGlBzSK3+yYZH/7d9ui1j8Q78wCbE1iP8MnDjBvV2kIKn/xV/84wjt9iQvDkFw==}
+  /@vencord/venmic@3.4.2:
+    resolution: {integrity: sha512-nwGjarof1wVvecGksGONfb+PduhY4gSuHTm39LktiQayHS69+yv4lepq4k1lxZzjOgFTy5VXfmJqxt+BpqoUUQ==}
     engines: {node: '>=14.15'}
     os: [linux]
     requiresBuild: true
     dependencies:
       cmake-js: 7.3.0
-      node-addon-api: 7.1.0
+      node-addon-api: 8.0.0
       pkg-prebuilds: 0.2.1
     transitivePeerDependencies:
       - supports-color
@@ -1333,11 +1333,11 @@ packages:
       possible-typed-array-names: 1.0.0
     dev: true
 
-  /axios@1.6.7(debug@4.3.4):
-    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
+  /axios@1.6.8(debug@4.3.4):
+    resolution: {integrity: sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==}
     requiresBuild: true
     dependencies:
-      follow-redirects: 1.15.5(debug@4.3.4)
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -1576,7 +1576,7 @@ packages:
     hasBin: true
     requiresBuild: true
     dependencies:
-      axios: 1.6.7(debug@4.3.4)
+      axios: 1.6.8(debug@4.3.4)
       debug: 4.3.4
       fs-extra: 11.2.0
       lodash.isplainobject: 4.0.6
@@ -2540,8 +2540,8 @@ packages:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
     dev: true
 
-  /follow-redirects@1.15.5(debug@4.3.4):
-    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
+  /follow-redirects@1.15.6(debug@4.3.4):
+    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
     engines: {node: '>=4.0'}
     requiresBuild: true
     peerDependencies:
@@ -3581,9 +3581,9 @@ packages:
     dev: true
     optional: true
 
-  /node-addon-api@7.1.0:
-    resolution: {integrity: sha512-mNcltoe1R8o7STTegSOHdnJNN7s5EUvhoS7ShnTHDyOSd+8H+UdWODq6qSv67PjC8Zc5JRT8+oLAMCr0SIXw7g==}
-    engines: {node: ^16 || ^18 || >= 20}
+  /node-addon-api@8.0.0:
+    resolution: {integrity: sha512-ipO7rsHEBqa9STO5C5T10fj732ml+5kLN1cAG8/jdHd56ldQeGj3Q7+scUS+VHK/qy1zLEwC4wMK5+yM0btPvw==}
+    engines: {node: ^18 || ^20 || >= 21}
     requiresBuild: true
     dev: false
     optional: true
@@ -4783,10 +4783,10 @@ packages:
       readable-stream: 3.6.2
     dev: true
 
-  github.com/OpenAsar/arrpc/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8:
-    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/98879cae0565e6fce34e4cb6f544bf42c6a7e7c8}
+  github.com/OpenAsar/arrpc/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c}
     name: arrpc
-    version: 3.2.0
+    version: 3.3.1
     hasBin: true
     dependencies:
       ws: 8.13.0
