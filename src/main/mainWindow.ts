@@ -409,6 +409,8 @@ function createMainWindow() {
     }));
     win.setMenuBarVisibility(false);
 
+    win.on("ready-to-show", () => initWindowBoundsListeners(win));
+
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
@@ -423,7 +425,6 @@ function createMainWindow() {
 
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
-    initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
