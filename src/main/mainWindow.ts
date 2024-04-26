@@ -11,10 +11,11 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
+    nativeImage,
     nativeTheme,
     Tray
 } from "electron";
-import { rm } from "fs/promises";
+import { readFile, rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
@@ -479,14 +480,21 @@ export async function createWindows() {
     initArRPC();
 }
 
-export async function setTrayIcon(iconName: string) {
+export async function setTrayIcon(iconURI: string) {
     if (!tray) return;
+    if (iconURI !== "" && iconURI !== "icon") {
+        tray.setImage(nativeImage.createFromDataURL(iconURI));
+        return;
+    }
+    tray.setImage(join(STATIC_DIR, "icon.png"));
+}
 
-    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
+export async function getTrayIconFile(iconName: string) {
+    const Icons = new Set(["speaking", "muted", "deafened", "idle"]);
 
     if (!Icons.has(iconName)) {
-        console.warn("setTrayIcon: Invalid icon name", iconName);
         iconName = "icon";
+        return readFile(join(STATIC_DIR, "icon.png"));
     }
-    tray.setImage(join(STATIC_DIR, iconName + ".png"));
+    return readFile(join(STATIC_DIR, iconName + ".svg"), "utf8");
 }
