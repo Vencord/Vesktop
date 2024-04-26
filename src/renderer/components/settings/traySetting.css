@@ -1,0 +1,16 @@
+.tray-settings {
+    display: flex;
+    flex-direction: column;
+}
+
+.tray-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tray-settings-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}

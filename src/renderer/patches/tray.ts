@@ -4,19 +4,49 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Logger } from "@vencord/types/utils";
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
 const muteActions = findByPropsLazy("isSelfMute");
 const deafActions = findByPropsLazy("isSelfDeaf");
 
-function setCurrentState() {
+var inCall = false;
+const logger = new Logger("VesktopTrayIcon");
+
+async function changeIconColor(iconName: string) {
+    const pickedColor = VesktopNative.settings.get().trayColor;
+
+    try {
+        var svg = await VesktopNative.app.getTrayIcon(iconName);
+        svg = svg.replace(/#f6bfac/gim, "#" + (pickedColor ?? "3DB77F"));
+        const canvas = document.createElement("canvas");
+        canvas.width = 128;
+        canvas.height = 128;
+        const img = new Image();
+        img.width = 128;
+        img.height = 128;
+        img.onload = () => {
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                const dataURL = canvas.toDataURL("image/png");
+                VesktopNative.app.setTrayIcon(dataURL);
+            }
+        };
+        img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    } catch (error) {
+        logger.error("Error: ", error);
+    }
+}
+
+export function setCurrentState() {
     if (deafActions.isSelfDeaf()) {
-        VesktopNative.app.setTrayIcon("deafened");
+        changeIconColor("deafened");
     } else if (muteActions.isSelfMute()) {
-        VesktopNative.app.setTrayIcon("muted");
+        changeIconColor("muted");
     } else {
-        VesktopNative.app.setTrayIcon("idle");
+        changeIconColor("idle");
     }
 }
 
@@ -26,7 +56,7 @@ onceReady.then(() => {
     FluxDispatcher.subscribe("SPEAKING", params => {
         if (params.userId === userID) {
             if (params.speakingFlags) {
-                VesktopNative.app.setTrayIcon("speaking");
+                changeIconColor("speaking");
             } else {
                 setCurrentState();
             }
@@ -34,18 +64,20 @@ onceReady.then(() => {
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", () => {
-        setCurrentState();
+        if (inCall) setCurrentState();
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", () => {
-        setCurrentState();
+        if (inCall) setCurrentState();
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
+            inCall = true;
             setCurrentState();
         } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("icon");
+            inCall = false;
         }
     });
 });

@@ -18,7 +18,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin, setTrayIcon } from "./mainWindow";
+import { getTrayIconFile, mainWin, setTrayIcon } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -154,4 +154,5 @@ watch(
     })
 );
 
-handle(IpcEvents.SET_TRAY_ICON, (_, iconName: string) => setTrayIcon(iconName));
+handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
+handle(IpcEvents.GET_TRAY_ICON, (_, iconName) => getTrayIconFile(iconName));
