@@ -3,8 +3,8 @@
 _pkgname="vesktop"
 pkgname="$_pkgname-git"
 pkgdesc="A standalone Electron app that loads Discord & Vencord"
-pkgver=0.4.1.r115.g1c2960ee
-pkgrel=2
+pkgver=r334.3a82eed
+pkgrel=1
 url="https://github.com/D3SOX/Vesktop"
 license=('GPL-3.0-only')
 arch=("any")
@@ -33,8 +33,7 @@ sha256sums=('SKIP')
 
 pkgver() {
   cd "$_pkgsrc"
-  git describe --long --tags --abbrev=8 --exclude='*[a-zA-Z][a-zA-Z]*' \
-    | sed -E 's/^[^0-9]*//;s/([^-]*-g)/r\1/;s/-/./g'
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {
