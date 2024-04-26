@@ -1,6 +1,10 @@
-# Vesktop
+# Vesktop (D3SOX)
 
-Vesktop is a custom Discord desktop app
+Vesktop is a custom Discord desktop app. This is my personal branch with some extra features and tweaks.
+
+**Extra features compared to [Vencord/Vesktop](https://github.com/Vencord/Vesktop) main**:
+- Global Keybinds (X11, KDE Wayland works too if enabled in System Settings)
+- Tray icon voice detection
 
 **Main features**:
 - Vencord preinstalled
@@ -9,7 +13,6 @@ Vesktop is a custom Discord desktop app
 - Much better privacy, since Discord has no access to your system
 
 **Not yet supported**:
-- Global Keybinds
 - see the [Roadmap](https://github.com/Vencord/Vesktop/issues/324)
 
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
