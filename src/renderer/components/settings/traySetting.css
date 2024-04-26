@@ -1,15 +1,15 @@
-.tray-settings {
+.vcd-tray-settings {
     display: flex;
     flex-direction: column;
 }
 
-.tray-container {
+.vcd-tray-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-.tray-settings-labels {
+.vcd-tray-settings-labels {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

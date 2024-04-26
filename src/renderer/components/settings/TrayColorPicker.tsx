@@ -20,12 +20,12 @@ const presets = [
     "#F6BFAC" // Vesktop inpired
 ];
 
-export const trayIconPicker: SettingsComponent = ({ settings }) => {
-    if (!settings.tray) return null; // how to disable instead of hiding?
+export const TrayIconPicker: SettingsComponent = ({ settings }) => {
+    if (!settings.tray) return null;
     return (
-        <div className="tray-settings">
-            <div className="tray-container">
-                <div className="tray-settings-labels">
+        <div className="vcd-tray-settings">
+            <div className="vcd-tray-container">
+                <div className="vcd-tray-settings-labels">
                     <Forms.FormTitle tag="h3">Tray Icon Color</Forms.FormTitle>
                     <Forms.FormText>Choose a color for your tray icon!</Forms.FormText>
                 </div>
