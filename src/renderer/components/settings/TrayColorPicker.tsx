@@ -9,7 +9,8 @@ import "./traySetting.css";
 import { Margins } from "@vencord/types/utils";
 import { findByCodeLazy } from "@vencord/types/webpack";
 import { Forms } from "@vencord/types/webpack/common";
-import { setCurrentState } from "renderer/patches/tray";
+import { isInCall, setCurrentState } from "renderer/patches/tray";
+import { isLinux } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
@@ -19,6 +20,11 @@ const presets = [
     "#3DB77F", // discord default ~
     "#F6BFAC" // Vesktop inpired
 ];
+
+if (!isLinux)
+    VesktopNative.app.getAccentColor().then(color => {
+        if (color) presets.unshift(color);
+    });
 
 export const TrayIconPicker: SettingsComponent = ({ settings }) => {
     if (!settings.tray) return null;
@@ -30,11 +36,11 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
                     <Forms.FormText>Choose a color for your tray icon!</Forms.FormText>
                 </div>
                 <ColorPicker
-                    color={parseInt(settings.trayColor ?? "#3DB77F", 16)}
+                    color={parseInt(settings.trayColor ?? "3DB77F", 16)}
                     onChange={newColor => {
                         const hexColor = newColor.toString(16).padStart(6, "0");
                         settings.trayColor = hexColor;
-                        setCurrentState();
+                        if (isInCall) setCurrentState();
                     }}
                     showEyeDropper={false}
                     suggestedColors={presets}

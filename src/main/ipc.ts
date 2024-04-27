@@ -7,7 +7,17 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
+import {
+    app,
+    BrowserWindow,
+    clipboard,
+    dialog,
+    nativeImage,
+    RelaunchOptions,
+    session,
+    shell,
+    systemPreferences
+} from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -156,3 +166,4 @@ watch(
 
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconName) => getTrayIconFile(iconName));
+handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => `#${systemPreferences.getAccentColor?.() || ""}`);
