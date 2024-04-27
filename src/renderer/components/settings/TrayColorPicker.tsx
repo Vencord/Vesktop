@@ -18,7 +18,14 @@ const ColorPicker = findByCodeLazy(".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT
 
 const presets = [
     "#3DB77F", // discord default ~
-    "#F6BFAC" // Vesktop inpired
+    "#F6BFAC", // Vesktop inpired
+    "#FC2F2F", // red
+    "#2FFC33", // green
+    "#FCF818", // yellow
+    "#2FFCE6", // light-blue
+    "#3870FA", // blue
+    "#6F32FD", // purple
+    "#FC18EC" // pink
 ];
 
 if (!isLinux)
