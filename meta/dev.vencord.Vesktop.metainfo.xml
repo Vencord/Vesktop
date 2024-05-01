@@ -28,6 +28,20 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.2" date="2024-05-01" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.2</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Fixed scrollbars looking wrong (actually Discord's fault)</li>
+          <li>Tray: Added left click hide/show feature by @0bCdian</li>
+          <li>MacOS: Fixed the app not properly requesting microphone permissions by @ssalggnikool</li>
+          <li>Linux: Various fixed related to audio screenshare by @Curve</li>
+          <li>Linux: Overhauled &amp; improved screenshare with better framerate by @kaitlynkittyy</li>
+          <li>Users can now pass --enable/disable-features command line flags by @takase1121</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.1" date="2024-03-12" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.1</url>
       <description>
