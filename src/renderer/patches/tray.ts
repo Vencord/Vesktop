@@ -11,7 +11,7 @@ import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 const muteActions = findByPropsLazy("isSelfMute");
 const deafActions = findByPropsLazy("isSelfDeaf");
 
-var inCall = false;
+export var isInCall = false;
 const logger = new Logger("VesktopTrayIcon");
 
 async function changeIconColor(iconName: string) {
@@ -64,20 +64,20 @@ onceReady.then(() => {
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", () => {
-        if (inCall) setCurrentState();
+        if (isInCall) setCurrentState();
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", () => {
-        if (inCall) setCurrentState();
+        if (isInCall) setCurrentState();
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
-            inCall = true;
+            isInCall = true;
             setCurrentState();
         } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("icon");
-            inCall = false;
+            isInCall = false;
         }
     });
 });

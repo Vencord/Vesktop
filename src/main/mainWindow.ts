@@ -481,7 +481,7 @@ export async function createWindows() {
 }
 
 export async function setTrayIcon(iconURI: string) {
-    if (!tray) return;
+    if (!tray || tray.isDestroyed()) return;
     if (iconURI !== "" && iconURI !== "icon") {
         tray.setImage(nativeImage.createFromDataURL(iconURI));
         return;

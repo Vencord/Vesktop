@@ -16,7 +16,8 @@ import {
     nativeImage,
     RelaunchOptions,
     session,
-    shell
+    shell,
+    systemPreferences
 } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
@@ -180,3 +181,4 @@ watch(
 
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconName) => getTrayIconFile(iconName));
+handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => `#${systemPreferences.getAccentColor?.() || ""}`);

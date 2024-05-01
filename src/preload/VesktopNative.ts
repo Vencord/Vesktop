@@ -26,7 +26,8 @@ export const VesktopNative = {
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
         setTrayIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
-        getTrayIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName)
+        getTrayIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
+        getAccentColor: () => invoke<string>(IpcEvents.GET_SYSTEM_ACCENT_COLOR)
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
