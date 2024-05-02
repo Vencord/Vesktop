@@ -193,11 +193,15 @@ function StreamSettings({
     );
 
     return (
-        <div className="vcd-screen-picker-settings-grid">
+        <div className={isLinux ? "vcd-screen-picker-settings-grid" : ""}>
             <div>
                 <Forms.FormTitle>What you're streaming</Forms.FormTitle>
                 <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
-                    <img src={thumb} alt="" />
+                    <img
+                        src={thumb}
+                        alt=""
+                        className={isLinux ? "vcd-screen-picker-preview-img-linux" : "vcd-screen-picker-preview-img"}
+                    />
                     <Text variant="text-sm/normal">{source.name}</Text>
                 </Card>
 
@@ -283,23 +287,22 @@ function StreamSettings({
                                     </p>
                                 </div>
                             </div>
+                            {isWindows && (
+                                <Switch
+                                    value={settings.audio}
+                                    onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
+                                    hideBorder
+                                    className="vcd-screen-picker-audio"
+                                >
+                                    Stream With Audio
+                                </Switch>
+                            )}
                         </section>
                     </div>
                 </Card>
             </div>
 
             <div>
-                {isWindows && (
-                    <Switch
-                        value={settings.audio}
-                        onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
-                        hideBorder
-                        className="vcd-screen-picker-audio"
-                    >
-                        Stream With Audio
-                    </Switch>
-                )}
-
                 {isLinux && (
                     <AudioSourcePickerLinux
                         audioSource={settings.audioSource}
@@ -331,13 +334,9 @@ function AudioSourcePickerLinux({
     setOnlyDefaultSpeakers(b: boolean): void;
 }) {
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
-        fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
+        fallbackValue: { ok: true, targets: [] }
     });
-
     const allSources = sources.ok ? ["None", "Entire System", ...sources.targets] : null;
-    const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
-
-    const [ignorePulseWarning, setIgnorePulseWarning] = useState(false);
 
     return (
         <>
@@ -349,38 +348,32 @@ function AudioSourcePickerLinux({
                     <Forms.FormTitle>Audio Source</Forms.FormTitle>
                 )}
 
-                {!sources.ok && sources.isGlibCxxOutdated && (
-                    <Forms.FormText>
-                        Failed to retrieve Audio Sources because your C++ library is too old to run
-                        <a href="https://github.com/Vencord/venmic" target="_blank">
-                            venmic
-                        </a>
-                        . See{" "}
-                        <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
-                            this guide
-                        </a>{" "}
-                        for possible solutions.
-                    </Forms.FormText>
-                )}
+                {!sources.ok &&
+                    (sources.isGlibcxxToOld ? (
+                        <Forms.FormText>
+                            Failed to retrieve Audio Sources because your C++ library is too old to run venmic. If you
+                            would like to stream with Audio, see{" "}
+                            <a
+                                href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a"
+                                target="_blank"
+                            >
+                                this guide
+                            </a>
+                        </Forms.FormText>
+                    ) : (
+                        <Forms.FormText>
+                            Failed to retrieve Audio Sources. If you would like to stream with Audio, make sure you're
+                            using Pipewire, not Pulseaudio
+                        </Forms.FormText>
+                    ))}
 
-                {hasPipewirePulse || ignorePulseWarning ? (
-                    allSources && (
-                        <Select
-                            options={allSources.map(s => ({ label: s, value: s, default: s === "None" }))}
-                            isSelected={s => s === audioSource}
-                            select={setAudioSource}
-                            serialize={String}
-                        />
-                    )
-                ) : (
-                    <Text variant="text-sm/normal">
-                        Could not find pipewire-pulse. This usually means that you do not run pipewire as your main
-                        audio-server. <br />
-                        You can still continue, however, please beware that you can only share audio of apps that are
-                        running under pipewire.
-                        <br />
-                        <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing</a>
-                    </Text>
+                {allSources && (
+                    <Select
+                        options={allSources.map(s => ({ label: s, value: s, default: s === "None" }))}
+                        isSelected={s => s === audioSource}
+                        select={setAudioSource}
+                        serialize={String}
+                    />
                 )}
 
                 <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
