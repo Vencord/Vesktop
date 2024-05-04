@@ -121,6 +121,20 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     return dir;
 });
 
+handle(IpcEvents.SELECT_TRAY_ICON, async () => {
+    const res = await dialog.showOpenDialog(mainWin!, {
+        properties: ["openFile"],
+        filters: [{name: "Image", extensions: ["png", "jpg"]}]
+    });
+    if (!res.filePaths.length) return "cancelled";
+    
+    const dir = res.filePaths[0];
+    const image = nativeImage.createFromPath(dir);
+    if(image.isEmpty()) return "invalid";
+
+    return dir;
+});
+
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
 
 handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {

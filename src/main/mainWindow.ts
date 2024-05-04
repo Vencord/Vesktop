@@ -12,6 +12,7 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
+    nativeImage,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
@@ -20,7 +21,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
-
+import { existsSync } from "fs";
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
@@ -120,8 +121,15 @@ function initTray(win: BrowserWindow) {
             }
         }
     ]);
-
-    tray = new Tray(ICON_PATH);
+    if (Settings.store.trayIconPath) {
+        const trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
+        if (!trayImage.isEmpty()) tray = new Tray(trayImage.resize({width: 32, height: 32}));
+        else tray = new Tray(ICON_PATH);
+    }
+    else {
+        tray = new Tray(ICON_PATH);
+    }
+    
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -273,7 +281,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         options.x = x;
         options.y = y;
     }
-
+    
     if (!Settings.store.disableMinSize) {
         options.minWidth = MIN_WIDTH;
         options.minHeight = MIN_HEIGHT;
@@ -327,6 +335,10 @@ function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
         if (enable) initTray(win);
         else tray?.destroy();
+    });
+    addSettingsListener("trayIconPath", _ => {
+        tray?.destroy();
+        initTray(win);
     });
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
