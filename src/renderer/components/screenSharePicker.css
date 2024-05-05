@@ -17,7 +17,7 @@
     grid-template-columns: 1fr 1fr;
 }
 
-.vcd-screen-picker-settings-grid > div {
+.vcd-screen-picker-settings-grid>div {
     display: flex;
     flex-direction: column;
 }
@@ -67,8 +67,13 @@
     box-sizing: border-box;
 }
 
-.vcd-screen-picker-preview img {
+.vcd-screen-picker-preview-img-linux {
     width: 100%;
+    margin-bottom: 0.5em;
+}
+
+.vcd-screen-picker-preview-img {
+    width: 90%;
     margin-bottom: 0.5em;
 }
 
