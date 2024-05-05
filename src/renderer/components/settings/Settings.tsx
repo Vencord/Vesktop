@@ -127,8 +127,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Tray Icon Image": [TrayIconImagePicker],
-    "Vencord Location": [VencordLocationPicker],
+    "Tray Icon Image": [TrayIconImagePicker]
 };
 
 function SettingsSections() {

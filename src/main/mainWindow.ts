@@ -103,6 +103,21 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            label: "Change Tray Icon",
+            async click() {
+                await setTrayIcon();
+                /*
+                switch (choice) {
+                    case "invalid":
+                        return;
+                    case "cancelled":
+                        return;
+                }
+                Settings.store.trayIconPath = choice;
+                */
+            }
+        },
+        {
             type: "separator"
         },
         {
@@ -120,12 +135,7 @@ function initTray(win: BrowserWindow) {
             }
         }
     ]);
-    tray = new Tray(ICON_PATH);
-    if (Settings.store.trayIconPath) {
-        const trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
-        if (!trayImage.isEmpty()) tray.setImage(trayImage.resize({width: 32, height: 32}));
-    }
-    
+    tray = new Tray(getTrayIcon());
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -277,7 +287,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         options.x = x;
         options.y = y;
     }
-    
+
     if (!Settings.store.disableMinSize) {
         options.minWidth = MIN_WIDTH;
         options.minHeight = MIN_HEIGHT;
@@ -485,4 +495,42 @@ export async function createWindows() {
     });
 
     initArRPC();
+}
+
+export function getTrayIcon(): string {
+    if (Settings.store.trayIconPath) {
+        const trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
+        if (!trayImage.isEmpty()) return Settings.store.trayIconPath;
+    }
+
+    return ICON_PATH;
+}
+
+async function setTrayIcon(): Promise<undefined> {
+    const userSelection = await dialog.showMessageBox(mainWin!, {
+        type: "question",
+        title: "Change/Reset tray icon",
+        message: "Would you like to change or reset the Vesktop tray icon?",
+        buttons: ["Change", "Reset"],
+        defaultId: 0,
+        cancelId: 2,
+        icon: getTrayIcon()
+    });
+    if (userSelection.response == 2) return;
+    if (userSelection.response == 1) {
+        Settings.store.trayIconPath = void 0;
+        return;
+    }
+    const res = await dialog.showOpenDialog(mainWin!, {
+        properties: ["openFile"],
+        filters: [{ name: "Image", extensions: ["png", "jpg"] }],
+        defaultPath: getTrayIcon()
+    });
+    if (!res.filePaths.length) return;
+
+    const dir = res.filePaths[0];
+    const image = nativeImage.createFromPath(dir);
+    if (image.isEmpty()) return;
+
+    Settings.store.trayIconPath = dir;
 }
