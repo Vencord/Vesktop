@@ -126,7 +126,8 @@ function initTray(win: BrowserWindow) {
             }
         }
     ]);
-    tray = new Tray(getTrayIcon());
+    const trayImage = nativeImage.createFromPath(getTrayIcon()).resize({ width: 32, height: 32 });
+    tray = new Tray(trayImage);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -493,7 +494,6 @@ export function getTrayIcon(): string {
         const trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
         if (!trayImage.isEmpty()) return Settings.store.trayIconPath;
     }
-
     return ICON_PATH;
 }
 
