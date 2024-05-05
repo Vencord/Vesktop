@@ -11,8 +11,8 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
-    nativeTheme,
     nativeImage,
+    nativeTheme,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
@@ -21,6 +21,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
+
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
@@ -507,8 +508,8 @@ async function setTrayIcon(): Promise<undefined> {
         cancelId: 2,
         icon: getTrayIcon()
     });
-    if (userSelection.response == 2) return;
-    if (userSelection.response == 1) {
+    if (userSelection.response === 2) return;
+    if (userSelection.response === 1) {
         Settings.store.trayIconPath = void 0;
         return;
     }
