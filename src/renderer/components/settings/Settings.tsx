@@ -15,7 +15,6 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { VencordLocationPicker } from "./VencordLocationPicker";
-import { TrayIconImagePicker } from "./TrayIconImagePicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
 interface BooleanSetting {
@@ -127,7 +126,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Tray Icon Image": [TrayIconImagePicker]
+    "Vencord Location": [VencordLocationPicker]
 };
 
 function SettingsSections() {
