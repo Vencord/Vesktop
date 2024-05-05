@@ -120,13 +120,10 @@ function initTray(win: BrowserWindow) {
             }
         }
     ]);
+    tray = new Tray(ICON_PATH);
     if (Settings.store.trayIconPath) {
         const trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
-        if (!trayImage.isEmpty()) tray = new Tray(trayImage.resize({width: 32, height: 32}));
-        else tray = new Tray(ICON_PATH);
-    }
-    else {
-        tray = new Tray(ICON_PATH);
+        if (!trayImage.isEmpty()) tray.setImage(trayImage.resize({width: 32, height: 32}));
     }
     
     tray.setToolTip("Vesktop");
