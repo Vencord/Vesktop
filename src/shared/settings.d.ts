@@ -24,7 +24,7 @@ export interface Settings {
     /** @deprecated use customTitleBar */
     discordWindowsTitleBar?: boolean;
     customTitleBar?: boolean;
-    trayIconPath?: string
+    trayIconPath?: string;
 
     checkUpdates?: boolean;
 
