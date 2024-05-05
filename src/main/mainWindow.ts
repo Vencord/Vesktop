@@ -106,15 +106,6 @@ function initTray(win: BrowserWindow) {
             label: "Change Tray Icon",
             async click() {
                 await setTrayIcon();
-                /*
-                switch (choice) {
-                    case "invalid":
-                        return;
-                    case "cancelled":
-                        return;
-                }
-                Settings.store.trayIconPath = choice;
-                */
             }
         },
         {
