@@ -18,7 +18,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin } from "./mainWindow";
+import { mainWin, getTrayIcon } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -117,20 +117,6 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 
     const dir = res.filePaths[0];
     if (!isValidVencordInstall(dir)) return "invalid";
-
-    return dir;
-});
-
-handle(IpcEvents.SELECT_TRAY_ICON, async () => {
-    const res = await dialog.showOpenDialog(mainWin!, {
-        properties: ["openFile"],
-        filters: [{name: "Image", extensions: ["png", "jpg"]}]
-    });
-    if (!res.filePaths.length) return "cancelled";
-    
-    const dir = res.filePaths[0];
-    const image = nativeImage.createFromPath(dir);
-    if(image.isEmpty()) return "invalid";
 
     return dir;
 });
