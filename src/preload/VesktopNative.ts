@@ -33,7 +33,8 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
+        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
+        selectImagePath: () => invoke<LiteralUnion<"cancelled", string>>(IpcEvents.SELECT_IMAGE_PATH)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),

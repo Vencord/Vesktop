@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { BrowserWindow } from "electron";
+import { BrowserWindow, webContents } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";
@@ -12,6 +12,8 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 import { Settings } from "./settings";
 
 export function createSplashWindow(startMinimized = false) {
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath } = Settings.store;
+
     const splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
@@ -19,8 +21,6 @@ export function createSplashWindow(startMinimized = false) {
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
-
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
 
     if (splashTheming) {
         if (splashColor) {
@@ -35,5 +35,17 @@ export function createSplashWindow(startMinimized = false) {
         }
     }
 
+    if (splashAnimationPath) {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "splash-animation://img";
+        `);
+    }
+    else {
+        splash.webContents.insertCSS(`img {image-rendering: pixelated}`)
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "../shiggy.gif";
+        `);
+    }
+    
     return splash;
 }

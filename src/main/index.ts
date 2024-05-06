@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow, nativeTheme } from "electron";
+import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
 import { checkUpdates } from "updater/main";
 
 import { DATA_DIR } from "./constants";
@@ -25,7 +25,7 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
     const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
@@ -74,6 +74,10 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        //register file handler so we can load the custom splash animation from the user's filesystem
+        protocol.handle("splash-animation", () => {
+            return net.fetch("file:///"+splashAnimationPath);
+        });
 
         bootstrap();
 
