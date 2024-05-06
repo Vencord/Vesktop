@@ -26,10 +26,10 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-If you don't know the difference, pick amd64
+If you don't know the difference, pick the Intel build.
 
-- [amd64 / x86_64](https://vencord.dev/download/vesktop/amd64/dmg)
-- [arm64 / aarch64](https://vencord.dev/download/vesktop/arm64/dmg)
+- [Intel build](https://vencord.dev/download/vesktop/amd64/dmg)
+- [Apple Silicon](https://vencord.dev/download/vesktop/arm64/dmg)
 
 ### Linux
 
