@@ -43,16 +43,12 @@ handleSync(
 );
 
 handleSync(IpcEvents.GET_TRAY_ICON, () => {
-    try {
-        if (!Settings.store.trayIconPath) return nativeImage.createFromPath(ICON_PATH).toDataURL();
+    if (!Settings.store.trayIconPath) return nativeImage.createFromPath(ICON_PATH).toDataURL();
 
-        const img = nativeImage.createFromPath(Settings.store.trayIconPath).resize({ width: 64, height: 64 });
-        if (img.isEmpty()) return nativeImage.createFromPath(ICON_PATH).toDataURL();
+    const img = nativeImage.createFromPath(Settings.store.trayIconPath).resize({ width: 64, height: 64 });
+    if (img.isEmpty()) return nativeImage.createFromPath(ICON_PATH).toDataURL();
 
-        return img.toDataURL();
-    } catch (error) {
-        return "no";
-    }
+    return img.toDataURL();
 });
 
 handleSync(IpcEvents.AUTOSTART_ENABLED, () => autoStart.isEnabled());

@@ -58,7 +58,7 @@
 #colMiddle {
     height: 48px;
     float: center;
-    display: inline;
+    display: inline-block;
     position: relative;
     left: 45%;
 }
