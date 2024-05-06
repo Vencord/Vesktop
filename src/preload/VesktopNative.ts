@@ -57,6 +57,9 @@ export const VesktopNative = {
         minimize: () => invoke<void>(IpcEvents.MINIMIZE),
         maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
     },
+    tray: {
+        getTrayIcon: () => sendSync<string>(IpcEvents.GET_TRAY_ICON)
+    },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
     },

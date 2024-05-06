@@ -12,6 +12,7 @@ import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
+import { ICON_PATH } from "shared/paths";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
@@ -40,6 +41,19 @@ handleSync(
     IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY,
     () => process.platform === "win32" && Number(release().split(".").pop()) >= 22621
 );
+
+handleSync(IpcEvents.GET_TRAY_ICON, () => {
+    try {
+        if (!Settings.store.trayIconPath) return nativeImage.createFromPath(ICON_PATH).toDataURL();
+
+        const img = nativeImage.createFromPath(Settings.store.trayIconPath).resize({ width: 64, height: 64 });
+        if (img.isEmpty()) return nativeImage.createFromPath(ICON_PATH).toDataURL();
+
+        return img.toDataURL();
+    } catch (error) {
+        return "no";
+    }
+});
 
 handleSync(IpcEvents.AUTOSTART_ENABLED, () => autoStart.isEnabled());
 handle(IpcEvents.ENABLE_AUTOSTART, autoStart.enable);
@@ -124,13 +138,13 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
 handle(IpcEvents.SELECT_TRAY_ICON, async () => {
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openFile"],
-        filters: [{name: "Image", extensions: ["png", "jpg"]}]
+        filters: [{ name: "Image", extensions: ["png", "jpg"] }]
     });
     if (!res.filePaths.length) return "cancelled";
-    
+
     const dir = res.filePaths[0];
     const image = nativeImage.createFromPath(dir);
-    if(image.isEmpty()) return "invalid";
+    if (image.isEmpty()) return "invalid";
 
     return dir;
 });
