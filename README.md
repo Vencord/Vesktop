@@ -28,8 +28,8 @@ If you don't know the difference, pick the Installer.
 
 If you don't know the difference, pick the Intel build.
 
-- [Intel build](https://vencord.dev/download/vesktop/amd64/dmg)
-- [Apple Silicon](https://vencord.dev/download/vesktop/arm64/dmg)
+- [Intel build (amd64)](https://vencord.dev/download/vesktop/amd64/dmg)
+- [Apple Silicon (arm64)](https://vencord.dev/download/vesktop/arm64/dmg)
 
 ### Linux
 
