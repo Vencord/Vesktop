@@ -131,6 +131,26 @@
                 "com.apple.security.device.camera": true
             }
         },
+        "dmg": {
+            "background": "build/background.tiff",
+            "icon": "build/icon.icns",
+            "iconSize": 105,
+            "window": {
+              "width": 512,
+              "height": 340
+            },
+      
+            "contents": [{
+                "x": 140,
+                "y": 160
+            },
+            {
+                "x": 372,
+                "y": 160,
+                "type": "link",
+                "path": "/Applications"
+            }]
+        },
         "nsis": {
             "include": "build/installer.nsh",
             "oneClick": false
