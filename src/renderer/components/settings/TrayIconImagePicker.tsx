@@ -6,7 +6,7 @@
 
 import { Forms, Switch, Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "renderer/settings";
-import { STATIC_DIR } from "shared/paths";
+
 import { SettingsComponent } from "./Settings";
 
 export const TrayIconImagePicker: SettingsComponent = ({ settings }) => {
