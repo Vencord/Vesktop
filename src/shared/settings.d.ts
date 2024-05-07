@@ -29,6 +29,7 @@ export interface Settings {
 
     splashTheming?: boolean;
     splashColor?: string;
+    splashAnimationPath?: string;
     splashBackground?: string;
 }
 
