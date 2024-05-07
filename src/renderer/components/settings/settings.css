@@ -13,20 +13,40 @@
     margin-bottom: 0.5rem;
 }
 
-.tray-icon-wrap {
+#vcd-tray-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+
+}
+.vcd-tray-setting-switch {
+    flex-grow: 1;
+    align-self: flex-start;
+    margin-right: 20rem;
+}
+.vcd-tray-setting-reset {
+    align-self: right;
     position: relative;
-    top: 0;
-    right: 0;
+    margin-left: auto;
+    margin-right: 1em;
+    bottom: 24px;
 }
 
-.tray-icon-image {
+.vcd-tray-icon-wrap {
+    position: relative;
+    align-self: right;
+    bottom: 24px;
+}
+
+.vcd-tray-icon-image {
     border-radius: 50%;
     position: relative;
     top: 0;
     right: 0;
 }
 
-.edit-button {
+.vcd-edit-button {
     visibility: visible;
     display: block;
     opacity: 0;
@@ -35,38 +55,13 @@
     left: 4px;
 }
 
-.tray-icon-wrap:hover .tray-icon-image {
+.vcd-tray-icon-wrap:hover .vcd-tray-icon-image {
     transition: 0.3s ease;
     background-color: rgb(0, 0, 0) no-repeat;
     opacity: 0.25;
 }
-.tray-icon-wrap:hover .edit-button {
+.vcd-tray-icon-wrap:hover .vcd-edit-button {
     transition: 0.3s ease;
     visibility: visible;
     opacity: 1;
-}
-
-#tray-setting {
-    height: 48px;
-    position: relative;
-}
-#colLeft {
-    height: 48px;
-    display: inline-block;
-    width: 40%;
-}
-#colMiddle {
-    height: 48px;
-    float: center;
-    display: inline-block;
-    position: relative;
-    left: 45%;
-}
-#colRight {
-    height: 48px;
-    display: inline;
-    float: right;
-    position: absolute;
-    top: -12px;
-    right: 0;
 }
