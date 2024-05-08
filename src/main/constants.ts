@@ -8,12 +8,12 @@ import { app } from "electron";
 import { existsSync, readdirSync, renameSync, rmdirSync } from "fs";
 import { join, resolve } from "path";
 
-const vesktopDir = resolve("..", "..", "..", "..", __dirname);
+const vesktopDir = resolve(__dirname, "..", "..", "..", "..");
 export const PORTABLE = process.platform === "win32" && !readdirSync(vesktopDir).includes("Uninstall Vesktop.exe");
 
 const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR = PORTABLE
-    ? resolve(vesktopDir + "Data")
+    ? join(vesktopDir, "Data")
     : process.env.VENCORD_USER_DATA_DIR || join(app.getPath("userData"));
 
 // TODO: remove eventually

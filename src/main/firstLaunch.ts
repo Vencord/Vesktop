@@ -6,13 +6,13 @@
 
 import { app } from "electron";
 import { BrowserWindow } from "electron/main";
-import { copyFileSync, mkdirSync, readdirSync } from "fs";
+import { copyFileSync, mkdirSync, readdirSync, existsSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { autoStart } from "./autoStart";
-import { DATA_DIR } from "./constants";
+import { DATA_DIR, PORTABLE } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -36,6 +36,8 @@ export function createFirstLaunchTour() {
     });
 
     makeLinksOpenExternally(win);
+
+    if (PORTABLE && !existsSync(DATA_DIR)) mkdirSync(DATA_DIR);
 
     win.loadFile(join(VIEW_DIR, "first-launch.html"));
     win.webContents.addListener("console-message", (_e, _l, msg) => {

@@ -28,11 +28,10 @@ handle(IpcEvents.UPDATER_DOWNLOAD, () => {
     const url = (() => {
         switch (process.platform) {
             case "win32":
+                console.log(assets);
                 return assets.find(a => {
-                    if (!a.name.endsWith(".exe")) return false;
-
-                    const isSetup = a.name.includes("Setup");
-                    return PORTABLE ? !isSetup : isSetup;
+                    if (PORTABLE && a.name.endsWith("win.zip")) return true;
+                    if (!PORTABLE && a.name.endsWith(".exe")) return true;
                 })!.browser_download_url;
             case "darwin":
                 return assets.find(a =>
