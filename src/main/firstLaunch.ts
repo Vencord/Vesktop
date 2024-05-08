@@ -6,7 +6,7 @@
 
 import { app } from "electron";
 import { BrowserWindow } from "electron/main";
-import { copyFileSync, mkdirSync, readdirSync, existsSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";
