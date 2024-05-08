@@ -5,6 +5,7 @@
  */
 
 import { app, BrowserWindow, shell } from "electron";
+import { PORTABLE } from "main/constants";
 import { Settings, State } from "main/settings";
 import { handle } from "main/utils/ipcWrappers";
 import { makeLinksOpenExternally } from "main/utils/makeLinksOpenExternally";
@@ -23,8 +24,6 @@ let updateData: UpdateData;
 
 handle(IpcEvents.UPDATER_GET_DATA, () => updateData);
 handle(IpcEvents.UPDATER_DOWNLOAD, () => {
-    const portable = !!process.env.PORTABLE_EXECUTABLE_FILE;
-
     const { assets } = updateData.release;
     const url = (() => {
         switch (process.platform) {
@@ -33,7 +32,7 @@ handle(IpcEvents.UPDATER_DOWNLOAD, () => {
                     if (!a.name.endsWith(".exe")) return false;
 
                     const isSetup = a.name.includes("Setup");
-                    return portable ? !isSetup : isSetup;
+                    return PORTABLE ? !isSetup : isSetup;
                 })!.browser_download_url;
             case "darwin":
                 return assets.find(a =>
