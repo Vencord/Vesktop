@@ -19,7 +19,7 @@ export function createSplashWindow(startMinimized = false) {
         icon: ICON_PATH,
         show: !startMinimized
     });
-    
+
     splash.loadFile(join(VIEW_DIR, "splash.html"));
 
     if (splashTheming) {
@@ -34,7 +34,7 @@ export function createSplashWindow(startMinimized = false) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
     }
-    
+
     if (splashAnimationPath) {
         splash.webContents.executeJavaScript(`
             document.getElementById("animation").src = "splash-animation://img";
@@ -46,6 +46,6 @@ export function createSplashWindow(startMinimized = false) {
             document.getElementById("animation").src = "../shiggy.gif";
         `);
     }
-
+    
     return splash;
 }

@@ -26,10 +26,10 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-If you don't know the difference, pick amd64
+If you don't know the difference, pick the Intel build.
 
-- [amd64 / x86_64](https://vencord.dev/download/vesktop/amd64/dmg)
-- [arm64 / aarch64](https://vencord.dev/download/vesktop/arm64/dmg)
+- [Intel build (amd64)](https://vencord.dev/download/vesktop/amd64/dmg)
+- [Apple Silicon (arm64)](https://vencord.dev/download/vesktop/arm64/dmg)
 
 ### Linux
 
@@ -54,6 +54,7 @@ Below you can find unofficial packages created by the community. They are not of
 
 - Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
 - NixOS: https://nixos.wiki/wiki/Discord#Vesktop
+- Windows - Scoop: https://scoop.sh/#/apps?q=Vesktop
 
 ## Building from Source
 

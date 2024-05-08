@@ -48,14 +48,14 @@ export const DEFAULT_HEIGHT = 720;
 
 export const DISCORD_HOSTNAMES = ["discord.com", "canary.discord.com", "ptb.discord.com"];
 
-const UserAgents = {
-    darwin: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    linux: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+const BrowserUserAgents = {
+    darwin: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    linux: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     windows:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
 };
 
-export const UserAgent = UserAgents[process.platform] || UserAgents.windows;
+export const BrowserUserAgent = BrowserUserAgents[process.platform] || BrowserUserAgents.windows;
 
 export const enum MessageBoxChoice {
     Default,

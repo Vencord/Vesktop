@@ -27,22 +27,34 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 function init() {
     const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
 
-    if (hardwareAcceleration === false) app.disableHardwareAcceleration();
+    const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
+    const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
+
+    if (hardwareAcceleration === false) {
+        app.disableHardwareAcceleration();
+    } else {
+        enabledFeatures.push("VaapiVideoDecodeLinuxGL", "VaapiVideoEncoder", "VaapiVideoDecoder");
+    }
+
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
-    app.commandLine.appendSwitch(
-        "disable-features",
-        "WinRetrieveSuggestionsOnlyOnDemand,HardwareMediaKeyHandling,MediaSessionService,WidgetLayering"
+    disabledFeatures.push(
+        "WinRetrieveSuggestionsOnlyOnDemand",
+        "HardwareMediaKeyHandling",
+        "MediaSessionService",
+        "WidgetLayering"
     );
+
+    app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
+    app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
 
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
@@ -62,7 +74,6 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
-
         //register file handler so we can load the custom splash animation from the user's filesystem
         protocol.handle("splash-animation", () => {
             return net.fetch("file:///"+splashAnimationPath);
