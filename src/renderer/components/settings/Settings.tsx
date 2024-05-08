@@ -16,6 +16,7 @@ import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
+import { CustomSplashAnimation } from "./CustomSplashAnimation";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
@@ -126,8 +127,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Vencord Location": [VencordLocationPicker],
-    "Custom Splash Animation":[]
+    "Custom Splash Animation":[CustomSplashAnimation],
+    "Vencord Location": [VencordLocationPicker]
 };
 
 function SettingsSections() {
