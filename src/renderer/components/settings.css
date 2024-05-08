@@ -1,6 +1,0 @@
-.vcd-location-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5em;
-    margin-top: 0.5em;
-}

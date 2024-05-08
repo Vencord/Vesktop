@@ -1,0 +1,18 @@
+name: Blank Issue
+description: Reserved for developers. Use the bug report or feature request templates instead.
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              # READ THIS BEFORE OPENING AN ISSUE
+
+              This form is only meant for Vesktop developers. If you don't know what you're doing,
+              please use the bug report or feature request templates instead.
+
+    - type: textarea
+      id: content
+      attributes:
+          label: Content
+      validations:
+          required: true
