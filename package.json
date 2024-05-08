@@ -55,7 +55,7 @@
         "typescript": "^5.4.2",
         "xml-formatter": "^3.6.2"
     },
-    "packageManager": "pnpm@8.11.0",
+    "packageManager": "pnpm@9.1.0",
     "engines": {
         "node": ">=18",
         "pnpm": ">=8"
@@ -130,6 +130,26 @@
                 "com.apple.security.device.audio-input": true,
                 "com.apple.security.device.camera": true
             }
+        },
+        "dmg": {
+            "background": "build/background.tiff",
+            "icon": "build/icon.icns",
+            "iconSize": 105,
+            "window": {
+              "width": 512,
+              "height": 340
+            },
+      
+            "contents": [{
+                "x": 140,
+                "y": 160
+            },
+            {
+                "x": 372,
+                "y": 160,
+                "type": "link",
+                "path": "/Applications"
+            }]
         },
         "nsis": {
             "include": "build/installer.nsh",

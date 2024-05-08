@@ -179,11 +179,15 @@ function StreamSettings({
     );
 
     return (
-        <div className="vcd-screen-picker-settings-grid">
+        <div className={isLinux ? "vcd-screen-picker-settings-grid" : ""}>
             <div>
                 <Forms.FormTitle>What you're streaming</Forms.FormTitle>
                 <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
-                    <img src={thumb} alt="" />
+                    <img
+                        src={thumb}
+                        alt=""
+                        className={isLinux ? "vcd-screen-picker-preview-img-linux" : "vcd-screen-picker-preview-img"}
+                    />
                     <Text variant="text-sm/normal">{source.name}</Text>
                 </Card>
 
@@ -269,23 +273,22 @@ function StreamSettings({
                                     </p>
                                 </div>
                             </div>
+                            {isWindows && (
+                                <Switch
+                                    value={settings.audio}
+                                    onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
+                                    hideBorder
+                                    className="vcd-screen-picker-audio"
+                                >
+                                    Stream With Audio
+                                </Switch>
+                            )}
                         </section>
                     </div>
                 </Card>
             </div>
 
             <div>
-                {isWindows && (
-                    <Switch
-                        value={settings.audio}
-                        onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
-                        hideBorder
-                        className="vcd-screen-picker-audio"
-                    >
-                        Stream With Audio
-                    </Switch>
-                )}
-
                 {isLinux && (
                     <AudioSourcePickerLinux
                         audioSource={settings.audioSource}
