@@ -126,7 +126,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Vencord Location": [VencordLocationPicker]
+    "Vencord Location": [VencordLocationPicker],
+    "Custom Splash Animation":[]
 };
 
 function SettingsSections() {

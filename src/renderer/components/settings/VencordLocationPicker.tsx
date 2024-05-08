@@ -11,7 +11,7 @@ import { SettingsComponent } from "./Settings";
 export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
     return (
         <>
-
+        /* */
         <Forms.FormTitle>Custom Splash Animation</Forms.FormTitle>
             <Forms.FormText>
                 The animation on the splash window is loaded from{" "}
@@ -48,7 +48,7 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                     Reset
                 </Button>
             </div>
-
+            /* */
 
             <Forms.FormText>
                 Vencord files are loaded from{" "}
