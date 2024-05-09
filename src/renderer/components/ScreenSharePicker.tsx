@@ -63,20 +63,6 @@ addPatch({
                 match: /this.localWant=/,
                 replace: "$self.patchStreamQuality(this);$&"
             }
-        },
-        {
-            find: "x-google-max-bitrate",
-            replacement: [
-                {
-                    // eslint-disable-next-line no-useless-escape
-                    match: /"x-google-max-bitrate=".concat\(\i\)/,
-                    replace: '"x-google-max-bitrate=".concat("80_000")'
-                },
-                {
-                    match: /;level-asymmetry-allowed=1/,
-                    replace: ";b=AS:800000;level-asymmetry-allowed=1"
-                }
-            ]
         }
     ],
     patchStreamQuality(opts: any) {
