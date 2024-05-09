@@ -29,8 +29,7 @@ handle(IpcEvents.UPDATER_DOWNLOAD, () => {
         switch (process.platform) {
             case "win32":
                 return assets.find(a => {
-                    if (PORTABLE && a.name.endsWith("win.zip")) return true;
-                    if (!PORTABLE && a.name.endsWith(".exe")) return true;
+                    return PORTABLE ? a.name.endsWith("win.zip") : a.name.endsWith(".exe");
                 })!.browser_download_url;
             case "darwin":
                 return assets.find(a =>
