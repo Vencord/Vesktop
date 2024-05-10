@@ -5,16 +5,21 @@
  */
 
 import { app } from "electron";
-import { existsSync, readdirSync, renameSync, rmdirSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, renameSync, rmdirSync } from "fs";
 import { dirname, join } from "path";
 
 const vesktopDir = dirname(process.execPath);
-export const PORTABLE = process.platform === "win32" && !readdirSync(vesktopDir).includes("Uninstall Vesktop.exe");
+
+export const PORTABLE =
+    process.platform === "win32" &&
+    !readdirSync(vesktopDir).includes("Uninstall Vesktop.exe") &&
+    !process.execPath.endsWith("electron");
 
 const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR = PORTABLE
     ? join(vesktopDir, "Data")
     : process.env.VENCORD_USER_DATA_DIR || join(app.getPath("userData"));
+mkdirSync(DATA_DIR, { recursive: true });
 
 // TODO: remove eventually
 if (existsSync(LEGACY_DATA_DIR)) {

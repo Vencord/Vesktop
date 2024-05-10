@@ -37,8 +37,6 @@ export function createFirstLaunchTour() {
 
     makeLinksOpenExternally(win);
 
-    if (PORTABLE && !existsSync(DATA_DIR)) mkdirSync(DATA_DIR);
-
     win.loadFile(join(VIEW_DIR, "first-launch.html"));
     win.webContents.addListener("console-message", (_e, _l, msg) => {
         if (msg === "cancel") return app.exit();
