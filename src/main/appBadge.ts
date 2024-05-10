@@ -6,26 +6,45 @@
 
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
-import { BADGE_DIR } from "shared/paths";
+import { BADGE_DIR, TRAY_ICON_DIR, TRAY_ICON_PATH } from "shared/paths";
+import { tray, mainWin } from "./mainWindow";
+import { Settings } from "./settings";
 
-const imgCache = new Map<number, NativeImage>();
-function loadBadge(index: number) {
-    const cached = imgCache.get(index);
+const imgCache = new Map<string, NativeImage>();
+
+function loadImg(path: string) {
+    const cached = imgCache.get(path);
     if (cached) return cached;
 
-    const img = nativeImage.createFromPath(join(BADGE_DIR, `${index}.ico`));
-    imgCache.set(index, img);
+    const img = nativeImage.createFromPath(path);
+    imgCache.set(path, img);
 
     return img;
+}
+
+function loadBadge(index: number) {
+    return loadImg(join(BADGE_DIR, `${index}.ico`));
+}
+
+function loadTrayIcon(index: number) {
+    return loadImg(index === 0 ? TRAY_ICON_PATH : join(TRAY_ICON_DIR, `icon_${index}.png`));
 }
 
 let lastIndex: null | number = -1;
 
 export function setBadgeCount(count: number) {
+    const [index, description] = getBadgeIndexAndDescription(count);
+
+    if (Settings.store.trayBadge) {
+        tray?.setImage(loadTrayIcon(index ?? 0));
+    }
+
+    if (!Settings.store.appBadge) return;
+
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            app.setBadgeCount(count); // Only works if libunity is installed
             break;
         case "darwin":
             if (count === 0) {
@@ -35,13 +54,10 @@ export function setBadgeCount(count: number) {
             app.dock.setBadge(count === -1 ? "•" : count.toString());
             break;
         case "win32":
-            const [index, description] = getBadgeIndexAndDescription(count);
             if (lastIndex === index) break;
 
             lastIndex = index;
 
-            // circular import shenanigans
-            const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
