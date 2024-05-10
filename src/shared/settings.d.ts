@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { Rectangle } from "electron";
+import type { Display, Rectangle } from "electron";
 
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
@@ -36,6 +36,7 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
+    display?: Display;
 
     skippedUpdate?: string;
     firstLaunch?: boolean;
