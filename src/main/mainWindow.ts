@@ -12,6 +12,7 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
+    screen,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
@@ -73,6 +74,10 @@ const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpe
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
 function initTray(win: BrowserWindow) {
+    const onTrayClick = () => {
+        if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
+        else win.show();
+    };
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
@@ -120,7 +125,7 @@ function initTray(win: BrowserWindow) {
     tray = new Tray(TRAY_ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
-    tray.on("click", () => win.show());
+    tray.on("click", onTrayClick);
 }
 
 async function clearData(win: BrowserWindow) {
@@ -265,7 +270,9 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    if (x != null && y != null) {
+    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayid);
+
+    if (x != null && y != null && storedDisplay) {
         options.x = x;
         options.y = y;
     }
@@ -313,6 +320,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
+        State.store.displayid = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);

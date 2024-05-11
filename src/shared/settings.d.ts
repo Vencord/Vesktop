@@ -21,7 +21,7 @@ export interface Settings {
     arRPC?: boolean;
     appBadge?: boolean;
     disableMinSize?: boolean;
-
+    clickTrayToShowHide?: boolean;
     /** @deprecated use customTitleBar */
     discordWindowsTitleBar?: boolean;
     customTitleBar?: boolean;
@@ -37,6 +37,7 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
+    displayid: int;
 
     skippedUpdate?: string;
     firstLaunch?: boolean;
