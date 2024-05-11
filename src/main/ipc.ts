@@ -139,7 +139,6 @@ const registered_keybinds = {};
 
 handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string, options: any) => {
     registered_keybinds[id] = shortcut;
-    console.log(registered_keybinds);
 });
 handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
     delete registered_keybinds[id];

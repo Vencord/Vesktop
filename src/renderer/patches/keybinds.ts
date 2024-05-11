@@ -22,8 +22,14 @@ addPatch({
                 },
                 {
                     // eslint-disable-next-line no-useless-escape
-                    match: /\(0,\i.isDesktop\)\(\)/g,
+                    match: /\(0,\i\.isDesktop\)\(\)/g,
                     replace: "true"
+                },
+                {
+                    // THIS PATCH IS TEMPORARY
+                    // eslint-disable-next-line no-useless-escape
+                    match: /\.keybindGroup,\i.card\),children:\[/g,
+                    replace: "$&`ID: ${this.props.keybind.id}`,"
                 }
             ]
         },
@@ -37,7 +43,7 @@ addPatch({
                 },
                 {
                     // eslint-disable-next-line no-useless-escape
-                    match: /inputEventUnregister\((parseInt\(\i,10\))\);else\{/,
+                    match: /inputEventUnregister\((parseInt\(\i,10\))\);else if\(\i\[\i\]\)\{/,
                     replace: "$&$self.unregisterKeybind($1);return;"
                 }
             ]

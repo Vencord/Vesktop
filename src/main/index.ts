@@ -73,7 +73,13 @@ function init() {
         const keybindIndex = cmdLine.indexOf("--keybind");
 
         if (keybindIndex !== -1) {
-            mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](false)`);
+            if (cmdLine[keybindIndex + 2] === "keyup" || cmdLine[keybindIndex + 2] === "keydown") {
+                mainWin.webContents.executeJavaScript(
+                    `Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](${cmdLine[keybindIndex + 2] === "keydown" ? "true" : "false"})`
+                );
+            } else {
+                mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](false)`);
+            }
         } else if (data.IS_DEV) app.quit();
         else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
