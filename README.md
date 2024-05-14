@@ -53,7 +53,7 @@ If you don't know the difference, pick amd64.
 Below you can find unofficial packages created by the community. They are not officially supported by us, so before reporting issues, please first confirm the issue also happens on official builds. When in doubt, consult with their packager first. The flatpak and AppImage should work on any distro that [supports them](https://flatpak.org/setup/), so I recommend you just use those instead!
 
 - Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
-- NixOS: https://nixos.wiki/wiki/Discord#Vesktop
+- NixOS: https://wiki.nixos.org/wiki/Discord#Vesktop
 - Windows - Scoop: https://scoop.sh/#/apps?q=Vesktop
 
 ## Building from Source
