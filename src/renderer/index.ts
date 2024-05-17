@@ -57,3 +57,11 @@ VesktopNative.arrpc.onActivity(data => {
 
     arRPC.handleEvent(new MessageEvent("message", { data }));
 });
+
+VesktopNative.voice.onToggleSelfMute(() => {
+    findByPropsLazy("toggleSelfMute").toggleSelfMute();
+});
+
+VesktopNative.voice.onToggleSelfDeaf(() => {
+    findByPropsLazy("toggleSelfDeaf").toggleSelfDeaf();
+});
