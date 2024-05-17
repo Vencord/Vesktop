@@ -32,7 +32,7 @@
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^20.11.26",
-        "@types/react": "^18.2.65",
+        "@types/react": "^18.2.0",
         "@typescript-eslint/eslint-plugin": "^7.2.0",
         "@typescript-eslint/parser": "^7.2.0",
         "@vencord/types": "^0.1.2",
@@ -136,20 +136,21 @@
             "icon": "build/icon.icns",
             "iconSize": 105,
             "window": {
-              "width": 512,
-              "height": 340
+                "width": 512,
+                "height": 340
             },
-      
-            "contents": [{
-                "x": 140,
-                "y": 160
-            },
-            {
-                "x": 372,
-                "y": 160,
-                "type": "link",
-                "path": "/Applications"
-            }]
+            "contents": [
+                {
+                    "x": 140,
+                    "y": 160
+                },
+                {
+                    "x": 372,
+                    "y": 160,
+                    "type": "link",
+                    "path": "/Applications"
+                }
+            ]
         },
         "nsis": {
             "include": "build/installer.nsh",
