@@ -35,7 +35,7 @@
         "@types/react": "^18.2.0",
         "@typescript-eslint/eslint-plugin": "^7.2.0",
         "@typescript-eslint/parser": "^7.2.0",
-        "@vencord/types": "^0.1.2",
+        "@vencord/types": "^1.8.4",
         "dotenv": "^16.4.5",
         "electron": "^29.1.1",
         "electron-builder": "^24.13.3",
