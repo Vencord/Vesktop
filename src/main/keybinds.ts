@@ -9,6 +9,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { mainWin } from "./mainWindow";
 
 export function initKeybinds() {
+    process.title = "Vesktop";
     process.on("SIGPIPE", async () => {
         mainWin.webContents.send(IpcEvents.TOGGLE_SELF_MUTE);
     });
