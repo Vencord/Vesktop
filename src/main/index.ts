@@ -40,6 +40,10 @@ function init() {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
 
+    // disable renderer backgrounding to prevent the app from unloading when in the background
+    // https://github.com/electron/electron/issues/2822
+    app.commandLine.appendSwitch("disable-renderer-backgrounding");
+
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
