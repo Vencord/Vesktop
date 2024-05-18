@@ -93,6 +93,8 @@ handle(IpcEvents.MAXIMIZE, e => {
     }
 });
 
+handleSync(IpcEvents.IS_MAXIMIZED, () => mainWin.isMaximized());
+
 handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
     const ses = session.defaultSession;
 
