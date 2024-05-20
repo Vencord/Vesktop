@@ -388,8 +388,7 @@ function createMainWindow() {
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
-            spellcheck: true,
-            backgroundThrottling: false
+            spellcheck: true
         },
         icon: ICON_PATH,
         frame: !noFrame,
