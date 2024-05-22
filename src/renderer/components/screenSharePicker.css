@@ -11,6 +11,21 @@
     gap: 1em;
 }
 
+.vcd-screen-picker-settings-grid {
+    gap: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.vcd-screen-picker-settings-grid>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.vcd-screen-picker-card {
+    flex-grow: 1;
+}
+
 .vcd-screen-picker-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -52,8 +67,13 @@
     box-sizing: border-box;
 }
 
-.vcd-screen-picker-preview img {
+.vcd-screen-picker-preview-img-linux {
     width: 100%;
+    margin-bottom: 0.5em;
+}
+
+.vcd-screen-picker-preview-img {
+    width: 90%;
     margin-bottom: 0.5em;
 }
 
@@ -121,4 +141,11 @@
 
 .vcd-screen-picker-audio {
     margin-bottom: 0;
+}
+
+.vcd-screen-picker-hint-description {
+    color: var(--header-secondary);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
 }

@@ -1,0 +1,72 @@
+name: 🛠️ Feature Request
+description: Create a feature request for Vesktop
+labels: [bug]
+title: "[Bug] <title>"
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              **Thanks 🩷 for taking the time to fill out this request! Before proceeding, please read the following**
+
+              Make sure a similar request doesn't already exist by [searching the existing issues](https://github.com/Vencord/Vesktop/issues?q=is%3Aissue) for keywords!
+
+              This form is only meant for **Vesktop feature requests**.
+              For plugin requests or Vencord feature requests, go [here](https://github.com/Vencord/plugin-requests/issues/new?template=request.yml) instead!
+
+    - type: input
+      id: discord
+      attributes:
+          label: Discord Account
+          description: Who on Discord is making this request? Not required but encouraged for easier follow-up
+          placeholder: username#0000
+      validations:
+          required: false
+
+    - type: textarea
+      id: motivation
+      attributes:
+          label: Motivation
+          description: If your feature request related to a problem? Please describe
+          placeholder: I'm always frustrated when ..., I think it would be better if ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: solution
+      attributes:
+          label: Solution
+          description: Describe the solution you'd like
+          placeholder: A clear and concise description of what you want to happen.
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Alternatives
+          description: Describe alternatives you've considered
+          placeholder: A clear and concise description of any alternative solutions or features you've considered.
+      validations:
+          required: true
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional context
+          description: Add any other context here. Screenshots or mockups could help greatly
+      validations:
+          required: false
+
+    - type: checkboxes
+      id: agreement-check
+      attributes:
+          label: Request Agreement
+          description: This form is only for Vesktop feature requests. If the following don't apply, re-read the introduction text
+          options:
+              - label: I have searched the existing issues and found no similar issue
+                required: true
+              - label: This is not a plugin request
+                required: true
+              - label: This is not a Vencord feature request
+                required: true

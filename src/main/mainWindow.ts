@@ -13,6 +13,7 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
+    screen,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
@@ -270,7 +271,9 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    if (x != null && y != null) {
+    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayid);
+
+    if (x != null && y != null && storedDisplay) {
         options.x = x;
         options.y = y;
     }
@@ -318,6 +321,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
+        State.store.displayid = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);
