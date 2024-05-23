@@ -35,11 +35,6 @@ function loadSettings<T extends object = any>(file: string, name: string) {
 }
 
 export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
-if (Object.hasOwn(Settings.plain, "discordWindowsTitleBar")) {
-    Settings.plain.customTitleBar = Settings.plain.discordWindowsTitleBar;
-    delete Settings.plain.discordWindowsTitleBar;
-    Settings.markAsChanged();
-}
 
 export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings");
 

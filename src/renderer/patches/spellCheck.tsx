@@ -6,7 +6,8 @@
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
 import { findStoreLazy } from "@vencord/types/webpack";
-import { FluxDispatcher, Menu, useStateFromStores } from "@vencord/types/webpack/common";
+import { FluxDispatcher, Menu, useMemo, useStateFromStores } from "@vencord/types/webpack/common";
+import { useSettings } from "renderer/settings";
 
 import { addPatch } from "./shared";
 
@@ -50,7 +51,16 @@ addContextMenuPatch("textarea-context", children => {
     const spellCheckEnabled = useStateFromStores([SpellCheckStore], () => SpellCheckStore.isEnabled());
     const hasCorrections = Boolean(word && corrections?.length);
 
-    children.push(
+    const availableLanguages = useMemo(VesktopNative.spellcheck.getAvailableLanguages, []);
+
+    const settings = useSettings();
+    const spellCheckLanguages = (settings.spellCheckLanguages ??= [...new Set(navigator.languages)]);
+
+    const pasteSectionIndex = children.findIndex(c => c?.props?.children?.some(c => c?.props?.id === "paste"));
+
+    children.splice(
+        pasteSectionIndex === -1 ? children.length : pasteSectionIndex,
+        0,
         <Menu.MenuGroup>
             {hasCorrections && (
                 <>
@@ -69,14 +79,39 @@ addContextMenuPatch("textarea-context", children => {
                     />
                 </>
             )}
-            <Menu.MenuCheckboxItem
-                id="vcd-spellcheck-enabled"
-                label="Enable Spellcheck"
-                checked={spellCheckEnabled}
-                action={() => {
-                    FluxDispatcher.dispatch({ type: "SPELLCHECK_TOGGLE" });
-                }}
-            />
+
+            <Menu.MenuItem id="vcd-spellcheck-settings" label="Spellcheck Settings">
+                <Menu.MenuCheckboxItem
+                    id="vcd-spellcheck-enabled"
+                    label="Enable Spellcheck"
+                    checked={spellCheckEnabled}
+                    action={() => {
+                        FluxDispatcher.dispatch({ type: "SPELLCHECK_TOGGLE" });
+                    }}
+                />
+
+                <Menu.MenuItem id="vcd-spellcheck-languages" label="Languages" disabled={!spellCheckEnabled}>
+                    {availableLanguages.map(lang => {
+                        const isEnabled = spellCheckLanguages.includes(lang);
+                        return (
+                            <Menu.MenuCheckboxItem
+                                id={"vcd-spellcheck-lang-" + lang}
+                                label={lang}
+                                checked={isEnabled}
+                                disabled={!isEnabled && spellCheckLanguages.length >= 5}
+                                action={() => {
+                                    const newSpellCheckLanguages = spellCheckLanguages.filter(l => l !== lang);
+                                    if (newSpellCheckLanguages.length === spellCheckLanguages.length) {
+                                        newSpellCheckLanguages.push(lang);
+                                    }
+
+                                    settings.spellCheckLanguages = newSpellCheckLanguages;
+                                }}
+                            />
+                        );
+                    })}
+                </Menu.MenuItem>
+            </Menu.MenuItem>
         </Menu.MenuGroup>
     );
 });
