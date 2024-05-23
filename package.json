@@ -27,15 +27,15 @@
         "arrpc": "github:OpenAsar/arrpc#6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^3.4.2"
+        "@vencord/venmic": "^3.5.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^20.11.26",
-        "@types/react": "^18.2.65",
+        "@types/react": "^18.2.0",
         "@typescript-eslint/eslint-plugin": "^7.2.0",
         "@typescript-eslint/parser": "^7.2.0",
-        "@vencord/types": "^0.1.2",
+        "@vencord/types": "^1.8.4",
         "dotenv": "^16.4.5",
         "electron": "^29.1.1",
         "electron-builder": "^24.13.3",
@@ -55,7 +55,7 @@
         "typescript": "^5.4.2",
         "xml-formatter": "^3.6.2"
     },
-    "packageManager": "pnpm@8.11.0",
+    "packageManager": "pnpm@9.1.0",
     "engines": {
         "node": ">=18",
         "pnpm": ">=8"
@@ -136,20 +136,21 @@
             "icon": "build/icon.icns",
             "iconSize": 105,
             "window": {
-              "width": 512,
-              "height": 340
+                "width": 512,
+                "height": 340
             },
-      
-            "contents": [{
-                "x": 140,
-                "y": 160
-            },
-            {
-                "x": 372,
-                "y": 160,
-                "type": "link",
-                "path": "/Applications"
-            }]
+            "contents": [
+                {
+                    "x": 140,
+                    "y": 160
+                },
+                {
+                    "x": 372,
+                    "y": 160,
+                    "type": "link",
+                    "path": "/Applications"
+                }
+            ]
         },
         "nsis": {
             "include": "build/installer.nsh",
