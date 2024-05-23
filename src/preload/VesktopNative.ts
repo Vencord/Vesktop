@@ -43,7 +43,7 @@ export const VesktopNative = {
         set: (settings: Settings, path?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, path)
     },
     spellcheck: {
-        setLanguages: (languages: readonly string[]) => invoke<void>(IpcEvents.SPELLCHECK_SET_LANGUAGES, languages),
+        getAvailableLanguages: () => sendSync<string[]>(IpcEvents.SPELLCHECK_GET_AVAILABLE_LANGUAGES),
         onSpellcheckResult(cb: SpellCheckerResultCallback) {
             spellCheckCallbacks.add(cb);
         },
