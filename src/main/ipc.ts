@@ -103,12 +103,8 @@ handle(IpcEvents.MAXIMIZE, e => {
     }
 });
 
-handle(IpcEvents.SPELLCHECK_SET_LANGUAGES, (_, languages: string[]) => {
-    const ses = session.defaultSession;
-
-    const available = ses.availableSpellCheckerLanguages;
-    const applicable = languages.filter(l => available.includes(l)).slice(0, 3);
-    if (applicable.length) ses.setSpellCheckerLanguages(applicable);
+handleSync(IpcEvents.SPELLCHECK_GET_AVAILABLE_LANGUAGES, e => {
+    e.returnValue = session.defaultSession.availableSpellCheckerLanguages;
 });
 
 handle(IpcEvents.SPELLCHECK_REPLACE_MISSPELLING, (e, word: string) => {

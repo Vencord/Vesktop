@@ -13,8 +13,8 @@ importers:
         version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
     optionalDependencies:
       '@vencord/venmic':
-        specifier: ^3.4.2
-        version: 3.4.2
+        specifier: ^3.5.0
+        version: 3.5.0
     devDependencies:
       '@fal-works/esbuild-plugin-global-externals':
         specifier: ^2.1.2
@@ -603,8 +603,8 @@ packages:
   '@vencord/types@1.8.4':
     resolution: {integrity: sha512-ogLqIOHVO+5zxKUVxAfGIAUZoEfIomrlg6f0cZ/2yd5vBAn1fA9Gi/NASoKfHZuJt8ZcYw329bgn0ah/VufqMg==}
 
-  '@vencord/venmic@3.4.2':
-    resolution: {integrity: sha512-nwGjarof1wVvecGksGONfb+PduhY4gSuHTm39LktiQayHS69+yv4lepq4k1lxZzjOgFTy5VXfmJqxt+BpqoUUQ==}
+  '@vencord/venmic@3.5.0':
+    resolution: {integrity: sha512-kPvrPcIeMkuqQriuiQAJ9rEBeqGR2nmFBuUtbZRGyiNRF9RDAfWSJYqhHVm6F7wbcqrSZio6FazZuBo0LvjJRw==}
     engines: {node: '>=14.15'}
     os: [linux]
 
@@ -678,6 +678,7 @@ packages:
   are-we-there-yet@3.0.1:
     resolution: {integrity: sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
+    deprecated: This package is no longer supported.
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1400,6 +1401,7 @@ packages:
   gauge@4.0.4:
     resolution: {integrity: sha512-f9m+BEN5jkg6a0fZjleidjN51VE1X+mPFQ2DJ0uv1V39oCLCbsGe6yjbBnp7eK7z/+GAon99a3nHuqbuuthyPg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
+    deprecated: This package is no longer supported.
 
   get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
@@ -1937,6 +1939,7 @@ packages:
   npmlog@6.0.2:
     resolution: {integrity: sha512-/vBvz5Jfr9dT/aFWd0FIRf+T/Q2WBsLENygUaFUqstqsycmZAP/t5BvFJTK0viFmSUxiUKTUplWy5vt+rvKIxg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
+    deprecated: This package is no longer supported.
 
   object-copy@0.1.0:
     resolution: {integrity: sha512-79LYn6VAb63zgtmAteVOWo9Vdj71ZVBy3Pbse+VqxDpEP83XuujMrGqHIwAXJ5I/aM0zU7dIyIAhifVTPrNItQ==}
@@ -3028,7 +3031,7 @@ snapshots:
       standalone-electron-types: 1.0.0
       type-fest: 3.13.1
 
-  '@vencord/venmic@3.4.2':
+  '@vencord/venmic@3.5.0':
     dependencies:
       cmake-js: 7.3.0
       node-addon-api: 8.0.0
