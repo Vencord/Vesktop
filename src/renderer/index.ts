@@ -12,7 +12,7 @@ import "./themedSplash";
 console.log("read if cute :3");
 
 export * as Components from "./components";
-import { findByPropsLazy } from "@vencord/types/webpack";
+import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher } from "@vencord/types/webpack/common";
 
 import SettingsUi from "./components/settings/Settings";
@@ -52,8 +52,10 @@ const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
     handleEvent(e: MessageEvent): void;
 };
 
-VesktopNative.arrpc.onActivity(data => {
+VesktopNative.arrpc.onActivity(async data => {
     if (!Settings.store.arRPC) return;
+
+    await onceReady;
 
     arRPC.handleEvent(new MessageEvent("message", { data }));
 });
