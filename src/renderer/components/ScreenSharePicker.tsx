@@ -35,10 +35,11 @@ interface StreamSettings {
     resolution: StreamResolution;
     fps: StreamFps;
     audio: boolean;
-    audioSource?: string;
+    audioSources?: string[];
     contentHint?: string;
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
+    selectByProcess?: boolean;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -118,11 +119,11 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     modalProps={props}
                     submit={async v => {
                         didSubmit = true;
-                        if (v.audioSource && v.audioSource !== "None") {
-                            if (v.audioSource === "Entire System") {
+                        if (v.audioSources && v.audioSources?.[0] !== "None") {
+                            if (v.audioSources?.[0] === "Entire System") {
                                 await VesktopNative.virtmic.startSystem(v.workaround);
                             } else {
-                                await VesktopNative.virtmic.start([v.audioSource], v.workaround);
+                                await VesktopNative.virtmic.start(v.audioSources, v.workaround);
                             }
                         }
                         resolve(v);
@@ -291,12 +292,14 @@ function StreamSettings({
             <div>
                 {isLinux && (
                     <AudioSourcePickerLinux
-                        audioSource={settings.audioSource}
+                        audioSources={settings.audioSources}
                         workaround={settings.workaround}
                         onlyDefaultSpeakers={settings.onlyDefaultSpeakers}
-                        setAudioSource={source => setSettings(s => ({ ...s, audioSource: source }))}
+                        selectByProcess={settings.selectByProcess}
+                        setAudioSources={source => setSettings(s => ({ ...s, audioSources: source }))}
                         setWorkaround={value => setSettings(s => ({ ...s, workaround: value }))}
                         setOnlyDefaultSpeakers={value => setSettings(s => ({ ...s, onlyDefaultSpeakers: value }))}
+                        setSelectByProcess={value => setSettings(s => ({ ...s, selectByProcess: value }))}
                     />
                 )}
             </div>
@@ -305,28 +308,60 @@ function StreamSettings({
 }
 
 function AudioSourcePickerLinux({
-    audioSource,
+    audioSources,
     workaround,
     onlyDefaultSpeakers,
-    setAudioSource,
+    selectByProcess,
+    setAudioSources,
     setWorkaround,
     setOnlyDefaultSpeakers
 }: {
-    audioSource?: string;
+    audioSources?: string[];
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
-    setAudioSource(s: string): void;
+    selectByProcess?: boolean;
+    setAudioSources(s: string[]): void;
     setWorkaround(b: boolean): void;
     setOnlyDefaultSpeakers(b: boolean): void;
+    setSelectByProcess(b: boolean): void;
 }) {
-    const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
+    const properties = selectByProcess ? ["application.process.id", "media.name"] : undefined;
+
+    const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(properties), {
         fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
     });
 
-    const allSources = sources.ok ? ["None", "Entire System", ...sources.targets] : null;
-    const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
+    const specialSources = ["None", "Entire System"];
+    const allSources = sources.ok ? [...specialSources, ...sources.targets] : null;
 
+    const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
     const [ignorePulseWarning, setIgnorePulseWarning] = useState(false);
+
+    const getName = (x: any) => {
+        if (specialSources.includes(x)) {
+            return x;
+        }
+
+        if (!selectByProcess) {
+            return x["application.name"];
+        }
+
+        let name = `${x["application.name"] ?? "Unknown"}`;
+
+        if (x["media.name"]) {
+            name += ` - ${x["media.name"]} `;
+        }
+
+        return `${name} - ${x["application.process.id"]}`;
+    };
+
+    const getValue = (x: any) => {
+        if (specialSources.includes(x)) {
+            return x;
+        }
+
+        return x["object.id"];
+    };
 
     return (
         <>
@@ -355,9 +390,22 @@ function AudioSourcePickerLinux({
                 {hasPipewirePulse || ignorePulseWarning ? (
                     allSources && (
                         <Select
-                            options={allSources.map(s => ({ label: s, value: s, default: s === "None" }))}
-                            isSelected={s => s === audioSource}
-                            select={setAudioSource}
+                            options={allSources.map(s => ({
+                                label: getName(s),
+                                value: getValue(s),
+                                default: s === "None"
+                            }))}
+                            isSelected={s => audioSources?.includes(s) || false}
+                            select={source => {
+                                const updated = [...(audioSources || []), source];
+
+                                if (updated?.some(x => specialSources.includes(x))) {
+                                    setAudioSources([source]);
+                                    return;
+                                }
+
+                                setAudioSources(updated);
+                            }}
                             serialize={String}
                         />
                     )
@@ -390,7 +438,7 @@ function AudioSourcePickerLinux({
                 <Switch
                     hideBorder
                     onChange={setOnlyDefaultSpeakers}
-                    disabled={audioSource !== "Entire System"}
+                    disabled={audioSources?.[0] !== "Entire System"}
                     value={onlyDefaultSpeakers ?? true}
                     note={
                         <>
@@ -400,6 +448,15 @@ function AudioSourcePickerLinux({
                     }
                 >
                     Only Default Speakers
+                </Switch>
+                <Switch
+                    hideBorder
+                    onChange={setOnlyDefaultSpeakers}
+                    disabled={audioSources?.[0] !== "Entire System"}
+                    value={onlyDefaultSpeakers ?? true}
+                    note={<>Allow to select applications more granularly.</>}
+                >
+                    Granular Selection
                 </Switch>
             </Card>
         </>

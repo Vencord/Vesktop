@@ -11,6 +11,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
 type LinkData = Parameters<PatchBayType["link"]>[0];
+type Node = Record<string, string>;
 
 let PatchBay: typeof PatchBayType | undefined;
 let patchBayInstance: PatchBayType | undefined;
@@ -66,17 +67,17 @@ function getRendererAudioServicePid() {
     );
 }
 
-ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
+ipcMain.handle(IpcEvents.VIRT_MIC_LIST, (_, props: string[]) => {
     const audioPid = getRendererAudioServicePid();
 
     const list = obtainVenmic()
-        ?.list()
-        .filter(s => s["application.process.id"] !== audioPid)
-        .map(s => s["application.name"]);
+        ?.list(props)
+        .filter(s => s["application.process.id"] !== audioPid);
 
-    const uniqueTargets = [...new Set(list)];
+    const sameProps = (x: Node, y: Node) => props.every(prop => x[prop] === y[prop]);
+    const unique = list?.filter((x, i, array) => array.findIndex(y => sameProps(x, y)) === i);
 
-    return list ? { ok: true, targets: uniqueTargets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
+    return list ? { ok: true, targets: unique, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[], workaround?: boolean) => {
