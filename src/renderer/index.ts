@@ -60,10 +60,12 @@ VesktopNative.arrpc.onActivity(async data => {
     arRPC.handleEvent(new MessageEvent("message", { data }));
 });
 
+const VoiceActions = findByPropsLazy("toggleSelfMute");
+
 VesktopNative.voice.onToggleSelfMute(() => {
-    findByPropsLazy("toggleSelfMute").toggleSelfMute();
+    VoiceActions.toggleSelfMute();
 });
 
 VesktopNative.voice.onToggleSelfDeaf(() => {
-    findByPropsLazy("toggleSelfDeaf").toggleSelfDeaf();
+    VoiceActions.toggleSelfDeaf();
 });

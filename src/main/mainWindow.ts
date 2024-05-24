@@ -468,6 +468,7 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
     const splash = createSplashWindow(startMinimized);
+    process.title = "Vesktop";
     // SteamOS letterboxes and scales it terribly, so just full screen it
     if (isDeckGameMode) splash.setFullScreen(true);
     await ensureVencordFiles();
