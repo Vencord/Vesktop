@@ -37,6 +37,7 @@ import {
     VENCORD_FILES_DIR
 } from "./constants";
 import { initKeybinds } from "./keybinds";
+import { isWayland } from "./screenShare";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -499,5 +500,5 @@ export async function createWindows() {
     });
 
     initArRPC();
-    initKeybinds();
+    if (isWayland) initKeybinds();
 }
