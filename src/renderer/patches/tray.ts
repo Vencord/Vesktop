@@ -8,8 +8,7 @@ import { Logger } from "@vencord/types/utils";
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
-const muteActions = findByPropsLazy("isSelfMute");
-const deafActions = findByPropsLazy("isSelfDeaf");
+const voiceActions = findByPropsLazy("isSelfMute");
 
 export var isInCall = false;
 const logger = new Logger("VesktopTrayIcon");
@@ -41,9 +40,9 @@ async function changeIconColor(iconName: string) {
 }
 
 export function setCurrentState() {
-    if (deafActions.isSelfDeaf()) {
+    if (voiceActions.isSelfDeaf()) {
         changeIconColor("deafened");
-    } else if (muteActions.isSelfMute()) {
+    } else if (voiceActions.isSelfMute()) {
         changeIconColor("muted");
     } else {
         changeIconColor("idle");
