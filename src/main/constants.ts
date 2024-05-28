@@ -16,9 +16,9 @@ export const PORTABLE =
     !existsSync(join(vesktopDir, "Uninstall Vesktop.exe"));
 
 const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
-export const DATA_DIR = PORTABLE
-    ? join(vesktopDir, "Data")
-    : process.env.VENCORD_USER_DATA_DIR || join(app.getPath("userData"));
+export const DATA_DIR =
+    process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
+
 mkdirSync(DATA_DIR, { recursive: true });
 
 // TODO: remove eventually
