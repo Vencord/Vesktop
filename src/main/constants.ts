@@ -12,8 +12,8 @@ const vesktopDir = dirname(process.execPath);
 
 export const PORTABLE =
     process.platform === "win32" &&
-    !readdirSync(vesktopDir).includes("Uninstall Vesktop.exe") &&
-    !process.execPath.endsWith("electron.exe");
+    !process.execPath.toLowerCase().endsWith("electron.exe") &&
+    !readdirSync(vesktopDir).includes("Uninstall Vesktop.exe");
 
 const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR = PORTABLE
