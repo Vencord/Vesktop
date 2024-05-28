@@ -403,7 +403,9 @@ function createMainWindow() {
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
-            spellcheck: true
+            spellcheck: true,
+            // disable renderer backgrounding to prevent the app from unloading when in the background
+            backgroundThrottling: false
         },
         icon: ICON_PATH,
         frame: !noFrame,
