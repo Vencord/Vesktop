@@ -49,6 +49,7 @@ interface StreamSettings {
     audioSources?: AudioSources;
     contentHint?: string;
     workaround?: boolean;
+    ignoreInputMedia?: boolean;
     onlyDefaultSpeakers?: boolean;
     granularSelect?: boolean;
 }
@@ -305,11 +306,13 @@ function StreamSettings({
                     <AudioSourcePickerLinux
                         audioSources={settings.audioSources}
                         workaround={settings.workaround}
+                        ignoreInputMedia={settings.ignoreInputMedia}
                         onlyDefaultSpeakers={settings.onlyDefaultSpeakers}
                         granularSelect={settings.granularSelect}
                         setAudioSources={sources => setSettings(s => ({ ...s, audioSources: sources }))}
                         setWorkaround={value => setSettings(s => ({ ...s, workaround: value }))}
                         setOnlyDefaultSpeakers={value => setSettings(s => ({ ...s, onlyDefaultSpeakers: value }))}
+                        setIgnoreInputMedia={value => setSettings(s => ({ ...s, ignoreInputMedia: value }))}
                         setGranularSelect={value => setSettings(s => ({ ...s, granularSelect: value }))}
                     />
                 )}
@@ -386,18 +389,22 @@ function AudioSourcePickerLinux({
     audioSources,
     workaround,
     onlyDefaultSpeakers,
+    ignoreInputMedia,
     granularSelect,
     setAudioSources,
     setWorkaround,
+    setIgnoreInputMedia,
     setOnlyDefaultSpeakers,
     setGranularSelect
 }: {
     audioSources?: AudioSources;
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
+    ignoreInputMedia?: boolean;
     granularSelect?: boolean;
     setAudioSources(s: AudioSources): void;
     setWorkaround(b: boolean): void;
+    setIgnoreInputMedia(b: boolean): void;
     setOnlyDefaultSpeakers(b: boolean): void;
     setGranularSelect(b: boolean): void;
 }) {
@@ -526,14 +533,17 @@ function AudioSourcePickerLinux({
                     onChange={setOnlyDefaultSpeakers}
                     disabled={audioSources !== "Entire System"}
                     value={onlyDefaultSpeakers ?? true}
-                    note={
-                        <>
-                            When sharing entire desktop audio, only share apps that play to the default speakers and
-                            ignore apps that play to other speakers or devices.
-                        </>
-                    }
+                    note={<>When sharing entire desktop audio, only share apps that play to the default speakers.</>}
                 >
                     Only Default Speakers
+                </Switch>
+                <Switch
+                    hideBorder
+                    onChange={setIgnoreInputMedia}
+                    value={ignoreInputMedia ?? true}
+                    note={<>Ignore Nodes that are intended to capture audio.</>}
+                >
+                    Ignore Input Media
                 </Switch>
                 <Switch
                     hideBorder
