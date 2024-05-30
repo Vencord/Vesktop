@@ -515,7 +515,7 @@ function AudioSourcePickerLinux({
                 <Switch
                     hideBorder
                     onChange={setOnlyDefaultSpeakers}
-                    disabled={audioSources?.[0] !== "Entire System"}
+                    disabled={audioSources !== "Entire System"}
                     value={onlyDefaultSpeakers ?? true}
                     note={
                         <>
