@@ -361,13 +361,22 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[
 
     const mediaName = node["media.name"];
 
-    if (!mediaName) {
+    if (mediaName) {
+        rtn.push({
+            name: `${first.name} [${mediaName}]`,
+            value: { ...firstValues, "media.name": mediaName }
+        });
+    }
+
+    const mediaClass = node["media.class"];
+
+    if (!mediaClass) {
         return rtn;
     }
 
     rtn.push({
-        name: `${first.name} [${mediaName}]`,
-        value: { ...firstValues, "media.name": mediaName }
+        name: `${first.name} [${mediaClass}]`,
+        value: { ...firstValues, "media.class": mediaClass }
     });
 
     return rtn;
