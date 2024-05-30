@@ -19,6 +19,7 @@ import {
     UserStore,
     useState
 } from "@vencord/types/webpack/common";
+import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
 import { isLinux, isWindows } from "renderer/utils";
@@ -31,15 +32,25 @@ const MediaEngineStore = findStoreLazy("MediaEngineStore");
 export type StreamResolution = (typeof StreamResolutions)[number];
 export type StreamFps = (typeof StreamFps)[number];
 
+type SpecialSource = "None" | "Entire System";
+
+type AudioSource = SpecialSource | Node;
+type AudioSources = SpecialSource | Node[];
+
+interface AudioItem {
+    name: string;
+    value: AudioSource;
+}
+
 interface StreamSettings {
     resolution: StreamResolution;
     fps: StreamFps;
     audio: boolean;
-    audioSources?: string[];
+    audioSources?: AudioSources;
     contentHint?: string;
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
-    selectByProcess?: boolean;
+    granularSelect?: boolean;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -119,8 +130,8 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     modalProps={props}
                     submit={async v => {
                         didSubmit = true;
-                        if (v.audioSources && v.audioSources?.[0] !== "None") {
-                            if (v.audioSources?.[0] === "Entire System") {
+                        if (v.audioSources && v.audioSources !== "None") {
+                            if (v.audioSources === "Entire System") {
                                 await VesktopNative.virtmic.startSystem(v.workaround);
                             } else {
                                 await VesktopNative.virtmic.start(v.audioSources, v.workaround);
@@ -295,11 +306,11 @@ function StreamSettings({
                         audioSources={settings.audioSources}
                         workaround={settings.workaround}
                         onlyDefaultSpeakers={settings.onlyDefaultSpeakers}
-                        selectByProcess={settings.selectByProcess}
-                        setAudioSources={source => setSettings(s => ({ ...s, audioSources: source }))}
+                        granularSelect={settings.granularSelect}
+                        setAudioSources={sources => setSettings(s => ({ ...s, audioSources: sources }))}
                         setWorkaround={value => setSettings(s => ({ ...s, workaround: value }))}
                         setOnlyDefaultSpeakers={value => setSettings(s => ({ ...s, onlyDefaultSpeakers: value }))}
-                        setSelectByProcess={value => setSettings(s => ({ ...s, selectByProcess: value }))}
+                        setGranularSelect={value => setSettings(s => ({ ...s, granularSelect: value }))}
                     />
                 )}
             </div>
@@ -307,61 +318,125 @@ function StreamSettings({
     );
 }
 
+function isSpecialSource(value?: AudioSource | AudioSources): value is SpecialSource {
+    return typeof value === "string";
+}
+
+function hasMatchingProps(value: Node, other: Node) {
+    return Object.keys(value).every(key => value[key] === other[key]);
+}
+
+function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[] {
+    if (isSpecialSource(node)) {
+        return [{ name: node, value: node }];
+    }
+
+    const rtn: AudioItem[] = [];
+
+    const name = node["application.name"];
+
+    if (name) {
+        rtn.push({ name: name, value: { "application.name": name } });
+    }
+
+    if (!granularSelect) {
+        return rtn;
+    }
+
+    const binary = node["application.process.binary"];
+
+    if (!name) {
+        rtn.push({ name: binary, value: { "application.process.binary": binary } });
+    }
+
+    const pid = node["application.process.id"];
+
+    const first = rtn[0];
+    const firstValues = first.value as Node;
+
+    rtn.push({
+        name: `${first.name} (${pid})`,
+        value: { ...firstValues, "application.process.id": pid }
+    });
+
+    const mediaName = node["media.name"];
+
+    if (!mediaName) {
+        return rtn;
+    }
+
+    rtn.push({
+        name: `${first.name} [${mediaName}]`,
+        value: { ...firstValues, "media.name": mediaName }
+    });
+
+    return rtn;
+}
+
 function AudioSourcePickerLinux({
     audioSources,
     workaround,
     onlyDefaultSpeakers,
-    selectByProcess,
+    granularSelect,
     setAudioSources,
     setWorkaround,
-    setOnlyDefaultSpeakers
+    setOnlyDefaultSpeakers,
+    setGranularSelect
 }: {
-    audioSources?: string[];
+    audioSources?: AudioSources;
     workaround?: boolean;
     onlyDefaultSpeakers?: boolean;
-    selectByProcess?: boolean;
-    setAudioSources(s: string[]): void;
+    granularSelect?: boolean;
+    setAudioSources(s: AudioSources): void;
     setWorkaround(b: boolean): void;
     setOnlyDefaultSpeakers(b: boolean): void;
-    setSelectByProcess(b: boolean): void;
+    setGranularSelect(b: boolean): void;
 }) {
-    const properties = selectByProcess ? ["application.process.id", "media.name"] : undefined;
+    const properties = granularSelect ? ["application.process.id"] : undefined;
 
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(properties), {
         fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
     });
 
-    const specialSources = ["None", "Entire System"];
+    const specialSources: SpecialSource[] = ["None", "Entire System"];
     const allSources = sources.ok ? [...specialSources, ...sources.targets] : null;
 
     const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
     const [ignorePulseWarning, setIgnorePulseWarning] = useState(false);
 
-    const getName = (x: any) => {
-        if (specialSources.includes(x)) {
-            return x;
+    const isSelected = (value: AudioSource) => {
+        if (!audioSources) {
+            return false;
         }
 
-        if (!selectByProcess) {
-            return x["application.name"];
+        if (isSpecialSource(audioSources) || isSpecialSource(value)) {
+            return audioSources === value;
         }
 
-        let name = `${x["application.name"] ?? "Unknown"}`;
-
-        if (x["media.name"]) {
-            name += ` - ${x["media.name"]} `;
-        }
-
-        return `${name} - ${x["application.process.id"]}`;
+        return audioSources.some(source => hasMatchingProps(source, value));
     };
 
-    const getValue = (x: any) => {
-        if (specialSources.includes(x)) {
-            return x;
+    const update = (value: SpecialSource | Node) => {
+        if (isSpecialSource(value)) {
+            setAudioSources(value);
+            return;
         }
 
-        return x["object.id"];
+        if (isSpecialSource(audioSources)) {
+            setAudioSources([value]);
+            return;
+        }
+
+        if (isSelected(value)) {
+            setAudioSources(audioSources?.filter(x => !hasMatchingProps(x, value)) ?? "None");
+            return;
+        }
+
+        setAudioSources([...(audioSources || []), value]);
     };
+
+    const uniqueName = (value: AudioItem, index: number, list: AudioItem[]) =>
+        list.findIndex(x => x.name === value.name) === index;
 
     return (
         <>
@@ -390,31 +465,33 @@ function AudioSourcePickerLinux({
                 {hasPipewirePulse || ignorePulseWarning ? (
                     allSources && (
                         <Select
-                            options={allSources.map(s => ({
-                                label: getName(s),
-                                value: getValue(s),
-                                default: s === "None"
-                            }))}
-                            isSelected={s => audioSources?.includes(s) || false}
-                            select={source => {
-                                const updated = [...(audioSources || []), source];
-
-                                if (updated?.some(x => specialSources.includes(x))) {
-                                    setAudioSources([source]);
-                                    return;
-                                }
-
-                                setAudioSources(updated);
-                            }}
+                            options={allSources
+                                .map(target => mapToAudioItem(target, granularSelect))
+                                .flat()
+                                .filter(uniqueName)
+                                .map(({ name, value }) => ({
+                                    label: name,
+                                    value: value,
+                                    default: name === "None"
+                                }))}
+                            isSelected={isSelected}
+                            select={update}
                             serialize={String}
                         />
                     )
                 ) : (
                     <Text variant="text-sm/normal">
-                        Could not find pipewire-pulse. This usually means that you do not run pipewire as your main
-                        audio-server. <br />
-                        You can still continue, however, please beware that you can only share audio of apps that are
-                        running under pipewire.
+                        Could not find pipewire-pulse. See{" "}
+                        <a
+                            href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install"
+                            target="_blank"
+                        >
+                            this guide
+                        </a>{" "}
+                        on how to switch to pipewire. <br />
+                        You can still continue, however, please{" "}
+                        <b>beware that you can only share audio of apps that are running under pipewire</b>.
+                        <br />
                         <br />
                         <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing</a>
                     </Text>
@@ -451,9 +528,11 @@ function AudioSourcePickerLinux({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={setOnlyDefaultSpeakers}
-                    disabled={audioSources?.[0] !== "Entire System"}
-                    value={onlyDefaultSpeakers ?? true}
+                    onChange={value => {
+                        setGranularSelect(value);
+                        setAudioSources("None");
+                    }}
+                    value={granularSelect ?? false}
                     note={<>Allow to select applications more granularly.</>}
                 >
                     Granular Selection

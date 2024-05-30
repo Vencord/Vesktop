@@ -67,32 +67,26 @@ function getRendererAudioServicePid() {
     );
 }
 
-ipcMain.handle(IpcEvents.VIRT_MIC_LIST, (_, props: string[]) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_LIST, (_, props?: string[]) => {
     const audioPid = getRendererAudioServicePid();
 
-    const list = obtainVenmic()
+    const targets = obtainVenmic()
         ?.list(props)
         .filter(s => s["application.process.id"] !== audioPid);
 
-    const sameProps = (x: Node, y: Node) => props.every(prop => x[prop] === y[prop]);
-    const unique = list?.filter((x, i, array) => array.findIndex(y => sameProps(x, y)) === i);
-
-    return list ? { ok: true, targets: unique, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
+    return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: string[], workaround?: boolean) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[], workaround?: boolean) => {
     const pid = getRendererAudioServicePid();
 
     const data: LinkData = {
-        include: targets.map(target => ({ key: "application.name", value: target })),
-        exclude: [{ key: "application.process.id", value: pid }]
+        include: targets,
+        exclude: [{ "application.process.id": pid }]
     };
 
     if (workaround) {
-        data.workaround = [
-            { key: "application.process.id", value: pid },
-            { key: "media.name", value: "RecordStream" }
-        ];
+        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
     return obtainVenmic()?.link(data);
@@ -102,15 +96,12 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, workaround?: boolean, onlyDe
     const pid = getRendererAudioServicePid();
 
     const data: LinkData = {
-        exclude: [{ key: "application.process.id", value: pid }],
+        exclude: [{ "application.process.id": pid }],
         only_default_speakers: onlyDefaultSpeakers
     };
 
     if (workaround) {
-        data.workaround = [
-            { key: "application.process.id", value: pid },
-            { key: "media.name", value: "RecordStream" }
-        ];
+        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
     return obtainVenmic()?.link(data);
