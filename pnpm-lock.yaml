@@ -13,8 +13,8 @@ importers:
         version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c
     optionalDependencies:
       '@vencord/venmic':
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.0.2
+        version: 4.0.2
     devDependencies:
       '@fal-works/esbuild-plugin-global-externals':
         specifier: ^2.1.2
@@ -603,8 +603,8 @@ packages:
   '@vencord/types@1.8.4':
     resolution: {integrity: sha512-ogLqIOHVO+5zxKUVxAfGIAUZoEfIomrlg6f0cZ/2yd5vBAn1fA9Gi/NASoKfHZuJt8ZcYw329bgn0ah/VufqMg==}
 
-  '@vencord/venmic@4.0.1':
-    resolution: {integrity: sha512-3NcX1IOwA3n/wyDG0AfAVqKMzTP7yD8p1oXxcJXAVlx9NQLFKXXjUmRIC13fpDUxEfmU9hCCuqnn9BkVr7DIWA==}
+  '@vencord/venmic@4.0.2':
+    resolution: {integrity: sha512-RCYev3p5mA6Y+8TkBJBPppCvgztWhKEGigEV4mh8WL4YQN9wQJfyv7VrdnDZMMeGfileXPDEcxzWlcForDowqQ==}
     engines: {node: '>=14.15'}
     os: [linux]
 
@@ -3034,7 +3034,7 @@ snapshots:
       standalone-electron-types: 1.0.0
       type-fest: 3.13.1
 
-  '@vencord/venmic@4.0.1':
+  '@vencord/venmic@4.0.2':
     dependencies:
       cmake-js: 7.3.0
       node-addon-api: 8.0.0
