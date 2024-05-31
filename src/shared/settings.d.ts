@@ -30,6 +30,13 @@ export interface Settings {
     splashBackground?: string;
 
     spellCheckLanguages?: string[];
+
+    audioWorkaround?: boolean;
+    audioGranularSelect?: boolean;
+
+    audioIgnoreVirtual?: boolean;
+    audioIgnoreInputMedia?: boolean;
+    audioOnlyDefaultSpeakers?: boolean;
 }
 
 export interface State {

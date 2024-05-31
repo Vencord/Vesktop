@@ -10,6 +10,8 @@ import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
+import { Settings } from "./settings";
+
 type LinkData = Parameters<PatchBayType["link"]>[0];
 type Node = Record<string, string>;
 
@@ -67,17 +69,17 @@ function getRendererAudioServicePid() {
     );
 }
 
-ipcMain.handle(IpcEvents.VIRT_MIC_LIST, (_, props?: string[]) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
 
     const targets = obtainVenmic()
-        ?.list(props)
+        ?.list(Settings.store.audioGranularSelect ? ["application.process.id"] : undefined)
         .filter(s => s["application.process.id"] !== audioPid);
 
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[], workaround?: boolean) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
     const pid = getRendererAudioServicePid();
 
     const data: LinkData = {
@@ -85,22 +87,42 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[], workaround?: boole
         exclude: [{ "application.process.id": pid }]
     };
 
-    if (workaround) {
+    const settings = Settings.store;
+
+    if (settings.audioIgnoreInputMedia ?? true) {
+        data.exclude?.push({ "media.class": "Stream/Input/Audio" });
+    }
+
+    if (settings.audioIgnoreVirtual ?? true) {
+        data.exclude?.push({ "node.virtual": "true" });
+    }
+
+    if (settings.audioWorkaround) {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
     return obtainVenmic()?.link(data);
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, workaround?: boolean, onlyDefaultSpeakers?: boolean) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () => {
     const pid = getRendererAudioServicePid();
+
+    const settings = Settings.store;
 
     const data: LinkData = {
         exclude: [{ "application.process.id": pid }],
-        only_default_speakers: onlyDefaultSpeakers
+        only_default_speakers: settings.audioOnlyDefaultSpeakers
     };
 
-    if (workaround) {
+    if (settings.audioIgnoreInputMedia ?? true) {
+        data.exclude?.push({ "media.class": "Stream/Input/Audio" });
+    }
+
+    if (settings.audioIgnoreVirtual ?? true) {
+        data.exclude?.push({ "node.virtual": "true" });
+    }
+
+    if (settings.audioWorkaround) {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
