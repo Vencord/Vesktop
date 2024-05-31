@@ -567,21 +567,31 @@ function AudioSourcePickerLinux({
 
             {hasPipewirePulse || ignorePulseWarning ? (
                 allSources && (
-                    <Select
-                        options={allSources
-                            .map(target => mapToAudioItem(target, granularSelect))
-                            .flat()
-                            .filter(uniqueName)
-                            .map(({ name, value }) => ({
-                                label: name,
-                                value: value,
-                                default: name === "None"
-                            }))}
-                        isSelected={isSelected}
-                        select={update}
-                        serialize={String}
-                        popoutPosition="top"
-                    />
+                    <>
+                        <Select
+                            options={allSources
+                                .map(target => mapToAudioItem(target, granularSelect))
+                                .flat()
+                                .filter(uniqueName)
+                                .map(({ name, value }) => ({
+                                    label: name,
+                                    value: value,
+                                    default: name === "None"
+                                }))}
+                            isSelected={isSelected}
+                            select={update}
+                            serialize={String}
+                            popoutPosition="top"
+                        />
+
+                        <Button
+                            color={Button.Colors.TRANSPARENT}
+                            onClick={openSettings}
+                            className="vcd-screen-picker-settings-button"
+                        >
+                            Open Audio Settings
+                        </Button>
+                    </>
                 )
             ) : (
                 <Text variant="text-sm/normal">
@@ -594,20 +604,10 @@ function AudioSourcePickerLinux({
                     </a>{" "}
                     on how to switch to pipewire. <br />
                     You can still continue, however, please{" "}
-                    <b>beware that you can only share audio of apps that are running under pipewire</b>.
-                    <br />
-                    <br />
-                    <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing</a>
+                    <b>beware that you can only share audio of apps that are running under pipewire</b>.{" "}
+                    <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing!</a>
                 </Text>
             )}
-
-            <Button
-                color={Button.Colors.TRANSPARENT}
-                onClick={openSettings}
-                className="vcd-screen-picker-settings-button"
-            >
-                Open Audio Settings
-            </Button>
         </div>
     );
 }
