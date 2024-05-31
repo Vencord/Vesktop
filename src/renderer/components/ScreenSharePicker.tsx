@@ -582,6 +582,7 @@ function AudioSourcePickerLinux({
                             select={update}
                             serialize={String}
                             popoutPosition="top"
+                            closeOnSelect={false}
                         />
 
                         <Button
