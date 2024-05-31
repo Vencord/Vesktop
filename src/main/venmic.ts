@@ -92,7 +92,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
         data.exclude?.push({ "media.class": "Stream/Input/Audio" });
     }
 
-    if (settings.audioIgnoreVirtual ?? true) {
+    if (settings.audioIgnoreVirtual) {
         data.exclude?.push({ "node.virtual": "true" });
     }
 
@@ -118,7 +118,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () => {
         data.exclude?.push({ "media.class": "Stream/Input/Audio" });
     }
 
-    if (settings.audioIgnoreVirtual ?? true) {
+    if (settings.audioIgnoreVirtual) {
         data.exclude?.push({ "node.virtual": "true" });
     }
 

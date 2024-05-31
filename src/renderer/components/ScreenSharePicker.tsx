@@ -237,7 +237,7 @@ function AudioSettingsModal({
                 <Switch
                     hideBorder
                     onChange={v => (Settings.audioIgnoreVirtual = v)}
-                    value={Settings.audioIgnoreVirtual ?? true}
+                    value={Settings.audioIgnoreVirtual ?? false}
                     note={
                         <>
                             Exclude virtual nodes, such as nodes belonging to loopbacks. This might be useful when using
