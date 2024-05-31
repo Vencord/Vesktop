@@ -188,6 +188,7 @@ function AudioSettingsModal({
             </Modals.ModalHeader>
             <Modals.ModalContent className="vcd-screen-picker-modal">
                 <Switch
+                    hideBorder
                     onChange={v => (Settings.audioWorkaround = v)}
                     value={Settings.audioWorkaround ?? false}
                     note={
@@ -201,9 +202,27 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
+                    onChange={v => (Settings.audioOnlySpeakers = v)}
+                    value={Settings.audioOnlySpeakers ?? true}
+                    note={
+                        <>
+                            When sharing entire desktop audio, only share apps that play to a speaker. You may want to
+                            disable this when using "mix bussing".
+                        </>
+                    }
+                >
+                    Only Speakers
+                </Switch>
+                <Switch
+                    hideBorder
                     onChange={v => (Settings.audioOnlyDefaultSpeakers = v)}
                     value={Settings.audioOnlyDefaultSpeakers ?? true}
-                    note={<>When sharing entire desktop audio, only share apps that play to the default speakers.</>}
+                    note={
+                        <>
+                            When sharing entire desktop audio, only share apps that play to the <b>default</b> speakers.
+                            You may want to disable this when using "mix bussing".
+                        </>
+                    }
                 >
                     Only Default Speakers
                 </Switch>
@@ -221,12 +240,20 @@ function AudioSettingsModal({
                     value={Settings.audioIgnoreVirtual ?? true}
                     note={
                         <>
-                            Exclude virtual nodes, such as nodes belonging to sinks, this might be useful when using
-                            "mix bussing"
+                            Exclude virtual nodes, such as nodes belonging to sinks. This might be useful when using
+                            "mix bussing".
                         </>
                     }
                 >
                     Ignore Virtual
+                </Switch>
+                <Switch
+                    hideBorder
+                    onChange={v => (Settings.audioIgnoreDevices = v)}
+                    value={Settings.audioIgnoreDevices ?? true}
+                    note={<>Exclude device nodes, such as nodes belonging to microphones or speakers.</>}
+                >
+                    Ignore Devices
                 </Switch>
                 <Switch
                     hideBorder

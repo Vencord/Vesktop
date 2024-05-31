@@ -81,13 +81,13 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
     const pid = getRendererAudioServicePid();
+    const settings = Settings.store;
 
     const data: LinkData = {
         include: targets,
-        exclude: [{ "application.process.id": pid }]
+        exclude: [{ "application.process.id": pid }],
+        ignore_devices: settings.audioIgnoreDevices
     };
-
-    const settings = Settings.store;
 
     if (settings.audioIgnoreInputMedia ?? true) {
         data.exclude?.push({ "media.class": "Stream/Input/Audio" });
@@ -106,11 +106,12 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () => {
     const pid = getRendererAudioServicePid();
-
     const settings = Settings.store;
 
     const data: LinkData = {
         exclude: [{ "application.process.id": pid }],
+        only_speakers: settings.audioOnlySpeakers,
+        ignore_devices: settings.audioIgnoreDevices,
         only_default_speakers: settings.audioOnlyDefaultSpeakers
     };
 

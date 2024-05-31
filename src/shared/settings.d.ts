@@ -35,7 +35,10 @@ export interface Settings {
     audioGranularSelect?: boolean;
 
     audioIgnoreVirtual?: boolean;
+    audioIgnoreDevices?: boolean;
     audioIgnoreInputMedia?: boolean;
+
+    audioOnlySpeakers?: boolean;
     audioOnlyDefaultSpeakers?: boolean;
 }
 
