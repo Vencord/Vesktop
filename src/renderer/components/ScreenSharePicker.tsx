@@ -240,7 +240,7 @@ function AudioSettingsModal({
                     value={Settings.audioIgnoreVirtual ?? true}
                     note={
                         <>
-                            Exclude virtual nodes, such as nodes belonging to sinks. This might be useful when using
+                            Exclude virtual nodes, such as nodes belonging to loopbacks. This might be useful when using
                             "mix bussing".
                         </>
                     }
