@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { PatchBay as PatchBayType } from "@vencord/venmic";
+import type { Node, PatchBay as PatchBayType } from "@vencord/venmic";
 import { app, ipcMain } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -13,7 +13,6 @@ import { STATIC_DIR } from "shared/paths";
 import { Settings } from "./settings";
 
 type LinkData = Parameters<PatchBayType["link"]>[0];
-type Node = Record<string, string>;
 
 let PatchBay: typeof PatchBayType | undefined;
 let patchBayInstance: PatchBayType | undefined;
