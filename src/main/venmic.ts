@@ -78,12 +78,12 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
     const pid = getRendererAudioServicePid();
     const settings = Settings.store;
 
     const data: LinkData = {
-        include: targets,
+        include: include,
         exclude: [{ "application.process.id": pid }],
         ignore_devices: settings.audioIgnoreDevices
     };
@@ -103,12 +103,12 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, targets: Node[]) => {
     return obtainVenmic()?.link(data);
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, () => {
+ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
     const pid = getRendererAudioServicePid();
     const settings = Settings.store;
 
     const data: LinkData = {
-        exclude: [{ "application.process.id": pid }],
+        exclude: [{ "application.process.id": pid }, ...exclude],
         only_speakers: settings.audioOnlySpeakers,
         ignore_devices: settings.audioIgnoreDevices,
         only_default_speakers: settings.audioOnlyDefaultSpeakers

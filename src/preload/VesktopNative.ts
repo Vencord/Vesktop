@@ -66,8 +66,8 @@ export const VesktopNative = {
             invoke<
                 { ok: false; isGlibCxxOutdated: boolean } | { ok: true; targets: Node[]; hasPipewirePulse: boolean }
             >(IpcEvents.VIRT_MIC_LIST),
-        start: (targets: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, targets),
-        startSystem: () => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM),
+        start: (include: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, include),
+        startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {

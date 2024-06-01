@@ -47,8 +47,9 @@ interface StreamSettings {
     resolution: StreamResolution;
     fps: StreamFps;
     audio: boolean;
-    audioSources?: AudioSources;
     contentHint?: string;
+    includeSources?: AudioSources;
+    excludeSources?: AudioSources;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -128,13 +129,17 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     modalProps={props}
                     submit={async v => {
                         didSubmit = true;
-                        if (v.audioSources && v.audioSources !== "None") {
-                            if (v.audioSources === "Entire System") {
-                                await VesktopNative.virtmic.startSystem();
+
+                        if (v.includeSources && v.includeSources !== "None") {
+                            if (v.includeSources === "Entire System") {
+                                await VesktopNative.virtmic.startSystem(
+                                    !v.excludeSources || isSpecialSource(v.excludeSources) ? [] : v.excludeSources
+                                );
                             } else {
-                                await VesktopNative.virtmic.start(v.audioSources);
+                                await VesktopNative.virtmic.start(v.includeSources);
                             }
                         }
+
                         resolve(v);
                     }}
                     close={() => {
@@ -302,7 +307,9 @@ function StreamSettings({
             <AudioSettingsModal
                 modalProps={props}
                 close={() => props.onClose()}
-                setAudioSources={sources => setSettings(s => ({ ...s, audioSources: sources }))}
+                setAudioSources={sources =>
+                    setSettings(s => ({ ...s, includeSources: sources, excludeSources: sources }))
+                }
             />
         ));
     };
@@ -414,9 +421,11 @@ function StreamSettings({
                 {isLinux && (
                     <AudioSourcePickerLinux
                         openSettings={openSettings}
-                        audioSources={settings.audioSources}
+                        includeSources={settings.includeSources}
+                        excludeSources={settings.excludeSources}
                         granularSelect={Settings.audioGranularSelect}
-                        setAudioSources={sources => setSettings(s => ({ ...s, audioSources: sources }))}
+                        setIncludeSources={sources => setSettings(s => ({ ...s, includeSources: sources }))}
+                        setExcludeSources={sources => setSettings(s => ({ ...s, excludeSources: sources }))}
                     />
                 )}
             </Card>
@@ -488,128 +497,152 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[
     return rtn;
 }
 
+function isItemSelected(sources?: AudioSources) {
+    return (value: AudioSource) => {
+        if (!sources) {
+            return false;
+        }
+
+        if (isSpecialSource(sources) || isSpecialSource(value)) {
+            return sources === value;
+        }
+
+        return sources.some(source => hasMatchingProps(source, value));
+    };
+}
+
+function updateItems(setSources: (s: AudioSources) => void, sources?: AudioSources) {
+    return (value: AudioSource) => {
+        if (isSpecialSource(value)) {
+            setSources(value);
+            return;
+        }
+
+        if (isSpecialSource(sources)) {
+            setSources([value]);
+            return;
+        }
+
+        if (isItemSelected(sources)(value)) {
+            setSources(sources?.filter(x => !hasMatchingProps(x, value)) ?? "None");
+            return;
+        }
+
+        setSources([...(sources || []), value]);
+    };
+}
+
 function AudioSourcePickerLinux({
-    audioSources,
+    includeSources,
+    excludeSources,
     granularSelect,
-    setAudioSources,
-    openSettings
+    openSettings,
+    setIncludeSources,
+    setExcludeSources
 }: {
-    audioSources?: AudioSources;
+    includeSources?: AudioSources;
+    excludeSources?: AudioSources;
     granularSelect?: boolean;
     openSettings: () => void;
-    setAudioSources: (s: AudioSources) => void;
+    setIncludeSources: (s: AudioSources) => void;
+    setExcludeSources: (s: AudioSources) => void;
 }) {
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
         fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
     });
 
-    const specialSources: SpecialSource[] = ["None", "Entire System"];
-    const allSources = sources.ok ? [...specialSources, ...sources.targets] : null;
-
     const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
     const [ignorePulseWarning, setIgnorePulseWarning] = useState(false);
 
-    const isSelected = (value: AudioSource) => {
-        if (!audioSources) {
-            return false;
-        }
+    if (!sources.ok && sources.isGlibCxxOutdated) {
+        return (
+            <Forms.FormText>
+                Failed to retrieve Audio Sources because your C++ library is too old to run
+                <a href="https://github.com/Vencord/venmic" target="_blank">
+                    venmic
+                </a>
+                . See{" "}
+                <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
+                    this guide
+                </a>{" "}
+                for possible solutions.
+            </Forms.FormText>
+        );
+    }
 
-        if (isSpecialSource(audioSources) || isSpecialSource(value)) {
-            return audioSources === value;
-        }
+    if (!hasPipewirePulse && !ignorePulseWarning) {
+        return (
+            <Text variant="text-sm/normal">
+                Could not find pipewire-pulse. See{" "}
+                <a href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install" target="_blank">
+                    this guide
+                </a>{" "}
+                on how to switch to pipewire. <br />
+                You can still continue, however, please{" "}
+                <b>beware that you can only share audio of apps that are running under pipewire</b>.{" "}
+                <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing!</a>
+            </Text>
+        );
+    }
 
-        return audioSources.some(source => hasMatchingProps(source, value));
-    };
-
-    const update = (value: SpecialSource | Node) => {
-        if (isSpecialSource(value)) {
-            setAudioSources(value);
-            return;
-        }
-
-        if (isSpecialSource(audioSources)) {
-            setAudioSources([value]);
-            return;
-        }
-
-        if (isSelected(value)) {
-            setAudioSources(audioSources?.filter(x => !hasMatchingProps(x, value)) ?? "None");
-            return;
-        }
-
-        setAudioSources([...(audioSources || []), value]);
-    };
+    const specialSources: SpecialSource[] = ["None", "Entire System"] as const;
 
     const uniqueName = (value: AudioItem, index: number, list: AudioItem[]) =>
         list.findIndex(x => x.name === value.name) === index;
 
+    const allSources = sources.ok
+        ? [...specialSources, ...sources.targets]
+              .map(target => mapToAudioItem(target, granularSelect))
+              .flat()
+              .filter(uniqueName)
+        : [];
+
     return (
-        <div>
-            {loading ? (
-                <Forms.FormTitle>Loading Audio Sources...</Forms.FormTitle>
-            ) : (
-                <Forms.FormTitle>Audio Source</Forms.FormTitle>
-            )}
-
-            {!sources.ok && sources.isGlibCxxOutdated && (
-                <Forms.FormText>
-                    Failed to retrieve Audio Sources because your C++ library is too old to run
-                    <a href="https://github.com/Vencord/venmic" target="_blank">
-                        venmic
-                    </a>
-                    . See{" "}
-                    <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
-                        this guide
-                    </a>{" "}
-                    for possible solutions.
-                </Forms.FormText>
-            )}
-
-            {hasPipewirePulse || ignorePulseWarning ? (
-                allSources && (
-                    <>
+        <>
+            <div className={includeSources === "Entire System" ? "vcd-screen-picker-quality" : undefined}>
+                <section>
+                    <Forms.FormTitle>{loading ? "Loading Sources..." : "Audio Sources"}</Forms.FormTitle>
+                    <Select
+                        options={allSources.map(({ name, value }) => ({
+                            label: name,
+                            value: value,
+                            default: name === "None"
+                        }))}
+                        isSelected={isItemSelected(includeSources)}
+                        select={updateItems(setIncludeSources, includeSources)}
+                        serialize={String}
+                        popoutPosition="top"
+                        closeOnSelect={false}
+                    />
+                </section>
+                {includeSources === "Entire System" && (
+                    <section>
+                        <Forms.FormTitle>Exclude Sources</Forms.FormTitle>
                         <Select
                             options={allSources
-                                .map(target => mapToAudioItem(target, granularSelect))
-                                .flat()
-                                .filter(uniqueName)
+                                .filter(x => x.name !== "Entire System")
                                 .map(({ name, value }) => ({
                                     label: name,
                                     value: value,
                                     default: name === "None"
                                 }))}
-                            isSelected={isSelected}
-                            select={update}
+                            isSelected={isItemSelected(excludeSources)}
+                            select={updateItems(setExcludeSources, excludeSources)}
                             serialize={String}
                             popoutPosition="top"
                             closeOnSelect={false}
                         />
-
-                        <Button
-                            color={Button.Colors.TRANSPARENT}
-                            onClick={openSettings}
-                            className="vcd-screen-picker-settings-button"
-                        >
-                            Open Audio Settings
-                        </Button>
-                    </>
-                )
-            ) : (
-                <Text variant="text-sm/normal">
-                    Could not find pipewire-pulse. See{" "}
-                    <a
-                        href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install"
-                        target="_blank"
-                    >
-                        this guide
-                    </a>{" "}
-                    on how to switch to pipewire. <br />
-                    You can still continue, however, please{" "}
-                    <b>beware that you can only share audio of apps that are running under pipewire</b>.{" "}
-                    <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing!</a>
-                </Text>
-            )}
-        </div>
+                    </section>
+                )}
+            </div>
+            <Button
+                color={Button.Colors.TRANSPARENT}
+                onClick={openSettings}
+                className="vcd-screen-picker-settings-button"
+            >
+                Open Audio Settings
+            </Button>
+        </>
     );
 }
 
