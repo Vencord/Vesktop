@@ -405,6 +405,7 @@ function createMainWindow() {
             devTools: true,
             preload: join(__dirname, "preload.js"),
             spellcheck: true,
+            // disable renderer backgrounding to prevent the app from unloading when in the background
             backgroundThrottling: false
         },
         icon: ICON_PATH,
@@ -430,6 +431,7 @@ function createMainWindow() {
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
+    if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
