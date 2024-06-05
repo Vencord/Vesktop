@@ -4,10 +4,13 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { findByPropsLazy } from "@vencord/types/webpack";
 import { Forms, Switch, Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
+
+const { PencilIcon } = findByPropsLazy("PencilIcon");
 
 export const TrayIconImagePicker: SettingsComponent = ({ settings }) => {
     return (
@@ -44,10 +47,8 @@ export const TrayIconImagePicker: SettingsComponent = ({ settings }) => {
                         width="48"
                         height="48"
                     ></img>
-                    <input
+                    <PencilIcon
                         className="vcd-edit-button"
-                        type="image"
-                        src="https://raw.githubusercontent.com/Vencord/Vesktop/main/static/pencil-edit-icon.svg"
                         width="40"
                         height="40"
                         onClick={async () => {
