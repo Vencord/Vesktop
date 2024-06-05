@@ -38,7 +38,7 @@
 }
 
 .vcd-screen-picker-selected img {
-    border: 2px solid var(--brand-experiment);
+    border: 2px solid var(--brand-500);
     border-radius: 3px;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .vcd-screen-picker-grid label:hover {
-    outline: 2px solid var(--brand-experiment);
+    outline: 2px solid var(--brand-500);
 }
 
 
@@ -101,8 +101,8 @@
 }
 
 .vcd-screen-picker-radio[data-checked="true"] {
-    background-color: var(--brand-experiment);
-    border-color: var(--brand-experiment);
+    background-color: var(--brand-500);
+    border-color: var(--brand-500);
 }
 
 .vcd-screen-picker-radio[data-checked="true"] h2 {

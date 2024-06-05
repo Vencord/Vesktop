@@ -443,6 +443,7 @@ function createMainWindow() {
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
+    if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
