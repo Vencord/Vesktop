@@ -194,8 +194,8 @@ function AudioSettingsModal({
             <Modals.ModalContent className="vcd-screen-picker-modal">
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioWorkaround = v)}
-                    value={Settings.audioWorkaround ?? false}
+                    onChange={v => (Settings.audio = { ...Settings.audio, workaround: v })}
+                    value={Settings.audio?.workaround ?? false}
                     note={
                         <>
                             Work around an issue that causes the microphone to be shared instead of the correct audio.
@@ -207,8 +207,8 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioOnlySpeakers = v)}
-                    value={Settings.audioOnlySpeakers ?? true}
+                    onChange={v => (Settings.audio = { ...Settings.audio, onlySpeakers: v })}
+                    value={Settings.audio?.onlySpeakers ?? true}
                     note={
                         <>
                             When sharing entire desktop audio, only share apps that play to a speaker. You may want to
@@ -220,8 +220,8 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioOnlyDefaultSpeakers = v)}
-                    value={Settings.audioOnlyDefaultSpeakers ?? true}
+                    onChange={v => (Settings.audio = { ...Settings.audio, onlyDefaultSpeakers: v })}
+                    value={Settings.audio?.onlyDefaultSpeakers ?? true}
                     note={
                         <>
                             When sharing entire desktop audio, only share apps that play to the <b>default</b> speakers.
@@ -233,16 +233,16 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioIgnoreInputMedia = v)}
-                    value={Settings.audioIgnoreInputMedia ?? true}
+                    onChange={v => (Settings.audio = { ...Settings.audio, ignoreInputMedia: v })}
+                    value={Settings.audio?.ignoreInputMedia ?? true}
                     note={<>Exclude nodes that are intended to capture audio.</>}
                 >
                     Ignore Inputs
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioIgnoreVirtual = v)}
-                    value={Settings.audioIgnoreVirtual ?? false}
+                    onChange={v => (Settings.audio = { ...Settings.audio, ignoreVirtual: v })}
+                    value={Settings.audio?.ignoreVirtual ?? false}
                     note={
                         <>
                             Exclude virtual nodes, such as nodes belonging to loopbacks. This might be useful when using
@@ -254,8 +254,8 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audioIgnoreDevices = v)}
-                    value={Settings.audioIgnoreDevices ?? true}
+                    onChange={v => (Settings.audio = { ...Settings.audio, ignoreDevices: v })}
+                    value={Settings.audio?.ignoreDevices ?? true}
                     note={<>Exclude device nodes, such as nodes belonging to microphones or speakers.</>}
                 >
                     Ignore Devices
@@ -263,10 +263,10 @@ function AudioSettingsModal({
                 <Switch
                     hideBorder
                     onChange={value => {
-                        Settings.audioGranularSelect = value;
+                        Settings.audio = { ...Settings.audio, granularSelect: value };
                         setAudioSources("None");
                     }}
-                    value={Settings.audioGranularSelect ?? false}
+                    value={Settings.audio?.granularSelect ?? false}
                     note={<>Allow to select applications more granularly.</>}
                 >
                     Granular Selection
@@ -423,7 +423,7 @@ function StreamSettings({
                         openSettings={openSettings}
                         includeSources={settings.includeSources}
                         excludeSources={settings.excludeSources}
-                        granularSelect={Settings.audioGranularSelect}
+                        granularSelect={Settings.audio?.granularSelect}
                         setIncludeSources={sources => setSettings(s => ({ ...s, includeSources: sources }))}
                         setExcludeSources={sources => setSettings(s => ({ ...s, excludeSources: sources }))}
                     />
@@ -664,7 +664,8 @@ function ModalComponent({
         resolution: "1080",
         fps: "60",
         contentHint: "motion",
-        audio: true
+        audio: true,
+        audioSources: "None"
     });
 
     return (

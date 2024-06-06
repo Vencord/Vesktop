@@ -71,8 +71,10 @@ function getRendererAudioServicePid() {
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
 
+    const { granularSelect } = Settings.store.audio ?? {};
+
     const targets = obtainVenmic()
-        ?.list(Settings.store.audioGranularSelect ? ["application.process.id"] : undefined)
+        ?.list(granularSelect ? ["application.process.id"] : undefined)
         .filter(s => s["application.process.id"] !== audioPid);
 
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
@@ -80,23 +82,23 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
     const pid = getRendererAudioServicePid();
-    const settings = Settings.store;
+    const { ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround } = Settings.store.audio ?? {};
 
     const data: LinkData = {
         include: include,
         exclude: [{ "application.process.id": pid }],
-        ignore_devices: settings.audioIgnoreDevices
+        ignore_devices: ignoreDevices
     };
 
-    if (settings.audioIgnoreInputMedia ?? true) {
-        data.exclude?.push({ "media.class": "Stream/Input/Audio" });
+    if (ignoreInputMedia ?? true) {
+        data.exclude!.push({ "media.class": "Stream/Input/Audio" });
     }
 
-    if (settings.audioIgnoreVirtual) {
-        data.exclude?.push({ "node.virtual": "true" });
+    if (ignoreVirtual) {
+        data.exclude!.push({ "node.virtual": "true" });
     }
 
-    if (settings.audioWorkaround) {
+    if (workaround) {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
@@ -105,24 +107,26 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
     const pid = getRendererAudioServicePid();
-    const settings = Settings.store;
+
+    const { workaround, ignoreDevices, ignoreInputMedia, ignoreVirtual, onlySpeakers, onlyDefaultSpeakers } =
+        Settings.store.audio ?? {};
 
     const data: LinkData = {
         exclude: [{ "application.process.id": pid }, ...exclude],
-        only_speakers: settings.audioOnlySpeakers,
-        ignore_devices: settings.audioIgnoreDevices,
-        only_default_speakers: settings.audioOnlyDefaultSpeakers
+        only_speakers: onlySpeakers,
+        ignore_devices: ignoreDevices,
+        only_default_speakers: onlyDefaultSpeakers
     };
 
-    if (settings.audioIgnoreInputMedia ?? true) {
-        data.exclude?.push({ "media.class": "Stream/Input/Audio" });
+    if (ignoreInputMedia ?? true) {
+        data.exclude.push({ "media.class": "Stream/Input/Audio" });
     }
 
-    if (settings.audioIgnoreVirtual) {
-        data.exclude?.push({ "node.virtual": "true" });
+    if (ignoreVirtual) {
+        data.exclude.push({ "node.virtual": "true" });
     }
 
-    if (settings.audioWorkaround) {
+    if (workaround) {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 

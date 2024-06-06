@@ -31,15 +31,17 @@ export interface Settings {
 
     spellCheckLanguages?: string[];
 
-    audioWorkaround?: boolean;
-    audioGranularSelect?: boolean;
+    audio?: {
+        workaround?: boolean;
+        granularSelect?: boolean;
 
-    audioIgnoreVirtual?: boolean;
-    audioIgnoreDevices?: boolean;
-    audioIgnoreInputMedia?: boolean;
+        ignoreVirtual?: boolean;
+        ignoreDevices?: boolean;
+        ignoreInputMedia?: boolean;
 
-    audioOnlySpeakers?: boolean;
-    audioOnlyDefaultSpeakers?: boolean;
+        onlySpeakers?: boolean;
+        onlyDefaultSpeakers?: boolean;
+    };
 }
 
 export interface State {
