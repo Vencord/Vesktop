@@ -665,7 +665,7 @@ function ModalComponent({
         fps: "60",
         contentHint: "motion",
         audio: true,
-        audioSources: "None"
+        includeSources: "None"
     });
 
     return (
