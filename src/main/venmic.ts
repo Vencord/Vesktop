@@ -4,15 +4,13 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { Node, PatchBay as PatchBayType } from "@vencord/venmic";
+import type { LinkData, Node, PatchBay as PatchBayType } from "@vencord/venmic";
 import { app, ipcMain } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
-
-type LinkData = Parameters<PatchBayType["link"]>[0];
 
 let PatchBay: typeof PatchBayType | undefined;
 let patchBayInstance: PatchBayType | undefined;
@@ -85,17 +83,17 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
     const { ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround } = Settings.store.audio ?? {};
 
     const data: LinkData = {
-        include: include,
+        include,
         exclude: [{ "application.process.id": pid }],
         ignore_devices: ignoreDevices
     };
 
     if (ignoreInputMedia ?? true) {
-        data.exclude!.push({ "media.class": "Stream/Input/Audio" });
+        data.exclude.push({ "media.class": "Stream/Input/Audio" });
     }
 
     if (ignoreVirtual) {
-        data.exclude!.push({ "node.virtual": "true" });
+        data.exclude.push({ "node.virtual": "true" });
     }
 
     if (workaround) {
@@ -112,6 +110,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
         Settings.store.audio ?? {};
 
     const data: LinkData = {
+        include: [],
         exclude: [{ "application.process.id": pid }, ...exclude],
         only_speakers: onlySpeakers,
         ignore_devices: ignoreDevices,
