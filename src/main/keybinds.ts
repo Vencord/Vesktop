@@ -5,7 +5,7 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { constants, open } from "node:fs";
+import { constants, existsSync, open, unlinkSync } from "node:fs";
 import { join } from "node:path";
 
 import { Socket } from "net";
@@ -18,14 +18,26 @@ const socketFile = join(xdgRuntimeDir, "vesktop-ipc");
 
 const Actions = new Set([IpcEvents.TOGGLE_SELF_DEAF, IpcEvents.TOGGLE_SELF_MUTE]);
 
-export function initKeybinds() {
+function createFIFO() {
+    if (existsSync(socketFile)) {
+        try {
+            unlinkSync(socketFile);
+        } catch (err) {
+            console.error("Failed to remove existing mkfifo file:", err);
+            return false;
+        }
+    }
+
     try {
         spawnSync("mkfifo", [socketFile]);
     } catch (err) {
-        console.log("Failed to create mkfifo while initializing keybinds:", err);
-        return;
+        console.error("Failed to create mkfifo while initializing keybinds:", err);
+        return false;
     }
+    return true;
+}
 
+function openFIFO() {
     try {
         open(socketFile, constants.O_RDONLY | constants.O_NONBLOCK, (err, fd) => {
             if (err) {
@@ -41,12 +53,28 @@ export function initKeybinds() {
                 }
             });
 
-            pipe.once("end", () => {
+            pipe.on("end", () => {
                 pipe.destroy();
-                initKeybinds();
+                openFIFO();
             });
         });
     } catch (err) {
-        console.log("Can't open socket file.", err);
+        console.error("Can't open socket file.", err);
+    }
+}
+
+function cleanup() {
+    try {
+        unlinkSync(socketFile);
+    } catch (err) {
+        console.error("Failed to remove mkfifo file:", err);
+    }
+}
+
+process.on("exit", cleanup);
+
+export function initKeybinds() {
+    if (createFIFO()) {
+        openFIFO();
     }
 }
