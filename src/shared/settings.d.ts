@@ -12,6 +12,7 @@ export interface Settings {
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     trayColor?: string;
+    trayAutoFill?: "auto" | "white" | "black";
     minimizeToTray?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;

@@ -8,8 +8,8 @@ import "./traySetting.css";
 
 import { Margins } from "@vencord/types/utils";
 import { findByCodeLazy } from "@vencord/types/webpack";
-import { Forms, Switch } from "@vencord/types/webpack/common";
-import { isInCall, setCurrentState } from "renderer/patches/tray";
+import { Forms, Select, Switch } from "@vencord/types/webpack/common";
+import { isInCall, setCurrentTrayIcon } from "renderer/patches/tray";
 import { isLinux, isMac } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
@@ -38,11 +38,11 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
     return (
         <Switch
             value={settings.tray ?? true}
-            onChange={async t => {
-                settings.tray = t;
-                if (isInCall) setCurrentState();
+            onChange={async v => {
+                settings.tray = v;
+                if (isInCall) setCurrentTrayIcon();
             }}
-            note="Tray Icon"
+            note="Add a tray icon for Vesktop"
         >
             Tray Icon
         </Switch>
@@ -63,11 +63,41 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
                     onChange={newColor => {
                         const hexColor = newColor.toString(16).padStart(6, "0");
                         settings.trayColor = hexColor;
-                        if (isInCall) setCurrentState();
+                        if (isInCall) setCurrentTrayIcon();
                     }}
                     showEyeDropper={false}
                     suggestedColors={presets}
                 />
+            </div>
+            <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
+        </div>
+    );
+};
+
+export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
+    return (
+        <div className="vcd-tray-settings">
+            <div className="vcd-tray-container">
+                <div className="vcd-tray-settings-labels">
+                    <Forms.FormTitle tag="h3">Tray icon fill color</Forms.FormTitle>
+                    <Forms.FormText>Choose background fill of Tray Icons in Voice Chat</Forms.FormText>
+                </div>
+
+                <Select
+                    placeholder="Auto"
+                    options={[
+                        { label: "Auto", value: "auto", default: true },
+                        { label: "Black", value: "black" },
+                        { label: "White", value: "white" }
+                    ]}
+                    closeOnSelect={true}
+                    select={v => {
+                        settings.trayAutoFill = v;
+                        if (isInCall) setCurrentTrayIcon();
+                    }}
+                    isSelected={v => v === settings.trayAutoFill}
+                    serialize={s => s}
+                ></Select>
             </div>
             <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
         </div>

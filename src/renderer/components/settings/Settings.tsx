@@ -14,7 +14,7 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { TrayIconPicker, TraySwitch } from "./TraySettings";
+import { TrayFillColorSwitch, TrayIconPicker, TraySwitch } from "./TraySettings";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -71,6 +71,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     Behaviour: [
         TraySwitch,
         TrayIconPicker,
+        TrayFillColorSwitch,
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
