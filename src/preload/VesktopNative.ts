@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
 import type { LiteralUnion } from "type-fest";
@@ -66,11 +67,10 @@ export const VesktopNative = {
     virtmic: {
         list: () =>
             invoke<
-                { ok: false; isGlibCxxOutdated: boolean } | { ok: true; targets: string[]; hasPipewirePulse: boolean }
+                { ok: false; isGlibCxxOutdated: boolean } | { ok: true; targets: Node[]; hasPipewirePulse: boolean }
             >(IpcEvents.VIRT_MIC_LIST),
-        start: (targets: string[], workaround?: boolean) => invoke<void>(IpcEvents.VIRT_MIC_START, targets, workaround),
-        startSystem: (workaround?: boolean, onlyDefaultSpeakers?: boolean) =>
-            invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, workaround, onlyDefaultSpeakers),
+        start: (include: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, include),
+        startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {
