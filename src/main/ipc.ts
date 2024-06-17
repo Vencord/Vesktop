@@ -8,7 +8,7 @@ if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
-import { mkdirSync, readFileSync, watch } from "fs";
+import { copyFileSync, mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
@@ -18,7 +18,7 @@ import { debounce } from "shared/utils/debounce";
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
-import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
+import { TRAY_ICON_PATH, VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
@@ -44,10 +44,8 @@ handleSync(
 
 handleSync(IpcEvents.GET_TRAY_ICON, () => {
     if (!Settings.store.trayIconPath) return nativeImage.createFromPath(ICON_PATH).toDataURL();
-
-    const img = nativeImage.createFromPath(Settings.store.trayIconPath).resize({ width: 64, height: 64 });
+    const img = nativeImage.createFromPath(TRAY_ICON_PATH).resize({ width: 64, height: 64 });
     if (img.isEmpty()) return nativeImage.createFromPath(ICON_PATH).toDataURL();
-
     return img.toDataURL();
 });
 
@@ -137,7 +135,7 @@ handle(IpcEvents.SELECT_TRAY_ICON, async () => {
     const dir = res.filePaths[0];
     const image = nativeImage.createFromPath(dir);
     if (image.isEmpty()) return "invalid";
-
+    copyFileSync(dir, TRAY_ICON_PATH);
     return dir;
 });
 

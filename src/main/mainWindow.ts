@@ -35,6 +35,7 @@ import {
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
+    TRAY_ICON_PATH,
     VENCORD_FILES_DIR
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
@@ -124,7 +125,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
     var trayImage = nativeImage.createFromPath(ICON_PATH);
-    if (Settings.store.trayIconPath) trayImage = nativeImage.createFromPath(Settings.store.trayIconPath);
+    if (Settings.store.trayIconPath) trayImage = nativeImage.createFromPath(TRAY_ICON_PATH);
     if (trayImage.isEmpty()) trayImage = nativeImage.createFromPath(ICON_PATH);
 
     if (process.platform === "darwin") {
