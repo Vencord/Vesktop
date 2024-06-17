@@ -8,9 +8,9 @@ import "./traySetting.css";
 
 import { Margins } from "@vencord/types/utils";
 import { findByCodeLazy } from "@vencord/types/webpack";
-import { Forms } from "@vencord/types/webpack/common";
+import { Forms, Switch } from "@vencord/types/webpack/common";
 import { isInCall, setCurrentState } from "renderer/patches/tray";
-import { isLinux } from "renderer/utils";
+import { isLinux, isMac } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
@@ -32,6 +32,22 @@ if (!isLinux)
     VesktopNative.app.getAccentColor().then(color => {
         if (color) presets.unshift(color);
     });
+
+export const TraySwitch: SettingsComponent = ({ settings }) => {
+    if (isMac) return null;
+    return (
+        <Switch
+            value={settings.tray ?? true}
+            onChange={async t => {
+                settings.tray = t;
+                if (isInCall) setCurrentState();
+            }}
+            note="Tray Icon"
+        >
+            Tray Icon
+        </Switch>
+    );
+};
 
 export const TrayIconPicker: SettingsComponent = ({ settings }) => {
     if (!settings.tray) return null;
