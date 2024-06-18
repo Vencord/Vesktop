@@ -11,12 +11,12 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
-    nativeImage,
     nativeTheme,
     screen,
     session,
     Tray
 } from "electron";
+import { mkdirSync, writeFileSync } from "fs";
 import { readFile, rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -503,10 +503,10 @@ export async function createWindows() {
     initArRPC();
 }
 
-export async function setTrayIcon(iconURI: string) {
+export async function setTrayIcon(iconName: string) {
     if (!tray || tray.isDestroyed()) return;
-    if (iconURI !== "" && iconURI !== "icon") {
-        tray.setImage(nativeImage.createFromDataURL(iconURI));
+    if (iconName !== "icon") {
+        tray.setImage(join(DATA_DIR, "TrayIcons", iconName + ".png"));
         return;
     }
     tray.setImage(join(STATIC_DIR, "icon.png"));
@@ -514,10 +514,31 @@ export async function setTrayIcon(iconURI: string) {
 
 export async function getTrayIconFile(iconName: string) {
     const Icons = new Set(["speaking", "muted", "deafened", "idle"]);
-
+    // add here checks for user-defined icons
     if (!Icons.has(iconName)) {
         iconName = "icon";
         return readFile(join(STATIC_DIR, "icon.png"));
     }
     return readFile(join(STATIC_DIR, iconName + ".svg"), "utf8");
+}
+
+export async function createTrayIcon(iconName: string, iconDataURL: string) {
+    iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
+    writeFileSync(join(DATA_DIR, "TrayIcons", iconName + ".png"), iconDataURL, "base64");
+    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+}
+
+export async function generateTrayIcons() {
+    // this function generates tray icons as .png's in Vesktop cache for future use
+    mkdirSync(join(DATA_DIR, "TrayIcons"), { recursive: true });
+    const trayIconsColor = Settings.store.trayColor ?? "#3DB77F";
+    const userDefinedIcons = false;
+    if (userDefinedIcons) {
+    } else {
+        const Icons = ["speaking", "muted", "deafened", "idle"];
+        for (const icon of Icons) {
+            mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
+        }
+    }
+    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }

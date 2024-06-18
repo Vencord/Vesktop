@@ -28,7 +28,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { getTrayIconFile, mainWin, setTrayIcon } from "./mainWindow";
+import { createTrayIcon, generateTrayIcons, getTrayIconFile, mainWin, setTrayIcon } from "./mainWindow";
 import { Settings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -163,3 +163,5 @@ watch(
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconName) => getTrayIconFile(iconName));
 handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => `#${systemPreferences.getAccentColor?.() || ""}`);
+handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL) => createTrayIcon(iconName, dataURL));
+handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());

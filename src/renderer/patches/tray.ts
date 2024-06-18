@@ -10,15 +10,27 @@ import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
 const voiceActions = findByPropsLazy("isSelfMute");
 
-export var isInCall = false;
+var isInCall = false;
 const logger = new Logger("VesktopTrayIcon");
 
-async function changeIconColor(iconName: string) {
+export function setCurrentTrayIcon() {
+    if (isInCall) {
+        if (voiceActions.isSelfDeaf()) {
+            VesktopNative.tray.setIcon("deafened");
+        } else if (voiceActions.isSelfMute()) {
+            VesktopNative.tray.setIcon("muted");
+        } else {
+            VesktopNative.tray.setIcon("idle");
+        }
+    }
+}
+
+VesktopNative.tray.createIconRequest(async (iconName: string) => {
     const pickedColor = VesktopNative.settings.get().trayColor;
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
 
     try {
-        var svg = await VesktopNative.app.getTrayIcon(iconName);
+        var svg = await VesktopNative.tray.getIcon(iconName);
         svg = svg.replace(/#f6bfac/gim, "#" + (pickedColor ?? "3DB77F"));
         if (fillColor !== "auto") {
             svg = svg.replace(/black/gim, fillColor);
@@ -35,32 +47,27 @@ async function changeIconColor(iconName: string) {
             if (ctx) {
                 ctx.drawImage(img, 0, 0);
                 const dataURL = canvas.toDataURL("image/png");
-                VesktopNative.app.setTrayIcon(dataURL);
+                VesktopNative.tray.createIconResponse(iconName, dataURL);
             }
         };
         img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     } catch (error) {
         logger.error("Error: ", error);
     }
-}
+});
 
-export function setCurrentTrayIcon() {
-    if (voiceActions.isSelfDeaf()) {
-        changeIconColor("deafened");
-    } else if (voiceActions.isSelfMute()) {
-        changeIconColor("muted");
-    } else {
-        changeIconColor("idle");
-    }
-}
+VesktopNative.tray.setCurrentVoiceIcon(() => {
+    setCurrentTrayIcon();
+});
 
 onceReady.then(() => {
+    VesktopNative.tray.generateTrayIcons();
     const userID = UserStore.getCurrentUser().id;
 
     FluxDispatcher.subscribe("SPEAKING", params => {
         if (params.userId === userID) {
             if (params.speakingFlags) {
-                changeIconColor("speaking");
+                VesktopNative.tray.setIcon("speaking");
             } else {
                 setCurrentTrayIcon();
             }
@@ -80,7 +87,7 @@ onceReady.then(() => {
             isInCall = true;
             setCurrentTrayIcon();
         } else if (params.state === "RTC_DISCONNECTED") {
-            VesktopNative.app.setTrayIcon("icon");
+            VesktopNative.tray.setIcon("icon");
             isInCall = false;
         }
     });
