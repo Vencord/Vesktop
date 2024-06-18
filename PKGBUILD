@@ -10,7 +10,7 @@ license=('GPL-3.0-only')
 arch=("any")
 
 depends=(
-  'electron29'
+  'electron31'
 )
 makedepends=(
   'git'
@@ -37,10 +37,10 @@ pkgver() {
 }
 
 build() {
-  export SYSTEM_ELECTRON_VERSION=$(</usr/lib/electron29/version)
+  export SYSTEM_ELECTRON_VERSION=$(</usr/lib/electron31/version)
   export ELECTRONVERSION=${SYSTEM_ELECTRON_VERSION%%.*}
 
-  sed -E -e 's&^(\s*)("electron"): "(.*)"(,?)$&\1\2: "'"$SYSTEM_ELECTRON_VERSION"'"\4&' -e '/linux/s&^&"electronDist": "/usr/lib/electron29",\n&' -i "$_pkgsrc/package.json"
+  sed -E -e 's&^(\s*)("electron"): "(.*)"(,?)$&\1\2: "'"$SYSTEM_ELECTRON_VERSION"'"\4&' -e '/linux/s&^&"electronDist": "/usr/lib/electron31",\n&' -i "$_pkgsrc/package.json"
 
   cd "$_pkgsrc"
   pnpm i
@@ -57,7 +57,7 @@ package() {
 
   install -Dm755 /dev/stdin "$pkgdir/usr/bin/$_pkgname" <<END
 #!/bin/sh
-exec electron29 /$_install_path/$_pkgname/app.asar "\$@"
+exec electron31 /$_install_path/$_pkgname/app.asar "\$@"
 END
 
   install -Dm755 /dev/stdin "$pkgdir/usr/share/applications/$_pkgname.desktop" <<END
