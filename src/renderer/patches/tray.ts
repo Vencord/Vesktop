@@ -8,18 +8,22 @@ import { Logger } from "@vencord/types/utils";
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
-const muteActions = findByPropsLazy("isSelfMute");
-const deafActions = findByPropsLazy("isSelfDeaf");
+const voiceActions = findByPropsLazy("isSelfMute");
 
 export var isInCall = false;
 const logger = new Logger("VesktopTrayIcon");
 
 async function changeIconColor(iconName: string) {
     const pickedColor = VesktopNative.settings.get().trayColor;
+    const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
 
     try {
         var svg = await VesktopNative.app.getTrayIcon(iconName);
         svg = svg.replace(/#f6bfac/gim, "#" + (pickedColor ?? "3DB77F"));
+        if (fillColor !== "auto") {
+            svg = svg.replace(/black/gim, fillColor);
+            svg = svg.replace(/white/gim, fillColor);
+        }
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
@@ -40,10 +44,10 @@ async function changeIconColor(iconName: string) {
     }
 }
 
-export function setCurrentState() {
-    if (deafActions.isSelfDeaf()) {
+export function setCurrentTrayIcon() {
+    if (voiceActions.isSelfDeaf()) {
         changeIconColor("deafened");
-    } else if (muteActions.isSelfMute()) {
+    } else if (voiceActions.isSelfMute()) {
         changeIconColor("muted");
     } else {
         changeIconColor("idle");
@@ -58,23 +62,23 @@ onceReady.then(() => {
             if (params.speakingFlags) {
                 changeIconColor("speaking");
             } else {
-                setCurrentState();
+                setCurrentTrayIcon();
             }
         }
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", () => {
-        if (isInCall) setCurrentState();
+        if (isInCall) setCurrentTrayIcon();
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", () => {
-        if (isInCall) setCurrentState();
+        if (isInCall) setCurrentTrayIcon();
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED") {
             isInCall = true;
-            setCurrentState();
+            setCurrentTrayIcon();
         } else if (params.state === "RTC_DISCONNECTED") {
             VesktopNative.app.setTrayIcon("icon");
             isInCall = false;
