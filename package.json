@@ -2,7 +2,7 @@
     "name": "vesktop",
     "version": "1.5.2",
     "private": true,
-    "description": "",
+    "description": "Vesktop is a custom Discord App aiming to give you better performance and improve linux support",
     "keywords": [],
     "homepage": "https://vencord.dev/",
     "license": "GPL-3.0",
@@ -123,13 +123,15 @@
                     ]
                 }
             ],
-            "category": "Network",
+            "category": "public.app-category.social-networking",
+            "darkModeSupport": true,
             "extendInfo": {
                 "NSMicrophoneUsageDescription": "This app needs access to the microphone",
                 "NSCameraUsageDescription": "This app needs access to the camera",
                 "com.apple.security.device.audio-input": true,
                 "com.apple.security.device.camera": true
-            }
+            },
+            "notarize": true
         },
         "dmg": {
             "background": "build/background.tiff",
