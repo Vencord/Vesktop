@@ -50,7 +50,7 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
 };
 
 export const TrayIconPicker: SettingsComponent = ({ settings }) => {
-    if (!settings.tray) return null;
+    if (!settings.tray || settings.trayCustom) return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
@@ -75,7 +75,7 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
 };
 
 export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
-    if (!settings.tray) return null;
+    if (!settings.tray || settings.trayCustom) return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">

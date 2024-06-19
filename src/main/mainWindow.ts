@@ -531,10 +531,7 @@ export async function createTrayIcon(iconName: string, iconDataURL: string) {
 export async function generateTrayIcons() {
     // this function generates tray icons as .png's in Vesktop cache for future use
     mkdirSync(join(DATA_DIR, "TrayIcons"), { recursive: true });
-    const trayIconsColor = Settings.store.trayColor ?? "#3DB77F";
-    const userDefinedIcons = false;
-    if (userDefinedIcons) {
-    } else {
+    if (!Settings.store.trayCustom) {
         const Icons = ["speaking", "muted", "deafened", "idle"];
         for (const icon of Icons) {
             mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);

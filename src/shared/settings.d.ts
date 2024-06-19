@@ -13,6 +13,7 @@ export interface Settings {
     tray?: boolean;
     trayColor?: string;
     trayAutoFill?: "auto" | "white" | "black";
+    trayCustom?: boolean;
     minimizeToTray?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
