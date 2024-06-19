@@ -1,7 +1,7 @@
 name: 🛠️ Feature Request
-description: Create a feature request for Vesktop
-labels: [bug]
-title: "[Bug] <title>"
+description: Request a feature for Vesktop
+labels: [enhancement]
+title: "[Feature Request] <title>"
 
 body:
     - type: markdown
