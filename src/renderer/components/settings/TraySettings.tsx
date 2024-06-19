@@ -9,7 +9,7 @@ import "./traySetting.css";
 import { Margins } from "@vencord/types/utils";
 import { findByCodeLazy } from "@vencord/types/webpack";
 import { Forms, Select, Switch } from "@vencord/types/webpack/common";
-import { isInCall, setCurrentTrayIcon } from "renderer/patches/tray";
+import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { isLinux, isMac } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
@@ -40,7 +40,7 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
             value={settings.tray ?? true}
             onChange={async v => {
                 settings.tray = v;
-                if (isInCall) setCurrentTrayIcon();
+                setCurrentTrayIcon();
             }}
             note="Add a tray icon for Vesktop"
         >
@@ -63,7 +63,7 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
                     onChange={newColor => {
                         const hexColor = newColor.toString(16).padStart(6, "0");
                         settings.trayColor = hexColor;
-                        if (isInCall) setCurrentTrayIcon();
+                        VesktopNative.tray.generateTrayIcons();
                     }}
                     showEyeDropper={false}
                     suggestedColors={presets}
@@ -75,6 +75,7 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
 };
 
 export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
+    if (!settings.tray) return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
@@ -93,7 +94,7 @@ export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
                     closeOnSelect={true}
                     select={v => {
                         settings.trayAutoFill = v;
-                        if (isInCall) setCurrentTrayIcon();
+                        VesktopNative.tray.generateTrayIcons();
                     }}
                     isSelected={v => v === settings.trayAutoFill}
                     serialize={s => s}

@@ -26,8 +26,6 @@ export const VesktopNative = {
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
-        setTrayIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
-        getTrayIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
         getAccentColor: () => invoke<string>(IpcEvents.GET_SYSTEM_ACCENT_COLOR)
     },
     autostart: {
@@ -85,5 +83,18 @@ export const VesktopNative = {
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
+    },
+    tray: {
+        setIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
+        getIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
+        createIconResponse: (iconName: string, iconDataURL: string) =>
+            invoke<void>(IpcEvents.CREATE_TRAY_ICON_RESPONSE, iconName, iconDataURL),
+        createIconRequest: (listener: (iconName: string) => void) => {
+            ipcRenderer.on(IpcEvents.CREATE_TRAY_ICON_REQUEST, (_, iconName: string) => listener(iconName));
+        },
+        generateTrayIcons: () => invoke<void>(IpcEvents.GENERATE_TRAY_ICONS),
+        setCurrentVoiceIcon: (listener: (...args: any[]) => void) => {
+            ipcRenderer.on(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON, listener);
+        }
     }
 };
