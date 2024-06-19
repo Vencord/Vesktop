@@ -506,7 +506,12 @@ export async function createWindows() {
 export async function setTrayIcon(iconName: string) {
     if (!tray || tray.isDestroyed()) return;
     if (iconName !== "icon") {
-        tray.setImage(join(DATA_DIR, "TrayIcons", iconName + ".png"));
+        try {
+            tray.setImage(join(DATA_DIR, "TrayIcons", iconName + ".png"));
+        } catch (error) {
+            console.log("Error: ", error, "Regenerating tray icons.");
+            generateTrayIcons(true);
+        }
         return;
     }
     tray.setImage(join(STATIC_DIR, "icon.png"));
@@ -528,10 +533,10 @@ export async function createTrayIcon(iconName: string, iconDataURL: string) {
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }
 
-export async function generateTrayIcons() {
+export async function generateTrayIcons(force = false) {
     // this function generates tray icons as .png's in Vesktop cache for future use
     mkdirSync(join(DATA_DIR, "TrayIcons"), { recursive: true });
-    if (!Settings.store.trayCustom) {
+    if (force || !Settings.store.trayCustom) {
         const Icons = ["speaking", "muted", "deafened", "idle"];
         for (const icon of Icons) {
             mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
