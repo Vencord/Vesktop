@@ -25,12 +25,12 @@ export function setCurrentTrayIcon() {
     }
 }
 
-VesktopNative.tray.createIconRequest(async (iconName: string) => {
+VesktopNative.tray.createIconRequest(async (iconPath: string) => {
     const pickedColor = VesktopNative.settings.get().trayColor;
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
 
     try {
-        var svg = await VesktopNative.tray.getIcon(iconName);
+        var svg = await VesktopNative.tray.getIcon(iconPath);
         svg = svg.replace(/#f6bfac/gim, "#" + (pickedColor ?? "3DB77F"));
         if (fillColor !== "auto") {
             svg = svg.replace(/black/gim, fillColor);
@@ -47,7 +47,9 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
             if (ctx) {
                 ctx.drawImage(img, 0, 0);
                 const dataURL = canvas.toDataURL("image/png");
-                VesktopNative.tray.createIconResponse(iconName, dataURL);
+                const fileNameExt = iconPath.replace(/^.*[\\/]/, "");
+                const fileName = fileNameExt.substring(0, fileNameExt.lastIndexOf("."));
+                VesktopNative.tray.createIconResponse(fileName, dataURL);
             }
         };
         img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;

@@ -161,7 +161,7 @@ watch(
 );
 
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
-handle(IpcEvents.GET_TRAY_ICON, (_, iconName) => getTrayIconFile(iconName));
+handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
 handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => `#${systemPreferences.getAccentColor?.() || ""}`);
 handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL) => createTrayIcon(iconName, dataURL));
 handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());

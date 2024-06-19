@@ -18,7 +18,7 @@ import {
 } from "electron";
 import { mkdirSync, writeFileSync } from "fs";
 import { readFile, rm } from "fs/promises";
-import { join } from "path";
+import { join, parse } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
@@ -517,17 +517,18 @@ export async function setTrayIcon(iconName: string) {
     tray.setImage(join(STATIC_DIR, "icon.png"));
 }
 
-export async function getTrayIconFile(iconName: string) {
+export async function getTrayIconFile(iconPath: string) {
     const Icons = new Set(["speaking", "muted", "deafened", "idle"]);
-    // add here checks for user-defined icons
-    if (!Icons.has(iconName)) {
-        iconName = "icon";
+    if (!Icons.has(parse(iconPath).name)) {
+        iconPath = "icon";
         return readFile(join(STATIC_DIR, "icon.png"));
     }
-    return readFile(join(STATIC_DIR, iconName + ".svg"), "utf8");
+    return readFile(iconPath, "utf8");
 }
 
 export async function createTrayIcon(iconName: string, iconDataURL: string) {
+    // creates .png at config/TrayIcons/iconName.png from given iconDataURL
+    // primarily called from renderer using CREATE_TRAY_ICON_RESPONSE IPC call
     iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
     writeFileSync(join(DATA_DIR, "TrayIcons", iconName + ".png"), iconDataURL, "base64");
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
@@ -539,7 +540,7 @@ export async function generateTrayIcons(force = false) {
     if (force || !Settings.store.trayCustom) {
         const Icons = ["speaking", "muted", "deafened", "idle"];
         for (const icon of Icons) {
-            mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
+            mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, join(STATIC_DIR, icon + ".svg"));
         }
     }
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
