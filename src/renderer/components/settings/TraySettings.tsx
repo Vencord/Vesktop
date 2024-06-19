@@ -49,6 +49,40 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
     );
 };
 
+export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
+    if (!settings.tray) return null;
+
+    return (
+        <>
+            <div id="vcd-tray-setting">
+                <div className="vcd-tray-setting-switch">
+                    <Switch
+                        key="tray"
+                        value={settings.trayCustom ?? false}
+                        onChange={v => (settings.trayCustom = v)}
+                        note={"Use custom default and voice status tray icons."}
+                    >
+                        Use custom tray icons
+                    </Switch>
+                </div>
+                <div className="vcd-tray-setting-customize">
+                    <Forms.FormText>
+                        <a
+                            href="about:blank"
+                            onClick={e => {
+                                e.preventDefault();
+                                // Bring up modal here
+                            }}
+                        >
+                            Configure
+                        </a>
+                    </Forms.FormText>
+                </div>
+            </div>
+        </>
+    );
+};
+
 export const TrayIconPicker: SettingsComponent = ({ settings }) => {
     if (!settings.tray || settings.trayCustom) return null;
     return (

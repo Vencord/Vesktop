@@ -14,7 +14,7 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { TrayFillColorSwitch, TrayIconPicker, TraySwitch } from "./TraySettings";
+import { TrayFillColorSwitch, TrayIconPicker, TraySwitch, CustomizeTraySwitch } from "./TraySettings";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -70,13 +70,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     ],
     Behaviour: [
         TraySwitch,
-        {
-            key: "trayCustom",
-            title: "Use custom tray icons",
-            description: "Disable rewriting tray icons at config folder",
-            defaultValue: false,
-            invisible: () => Settings.store.tray === false
-        },
+        CustomizeTraySwitch,
         TrayIconPicker,
         TrayFillColorSwitch,
         {

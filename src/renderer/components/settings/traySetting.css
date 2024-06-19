@@ -20,19 +20,17 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
-
 }
 .vcd-tray-setting-switch {
     flex-grow: 1;
     align-self: flex-start;
-    margin-right: 20rem;
+    margin-right: -3.6rem;
 }
-.vcd-tray-setting-reset {
+.vcd-tray-setting-customize {
     align-self: right;
     position: relative;
-    margin-left: auto;
-    margin-right: 1em;
-    bottom: 24px;
+    margin-right: 0em;
+    bottom: 4px;
 }
 
 .vcd-tray-icon-wrap {
