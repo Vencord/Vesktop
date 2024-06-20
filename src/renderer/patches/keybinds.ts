@@ -11,7 +11,7 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".default.Messages.KEYBINDS,children:",
+            find: ".Messages.KEYBINDS,children:",
             replacement: {
                 match: /.\.isPlatformEmbedded/,
                 replace: "true"
