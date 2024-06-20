@@ -90,7 +90,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                 >
                     Custom Tray Icons
                 </Switch>
-                <Forms.FormDivider className={Margins.top8} />
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
                         Main icon
@@ -98,7 +98,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                     {trayEditButton("icon")}
                 </Forms.FormSection>
 
-                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
                         Idle icon
@@ -106,7 +106,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                     {trayEditButton("idle")}
                 </Forms.FormSection>
 
-                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
                         Speaking icon
@@ -114,7 +114,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                     {trayEditButton("speaking")}
                 </Forms.FormSection>
 
-                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
                         Muted icon
@@ -122,7 +122,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                     {trayEditButton("muted")}
                 </Forms.FormSection>
 
-                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
                         Deafened icon
