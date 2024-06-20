@@ -11,6 +11,7 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
+    nativeImage,
     nativeTheme,
     screen,
     session,
@@ -19,11 +20,11 @@ import {
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
+import { ICON_PATH, ICONS_DIR } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -126,7 +127,7 @@ function initTray(win: BrowserWindow) {
 
     tray = new Tray(ICON_PATH);
     try {
-        if (Settings.store.trayCustom) tray.setImage(join(DATA_DIR, "TrayIcons", "icon.png"));
+        if (Settings.store.trayCustom) tray.setImage(join(ICONS_DIR, "icon.png"));
     } catch (error) {
         console.log("Error while loading custom tray image. Recreating new ones.");
         generateTrayIcons(true);
@@ -514,7 +515,11 @@ export async function setTrayIcon(iconName: string) {
     const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
     if (Icons.has(iconName)) {
         try {
-            tray.setImage(join(DATA_DIR, "TrayIcons", iconName + ".png"));
+            var trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
+            if (process.platform === "darwin") {
+                trayImage = trayImage.resize({ width: 16, height: 16 });
+            }
+            tray.setImage(trayImage);
         } catch (error) {
             console.log("Error: ", error, "Regenerating tray icons.");
             generateTrayIcons(true);

@@ -9,9 +9,8 @@ import { copyFileSync, mkdirSync, writeFileSync } from "fs";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
-import { STATIC_DIR } from "shared/paths";
+import { ICONS_DIR, STATIC_DIR } from "shared/paths";
 
-import { DATA_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 
@@ -28,11 +27,8 @@ export function getTrayIconFileSync(iconName: string) {
     // returns dataURL of image from TrayIcons folder
     const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
     if (Icons.has(iconName)) {
-        const img = nativeImage
-            .createFromPath(join(DATA_DIR, "TrayIcons", iconName + ".png"))
-            .resize({ width: 128, height: 128 });
-        if (img.isEmpty())
-            return nativeImage.createFromPath(join(DATA_DIR, "TrayIcons", iconName + ".png")).toDataURL();
+        const img = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png")).resize({ width: 128, height: 128 });
+        if (img.isEmpty()) return nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png")).toDataURL();
         return img.toDataURL();
     }
 }
@@ -41,19 +37,19 @@ export async function createTrayIcon(iconName: string, iconDataURL: string) {
     // creates .png at config/TrayIcons/iconName.png from given iconDataURL
     // primarily called from renderer using CREATE_TRAY_ICON_RESPONSE IPC call
     iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
-    writeFileSync(join(DATA_DIR, "TrayIcons", iconName + ".png"), iconDataURL, "base64");
+    writeFileSync(join(ICONS_DIR, iconName + ".png"), iconDataURL, "base64");
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }
 
 export async function generateTrayIcons(force = false) {
     // this function generates tray icons as .png's in Vesktop cache for future use
-    mkdirSync(join(DATA_DIR, "TrayIcons"), { recursive: true });
+    mkdirSync(ICONS_DIR, { recursive: true });
     if (force || !Settings.store.trayCustom) {
         const Icons = ["speaking", "muted", "deafened", "idle"];
         for (const icon of Icons) {
             mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
         }
-        copyFileSync(join(STATIC_DIR, "icon.png"), join(DATA_DIR, "TrayIcons", "icon.png"));
+        copyFileSync(join(STATIC_DIR, "icon.png"), join(ICONS_DIR, "icon.png"));
         mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
     }
 }
@@ -71,6 +67,6 @@ export async function pickTrayIcon(iconName: string) {
     // add .svg !!
     const image = nativeImage.createFromPath(dir);
     if (image.isEmpty()) return "invalid";
-    copyFileSync(dir, join(DATA_DIR, "TrayIcons", iconName + ".png"));
+    copyFileSync(dir, join(ICONS_DIR, iconName + ".png"));
     return dir;
 }

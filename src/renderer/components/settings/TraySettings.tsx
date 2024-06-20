@@ -11,7 +11,7 @@ import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
 import { Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
-import { isLinux, isMac } from "renderer/utils";
+import { isLinux } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
@@ -87,16 +87,6 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
             <Modals.ModalContent className="vcd-custom-tray-modal">
-                <Switch
-                    hideBorder
-                    value={Settings.trayCustom ?? false}
-                    onChange={async v => {
-                        Settings.trayCustom = v;
-                    }}
-                    note="Whether to use custom tray icons"
-                >
-                    Custom Tray Icons
-                </Switch>
                 <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
                 <Forms.FormSection className="vcd-custom-tray-icon-section">
                     <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
@@ -143,11 +133,10 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
 }
 
 const openTrayModal = () => {
-    const key = openModal(props => <TrayModalComponent modalProps={props} close={() => props.onClose()} />);
+    openModal(props => <TrayModalComponent modalProps={props} close={() => props.onClose()} />);
 };
 
 export const TraySwitch: SettingsComponent = ({ settings }) => {
-    if (isMac) return null;
     return (
         <Switch
             value={settings.tray ?? true}
