@@ -14,7 +14,7 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { TrayFillColorSwitch, TrayIconPicker, TraySwitch, CustomizeTraySwitch } from "./TraySettings";
+import { CustomizeTraySwitch, TrayFillColorSwitch, TrayIconPicker, TraySwitch } from "./TraySettings";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 

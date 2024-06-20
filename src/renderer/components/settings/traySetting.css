@@ -35,8 +35,7 @@
 
 .vcd-tray-icon-wrap {
     position: relative;
-    align-self: right;
-    bottom: 24px;
+    align-self: end;
 }
 
 .vcd-tray-icon-image {
@@ -48,11 +47,10 @@
 
 .vcd-edit-button {
     visibility: visible;
-    display: block;
     opacity: 0;
     position: absolute;
-    top: 3px;
-    left: 4px;
+    top: 0.5em;
+    left: 0.7em;
 }
 
 .vcd-tray-icon-wrap:hover .vcd-tray-icon-image {
@@ -64,4 +62,25 @@
     transition: 0.3s ease;
     visibility: visible;
     opacity: 1;
+}
+
+
+
+
+.vcd-custom-tray-header h1 {
+    margin: 0;
+}
+
+.vcd-custom-tray-modal {
+    padding: 1em;
+}
+
+.vcd-custom-tray-icon-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.vcd-custom-tray-icon-form-text {
+    font-size: medium;
 }

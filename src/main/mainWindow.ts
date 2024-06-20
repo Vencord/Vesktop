@@ -16,9 +16,8 @@ import {
     session,
     Tray
 } from "electron";
-import { mkdirSync, writeFileSync } from "fs";
-import { readFile, rm } from "fs/promises";
-import { join, parse } from "path";
+import { rm } from "fs/promises";
+import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
@@ -39,6 +38,7 @@ import {
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
+import { generateTrayIcons } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
@@ -515,33 +515,4 @@ export async function setTrayIcon(iconName: string) {
         return;
     }
     tray.setImage(join(STATIC_DIR, "icon.png"));
-}
-
-export async function getTrayIconFile(iconPath: string) {
-    const Icons = new Set(["speaking", "muted", "deafened", "idle"]);
-    if (!Icons.has(parse(iconPath).name)) {
-        iconPath = "icon";
-        return readFile(join(STATIC_DIR, "icon.png"));
-    }
-    return readFile(iconPath, "utf8");
-}
-
-export async function createTrayIcon(iconName: string, iconDataURL: string) {
-    // creates .png at config/TrayIcons/iconName.png from given iconDataURL
-    // primarily called from renderer using CREATE_TRAY_ICON_RESPONSE IPC call
-    iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
-    writeFileSync(join(DATA_DIR, "TrayIcons", iconName + ".png"), iconDataURL, "base64");
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
-}
-
-export async function generateTrayIcons(force = false) {
-    // this function generates tray icons as .png's in Vesktop cache for future use
-    mkdirSync(join(DATA_DIR, "TrayIcons"), { recursive: true });
-    if (force || !Settings.store.trayCustom) {
-        const Icons = ["speaking", "muted", "deafened", "idle"];
-        for (const icon of Icons) {
-            mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, join(STATIC_DIR, icon + ".svg"));
-        }
-    }
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }

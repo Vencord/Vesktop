@@ -35,7 +35,8 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
+        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
+        selectTrayIcon: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_TRAY_ICON)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
@@ -82,7 +83,8 @@ export const VesktopNative = {
     },
     tray: {
         setIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
-        getIcon: (iconPath: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconPath),
+        getIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
+        getIconSync: (iconName: string) => sendSync<string>(IpcEvents.GET_TRAY_ICON_SYNC, iconName),
         createIconResponse: (iconName: string, iconDataURL: string) =>
             invoke<void>(IpcEvents.CREATE_TRAY_ICON_RESPONSE, iconName, iconDataURL),
         createIconRequest: (listener: (iconName: string) => void) => {

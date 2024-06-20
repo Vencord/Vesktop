@@ -6,15 +6,17 @@
 
 import "./traySetting.css";
 
-import { Margins } from "@vencord/types/utils";
-import { findByCodeLazy } from "@vencord/types/webpack";
-import { Forms, Select, Switch } from "@vencord/types/webpack/common";
+import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
+import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
+import { Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
+import { useSettings } from "renderer/settings";
 import { isLinux, isMac } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
 const ColorPicker = findByCodeLazy(".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR", ".BACKGROUND_PRIMARY)");
+const { PencilIcon } = findByPropsLazy("PencilIcon");
 
 const presets = [
     "#3DB77F", // discord default ~
@@ -32,6 +34,110 @@ if (!isLinux)
     VesktopNative.app.getAccentColor().then(color => {
         if (color) presets.unshift(color);
     });
+
+function trayEditButton(iconName: string) {
+    return (
+        <div className="vcd-tray-icon-wrap">
+            <img
+                className="vcd-tray-icon-image"
+                src={VesktopNative.tray.getIconSync(iconName)}
+                alt="read if cute :3"
+                width="48"
+                height="48"
+            ></img>
+            <PencilIcon
+                className="vcd-edit-button"
+                width="40"
+                height="40"
+                onClick={async () => {
+                    const choice = await VesktopNative.fileManager.selectTrayIcon();
+                    switch (choice) {
+                        case "cancelled":
+                            return;
+                        case "invalid":
+                            Toasts.show({
+                                message: "Please select a valid .png or .jpg image!",
+                                id: Toasts.genId(),
+                                type: Toasts.Type.FAILURE
+                            });
+                            return;
+                    }
+                    console.log("choice:", choice);
+                    // copy image and reload
+                    // settings.trayIconPath = choice;
+                }}
+            />
+        </div>
+    );
+}
+
+function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () => void }) {
+    const Settings = useSettings();
+    return (
+        <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
+            <Modals.ModalHeader className="vcd-custom-tray-header">
+                <Forms.FormTitle tag="h2">Custom Tray Icons</Forms.FormTitle>
+                <Modals.ModalCloseButton onClick={close} />
+            </Modals.ModalHeader>
+            <Modals.ModalContent className="vcd-custom-tray-modal">
+                <Switch
+                    hideBorder
+                    value={Settings.trayCustom ?? false}
+                    onChange={async v => {
+                        Settings.trayCustom = v;
+                    }}
+                    note="Whether to use custom tray icons"
+                >
+                    Custom Tray Icons
+                </Switch>
+                <Forms.FormDivider className={Margins.top8} />
+                <Forms.FormSection className="vcd-custom-tray-icon-section">
+                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
+                        Main icon
+                    </Forms.FormText>
+                    {trayEditButton("icon")}
+                </Forms.FormSection>
+
+                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormSection className="vcd-custom-tray-icon-section">
+                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
+                        Idle icon
+                    </Forms.FormText>
+                    {trayEditButton("idle")}
+                </Forms.FormSection>
+
+                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormSection className="vcd-custom-tray-icon-section">
+                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
+                        Speaking icon
+                    </Forms.FormText>
+                    {trayEditButton("speaking")}
+                </Forms.FormSection>
+
+                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormSection className="vcd-custom-tray-icon-section">
+                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
+                        Muted icon
+                    </Forms.FormText>
+                    {trayEditButton("muted")}
+                </Forms.FormSection>
+
+                <Forms.FormDivider className={(Margins.top8, Margins.bottom8)} />
+                <Forms.FormSection className="vcd-custom-tray-icon-section">
+                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
+                        Deafened icon
+                    </Forms.FormText>
+                    {trayEditButton("deafened")}
+                </Forms.FormSection>
+            </Modals.ModalContent>
+            <Modals.ModalFooter></Modals.ModalFooter>
+        </Modals.ModalRoot>
+    );
+}
+
+const openTrayModal = () => {
+    const key = openModal(props => <TrayModalComponent modalProps={props} close={() => props.onClose()} />);
+};
 
 export const TraySwitch: SettingsComponent = ({ settings }) => {
     if (isMac) return null;
@@ -71,7 +177,7 @@ export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
                             href="about:blank"
                             onClick={e => {
                                 e.preventDefault();
-                                // Bring up modal here
+                                openTrayModal();
                             }}
                         >
                             Configure
