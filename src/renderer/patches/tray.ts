@@ -22,6 +22,8 @@ export function setCurrentTrayIcon() {
         } else {
             VesktopNative.tray.setIcon("idle");
         }
+    } else {
+        VesktopNative.tray.setIcon("icon");
     }
 }
 

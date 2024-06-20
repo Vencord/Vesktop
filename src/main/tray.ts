@@ -53,11 +53,15 @@ export async function generateTrayIcons(force = false) {
         for (const icon of Icons) {
             mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
         }
+        copyFileSync(join(STATIC_DIR, "icon.png"), join(DATA_DIR, "TrayIcons", "icon.png"));
+        mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
     }
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }
 
 export async function pickTrayIcon(iconName: string) {
+    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
+    if (!Icons.has(iconName)) return;
+
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openFile"],
         filters: [{ name: "Image", extensions: ["png", "jpg"] }]

@@ -23,7 +23,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH, STATIC_DIR } from "../shared/paths";
+import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -125,6 +125,12 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
+    try {
+        if (Settings.store.trayCustom) tray.setImage(join(DATA_DIR, "TrayIcons", "icon.png"));
+    } catch (error) {
+        console.log("Error while loading custom tray image. Recreating new ones.");
+        generateTrayIcons(true);
+    }
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -505,7 +511,8 @@ export async function createWindows() {
 
 export async function setTrayIcon(iconName: string) {
     if (!tray || tray.isDestroyed()) return;
-    if (iconName !== "icon") {
+    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
+    if (Icons.has(iconName)) {
         try {
             tray.setImage(join(DATA_DIR, "TrayIcons", iconName + ".png"));
         } catch (error) {
@@ -514,5 +521,4 @@ export async function setTrayIcon(iconName: string) {
         }
         return;
     }
-    tray.setImage(join(STATIC_DIR, "icon.png"));
 }

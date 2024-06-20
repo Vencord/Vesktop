@@ -36,7 +36,8 @@ export const VesktopNative = {
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
         selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
-        selectTrayIcon: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_TRAY_ICON)
+        selectTrayIcon: (iconName: string) =>
+            invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_TRAY_ICON, iconName)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),

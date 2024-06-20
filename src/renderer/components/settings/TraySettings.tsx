@@ -44,13 +44,14 @@ function trayEditButton(iconName: string) {
                 alt="read if cute :3"
                 width="48"
                 height="48"
+                id={iconName}
             ></img>
             <PencilIcon
                 className="vcd-edit-button"
                 width="40"
                 height="40"
                 onClick={async () => {
-                    const choice = await VesktopNative.fileManager.selectTrayIcon();
+                    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
                     switch (choice) {
                         case "cancelled":
                             return;
@@ -65,6 +66,12 @@ function trayEditButton(iconName: string) {
                     console.log("choice:", choice);
                     // copy image and reload
                     // settings.trayIconPath = choice;
+                    const iconDataURL = VesktopNative.tray.getIconSync(iconName);
+                    const img = document.getElementById(iconName) as HTMLImageElement;
+                    if (img) {
+                        img.src = iconDataURL;
+                    }
+                    VesktopNative.tray.createIconResponse(iconName, iconDataURL);
                 }}
             />
         </div>
