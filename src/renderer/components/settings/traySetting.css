@@ -36,6 +36,8 @@
 .vcd-tray-icon-wrap {
     position: relative;
     align-self: end;
+    background: var(--background-secondrary);
+    border-radius: var(--radius-sm);
 }
 
 .vcd-tray-icon-image {
@@ -75,8 +77,8 @@
 .vcd-custom-tray-icon-section {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
+    column-gap: 1em;
 }
 
 .vcd-custom-tray-icon-form-text {

@@ -97,21 +97,49 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
             <Modals.ModalContent className="vcd-custom-tray-modal">
-                {Object.entries(statusToSettingsKey).map(([status, { key, label }]) => (
-                    <div key={status}>
+                {Object.entries(statusToSettingsKey).map(([iconName, { key, label }]) => (
+                    <div key={iconName}>
+                        <Forms.FormTitle tag="h3">{label}</Forms.FormTitle>
                         <Forms.FormSection className="vcd-custom-tray-icon-section">
-                            <div className="vcd-custom-tray-icon-label">
-                                {trayEditButton(status)}
-                                <Forms.FormText>{label}</Forms.FormText>
-                            </div>
+                            {trayEditButton(iconName)}
+                            <Button
+                                onClick={async () => {
+                                    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
+                                    switch (choice) {
+                                        case "cancelled":
+                                            return;
+                                        case "invalid":
+                                            Toasts.show({
+                                                message: "Please select a valid .png or .jpg image!",
+                                                id: Toasts.genId(),
+                                                type: Toasts.Type.FAILURE
+                                            });
+                                            return;
+                                    }
+
+                                    const iconKey =
+                                        statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+                                    Settings[iconKey] = true;
+                                    const iconDataURL = VesktopNative.tray.getIconSync(iconName);
+                                    const img = document.getElementById(iconName) as HTMLImageElement;
+                                    if (img) {
+                                        img.src = iconDataURL;
+                                    }
+                                    setCurrentTrayIcon();
+                                }}
+                                look={Button.Looks.OUTLINED}
+                            >
+                                Choose icon
+                            </Button>
                             {Settings[key] && (
                                 <Button
                                     onClick={() => {
-                                        Settings[key] = false;
+                                        Settings.trayMainOverride = false;
                                         setCurrentTrayIcon();
                                     }}
+                                    look={Button.Looks.LINK}
                                 >
-                                    Reset
+                                    Reset Icon
                                 </Button>
                             )}
                         </Forms.FormSection>
