@@ -86,8 +86,8 @@ export const VesktopNative = {
         setIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
         getIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
         getIconSync: (iconName: string) => sendSync<string>(IpcEvents.GET_TRAY_ICON_SYNC, iconName),
-        createIconResponse: (iconName: string, iconDataURL: string) =>
-            invoke<void>(IpcEvents.CREATE_TRAY_ICON_RESPONSE, iconName, iconDataURL),
+        createIconResponse: (iconName: string, iconDataURL: string, isCustomIcon: boolean = true) =>
+            invoke<void>(IpcEvents.CREATE_TRAY_ICON_RESPONSE, iconName, iconDataURL, isCustomIcon),
         createIconRequest: (listener: (iconName: string) => void) => {
             ipcRenderer.on(IpcEvents.CREATE_TRAY_ICON_REQUEST, (_, iconPath: string) => listener(iconPath));
         },

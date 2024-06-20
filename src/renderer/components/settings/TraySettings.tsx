@@ -8,7 +8,7 @@ import "./traySetting.css";
 
 import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
 import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
-import { Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
+import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
 import { isLinux } from "renderer/utils";
@@ -35,7 +35,16 @@ if (!isLinux)
         if (color) presets.unshift(color);
     });
 
+const statusToSettingsKey = {
+    icon: { key: "trayMainOverride", label: "Main Icon" },
+    idle: { key: "trayIdleOverride", label: "Idle icon" },
+    speaking: { key: "traySpeakingOverride", label: "Speaking icon" },
+    muted: { key: "trayMutedOverride", label: "Muted icon" },
+    deafened: { key: "trayDeafenedOverride", label: "Deafened icon" }
+};
+
 function trayEditButton(iconName: string) {
+    const Settings = useSettings();
     return (
         <div className="vcd-tray-icon-wrap">
             <img
@@ -63,15 +72,15 @@ function trayEditButton(iconName: string) {
                             });
                             return;
                     }
-                    console.log("choice:", choice);
-                    // copy image and reload
-                    // settings.trayIconPath = choice;
+
+                    const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+                    Settings[iconKey] = true;
                     const iconDataURL = VesktopNative.tray.getIconSync(iconName);
                     const img = document.getElementById(iconName) as HTMLImageElement;
                     if (img) {
                         img.src = iconDataURL;
                     }
-                    VesktopNative.tray.createIconResponse(iconName, iconDataURL);
+                    setCurrentTrayIcon();
                 }}
             />
         </div>
@@ -80,6 +89,7 @@ function trayEditButton(iconName: string) {
 
 function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () => void }) {
     const Settings = useSettings();
+
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
             <Modals.ModalHeader className="vcd-custom-tray-header">
@@ -87,45 +97,27 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
             <Modals.ModalContent className="vcd-custom-tray-modal">
-                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
-                <Forms.FormSection className="vcd-custom-tray-icon-section">
-                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
-                        Main icon
-                    </Forms.FormText>
-                    {trayEditButton("icon")}
-                </Forms.FormSection>
-
-                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
-                <Forms.FormSection className="vcd-custom-tray-icon-section">
-                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
-                        Idle icon
-                    </Forms.FormText>
-                    {trayEditButton("idle")}
-                </Forms.FormSection>
-
-                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
-                <Forms.FormSection className="vcd-custom-tray-icon-section">
-                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
-                        Speaking icon
-                    </Forms.FormText>
-                    {trayEditButton("speaking")}
-                </Forms.FormSection>
-
-                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
-                <Forms.FormSection className="vcd-custom-tray-icon-section">
-                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
-                        Muted icon
-                    </Forms.FormText>
-                    {trayEditButton("muted")}
-                </Forms.FormSection>
-
-                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
-                <Forms.FormSection className="vcd-custom-tray-icon-section">
-                    <Forms.FormText className={Margins.top16 + " vcd-custom-tray-icon-form-text"}>
-                        Deafened icon
-                    </Forms.FormText>
-                    {trayEditButton("deafened")}
-                </Forms.FormSection>
+                {Object.entries(statusToSettingsKey).map(([status, { key, label }]) => (
+                    <div key={status}>
+                        <Forms.FormSection className="vcd-custom-tray-icon-section">
+                            <div className="vcd-custom-tray-icon-label">
+                                {trayEditButton(status)}
+                                <Forms.FormText>{label}</Forms.FormText>
+                            </div>
+                            {Settings[key] && (
+                                <Button
+                                    onClick={() => {
+                                        Settings[key] = false;
+                                        setCurrentTrayIcon();
+                                    }}
+                                >
+                                    Reset
+                                </Button>
+                            )}
+                        </Forms.FormSection>
+                        <Forms.FormDivider className={`${Margins.top8} ${Margins.bottom8}`} />
+                    </div>
+                ))}
             </Modals.ModalContent>
             <Modals.ModalFooter></Modals.ModalFooter>
         </Modals.ModalRoot>
@@ -156,37 +148,28 @@ export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
 
     return (
         <>
-            <div id="vcd-tray-setting">
-                <div className="vcd-tray-setting-switch">
-                    <Switch
-                        key="tray"
-                        value={settings.trayCustom ?? false}
-                        onChange={v => (settings.trayCustom = v)}
-                        note={"Use custom default and voice status tray icons."}
+            <div className="vcd-tray-settings">
+                <div className="vcd-tray-container">
+                    <div className="vcd-tray-settings-labels">
+                        <Forms.FormTitle tag="h3">Custom tray icons</Forms.FormTitle>
+                        <Forms.FormText>Use custom default and voice status tray icons.</Forms.FormText>
+                    </div>
+                    <Button
+                        onClick={async () => {
+                            openTrayModal();
+                        }}
                     >
-                        Use custom tray icons
-                    </Switch>
+                        Configure
+                    </Button>
                 </div>
-                <div className="vcd-tray-setting-customize">
-                    <Forms.FormText>
-                        <a
-                            href="about:blank"
-                            onClick={e => {
-                                e.preventDefault();
-                                openTrayModal();
-                            }}
-                        >
-                            Configure
-                        </a>
-                    </Forms.FormText>
-                </div>
+                <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
             </div>
         </>
     );
 };
 
 export const TrayIconPicker: SettingsComponent = ({ settings }) => {
-    if (!settings.tray || settings.trayCustom) return null;
+    if (!settings.tray) return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
@@ -211,7 +194,7 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
 };
 
 export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
-    if (!settings.tray || settings.trayCustom) return null;
+    if (!settings.tray) return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">

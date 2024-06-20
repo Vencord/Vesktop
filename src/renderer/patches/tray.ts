@@ -49,7 +49,7 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
             if (ctx) {
                 ctx.drawImage(img, 0, 0);
                 const dataURL = canvas.toDataURL("image/png");
-                VesktopNative.tray.createIconResponse(iconName, dataURL);
+                VesktopNative.tray.createIconResponse(iconName, dataURL, false);
             }
         };
         img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;

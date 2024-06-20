@@ -76,8 +76,15 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
 .vcd-custom-tray-icon-form-text {
     font-size: medium;
+}
+
+.vcd-custom-tray-icon-label {
+    margin-top: 0.5em;
+    display: flex;
+    align-items: center;
 }
