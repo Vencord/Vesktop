@@ -47,7 +47,7 @@ function changeColorsInSvg(svg: string, stockColor: string, isBadge: boolean = f
     const pickedColor = VesktopNative.settings.get().trayColor;
     const reg = new RegExp(stockColor, "gim");
     svg = svg.replace(reg, "#" + (pickedColor ?? stockColor));
-    if (backgroundTooBright(pickedColor ?? stockColor)) svg = svg.replace(/white/gim, "black");
+    if (isBadge && backgroundTooBright(pickedColor ?? stockColor)) svg = svg.replace(/white/gim, "black");
 
     return svg;
 }
@@ -79,7 +79,7 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
 VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataSVG: string) => {
     const pickedColor = VesktopNative.settings.get().trayColor;
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "white";
-    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959");
+    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959", true);
     if (fillColor !== "auto") badgeDataSVG = badgeDataSVG.replace(/white/gim, fillColor);
 
     const canvas = document.createElement("canvas");
