@@ -5,13 +5,13 @@
  */
 
 import { dialog, NativeImage, nativeImage } from "electron";
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
-import { ICONS_DIR, STATIC_DIR } from "shared/paths";
+import { BADGE_DIR, ICONS_DIR, STATIC_DIR } from "shared/paths";
 
-import { lastBadgeCount, loadBadge } from "./appBadge";
+import { lastBadgeCount } from "./appBadge";
 import { mainWin, tray } from "./mainWindow";
 import { Settings } from "./settings";
 
@@ -44,9 +44,10 @@ export async function setTrayIcon(iconName: string) {
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon.png"));
         }
 
-        const badgeImg = loadBadge(lastBadgeCount);
+        const badge = lastBadgeCount > 9 ? 10 : lastBadgeCount;
+        const badgeSvg = readFileSync(join(BADGE_DIR, "svg", `${badge}.svg`), "utf8");
         // and send IPC call to renderer to add to image
-        mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeImg.toDataURL());
+        mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeSvg);
         return;
     }
 

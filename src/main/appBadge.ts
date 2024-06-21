@@ -12,11 +12,11 @@ import { BADGE_DIR } from "shared/paths";
 import { mainWin } from "./mainWindow";
 
 const imgCache = new Map<number, NativeImage>();
-export function loadBadge(index: number) {
+function loadBadge(index: number) {
     const cached = imgCache.get(index);
     if (cached) return cached;
 
-    const img = nativeImage.createFromPath(join(BADGE_DIR, `${index}.png`));
+    const img = nativeImage.createFromPath(join(BADGE_DIR, "ico", `${index}.ico`));
     imgCache.set(index, img);
 
     return img;
