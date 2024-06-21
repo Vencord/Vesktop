@@ -7,6 +7,7 @@
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
+import { exec } from "child_process";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -25,7 +26,18 @@ export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            // app.setBadgeCount(count);
+            
+            function emitDBusBadge(count: number, visible: boolean) {
+                const badgeCountCommand = `gdbus emit --session --object-path / --signal com.canonical.Unity.LauncherEntry.Update "application://vesktop.desktop" "{'count': <int64 ${count}>, 'count-visible': <${visible}>}"`;
+                exec(badgeCountCommand)
+            }
+
+            if (count === 0) {
+                emitDBusBadge(count, false);
+                break;
+            }
+            emitDBusBadge(count, true);
             break;
         case "darwin":
             if (count === 0) {
