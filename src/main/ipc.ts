@@ -7,17 +7,7 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import {
-    app,
-    BrowserWindow,
-    clipboard,
-    dialog,
-    nativeImage,
-    RelaunchOptions,
-    session,
-    shell,
-    systemPreferences
-} from "electron";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -28,7 +18,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin } from "./mainWindow";
+import { getAccentColor, mainWin } from "./mainWindow";
 import { Settings } from "./settings";
 import {
     createTrayIcon,
@@ -172,7 +162,7 @@ watch(
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
 handleSync(IpcEvents.GET_TRAY_ICON_SYNC, (_, iconPath) => getTrayIconFileSync(iconPath));
-handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => `#${systemPreferences.getAccentColor?.() || ""}`);
+handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => getAccentColor());
 handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon) =>
     createTrayIcon(iconName, dataURL, isCustomIcon)
 );

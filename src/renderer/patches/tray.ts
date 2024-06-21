@@ -27,8 +27,8 @@ export function setCurrentTrayIcon() {
     }
 }
 
-function changeColorsInSvg(svg: string, stockColor: string, isBadge: boolean = false) {
-    const pickedColor = VesktopNative.settings.get().trayColor;
+function changeColorsInSvg(svg: string, stockColor: string) {
+    const pickedColor = VesktopNative.settings.get().trayColor || VesktopNative.app.getAccentColor();
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
     const reg = new RegExp(stockColor, "gim");
     svg = svg.replace(reg, "#" + (pickedColor ?? stockColor));
@@ -65,7 +65,7 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
 
 VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataSVG: string) => {
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "white";
-    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959", true);
+    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959");
     if (fillColor !== "auto") badgeDataSVG = badgeDataSVG.replace(/white/gim, fillColor);
 
     const canvas = document.createElement("canvas");

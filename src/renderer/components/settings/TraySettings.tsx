@@ -11,7 +11,6 @@ import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
 import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
-import { isLinux } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
@@ -30,10 +29,9 @@ const presets = [
     "#FC18EC" // pink
 ];
 
-if (!isLinux)
-    VesktopNative.app.getAccentColor().then(color => {
-        if (color) presets.unshift(color);
-    });
+VesktopNative.app.getAccentColor().then(color => {
+    if (color) presets.unshift(color);
+});
 
 const statusToSettingsKey = {
     icon: { key: "trayMainOverride", label: "Main Icon" },
