@@ -21,12 +21,12 @@ addPatch({
             find: "[kb store] KeybindStore",
             replacement: [
                 {
-                    match: /(inputEventRegister\(parseInt\((.{1,2})\),(.{1,2}),(.{1,2}),(.{1,2})\);else\{)([^;]*;[^;]*;.{1,2}\.keyup&&.{1,2}\.bindGlobal\(\(0,(.{1,2}\.toString)\))/,
+                    match: /(inputEventRegister\(parseInt\((\i)\),(\i),(\i),(\i)\);else\{)([^;]*;[^;]*;\i\.keyup&&\i\.bindGlobal\(\(0,(\i\.\i)\))/,
                     replace: "$1$self.registerKeybind($2,$3,$4,$7);return;$6"
                 },
                 {
-                    // WHY IS THE RADIX SPEICIFIED
-                    match: /(inputEventUnregister\(parseInt\((.{1,2}),10\)\);else if\(\i\[\i\]\)\{)/,
+                    // WHY IS THE RADIX SPECIFIED
+                    match: /(inputEventUnregister\(parseInt\((\i),10\)\);else if\(\i\[\i\]\)\{)/,
                     replace: "$1$self.unregisterKeybind($2);return;"
                 }
             ]
