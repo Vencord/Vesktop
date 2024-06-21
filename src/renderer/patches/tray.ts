@@ -27,28 +27,15 @@ export function setCurrentTrayIcon() {
     }
 }
 
-function backgroundTooBright(color: string) {
-    // calculate relative luminance
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(color);
-    if (!result) {
-        return false;
-    }
-    const normalizedR = parseInt(result[1], 16) / 255;
-    const normalizedG = parseInt(result[2], 16) / 255;
-    const normalizedB = parseInt(result[3], 16) / 255;
-    const lumR = normalizedR <= 0.03928 ? normalizedR / 12.92 : Math.pow((normalizedR + 0.055) / 1.055, 2.4);
-    const lumG = normalizedG <= 0.03928 ? normalizedG / 12.92 : Math.pow((normalizedG + 0.055) / 1.055, 2.4);
-    const lumB = normalizedB <= 0.03928 ? normalizedB / 12.92 : Math.pow((normalizedB + 0.055) / 1.055, 2.4);
-
-    return 0.2126 * lumR + 0.7152 * lumG + 0.0722 * lumB > 0.5;
-}
-
 function changeColorsInSvg(svg: string, stockColor: string, isBadge: boolean = false) {
     const pickedColor = VesktopNative.settings.get().trayColor;
+    const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
     const reg = new RegExp(stockColor, "gim");
     svg = svg.replace(reg, "#" + (pickedColor ?? stockColor));
-    if (isBadge && backgroundTooBright(pickedColor ?? stockColor)) svg = svg.replace(/white/gim, "black");
-
+    if (fillColor !== "auto") {
+        svg = svg.replace(/black/gim, fillColor);
+        svg = svg.replace(/white/gim, fillColor);
+    }
     return svg;
 }
 
@@ -77,7 +64,6 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
 });
 
 VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataSVG: string) => {
-    const pickedColor = VesktopNative.settings.get().trayColor;
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "white";
     badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959", true);
     if (fillColor !== "auto") badgeDataSVG = badgeDataSVG.replace(/white/gim, fillColor);

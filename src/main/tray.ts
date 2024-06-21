@@ -42,8 +42,7 @@ export async function setTrayIcon(iconName: string) {
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon.png"));
         }
 
-        const badge = lastBadgeCount > 9 ? 10 : lastBadgeCount;
-        const badgeSvg = readFileSync(join(BADGE_DIR, "svg", `${badge}.svg`), "utf8");
+        const badgeSvg = readFileSync(join(BADGE_DIR, `badge.svg`), "utf8");
         // and send IPC call to renderer to add to image
         mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeSvg);
         return;

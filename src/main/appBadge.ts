@@ -16,7 +16,7 @@ function loadBadge(index: number) {
     const cached = imgCache.get(index);
     if (cached) return cached;
 
-    const img = nativeImage.createFromPath(join(BADGE_DIR, "ico", `${index}.ico`));
+    const img = nativeImage.createFromPath(join(BADGE_DIR, `${index}.ico`));
     imgCache.set(index, img);
 
     return img;

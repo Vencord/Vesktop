@@ -117,9 +117,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                                                 return;
                                         }
 
-                                        const iconKey =
-                                            statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
-                                        Settings[iconKey] = true;
+                                        Settings[key] = true;
                                         const iconDataURL = VesktopNative.tray.getIconSync(iconName);
                                         const img = document.getElementById(iconName) as HTMLImageElement;
                                         if (img) {
@@ -134,9 +132,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                                 {Settings[key] && (
                                     <Button
                                         onClick={() => {
-                                            const iconKey =
-                                                statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
-                                            Settings[iconKey] = false;
+                                            Settings[key] = false;
                                             setCurrentTrayIcon();
                                         }}
                                         look={Button.Looks.LINK}
