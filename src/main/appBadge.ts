@@ -29,8 +29,10 @@ export function setBadgeCount(count: number) {
     lastBadgeCount = count;
     switch (process.platform) {
         case "linux":
-            if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            // commented out lines are temp to be replaced by #686
+            // if (count === -1) count = 0;
+            // app.setBadgeCount(count);
+
             break;
         case "darwin":
             if (count === 0) {

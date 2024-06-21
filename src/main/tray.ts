@@ -34,7 +34,7 @@ export async function setTrayIcon(iconName: string) {
     if (!Icons.has(iconName)) return;
 
     // if need to set main icon then check whether there is need of notif badge
-    if (iconName === "icon" && lastBadgeCount && lastBadgeCount > 0) {
+    if (iconName === "icon" && lastBadgeCount === -1) {
         var trayImage: NativeImage;
         if (isCustomIcon("icon")) {
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon_custom.png"));
@@ -43,7 +43,7 @@ export async function setTrayIcon(iconName: string) {
         }
 
         const badgeSvg = readFileSync(join(BADGE_DIR, `badge.svg`), "utf8");
-        // and send IPC call to renderer to add to image
+        // and send IPC call to renderer to add badge to icon
         mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeSvg);
         return;
     }
