@@ -13,7 +13,7 @@ addPatch({
             replacement: {
                 // FIXME: fix eslint rule
                 // eslint-disable-next-line no-useless-escape
-                match: /\.isPlatformEmbedded(?=\?\i\.DesktopNotificationTypes\.ALL)/g,
+                match: /\.isPlatformEmbedded(?=\?\i\.\i\.ALL)/g,
                 replace: "$&||true"
             }
         }
