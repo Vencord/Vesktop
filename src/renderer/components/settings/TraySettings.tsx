@@ -37,10 +37,10 @@ if (!isLinux)
 
 const statusToSettingsKey = {
     icon: { key: "trayMainOverride", label: "Main Icon" },
-    idle: { key: "trayIdleOverride", label: "Idle icon" },
-    speaking: { key: "traySpeakingOverride", label: "Speaking icon" },
-    muted: { key: "trayMutedOverride", label: "Muted icon" },
-    deafened: { key: "trayDeafenedOverride", label: "Deafened icon" }
+    idle: { key: "trayIdleOverride", label: "Idle Icon" },
+    speaking: { key: "traySpeakingOverride", label: "Speaking Icon" },
+    muted: { key: "trayMutedOverride", label: "Muted Icon" },
+    deafened: { key: "trayDeafenedOverride", label: "Deafened Icon" }
 };
 
 function trayEditButton(iconName: string) {
@@ -99,49 +99,53 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
             <Modals.ModalContent className="vcd-custom-tray-modal">
                 {Object.entries(statusToSettingsKey).map(([iconName, { key, label }]) => (
                     <div key={iconName}>
-                        <Forms.FormTitle tag="h3">{label}</Forms.FormTitle>
                         <Forms.FormSection className="vcd-custom-tray-icon-section">
-                            {trayEditButton(iconName)}
-                            <Button
-                                onClick={async () => {
-                                    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
-                                    switch (choice) {
-                                        case "cancelled":
-                                            return;
-                                        case "invalid":
-                                            Toasts.show({
-                                                message: "Please select a valid .png or .jpg image!",
-                                                id: Toasts.genId(),
-                                                type: Toasts.Type.FAILURE
-                                            });
-                                            return;
-                                    }
-
-                                    const iconKey =
-                                        statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
-                                    Settings[iconKey] = true;
-                                    const iconDataURL = VesktopNative.tray.getIconSync(iconName);
-                                    const img = document.getElementById(iconName) as HTMLImageElement;
-                                    if (img) {
-                                        img.src = iconDataURL;
-                                    }
-                                    setCurrentTrayIcon();
-                                }}
-                                look={Button.Looks.OUTLINED}
-                            >
-                                Choose icon
-                            </Button>
-                            {Settings[key] && (
+                            <div className="vcd-custom-tray-buttons">
+                                {trayEditButton(iconName)}
                                 <Button
-                                    onClick={() => {
-                                        Settings.trayMainOverride = false;
+                                    onClick={async () => {
+                                        const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
+                                        switch (choice) {
+                                            case "cancelled":
+                                                return;
+                                            case "invalid":
+                                                Toasts.show({
+                                                    message: "Please select a valid .png or .jpg image!",
+                                                    id: Toasts.genId(),
+                                                    type: Toasts.Type.FAILURE
+                                                });
+                                                return;
+                                        }
+
+                                        const iconKey =
+                                            statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+                                        Settings[iconKey] = true;
+                                        const iconDataURL = VesktopNative.tray.getIconSync(iconName);
+                                        const img = document.getElementById(iconName) as HTMLImageElement;
+                                        if (img) {
+                                            img.src = iconDataURL;
+                                        }
                                         setCurrentTrayIcon();
                                     }}
-                                    look={Button.Looks.LINK}
+                                    look={Button.Looks.OUTLINED}
                                 >
-                                    Reset Icon
+                                    Choose Icon
                                 </Button>
-                            )}
+                                {Settings[key] && (
+                                    <Button
+                                        onClick={() => {
+                                            Settings.trayMainOverride = false;
+                                            setCurrentTrayIcon();
+                                        }}
+                                        look={Button.Looks.LINK}
+                                    >
+                                        Reset Icon
+                                    </Button>
+                                )}
+                            </div>
+                            <div>
+                                <Forms.FormText>{label}</Forms.FormText>
+                            </div>
                         </Forms.FormSection>
                         <Forms.FormDivider className={`${Margins.top8} ${Margins.bottom8}`} />
                     </div>
