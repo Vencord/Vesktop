@@ -11,8 +11,6 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
-    NativeImage,
-    nativeImage,
     nativeTheme,
     screen,
     session,
@@ -21,7 +19,7 @@ import {
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
-import { ICON_PATH, ICONS_DIR } from "shared/paths";
+import { ICON_PATH } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
@@ -40,13 +38,13 @@ import {
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
-import { generateTrayIcons, isCustomIcon, statusToSettingsKey } from "./tray";
+import { setTrayIcon } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-let tray: Tray;
+export let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -127,14 +125,7 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
-    try {
-        if (Settings.store.trayMainOverride) tray.setImage(join(ICONS_DIR, "icon_custom.png"));
-        else tray.setImage(join(ICONS_DIR, "icon.png"));
-    } catch (error) {
-        console.log("Error while loading custom tray image. Recreating new ones.");
-        Settings.store.trayMainOverride = false;
-        generateTrayIcons();
-    }
+    setTrayIcon("icon");
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -511,35 +502,4 @@ export async function createWindows() {
     });
 
     initArRPC();
-}
-
-export async function setTrayIcon(iconName: string) {
-    if (!tray || tray.isDestroyed()) return;
-    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
-
-    if (!Icons.has(iconName)) return;
-    try {
-        var trayImage: NativeImage;
-        if (isCustomIcon(iconName)) {
-            trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + "_custom.png"));
-            if (trayImage.isEmpty()) {
-                const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey];
-                Settings.store[iconKey] = false;
-                generateTrayIcons();
-                return;
-            }
-        } else trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
-        if (trayImage.isEmpty()) {
-            generateTrayIcons();
-            return;
-        }
-        if (process.platform === "darwin") {
-            trayImage = trayImage.resize({ width: 16, height: 16 });
-        }
-        tray.setImage(trayImage);
-    } catch (error) {
-        console.log("Error: ", error, "Regenerating tray icons.");
-        generateTrayIcons(); // TODO: pass here only one icon request
-    }
-    return;
 }

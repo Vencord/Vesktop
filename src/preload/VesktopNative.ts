@@ -94,6 +94,12 @@ export const VesktopNative = {
         generateTrayIcons: () => invoke<void>(IpcEvents.GENERATE_TRAY_ICONS),
         setCurrentVoiceIcon: (listener: (...args: any[]) => void) => {
             ipcRenderer.on(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON, listener);
-        }
+        },
+        addBadgeToIcon: (listener: (iconDataURL: string, badgeDataURL: string) => void) => {
+            ipcRenderer.on(IpcEvents.ADD_BADGE_TO_ICON, (_, iconDataURL: string, badgeDataURL: string) =>
+                listener(iconDataURL, badgeDataURL)
+            );
+        },
+        returnIconWithBadge: (dataURL: string) => invoke<void>(IpcEvents.GET_ICON_WITH_BADGE, dataURL)
     }
 };

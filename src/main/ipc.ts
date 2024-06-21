@@ -28,9 +28,17 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin, setTrayIcon } from "./mainWindow";
+import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
-import { createTrayIcon, generateTrayIcons, getTrayIconFile, getTrayIconFileSync, pickTrayIcon } from "./tray";
+import {
+    createTrayIcon,
+    generateTrayIcons,
+    getIconWithBadge,
+    getTrayIconFile,
+    getTrayIconFileSync,
+    pickTrayIcon,
+    setTrayIcon
+} from "./tray";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -170,3 +178,4 @@ handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon)
 );
 handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());
 handle(IpcEvents.SELECT_TRAY_ICON, async (_, iconName) => pickTrayIcon(iconName));
+handle(IpcEvents.GET_ICON_WITH_BADGE, async (_, dataURL) => getIconWithBadge(dataURL));

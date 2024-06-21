@@ -5,13 +5,14 @@
  */
 
 import { dialog, NativeImage, nativeImage } from "electron";
-import { copyFileSync, mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { ICONS_DIR, STATIC_DIR } from "shared/paths";
 
-import { mainWin } from "./mainWindow";
+import { lastBadgeCount, loadBadge } from "./appBadge";
+import { mainWin, tray } from "./mainWindow";
 import { Settings } from "./settings";
 
 export const statusToSettingsKey = {
@@ -26,6 +27,62 @@ export const isCustomIcon = (status: string) => {
     const settingKey = statusToSettingsKey[status as keyof typeof statusToSettingsKey];
     return Settings.store[settingKey];
 };
+
+export async function setTrayIcon(iconName: string) {
+    if (!tray || tray.isDestroyed()) return;
+    const Icons = new Set(["speaking", "muted", "deafened", "idle", "icon"]);
+    if (!Icons.has(iconName)) return;
+
+    // if need to set main icon then check whether there is need of notif badge
+    if (iconName === "icon" && lastBadgeCount && lastBadgeCount > 0) {
+        var trayImage: NativeImage;
+        if (isCustomIcon("icon")) {
+            console.log("setting badge and CUSTOM icon");
+            trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon_custom.png"));
+        } else {
+            console.log("setting badge and stock icon");
+            trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon.png"));
+        }
+
+        const badgeImg = loadBadge(lastBadgeCount);
+        // and send IPC call to renderer to add to image
+        mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeImg.toDataURL());
+        return;
+    }
+
+    try {
+        var trayImage: NativeImage;
+        if (isCustomIcon(iconName)) {
+            trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + "_custom.png"));
+            if (trayImage.isEmpty()) {
+                const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey];
+                Settings.store[iconKey] = false;
+                generateTrayIcons();
+                return;
+            }
+        } else trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
+        if (trayImage.isEmpty()) {
+            generateTrayIcons();
+            return;
+        }
+        if (process.platform === "darwin") {
+            trayImage = trayImage.resize({ width: 16, height: 16 });
+        }
+        tray.setImage(trayImage);
+    } catch (error) {
+        console.log("Error: ", error, "Regenerating tray icons.");
+        generateTrayIcons(); // TODO: pass here only one icon request
+    }
+    return;
+}
+
+export async function setTrayIconWithBadge(iconDataURL: string) {
+    var trayImage = nativeImage.createFromDataURL(iconDataURL);
+    if (process.platform === "darwin") {
+        trayImage = trayImage.resize({ width: 16, height: 16 });
+    }
+    tray.setImage(trayImage);
+}
 
 export async function getTrayIconFile(iconName: string) {
     const Icons = new Set(["speaking", "muted", "deafened", "idle"]);
@@ -62,7 +119,9 @@ export async function createTrayIcon(iconName: string, iconDataURL: string, isCu
     // primarily called from renderer using CREATE_TRAY_ICON_RESPONSE IPC call
     iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
     if (isCustomIcon) {
-        writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), iconDataURL, "base64");
+        const img = nativeImage.createFromDataURL(iconDataURL).resize({ width: 128, height: 128 });
+        // writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toDataURL(), "base64");
+        writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toPNG());
     } else {
         writeFileSync(join(ICONS_DIR, iconName + ".png"), iconDataURL, "base64");
     }
@@ -76,7 +135,8 @@ export async function generateTrayIcons() {
     for (const icon of Icons) {
         mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
     }
-    copyFileSync(join(STATIC_DIR, "icon.png"), join(ICONS_DIR, "icon.png"));
+    const img = nativeImage.createFromPath(join(STATIC_DIR, "icon.png")).resize({ width: 128, height: 128 });
+    writeFileSync(join(ICONS_DIR, "icon.png"), img.toPNG());
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }
 
@@ -93,6 +153,11 @@ export async function pickTrayIcon(iconName: string) {
     // add .svg !!
     const image = nativeImage.createFromPath(dir);
     if (image.isEmpty()) return "invalid";
-    copyFileSync(dir, join(ICONS_DIR, iconName + "_custom.png"));
+    const img = nativeImage.createFromPath(dir).resize({ width: 128, height: 128 });
+    writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toPNG());
     return dir;
+}
+
+export async function getIconWithBadge(dataURL: string) {
+    tray.setImage(nativeImage.createFromDataURL(dataURL));
 }

@@ -58,6 +58,36 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
     }
 });
 
+VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataURL: string) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+
+    const img = new Image();
+    img.width = 128;
+    img.height = 128;
+
+    img.onload = () => {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+            ctx.drawImage(img, 0, 0);
+
+            const iconImg = new Image();
+            iconImg.width = 64;
+            iconImg.height = 64;
+
+            iconImg.onload = () => {
+                ctx.drawImage(iconImg, 64, 0, 64, 64);
+                VesktopNative.tray.returnIconWithBadge(canvas.toDataURL());
+            };
+
+            iconImg.src = badgeDataURL;
+        }
+    };
+
+    img.src = iconDataURL;
+});
+
 VesktopNative.tray.setCurrentVoiceIcon(() => {
     setCurrentTrayIcon();
 });
