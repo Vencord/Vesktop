@@ -37,10 +37,8 @@ export async function setTrayIcon(iconName: string) {
     if (iconName === "icon" && lastBadgeCount && lastBadgeCount > 0) {
         var trayImage: NativeImage;
         if (isCustomIcon("icon")) {
-            console.log("setting badge and CUSTOM icon");
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon_custom.png"));
         } else {
-            console.log("setting badge and stock icon");
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon.png"));
         }
 

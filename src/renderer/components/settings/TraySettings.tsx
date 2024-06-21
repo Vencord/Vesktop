@@ -134,7 +134,9 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                                 {Settings[key] && (
                                     <Button
                                         onClick={() => {
-                                            Settings.trayMainOverride = false;
+                                            const iconKey =
+                                                statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+                                            Settings[iconKey] = false;
                                             setCurrentTrayIcon();
                                         }}
                                         look={Button.Looks.LINK}
