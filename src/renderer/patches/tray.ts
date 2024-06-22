@@ -39,9 +39,9 @@ function changeColorsInSvg(svg: string, stockColor: string) {
     return svg;
 }
 
-VesktopNative.tray.createIconRequest(async (iconName: string) => {
+VesktopNative.tray.createIconRequest(async (iconName: string, svgIcon: string = "") => {
     try {
-        var svg = await VesktopNative.tray.getIcon(iconName);
+        var svg = svgIcon || (await VesktopNative.tray.getIcon(iconName));
         svg = changeColorsInSvg(svg, "#f6bfac");
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -54,7 +54,8 @@ VesktopNative.tray.createIconRequest(async (iconName: string) => {
             if (ctx) {
                 ctx.drawImage(img, 0, 0);
                 const dataURL = canvas.toDataURL("image/png");
-                VesktopNative.tray.createIconResponse(iconName, dataURL, false);
+                const isSvg = svgIcon !== "";
+                VesktopNative.tray.createIconResponse(iconName, dataURL, isSvg, isSvg); // custom if svgIcon is provided
             }
         };
         img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;

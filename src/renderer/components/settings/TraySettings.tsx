@@ -41,6 +41,36 @@ const statusToSettingsKey = {
     deafened: { key: "trayDeafenedOverride", label: "Deafened Icon" }
 };
 
+async function changeIcon(iconName, settings) {
+    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
+    switch (choice) {
+        case "cancelled":
+            return;
+        case "invalid":
+            Toasts.show({
+                message: "Please select a valid .png or .jpg image!",
+                id: Toasts.genId(),
+                type: Toasts.Type.FAILURE
+            });
+            return;
+    }
+
+    const updateIcon = () => {
+        const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+        settings[iconKey] = true;
+        const iconDataURL = VesktopNative.tray.getIconSync(iconName);
+        const img = document.getElementById(iconName) as HTMLImageElement;
+        if (img) {
+            img.src = iconDataURL;
+        }
+        setCurrentTrayIcon();
+    };
+
+    // sometimes new icon may not be generated in time and will be used old icon :c
+    if (choice === "svg") setTimeout(updateIcon, 50);
+    else updateIcon();
+}
+
 function trayEditButton(iconName: string) {
     const Settings = useSettings();
     return (
@@ -58,27 +88,7 @@ function trayEditButton(iconName: string) {
                 width="40"
                 height="40"
                 onClick={async () => {
-                    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
-                    switch (choice) {
-                        case "cancelled":
-                            return;
-                        case "invalid":
-                            Toasts.show({
-                                message: "Please select a valid .png or .jpg image!",
-                                id: Toasts.genId(),
-                                type: Toasts.Type.FAILURE
-                            });
-                            return;
-                    }
-
-                    const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
-                    Settings[iconKey] = true;
-                    const iconDataURL = VesktopNative.tray.getIconSync(iconName);
-                    const img = document.getElementById(iconName) as HTMLImageElement;
-                    if (img) {
-                        img.src = iconDataURL;
-                    }
-                    setCurrentTrayIcon();
+                    changeIcon(iconName, Settings);
                 }}
             />
         </div>
@@ -102,26 +112,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                                 {trayEditButton(iconName)}
                                 <Button
                                     onClick={async () => {
-                                        const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
-                                        switch (choice) {
-                                            case "cancelled":
-                                                return;
-                                            case "invalid":
-                                                Toasts.show({
-                                                    message: "Please select a valid .png or .jpg image!",
-                                                    id: Toasts.genId(),
-                                                    type: Toasts.Type.FAILURE
-                                                });
-                                                return;
-                                        }
-
-                                        Settings[key] = true;
-                                        const iconDataURL = VesktopNative.tray.getIconSync(iconName);
-                                        const img = document.getElementById(iconName) as HTMLImageElement;
-                                        if (img) {
-                                            img.src = iconDataURL;
-                                        }
-                                        setCurrentTrayIcon();
+                                        changeIcon(iconName, Settings);
                                     }}
                                     look={Button.Looks.OUTLINED}
                                 >

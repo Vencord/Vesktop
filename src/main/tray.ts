@@ -112,14 +112,19 @@ export function getTrayIconFileSync(iconName: string) {
     }
 }
 
-export async function createTrayIcon(iconName: string, iconDataURL: string, isCustomIcon: boolean = false) {
+export async function createTrayIcon(
+    iconName: string,
+    iconDataURL: string,
+    isCustomIcon: boolean = false,
+    isSvg: boolean = false
+) {
     // creates .png at config/TrayIcons/iconName.png from given iconDataURL
     // primarily called from renderer using CREATE_TRAY_ICON_RESPONSE IPC call
     iconDataURL = iconDataURL.replace(/^data:image\/png;base64,/, "");
     if (isCustomIcon) {
         const img = nativeImage.createFromDataURL(iconDataURL).resize({ width: 128, height: 128 });
-        // writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toDataURL(), "base64");
-        writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toPNG());
+        if (isSvg) writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), iconDataURL, "base64");
+        else writeFileSync(join(ICONS_DIR, iconName + "_custom.png"), img.toPNG());
     } else {
         writeFileSync(join(ICONS_DIR, iconName + ".png"), iconDataURL, "base64");
     }
@@ -144,11 +149,15 @@ export async function pickTrayIcon(iconName: string) {
 
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openFile"],
-        filters: [{ name: "Image", extensions: ["png", "jpg"] }]
+        filters: [{ name: "Image", extensions: ["png", "jpg", "svg"] }]
     });
     if (!res.filePaths.length) return "cancelled";
     const dir = res.filePaths[0];
     // add .svg !!
+    if (dir.split(".").pop() === "svg") {
+        mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, iconName, readFileSync(dir, "utf-8"));
+        return "svg";
+    }
     const image = nativeImage.createFromPath(dir);
     if (image.isEmpty()) return "invalid";
     const img = nativeImage.createFromPath(dir).resize({ width: 128, height: 128 });

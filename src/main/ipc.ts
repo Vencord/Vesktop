@@ -163,8 +163,8 @@ handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
 handleSync(IpcEvents.GET_TRAY_ICON_SYNC, (_, iconPath) => getTrayIconFileSync(iconPath));
 handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => getAccentColor());
-handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon) =>
-    createTrayIcon(iconName, dataURL, isCustomIcon)
+handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon, isSvg) =>
+    createTrayIcon(iconName, dataURL, isCustomIcon, isSvg)
 );
 handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());
 handle(IpcEvents.SELECT_TRAY_ICON, async (_, iconName) => pickTrayIcon(iconName));
