@@ -42,6 +42,13 @@ export async function setTrayIcon(iconName: string) {
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon.png"));
         }
 
+        if (trayImage.isEmpty()) {
+            const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey];
+            Settings.store[iconKey] = false;
+            generateTrayIcons("icon");
+            return;
+        }
+
         const badgeSvg = readFileSync(join(BADGE_DIR, `badge.svg`), "utf8");
         // and send IPC call to renderer to add badge to icon
         mainWin.webContents.send(IpcEvents.ADD_BADGE_TO_ICON, trayImage.toDataURL(), badgeSvg);
@@ -55,12 +62,12 @@ export async function setTrayIcon(iconName: string) {
             if (trayImage.isEmpty()) {
                 const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey];
                 Settings.store[iconKey] = false;
-                generateTrayIcons();
+                generateTrayIcons(iconName);
                 return;
             }
         } else trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
         if (trayImage.isEmpty()) {
-            generateTrayIcons();
+            generateTrayIcons(iconName);
             return;
         }
         if (process.platform === "darwin") {
@@ -68,8 +75,8 @@ export async function setTrayIcon(iconName: string) {
         }
         tray.setImage(trayImage);
     } catch (error) {
-        console.log("Error: ", error, "Regenerating tray icons.");
-        generateTrayIcons(); // TODO: pass here only one icon request
+        console.log("Error: ", error, "Regenerating tray icon.");
+        generateTrayIcons(iconName);
     }
     return;
 }
@@ -102,8 +109,8 @@ export function getTrayIconFileSync(iconName: string) {
         } else img = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
         img = img.resize({ width: 128, height: 128 });
         if (img.isEmpty()) {
-            console.log("Can't open icon file. Regenerating.");
-            generateTrayIcons();
+            console.log("Can't open icon file for", iconName, ". Regenerating.");
+            generateTrayIcons(iconName);
             img = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
             const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey];
             Settings.store[iconKey] = false;
@@ -131,16 +138,26 @@ export async function createTrayIcon(
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
 }
 
-export async function generateTrayIcons() {
+export async function generateTrayIcons(iconName: string = "") {
     // this function generates tray icons as .png's in Vesktop cache for future use
     mkdirSync(ICONS_DIR, { recursive: true });
     const Icons = ["speaking", "muted", "deafened", "idle"];
+
+    const createMainIcon = () => {
+        const img = nativeImage.createFromPath(join(STATIC_DIR, "icon.png")).resize({ width: 128, height: 128 });
+        writeFileSync(join(ICONS_DIR, "icon.png"), img.toPNG());
+        mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+    };
+
+    if (iconName) {
+        if (Icons.includes(iconName)) mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, iconName);
+        else if (iconName === "icon") createMainIcon();
+        return;
+    }
     for (const icon of Icons) {
         mainWin.webContents.send(IpcEvents.CREATE_TRAY_ICON_REQUEST, icon);
     }
-    const img = nativeImage.createFromPath(join(STATIC_DIR, "icon.png")).resize({ width: 128, height: 128 });
-    writeFileSync(join(ICONS_DIR, "icon.png"), img.toPNG());
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+    createMainIcon();
 }
 
 export async function pickTrayIcon(iconName: string) {

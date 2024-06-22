@@ -97,7 +97,6 @@ function trayEditButton(iconName: string) {
 
 function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () => void }) {
     const Settings = useSettings();
-
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
             <Modals.ModalHeader className="vcd-custom-tray-header">
@@ -118,7 +117,7 @@ function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () 
                                 >
                                     Choose Icon
                                 </Button>
-                                {Settings[key] && (
+                                {VesktopNative.settings.get()[key] && (
                                     <Button
                                         onClick={() => {
                                             Settings[key] = false;
