@@ -1,8 +1,3 @@
-.vcd-tray-settings {
-    display: flex;
-    flex-direction: column;
-}
-
 .vcd-tray-container {
     display: flex;
     flex-direction: row;
@@ -20,17 +15,6 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
-}
-.vcd-tray-setting-switch {
-    flex-grow: 1;
-    align-self: flex-start;
-    margin-right: -4.5rem;
-}
-.vcd-tray-setting-customize {
-    align-self: right;
-    position: relative;
-    margin-right: 0em;
-    bottom: 4px;
 }
 
 .vcd-tray-icon-wrap {
@@ -79,16 +63,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-}
-
-.vcd-custom-tray-icon-form-text {
-    font-size: medium;
-}
-
-.vcd-custom-tray-icon-label {
-    margin-top: 0.5em;
-    display: flex;
-    align-items: center;
 }
 
 .vcd-custom-tray-buttons {
