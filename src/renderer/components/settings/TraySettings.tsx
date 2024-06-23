@@ -48,7 +48,7 @@ async function changeIcon(iconName, settings) {
             return;
         case "invalid":
             Toasts.show({
-                message: "Please select a valid .png or .jpg image!",
+                message: "Please select a valid .png, .jpg or .svg image!",
                 id: Toasts.genId(),
                 type: Toasts.Type.FAILURE
             });

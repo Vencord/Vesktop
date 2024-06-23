@@ -535,7 +535,7 @@ export function getAccentColor() {
             const hexColor = `#${toHex(r255)}${toHex(g255)}${toHex(b255)}`;
             return hexColor;
         }
-        return undefined;
+        return "";
     } else {
         return `#${systemPreferences.getAccentColor?.() || ""}`;
     }
