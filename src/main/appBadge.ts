@@ -42,15 +42,7 @@ export function setBadgeCount(count: number) {
                     `{\'count\': <int64 ${count}>, \'count-visible\': <${visible}>}`
                 ]);
             }
-            if (count === 0) {
-                emitDBusBadge(count, false);
-                break;
-            }
-            if (count === -1) {
-                emitDBusBadge(0, true);
-                break;
-            }
-            emitDBusBadge(count, true);
+            emitDBusBadge(count === -1 ? 0 : count, count !== 0);
             break;
         case "darwin":
             if (count === 0) {
