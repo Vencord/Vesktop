@@ -125,10 +125,10 @@ onceReady.then(() => {
     });
 
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
-        if (params.state === "RTC_CONNECTED") {
+        if (params.state === "RTC_CONNECTED" && params.context === "default") {
             isInCall = true;
             setCurrentTrayIcon();
-        } else if (params.state === "RTC_DISCONNECTED") {
+        } else if (params.state === "RTC_DISCONNECTED" && params.context === "default") {
             VesktopNative.tray.setIcon("icon");
             isInCall = false;
         }
