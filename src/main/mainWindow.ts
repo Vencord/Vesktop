@@ -108,7 +108,7 @@ function initTray(win: BrowserWindow) {
             type: "separator"
         },
         {
-            label: "Relaunch",
+            label: "Restart Vesktop",
             click() {
                 app.relaunch();
                 app.quit();
