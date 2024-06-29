@@ -93,6 +93,10 @@ handle(IpcEvents.MAXIMIZE, e => {
     }
 });
 
+handle(IpcEvents.SET_ZOOM, (e, zoom: number) => {
+    mainWin.webContents.setZoomFactor(zoom);
+});
+
 handleSync(IpcEvents.SPELLCHECK_GET_AVAILABLE_LANGUAGES, e => {
     e.returnValue = session.defaultSession.availableSpellCheckerLanguages;
 });
