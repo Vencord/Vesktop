@@ -11,6 +11,7 @@ import {
     dialog,
     Menu,
     MenuItemConstructorOptions,
+    nativeImage,
     nativeTheme,
     screen,
     session,
@@ -34,6 +35,7 @@ import {
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
+    TRAY_ICON_PATH,
     VENCORD_FILES_DIR
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
@@ -122,8 +124,16 @@ function initTray(win: BrowserWindow) {
             }
         }
     ]);
+    var trayImage = nativeImage.createFromPath(ICON_PATH);
+    if (Settings.store.trayIconPath) trayImage = nativeImage.createFromPath(TRAY_ICON_PATH);
+    if (trayImage.isEmpty()) trayImage = nativeImage.createFromPath(ICON_PATH);
 
-    tray = new Tray(ICON_PATH);
+    if (process.platform === "darwin") {
+        tray = new Tray(trayImage.resize({ width: 16, height: 16 }));
+    } else {
+        tray = new Tray(trayImage.resize({ width: 32, height: 32 }));
+    }
+
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -333,6 +343,10 @@ function initSettingsListeners(win: BrowserWindow) {
         if (enable) initTray(win);
         else tray?.destroy();
     });
+    addSettingsListener("trayIconPath", _ => {
+        tray?.destroy();
+        initTray(win);
+    });
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
             // 0 no work
@@ -447,7 +461,7 @@ function createMainWindow() {
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
 
     initWindowBoundsListeners(win);
-    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (Settings.store.tray ?? true)) initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);

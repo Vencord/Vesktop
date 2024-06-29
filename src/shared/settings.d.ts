@@ -22,6 +22,7 @@ export interface Settings {
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
+    trayIconPath?: string;
 
     checkUpdates?: boolean;
 

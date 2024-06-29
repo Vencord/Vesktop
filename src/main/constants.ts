@@ -18,6 +18,7 @@ export const PORTABLE =
 const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR =
     process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
+export const TRAY_ICON_PATH = join(DATA_DIR, "settings", "tray_icon");
 
 mkdirSync(DATA_DIR, { recursive: true });
 

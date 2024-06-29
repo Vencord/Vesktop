@@ -14,6 +14,7 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { TrayIconImagePicker } from "./TrayIconImagePicker";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -69,13 +70,6 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     ],
     Behaviour: [
         {
-            key: "tray",
-            title: "Tray Icon",
-            description: "Add a tray icon for Vesktop",
-            defaultValue: true,
-            invisible: () => isMac
-        },
-        {
             key: "minimizeToTray",
             title: "Minimize to tray",
             description: "Hitting X will make Vesktop minimize to the tray instead of closing",
@@ -126,6 +120,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
+    "Tray Icon Image": [TrayIconImagePicker],
     "Vencord Location": [VencordLocationPicker]
 };
 

@@ -34,7 +34,8 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
+        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR),
+        selectTrayIcon: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_TRAY_ICON)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
@@ -56,6 +57,9 @@ export const VesktopNative = {
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
         minimize: () => invoke<void>(IpcEvents.MINIMIZE),
         maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
+    },
+    tray: {
+        getTrayIcon: () => sendSync<string>(IpcEvents.GET_TRAY_ICON)
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
