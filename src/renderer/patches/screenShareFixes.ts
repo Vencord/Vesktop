@@ -36,7 +36,7 @@ if (isLinux) {
 
         const constraints = {
             ...track.getConstraints(),
-            frameRate: { min: frameRate, ideal: frameRate},
+            frameRate: { min: frameRate, ideal: frameRate },
             width: { min: 640, ideal: width, max: width },
             height: { min: 480, ideal: height, max: height },
             advanced: [{ width: width, height: height }],
