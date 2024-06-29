@@ -87,11 +87,7 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
-            label: "About",
-            click: createAboutWindow
-        },
-        {
-            label: "Update Vencord",
+            label: "Update Vencord and Restart Vesktop",
             async click() {
                 await downloadVencordFiles();
                 app.relaunch();
@@ -105,10 +101,14 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
+            label: "About",
+            click: createAboutWindow
+        },
+        {
             type: "separator"
         },
         {
-            label: "Relaunch",
+            label: "Restart Vesktop",
             click() {
                 app.relaunch();
                 app.quit();
