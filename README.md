@@ -26,7 +26,7 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-If you don't know the difference, pick the Intel build.
+If you don't know the difference, check About This Mac from the Apple menu. If the first item is labeled "Chip", choose the Apple Silicon build. If it is labeled "Processor", choose the Intel build. 
 
 - [Intel build (amd64)](https://vencord.dev/download/vesktop/amd64/dmg)
 - [Apple Silicon (arm64)](https://vencord.dev/download/vesktop/arm64/dmg)
