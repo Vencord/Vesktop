@@ -64,8 +64,18 @@ function init() {
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
-    app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        if (data.IS_DEV) app.quit();
+    app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
+        const keybindIndex = cmdLine.indexOf("--keybind");
+
+        if (keybindIndex !== -1) {
+            if (cmdLine[keybindIndex + 2] === "keyup" || cmdLine[keybindIndex + 2] === "keydown") {
+                mainWin.webContents.executeJavaScript(
+                    `Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](${cmdLine[keybindIndex + 2] === "keydown" ? "true" : "false"})`
+                );
+            } else {
+                mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](false)`);
+            }
+        } else if (data.IS_DEV) app.quit();
         else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
             if (!mainWin.isVisible()) mainWin.show();
@@ -89,15 +99,24 @@ function init() {
 }
 
 if (!app.requestSingleInstanceLock({ IS_DEV })) {
-    if (IS_DEV) {
-        console.log("Vesktop is already running. Quitting previous instance...");
-        init();
-    } else {
-        console.log("Vesktop is already running. Quitting...");
+    if (process.argv.includes("--keybind")) {
         app.quit();
+    } else {
+        if (IS_DEV) {
+            console.log("Vesktop is already running. Quitting previous instance...");
+            init();
+        } else {
+            console.log("Vesktop is already running. Quitting...");
+            app.quit();
+        }
     }
 } else {
-    init();
+    if (process.argv.includes("--keybind")) {
+        console.error("No instances running! cannot issue a keybind!");
+        app.quit();
+    } else {
+        init();
+    }
 }
 
 async function bootstrap() {
