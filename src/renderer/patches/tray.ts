@@ -107,7 +107,7 @@ onceReady.then(() => {
     const userID = UserStore.getCurrentUser().id;
 
     FluxDispatcher.subscribe("SPEAKING", params => {
-        if (params.userId === userID) {
+        if (params.userId === userID && params.context === "default") {
             if (params.speakingFlags) {
                 VesktopNative.tray.setIcon("speaking");
             } else {
