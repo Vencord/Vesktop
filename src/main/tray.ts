@@ -34,7 +34,7 @@ export async function setTrayIcon(iconName: string) {
     if (!Icons.has(iconName)) return;
 
     // if need to set main icon then check whether there is need of notif badge
-    if (iconName === "icon" && lastBadgeCount > 0) {
+    if (iconName === "icon" && lastBadgeCount !== 0) {
         var trayImage: NativeImage;
         if (isCustomIcon("icon")) {
             trayImage = nativeImage.createFromPath(join(ICONS_DIR, "icon_custom.png"));

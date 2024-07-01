@@ -68,7 +68,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         WindowsTransparencyControls
     ],
-    Behaviour: [
+    Tray: [
         TraySwitch,
         CustomizeTraySwitch,
         TrayIconPicker,
@@ -86,7 +86,9 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Left clicking tray icon will toggle the vesktop window visibility.",
             defaultValue: false,
             invisible: () => Settings.store.tray === false
-        },
+        }
+    ],
+    Behaviour: [
         {
             key: "disableMinSize",
             title: "Disable minimum window size",

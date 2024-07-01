@@ -34,11 +34,11 @@ VesktopNative.app.getAccentColor().then(color => {
 });
 
 const statusToSettingsKey = {
-    icon: { key: "trayMainOverride", label: "Main Icon" },
-    idle: { key: "trayIdleOverride", label: "Idle Icon" },
-    speaking: { key: "traySpeakingOverride", label: "Speaking Icon" },
-    muted: { key: "trayMutedOverride", label: "Muted Icon" },
-    deafened: { key: "trayDeafenedOverride", label: "Deafened Icon" }
+    icon: { key: "trayMainOverride", label: "Default" },
+    idle: { key: "trayIdleOverride", label: "Idle" },
+    speaking: { key: "traySpeakingOverride", label: "Speaking" },
+    muted: { key: "trayMutedOverride", label: "Muted" },
+    deafened: { key: "trayDeafenedOverride", label: "Deafened" }
 };
 
 async function changeIcon(iconName, settings) {
@@ -154,9 +154,9 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
                 settings.tray = v;
                 setCurrentTrayIcon();
             }}
-            note="Add a tray icon for Vesktop"
+            note="Add a system tray entry for Vesktop"
         >
-            Tray Icon
+            Enable Tray Icon
         </Switch>
     );
 };
@@ -169,8 +169,8 @@ export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
             <div className="vcd-tray-settings">
                 <div className="vcd-tray-container">
                     <div className="vcd-tray-settings-labels">
-                        <Forms.FormTitle tag="h3">Custom tray icons</Forms.FormTitle>
-                        <Forms.FormText>Use custom default and voice status tray icons.</Forms.FormText>
+                        <Forms.FormTitle tag="h3">Custom Tray Icons</Forms.FormTitle>
+                        <Forms.FormText>Pick custom icons for your tray.</Forms.FormText>
                     </div>
                     <Button
                         onClick={async () => {
@@ -192,8 +192,8 @@ export const TrayIconPicker: SettingsComponent = ({ settings }) => {
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
                 <div className="vcd-tray-settings-labels">
-                    <Forms.FormTitle tag="h3">Tray Icon Color</Forms.FormTitle>
-                    <Forms.FormText>Choose a color for your tray icon!</Forms.FormText>
+                    <Forms.FormTitle tag="h3">Tray Icon Accent</Forms.FormTitle>
+                    <Forms.FormText>Choose an accent color for your tray icon.</Forms.FormText>
                 </div>
                 <ColorPicker
                     color={parseInt(settings.trayColor ?? "3DB77F", 16)}
@@ -217,8 +217,8 @@ export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
                 <div className="vcd-tray-settings-labels">
-                    <Forms.FormTitle tag="h3">Tray icon fill color</Forms.FormTitle>
-                    <Forms.FormText>Choose background fill of Tray Icons in Voice Chat</Forms.FormText>
+                    <Forms.FormTitle tag="h3">Tray Icon Color</Forms.FormTitle>
+                    <Forms.FormText>Choose the main color of the Tray Icons</Forms.FormText>
                 </div>
 
                 <Select
