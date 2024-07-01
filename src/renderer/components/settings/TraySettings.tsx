@@ -6,15 +6,16 @@
 
 import "./traySetting.css";
 
-import { Margins } from "@vencord/types/utils";
-import { findByCodeLazy } from "@vencord/types/webpack";
-import { Forms, Select, Switch } from "@vencord/types/webpack/common";
+import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
+import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
+import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
-import { isLinux, isMac } from "renderer/utils";
+import { useSettings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
 
 const ColorPicker = findByCodeLazy(".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR", ".BACKGROUND_PRIMARY)");
+const { PencilIcon } = findByPropsLazy("PencilIcon");
 
 const presets = [
     "#3DB77F", // discord default ~
@@ -28,13 +29,124 @@ const presets = [
     "#FC18EC" // pink
 ];
 
-if (!isLinux)
-    VesktopNative.app.getAccentColor().then(color => {
-        if (color) presets.unshift(color);
-    });
+VesktopNative.app.getAccentColor().then(color => {
+    if (color) presets.unshift(color);
+});
+
+const statusToSettingsKey = {
+    icon: { key: "trayMainOverride", label: "Main Icon" },
+    idle: { key: "trayIdleOverride", label: "Idle Icon" },
+    speaking: { key: "traySpeakingOverride", label: "Speaking Icon" },
+    muted: { key: "trayMutedOverride", label: "Muted Icon" },
+    deafened: { key: "trayDeafenedOverride", label: "Deafened Icon" }
+};
+
+async function changeIcon(iconName, settings) {
+    const choice = await VesktopNative.fileManager.selectTrayIcon(iconName);
+    switch (choice) {
+        case "cancelled":
+            return;
+        case "invalid":
+            Toasts.show({
+                message: "Please select a valid .png, .jpg or .svg image!",
+                id: Toasts.genId(),
+                type: Toasts.Type.FAILURE
+            });
+            return;
+    }
+
+    const updateIcon = () => {
+        const iconKey = statusToSettingsKey[iconName as keyof typeof statusToSettingsKey].key;
+        settings[iconKey] = true;
+        const iconDataURL = VesktopNative.tray.getIconSync(iconName);
+        const img = document.getElementById(iconName) as HTMLImageElement;
+        if (img) {
+            img.src = iconDataURL;
+        }
+        setCurrentTrayIcon();
+    };
+
+    // sometimes new icon may not be generated in time and will be used old icon :c
+    if (choice === "svg") setTimeout(updateIcon, 50);
+    else updateIcon();
+}
+
+function trayEditButton(iconName: string) {
+    const Settings = useSettings();
+    return (
+        <div className="vcd-tray-icon-wrap">
+            <img
+                className="vcd-tray-icon-image"
+                src={VesktopNative.tray.getIconSync(iconName)}
+                alt="read if cute :3"
+                width="48"
+                height="48"
+                id={iconName}
+            ></img>
+            <PencilIcon
+                className="vcd-edit-button"
+                width="40"
+                height="40"
+                onClick={async () => {
+                    changeIcon(iconName, Settings);
+                }}
+            />
+        </div>
+    );
+}
+
+function TrayModalComponent({ modalProps, close }: { modalProps: any; close: () => void }) {
+    const Settings = useSettings();
+    return (
+        <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
+            <Modals.ModalHeader className="vcd-custom-tray-header">
+                <Forms.FormTitle tag="h2">Custom Tray Icons</Forms.FormTitle>
+                <Modals.ModalCloseButton onClick={close} />
+            </Modals.ModalHeader>
+            <Modals.ModalContent className="vcd-custom-tray-modal">
+                {Object.entries(statusToSettingsKey).map(([iconName, { key, label }]) => (
+                    <div key={iconName}>
+                        <Forms.FormSection className="vcd-custom-tray-icon-section">
+                            <div className="vcd-custom-tray-buttons">
+                                {trayEditButton(iconName)}
+                                <Button
+                                    onClick={async () => {
+                                        changeIcon(iconName, Settings);
+                                    }}
+                                    look={Button.Looks.OUTLINED}
+                                >
+                                    Choose Icon
+                                </Button>
+                                {VesktopNative.settings.get()[key] && (
+                                    <Button
+                                        onClick={() => {
+                                            Settings[key] = false;
+                                            setCurrentTrayIcon();
+                                        }}
+                                        look={Button.Looks.LINK}
+                                    >
+                                        Reset Icon
+                                    </Button>
+                                )}
+                            </div>
+                            <div>
+                                <Forms.FormText>{label}</Forms.FormText>
+                            </div>
+                        </Forms.FormSection>
+                        <Forms.FormDivider className={`${Margins.top8} ${Margins.bottom8}`} />
+                    </div>
+                ))}
+            </Modals.ModalContent>
+            <Modals.ModalFooter></Modals.ModalFooter>
+        </Modals.ModalRoot>
+    );
+}
+
+const openTrayModal = () => {
+    openModal(props => <TrayModalComponent modalProps={props} close={() => props.onClose()} />);
+};
 
 export const TraySwitch: SettingsComponent = ({ settings }) => {
-    if (isMac) return null;
     return (
         <Switch
             value={settings.tray ?? true}
@@ -46,6 +158,31 @@ export const TraySwitch: SettingsComponent = ({ settings }) => {
         >
             Tray Icon
         </Switch>
+    );
+};
+
+export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
+    if (!settings.tray) return null;
+
+    return (
+        <>
+            <div className="vcd-tray-settings">
+                <div className="vcd-tray-container">
+                    <div className="vcd-tray-settings-labels">
+                        <Forms.FormTitle tag="h3">Custom tray icons</Forms.FormTitle>
+                        <Forms.FormText>Use custom default and voice status tray icons.</Forms.FormText>
+                    </div>
+                    <Button
+                        onClick={async () => {
+                            openTrayModal();
+                        }}
+                    >
+                        Configure
+                    </Button>
+                </div>
+                <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
+            </div>
+        </>
     );
 };
 

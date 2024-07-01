@@ -13,6 +13,11 @@ export interface Settings {
     tray?: boolean;
     trayColor?: string;
     trayAutoFill?: "auto" | "white" | "black";
+    trayMainOverride?: boolean;
+    trayIdleOverride?: boolean;
+    trayMutedOverride?: boolean;
+    traySpeakingOverride?: boolean;
+    trayDeafenedOverride?: boolean;
     minimizeToTray?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
