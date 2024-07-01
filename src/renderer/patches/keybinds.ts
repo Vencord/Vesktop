@@ -13,7 +13,7 @@ const { toString } = findByPropsLazy("keyToCode");
 addPatch({
     patches: [
         {
-            find: ".default.Messages.KEYBINDS,children:",
+            find: "keybindActionTypes",
             replacement: [
                 {
                     // eslint-disable-next-line no-useless-escape
