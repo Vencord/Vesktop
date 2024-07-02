@@ -13,7 +13,7 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
-import { createWindows } from "./mainWindow";
+import { createWindows, getAccentColor } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
@@ -48,6 +48,8 @@ export function createFirstLaunchTour() {
         Settings.store.minimizeToTray = data.minimizeToTray;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.arRPC = data.richPresence;
+        Settings.store.tray = true;
+        Settings.store.trayColor = getAccentColor()?.slice(1);
 
         if (data.autoStart) autoStart.enable();
 

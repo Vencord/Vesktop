@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { execFileSync } from "child_process";
 import {
     app,
     BrowserWindow,
@@ -14,16 +15,17 @@ import {
     nativeTheme,
     screen,
     session,
+    systemPreferences,
     Tray
 } from "electron";
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
+import { ICON_PATH } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -38,12 +40,13 @@ import {
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
+import { setTrayIcon } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-let tray: Tray;
+export let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -124,6 +127,7 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
+    setTrayIcon("icon");
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -500,4 +504,39 @@ export async function createWindows() {
     });
 
     initArRPC();
+}
+
+export function getAccentColor() {
+    if (process.platform === "linux") {
+        var accentColor = execFileSync("gdbus", [
+            "call",
+            "--session",
+            "--dest",
+            "org.freedesktop.portal.Desktop",
+            "--object-path",
+            "/org/freedesktop/portal/desktop",
+            "--method",
+            "org.freedesktop.portal.Settings.Read",
+            "org.freedesktop.appearance",
+            "accent-color"
+        ]);
+        const rgbMatch = accentColor.toString().match(/\((\d+\.\d+),\s*(\d+\.\d+),\s*(\d+\.\d+)\)/);
+
+        if (rgbMatch) {
+            const r = parseFloat(rgbMatch[1]);
+            const g = parseFloat(rgbMatch[2]);
+            const b = parseFloat(rgbMatch[3]);
+
+            const r255 = Math.round(r * 255);
+            const g255 = Math.round(g * 255);
+            const b255 = Math.round(b * 255);
+
+            const toHex = (value: number) => value.toString(16).padStart(2, "0");
+            const hexColor = `#${toHex(r255)}${toHex(g255)}${toHex(b255)}`;
+            return hexColor;
+        }
+        return "";
+    } else {
+        return `#${systemPreferences.getAccentColor?.() || ""}`;
+    }
 }
