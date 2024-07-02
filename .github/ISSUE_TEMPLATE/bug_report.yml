@@ -17,7 +17,7 @@ body:
               - Purely graphical glitches like flickering, scaling issues, etc: Issue with your gpu. Nothing we can do, update drivers or disable hardware acceleration
               - Vencord related issues: This is the Vesktop repo, not Vencord
               - **SCREENSHARE NOT STARTING** / black screening on Linux: Issue with your desktop environment, specifically its xdg-desktop-portal.
-                If you're on flatpak, try using native version. If that also doesn't work, you have to fix your systen. Inspect errors and google around.
+                If you're on flatpak, try using native version. If that also doesn't work, you have to fix your system. Inspect errors and google around.
 
               Linux users: Please only report issues with supported packages (flatpak and any builds from the README / releases).
               We do not support other packages, like the AUR or Nix packages, so please first make sure your issue is reproducible with official releases,
