@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { dialog, NativeImage, nativeImage } from "electron";
+import { dialog, NativeImage, nativeImage, nativeTheme } from "electron";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -185,3 +185,7 @@ export async function pickTrayIcon(iconName: string) {
 export async function getIconWithBadge(dataURL: string) {
     tray.setImage(nativeImage.createFromDataURL(dataURL));
 }
+
+nativeTheme.on("updated", () => {
+    generateTrayIcons();
+});

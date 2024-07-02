@@ -32,8 +32,9 @@ function changeColorsInSvg(svg: string, stockColor: string) {
     const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
     const reg = new RegExp(stockColor, "gim");
     svg = svg.replace(reg, "#" + (pickedColor ?? stockColor));
-    if (fillColor !== "auto") {
+    if (fillColor === "white") {
         svg = svg.replace(/black/gim, fillColor);
+    } else if (fillColor === "black") {
         svg = svg.replace(/white/gim, fillColor);
     }
     return svg;
