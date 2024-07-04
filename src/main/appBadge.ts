@@ -30,19 +30,17 @@ export function setBadgeCount(count: number) {
                 break;
             }
             
-            function emitDBusBadge(count: number, visible: boolean) {
-                execFile ("gdbus", [
-                    "emit",
-                    "--session",
-                    "--object-path",
-                    "/",
-                    "--signal",
-                    "com.canonical.Unity.LauncherEntry.Update",
-                    "application://vesktop.desktop",
-                    `{\'count\': <int64 ${count}>, \'count-visible\': <${visible}>}`
-                ]);
-            }
-            emitDBusBadge(count === -1 ? 0 : count, count !== 0);
+            execFile ("gdbus", [
+                "emit",
+                "--session",
+                "--object-path",
+                "/",
+                "--signal",
+                "com.canonical.Unity.LauncherEntry.Update",
+                "application://vesktop.desktop",
+                `{\'count\': <int64 ${count === -1 ? 0 : count}>, \'count-visible\': <${count !== 0}>}`
+            ]);
+
             break;
         case "darwin":
             if (count === 0) {
