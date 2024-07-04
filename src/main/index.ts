@@ -7,7 +7,7 @@
 import "./ipc";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
-import { checkUpdates } from "updater/main";
+import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
@@ -20,6 +20,8 @@ import { isDeckGameMode } from "./utils/steamOS";
 if (IS_DEV) {
     require("source-map-support").install();
 }
+
+autoUpdater.checkForUpdatesAndNotify();
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
@@ -42,7 +44,13 @@ function init() {
 
     // disable renderer backgrounding to prevent the app from unloading when in the background
     // https://github.com/electron/electron/issues/2822
+    // https://github.com/GoogleChrome/chrome-launcher/blob/5a27dd574d47a75fec0fb50f7b774ebf8a9791ba/docs/chrome-flags-for-tools.md#task-throttling
     app.commandLine.appendSwitch("disable-renderer-backgrounding");
+    app.commandLine.appendSwitch("disable-background-timer-throttling");
+    app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
+    if (process.platform === "win32") {
+        disabledFeatures.push("CalculateNativeWinOcclusion");
+    }
 
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -50,12 +58,7 @@ function init() {
     // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
     //
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
-    disabledFeatures.push(
-        "WinRetrieveSuggestionsOnlyOnDemand",
-        "HardwareMediaKeyHandling",
-        "MediaSessionService",
-        "WidgetLayering"
-    );
+    disabledFeatures.push("WinRetrieveSuggestionsOnlyOnDemand", "HardwareMediaKeyHandling", "MediaSessionService");
 
     app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
     app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
@@ -73,7 +76,6 @@ function init() {
     });
 
     app.whenReady().then(async () => {
-        checkUpdates();
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
 
         registerScreenShareHandler();

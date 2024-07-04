@@ -40,5 +40,3 @@ if (IS_DEV) {
     });
 }
 // #endregion
-
-VesktopNative.spellcheck.setLanguages(window.navigator.languages);
