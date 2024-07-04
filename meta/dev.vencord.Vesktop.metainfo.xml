@@ -182,7 +182,7 @@
   <url type="vcs-browser">https://github.com/Vencord/Vesktop</url>
   <categories>
     <category>InstantMessaging</category>
-    <category>AudioVideo</category>
+    <category>Network</category>
   </categories>
   <requires>
     <control>pointing</control>

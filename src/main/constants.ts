@@ -37,7 +37,8 @@ if (existsSync(LEGACY_DATA_DIR)) {
         console.error("Migration failed", e);
     }
 }
-app.setPath("sessionData", join(DATA_DIR, "sessionData"));
+const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
+app.setPath("sessionData", SESSION_DATA_DIR);
 
 export const VENCORD_SETTINGS_DIR = join(DATA_DIR, "settings");
 export const VENCORD_QUICKCSS_FILE = join(VENCORD_SETTINGS_DIR, "quickCss.css");
@@ -47,7 +48,8 @@ export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
 // needs to be inline require because of circular dependency
 // as otherwise "DATA_DIR" (which is used by ./settings) will be uninitialised
 export const VENCORD_FILES_DIR =
-    (require("./settings") as typeof import("./settings")).Settings.store.vencordDir || join(DATA_DIR, "vencordDist");
+    (require("./settings") as typeof import("./settings")).State.store.vencordDir ||
+    join(SESSION_DATA_DIR, "vencordFiles");
 
 export const USER_AGENT = `Vesktop/${app.getVersion()} (https://github.com/Vencord/Vesktop)`;
 

@@ -8,7 +8,6 @@ import type { Rectangle } from "electron";
 
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
-    vencordDir?: string;
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     minimizeToTray?: boolean;
@@ -54,4 +53,6 @@ export interface State {
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+
+    vencordDir?: string;
 }
