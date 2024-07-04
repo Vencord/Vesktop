@@ -65,6 +65,7 @@
         "productName": "Vesktop",
         "files": [
             "!*",
+            "!node_modules",
             "dist/js",
             "static",
             "package.json",
@@ -118,8 +119,7 @@
                 {
                     "target": "default",
                     "arch": [
-                        "x64",
-                        "arm64"
+                        "universal"
                     ]
                 }
             ],
@@ -158,8 +158,20 @@
         },
         "win": {
             "target": [
-                "nsis",
-                "zip"
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                },
+                {
+                    "target": "zip",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
             ]
         },
         "publish": {
