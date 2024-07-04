@@ -445,10 +445,11 @@ function createMainWindow() {
     });
 
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
-    else if (Settings.store.appBadge) mainWin.webContents.on('page-title-updated', (_, title) => {
-        let cleanedTitle = title.replace(/^\(\d+\)\s*|•\s/, '');
-        mainWin.setTitle(cleanedTitle);    
-    });
+    else if (Settings.store.appBadge)
+    	mainWin.webContents.on("page-title-updated", (_, title) => {
+	        title = title.replace(/^\(\d+\)\s*|•\s/, "");
+	        mainWin.setTitle(title);    
+	    });
 
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
