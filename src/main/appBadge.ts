@@ -26,8 +26,7 @@ export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
             if (typeof count !== "number") { //sanitize
-                console.log("what the hel- *kaboom*") 
-                break;
+                throw new Error("count must be a number");
             }
             
             execFile ("gdbus", [
