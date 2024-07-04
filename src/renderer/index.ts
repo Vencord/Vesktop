@@ -68,7 +68,7 @@ if (Settings.store[vencordDir]) {
             () =>
                 Alerts.show({
                     title: "Custom Vencord Location",
-                    body: "Due to changes in Vesktop, your custom Vencord location had to bee reset. Please set it again in the settings.",
+                    body: "Due to security hardening changes in Vesktop, your custom Vencord location had to be reset. Please configure it again in the settings.",
                     onConfirm: () => delete Settings.store[vencordDir]
                 }),
             5000
