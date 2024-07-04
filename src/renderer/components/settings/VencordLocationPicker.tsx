@@ -4,24 +4,28 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { useForceUpdater } from "@vencord/types/utils";
 import { Button, Forms, Toasts } from "@vencord/types/webpack/common";
 
 import { SettingsComponent } from "./Settings";
 
 export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
+    const forceUpdate = useForceUpdater();
+    const vencordDir = VesktopNative.fileManager.getVencordDir();
+
     return (
         <>
             <Forms.FormText>
                 Vencord files are loaded from{" "}
-                {settings.vencordDir ? (
+                {vencordDir ? (
                     <a
                         href="about:blank"
                         onClick={e => {
                             e.preventDefault();
-                            VesktopNative.fileManager.showItemInFolder(settings.vencordDir!);
+                            VesktopNative.fileManager.showItemInFolder(vencordDir!);
                         }}
                     >
-                        {settings.vencordDir}
+                        {vencordDir}
                     </a>
                 ) : (
                     "the default location"
@@ -34,7 +38,14 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                         const choice = await VesktopNative.fileManager.selectVencordDir();
                         switch (choice) {
                             case "cancelled":
-                                return;
+                                break;
+                            case "ok":
+                                Toasts.show({
+                                    message: "Vencord install changed. Fully restart Vesktop to apply.",
+                                    id: Toasts.genId(),
+                                    type: Toasts.Type.SUCCESS
+                                });
+                                break;
                             case "invalid":
                                 Toasts.show({
                                     message:
@@ -42,9 +53,9 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                                     id: Toasts.genId(),
                                     type: Toasts.Type.FAILURE
                                 });
-                                return;
+                                break;
                         }
-                        settings.vencordDir = choice;
+                        forceUpdate();
                     }}
                 >
                     Change
@@ -52,7 +63,10 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                 <Button
                     size={Button.Sizes.SMALL}
                     color={Button.Colors.RED}
-                    onClick={() => (settings.vencordDir = void 0)}
+                    onClick={async () => {
+                        await VesktopNative.fileManager.selectVencordDir(null);
+                        forceUpdate();
+                    }}
                 >
                     Reset
                 </Button>
