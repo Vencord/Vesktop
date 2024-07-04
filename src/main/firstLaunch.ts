@@ -18,11 +18,11 @@ import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
 interface Data {
-    minimizeToTray: boolean;
     discordBranch: "stable" | "canary" | "ptb";
-    autoStart: boolean;
-    importSettings: boolean;
-    richPresence: boolean;
+    minimizeToTray?: "on";
+    autoStart?: "on";
+    importSettings?: "on";
+    richPresence?: "on";
 }
 
 export function createFirstLaunchTour() {
@@ -44,12 +44,12 @@ export function createFirstLaunchTour() {
         if (!msg.startsWith("form:")) return;
         const data = JSON.parse(msg.slice(5)) as Data;
 
+        console.log(data);
         State.store.firstLaunch = false;
-        Settings.store.minimizeToTray = data.minimizeToTray;
-        Settings.store.discordBranch = data.discordBranch;
-        Settings.store.arRPC = data.richPresence;
         Settings.store.tray = true;
         Settings.store.trayColor = getAccentColor()?.slice(1);
+        Settings.store.minimizeToTray = !!data.minimizeToTray;
+        Settings.store.arRPC = !!data.richPresence;
 
         if (data.autoStart) autoStart.enable();
 
