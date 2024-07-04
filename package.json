@@ -65,6 +65,7 @@
         "productName": "Vesktop",
         "files": [
             "!*",
+            "!node_modules",
             "dist/js",
             "static",
             "package.json",
