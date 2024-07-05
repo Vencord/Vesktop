@@ -19,7 +19,7 @@ import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { getAccentColor, mainWin } from "./mainWindow";
-import { Settings } from "./settings";
+import { Settings, State } from "./settings";
 import {
     createTrayIcon,
     generateTrayIcons,
@@ -29,7 +29,6 @@ import {
     pickTrayIcon,
     setTrayIcon
 } from "./tray";
-import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";

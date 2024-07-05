@@ -140,6 +140,7 @@ export async function createTrayIcon(
 
 export async function generateTrayIcons(iconName: string = "") {
     // this function generates tray icons as .png's in Vesktop cache for future use
+    if (!mainWin) return;
     mkdirSync(ICONS_DIR, { recursive: true });
     const Icons = ["speaking", "muted", "deafened", "idle"];
 
