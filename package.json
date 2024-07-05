@@ -24,8 +24,7 @@
         "updateMeta": "tsx scripts/utils/updateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24",
-        "electron-updater": "^6.2.1"
+        "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"
