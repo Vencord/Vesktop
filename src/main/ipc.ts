@@ -29,7 +29,7 @@ import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { getAccentColor, mainWin } from "./mainWindow";
-import { Settings } from "./settings";
+import { Settings, State } from "./settings";
 import {
     createTrayIcon,
     generateTrayIcons,
@@ -124,7 +124,14 @@ handle(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, (e, word: string) => {
     e.sender.session.addWordToSpellCheckerDictionary(word);
 });
 
-handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
+handleSync(IpcEvents.GET_VENCORD_DIR, e => (e.returnValue = State.store.vencordDir));
+
+handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
+    if (value === null) {
+        delete State.store.vencordDir;
+        return "ok";
+    }
+
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openDirectory"]
     });
@@ -133,7 +140,9 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async () => {
     const dir = res.filePaths[0];
     if (!isValidVencordInstall(dir)) return "invalid";
 
-    return dir;
+    State.store.vencordDir = dir;
+
+    return "ok";
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
