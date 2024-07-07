@@ -195,7 +195,7 @@ export const TrayColorTypeSelect: SettingsComponent = ({ settings }) => {
             </div>
 
             <Select
-                placeholder="Auto"
+                placeholder="Default"
                 options={[
                     { label: "Default", value: "default", default: true },
                     { label: "System Accent", value: "system" },

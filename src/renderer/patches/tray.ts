@@ -70,9 +70,7 @@ VesktopNative.tray.createIconRequest(async (iconName: string, svgIcon: string = 
 });
 
 VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataSVG: string) => {
-    const fillColor = VesktopNative.settings.get().trayAutoFill ?? "white";
-    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#F35959");
-    if (fillColor !== "auto") badgeDataSVG = badgeDataSVG.replace(/white/gim, fillColor);
+    badgeDataSVG = changeColorsInSvg(badgeDataSVG, "#f6bfac", (await VesktopNative.app.getAccentColor()).substring(1));
 
     const canvas = document.createElement("canvas");
     canvas.width = 128;
