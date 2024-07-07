@@ -447,8 +447,7 @@ function createMainWindow() {
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
     else if (Settings.store.appBadge)
     	mainWin.webContents.on("page-title-updated", (_, title) => {
-	        title = title.replace(/^\(\d+\)\s*|•\s/, "");
-	        mainWin.setTitle(title);    
+	        mainWin.setTitle(title.replace(/^\(\d+\)\s*|•\s/, ""));    
 	    });
 
     initWindowBoundsListeners(win);
