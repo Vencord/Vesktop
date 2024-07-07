@@ -11,6 +11,7 @@ export interface Settings {
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     trayColor?: string;
+    trayColorType?: "default" | "system" | "custom";
     trayAutoFill?: "auto" | "white" | "black";
     trayMainOverride?: boolean;
     trayIdleOverride?: boolean;
