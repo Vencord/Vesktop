@@ -25,6 +25,10 @@ cd Vesktop
 makepkg -rsifc
 ```
 
+### Others
+
+Download the binaries for your platform from [releases](https://github.com/D3SOX/Vesktop/releases)
+
 ## Building from Source
 
 Packaging will create builds in the dist/ folder
