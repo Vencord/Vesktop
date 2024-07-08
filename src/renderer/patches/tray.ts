@@ -27,9 +27,11 @@ export function setCurrentTrayIcon() {
     }
 }
 
-function changeColorsInSvg(svg: string, stockColor: string) {
-    const pickedColor = VesktopNative.settings.get().trayColor || VesktopNative.app.getAccentColor();
-    const fillColor = VesktopNative.settings.get().trayAutoFill ?? "auto";
+function changeColorsInSvg(svg: string, stockColor: string, accentColor: string = "f6bfac") {
+    const Settings = VesktopNative.settings.get();
+    if (Settings.trayColorType === "default") return svg;
+    const pickedColor = Settings.trayColorType === "system" ? accentColor : Settings.trayColor || accentColor;
+    const fillColor = Settings.trayAutoFill ?? "auto";
     const reg = new RegExp(stockColor, "gim");
     svg = svg.replace(reg, "#" + (pickedColor ?? stockColor));
     if (fillColor === "white") {
@@ -43,7 +45,8 @@ function changeColorsInSvg(svg: string, stockColor: string) {
 VesktopNative.tray.createIconRequest(async (iconName: string, svgIcon: string = "") => {
     try {
         var svg = svgIcon || (await VesktopNative.tray.getIcon(iconName));
-        svg = changeColorsInSvg(svg, "#f6bfac");
+        svg = changeColorsInSvg(svg, "#f6bfac", (await VesktopNative.app.getAccentColor()).substring(1));
+
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;

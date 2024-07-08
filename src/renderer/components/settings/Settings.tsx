@@ -14,7 +14,13 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { CustomizeTraySwitch, TrayFillColorSwitch, TrayIconPicker, TraySwitch } from "./TraySettings";
+import {
+    CustomizeTraySwitch,
+    TrayColorTypeSelect,
+    TrayFillColorSwitch,
+    TrayIconPicker,
+    TraySwitch
+} from "./TraySettings";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -71,6 +77,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     Tray: [
         TraySwitch,
         CustomizeTraySwitch,
+        TrayColorTypeSelect,
         TrayIconPicker,
         TrayFillColorSwitch,
         {

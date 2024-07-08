@@ -186,8 +186,37 @@ export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
     );
 };
 
-export const TrayIconPicker: SettingsComponent = ({ settings }) => {
+export const TrayColorTypeSelect: SettingsComponent = ({ settings }) => {
     if (!settings.tray) return null;
+    return (
+        <div className="vcd-tray-settings">
+            <div className="vcd-tray-settings-labels">
+                <Forms.FormTitle tag="h3">Tray Color Type</Forms.FormTitle>
+            </div>
+
+            <Select
+                placeholder="Auto"
+                options={[
+                    { label: "Default", value: "default", default: true },
+                    { label: "System Accent", value: "system" },
+                    { label: "Custom", value: "custom" }
+                ]}
+                closeOnSelect={true}
+                select={v => {
+                    settings.trayColorType = v;
+                    VesktopNative.tray.generateTrayIcons();
+                }}
+                isSelected={v => v === settings.trayColorType}
+                serialize={s => s}
+                className="vcd-tray-settings-select"
+            ></Select>
+            <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
+        </div>
+    );
+};
+
+export const TrayIconPicker: SettingsComponent = ({ settings }) => {
+    if (!settings.tray || settings.trayColorType !== "custom") return null;
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-container">
@@ -215,28 +244,25 @@ export const TrayFillColorSwitch: SettingsComponent = ({ settings }) => {
     if (!settings.tray) return null;
     return (
         <div className="vcd-tray-settings">
-            <div className="vcd-tray-container">
-                <div className="vcd-tray-settings-labels">
-                    <Forms.FormTitle tag="h3">Tray Icon Color</Forms.FormTitle>
-                    <Forms.FormText>Choose the main color of the Tray Icons</Forms.FormText>
-                </div>
-
-                <Select
-                    placeholder="Auto"
-                    options={[
-                        { label: "Auto", value: "auto", default: true },
-                        { label: "Black", value: "black" },
-                        { label: "White", value: "white" }
-                    ]}
-                    closeOnSelect={true}
-                    select={v => {
-                        settings.trayAutoFill = v;
-                        VesktopNative.tray.generateTrayIcons();
-                    }}
-                    isSelected={v => v === settings.trayAutoFill}
-                    serialize={s => s}
-                ></Select>
+            <div className="vcd-tray-settings-labels">
+                <Forms.FormTitle tag="h3">Tray Icon Main Color</Forms.FormTitle>
             </div>
+
+            <Select
+                placeholder="Auto"
+                options={[
+                    { label: "Auto", value: "auto", default: true },
+                    { label: "Black", value: "black" },
+                    { label: "White", value: "white" }
+                ]}
+                closeOnSelect={true}
+                select={v => {
+                    settings.trayAutoFill = v;
+                    VesktopNative.tray.generateTrayIcons();
+                }}
+                isSelected={v => v === settings.trayAutoFill}
+                serialize={s => s}
+            ></Select>
             <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
         </div>
     );
