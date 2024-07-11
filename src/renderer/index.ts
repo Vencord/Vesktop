@@ -13,7 +13,7 @@ console.log("read if cute :3");
 
 export * as Components from "./components";
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher } from "@vencord/types/webpack/common";
+import { Alerts, FluxDispatcher } from "@vencord/types/webpack/common";
 
 import SettingsUi from "./components/settings/Settings";
 import { Settings } from "./settings";
@@ -59,3 +59,19 @@ VesktopNative.arrpc.onActivity(async data => {
 
     arRPC.handleEvent(new MessageEvent("message", { data }));
 });
+
+// TODO: remove soon
+const vencordDir = "vencordDir" as keyof typeof Settings.store;
+if (Settings.store[vencordDir]) {
+    onceReady.then(() =>
+        setTimeout(
+            () =>
+                Alerts.show({
+                    title: "Custom Vencord Location",
+                    body: "Due to security hardening changes in Vesktop, your custom Vencord location had to be reset. Please configure it again in the settings.",
+                    onConfirm: () => delete Settings.store[vencordDir]
+                }),
+            5000
+        )
+    );
+}

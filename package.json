@@ -1,6 +1,6 @@
 {
     "name": "vesktop",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "private": true,
     "description": "",
     "keywords": [],
@@ -24,10 +24,11 @@
         "updateMeta": "tsx scripts/utils/updateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#6960a8fd4d65d566da93dbdb8a7ca474aa0a3c9c"
+        "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24",
+        "electron-updater": "^6.2.1"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^3.5.0"
+        "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
@@ -37,7 +38,7 @@
         "@typescript-eslint/parser": "^7.2.0",
         "@vencord/types": "^1.8.4",
         "dotenv": "^16.4.5",
-        "electron": "^29.1.1",
+        "electron": "^31.1.0",
         "electron-builder": "^24.13.3",
         "esbuild": "^0.20.1",
         "eslint": "^8.57.0",
@@ -65,6 +66,7 @@
         "productName": "Vesktop",
         "files": [
             "!*",
+            "!node_modules",
             "dist/js",
             "static",
             "package.json",
@@ -118,8 +120,7 @@
                 {
                     "target": "default",
                     "arch": [
-                        "x64",
-                        "arm64"
+                        "universal"
                     ]
                 }
             ],
@@ -158,12 +159,29 @@
         },
         "win": {
             "target": [
-                "nsis",
-                "zip"
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                },
+                {
+                    "target": "zip",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
             ]
         },
         "publish": {
             "provider": "github"
+        }
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "arrpc@3.4.0": "patches/arrpc@3.4.0.patch"
         }
     }
 }
