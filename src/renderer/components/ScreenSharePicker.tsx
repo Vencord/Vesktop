@@ -254,7 +254,13 @@ function AudioSettingsModal({
                 </Switch>
                 <Switch
                     hideBorder
-                    onChange={v => (Settings.audio = { ...Settings.audio, ignoreDevices: v })}
+                    onChange={v =>
+                        (Settings.audio = {
+                            ...Settings.audio,
+                            ignoreDevices: v,
+                            deviceSelect: v ? false : Settings.audio?.deviceSelect
+                        })
+                    }
                     value={Settings.audio?.ignoreDevices ?? true}
                     note={<>Exclude device nodes, such as nodes belonging to microphones or speakers.</>}
                 >
@@ -270,6 +276,23 @@ function AudioSettingsModal({
                     note={<>Allow to select applications more granularly.</>}
                 >
                     Granular Selection
+                </Switch>
+                <Switch
+                    hideBorder
+                    onChange={value => {
+                        Settings.audio = { ...Settings.audio, deviceSelect: value };
+                        setAudioSources("None");
+                    }}
+                    value={Settings.audio?.deviceSelect ?? false}
+                    disabled={Settings.audio?.ignoreDevices}
+                    note={
+                        <>
+                            Allow to select devices such as microphones. Requires <b>Ignore Devices</b> to be turned
+                            off.
+                        </>
+                    }
+                >
+                    Device Selection
                 </Switch>
             </Modals.ModalContent>
             <Modals.ModalFooter className="vcd-screen-picker-footer">
@@ -423,6 +446,7 @@ function StreamSettings({
                         openSettings={openSettings}
                         includeSources={settings.includeSources}
                         excludeSources={settings.excludeSources}
+                        deviceSelect={Settings.audio?.deviceSelect}
                         granularSelect={Settings.audio?.granularSelect}
                         setIncludeSources={sources => setSettings(s => ({ ...s, includeSources: sources }))}
                         setExcludeSources={sources => setSettings(s => ({ ...s, excludeSources: sources }))}
@@ -441,12 +465,22 @@ function hasMatchingProps(value: Node, other: Node) {
     return Object.keys(value).every(key => value[key] === other[key]);
 }
 
-function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[] {
+function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelect?: boolean): AudioItem[] {
     if (isSpecialSource(node)) {
         return [{ name: node, value: node }];
     }
 
     const rtn: AudioItem[] = [];
+
+    const mediaClass = node["media.class"];
+
+    if (mediaClass?.includes("Video") || mediaClass?.includes("Midi")) {
+        return rtn;
+    }
+
+    if (!deviceSelect && node["device.id"]) {
+        return rtn;
+    }
 
     const name = node["application.name"];
 
@@ -458,9 +492,15 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[
         return rtn;
     }
 
-    const binary = node["application.process.binary"];
+    const rawName = node["node.name"];
 
     if (!name) {
+        rtn.push({ name: rawName, value: { "node.name": rawName } });
+    }
+
+    const binary = node["application.process.binary"];
+
+    if (!name && binary) {
         rtn.push({ name: binary, value: { "application.process.binary": binary } });
     }
 
@@ -469,10 +509,12 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[
     const first = rtn[0];
     const firstValues = first.value as Node;
 
-    rtn.push({
-        name: `${first.name} (${pid})`,
-        value: { ...firstValues, "application.process.id": pid }
-    });
+    if (pid) {
+        rtn.push({
+            name: `${first.name} (${pid})`,
+            value: { ...firstValues, "application.process.id": pid }
+        });
+    }
 
     const mediaName = node["media.name"];
 
@@ -483,16 +525,12 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean): AudioItem[
         });
     }
 
-    const mediaClass = node["media.class"];
-
-    if (!mediaClass) {
-        return rtn;
+    if (mediaClass) {
+        rtn.push({
+            name: `${first.name} [${mediaClass}]`,
+            value: { ...firstValues, "media.class": mediaClass }
+        });
     }
-
-    rtn.push({
-        name: `${first.name} [${mediaClass}]`,
-        value: { ...firstValues, "media.class": mediaClass }
-    });
 
     return rtn;
 }
@@ -535,6 +573,7 @@ function updateItems(setSources: (s: AudioSources) => void, sources?: AudioSourc
 function AudioSourcePickerLinux({
     includeSources,
     excludeSources,
+    deviceSelect,
     granularSelect,
     openSettings,
     setIncludeSources,
@@ -542,6 +581,7 @@ function AudioSourcePickerLinux({
 }: {
     includeSources?: AudioSources;
     excludeSources?: AudioSources;
+    deviceSelect?: boolean;
     granularSelect?: boolean;
     openSettings: () => void;
     setIncludeSources: (s: AudioSources) => void;
@@ -592,7 +632,7 @@ function AudioSourcePickerLinux({
 
     const allSources = sources.ok
         ? [...specialSources, ...sources.targets]
-              .map(target => mapToAudioItem(target, granularSelect))
+              .map(target => mapToAudioItem(target, granularSelect, deviceSelect))
               .flat()
               .filter(uniqueName)
         : [];
