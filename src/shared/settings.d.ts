@@ -8,7 +8,6 @@ import type { Rectangle } from "electron";
 
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
-    vencordDir?: string;
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     minimizeToTray?: boolean;
@@ -22,8 +21,6 @@ export interface Settings {
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
-
-    checkUpdates?: boolean;
 
     splashTheming?: boolean;
     splashColor?: string;
@@ -52,8 +49,9 @@ export interface State {
     windowBounds?: Rectangle;
     displayid: int;
 
-    skippedUpdate?: string;
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+
+    vencordDir?: string;
 }

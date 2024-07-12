@@ -4,7 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { existsSync, mkdirSync } from "fs";
+import { mkdirSync } from "fs";
+import { access, constants as FsConstants } from "fs/promises";
 import { join } from "path";
 
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
@@ -56,12 +57,18 @@ export async function downloadVencordFiles() {
     );
 }
 
-export function isValidVencordInstall(dir: string) {
-    return FILES_TO_DOWNLOAD.every(f => existsSync(join(dir, f)));
+const existsAsync = (path: string) =>
+    access(path, FsConstants.F_OK)
+        .then(() => true)
+        .catch(() => false);
+
+export async function isValidVencordInstall(dir: string) {
+    return Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f)))).then(arr => !arr.includes(false));
 }
 
 export async function ensureVencordFiles() {
-    if (isValidVencordInstall(VENCORD_FILES_DIR)) return;
+    if (await isValidVencordInstall(VENCORD_FILES_DIR)) return;
+
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
     await downloadVencordFiles();
