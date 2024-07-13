@@ -30,7 +30,7 @@ If you don't know the difference, pick the Installer.
 
 -   [Installer](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-Setup-2.0.0.exe)
 -   Portable
-    -   [x64 / amd64](<(https://github.com/Equicord/Equibop/releases/latest/download/Equibop-2.0.0-win.zip)>)
+    -   [x64 / amd64](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-2.0.0-win.zip)
     -   [arm64](https://github.com/Equicord/Equibop/releases/download/v2.0.0/Equibop-2.0.0-arm64-win.zip)
 
 ### Mac
