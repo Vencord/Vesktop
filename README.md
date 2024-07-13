@@ -73,8 +73,10 @@ pnpm start
 
 # Or package
 pnpm package
+
 # Or only build the pacman target
 pnpm package --linux pacman
+
 # Or package to a directory only
 pnpm package:dir
 ```
