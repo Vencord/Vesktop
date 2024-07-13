@@ -1,5 +1,5 @@
 name: 🛠️ Feature Request
-description: Request a feature for Equitop
+description: Request a feature for Equibop
 labels: [enhancement]
 title: "[Feature Request] <title>"
 
@@ -9,9 +9,9 @@ body:
           value: |
               **Thanks 🩷 for taking the time to fill out this request! Before proceeding, please read the following**
 
-              Make sure a similar request doesn't already exist by [searching the existing issues](https://github.com/Equicord/Equitop/issues?q=is%3Aissue) for keywords!
+              Make sure a similar request doesn't already exist by [searching the existing issues](https://github.com/Equicord/Equibop/issues?q=is%3Aissue) for keywords!
 
-              This form is only meant for **Equitop feature requests**.
+              This form is only meant for **Equibop feature requests**.
               For plugin requests or Vencord feature requests, suggest them on the discord instead: https://discord.gg/5Xh2W87egW
 
     - type: input
@@ -62,7 +62,7 @@ body:
       id: agreement-check
       attributes:
           label: Request Agreement
-          description: This form is only for Equitop feature requests. If the following don't apply, re-read the introduction text
+          description: This form is only for Equibop feature requests. If the following don't apply, re-read the introduction text
           options:
               - label: I have searched the existing issues and found no similar issue
                 required: true

@@ -42,8 +42,8 @@ const customSettingsSections = (
 ).customSections;
 
 customSettingsSections.push(() => ({
-    section: "Equitop",
-    label: "Equitop Settings",
+    section: "Equibop",
+    label: "Equibop Settings",
     element: SettingsUi,
     className: "vc-vesktop-settings"
 }));
@@ -68,7 +68,7 @@ if (Settings.store[vencordDir]) {
             () =>
                 Alerts.show({
                     title: "Custom Equicord Location",
-                    body: "Due to security hardening changes in Equitop, your custom Equicord location had to be reset. Please configure it again in the settings.",
+                    body: "Due to security hardening changes in Equibop, your custom Equicord location had to be reset. Please configure it again in the settings.",
                     onConfirm: () => delete Settings.store[vencordDir]
                 }),
             5000

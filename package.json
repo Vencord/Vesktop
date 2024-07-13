@@ -1,10 +1,10 @@
 {
-    "name": "equitop",
+    "name": "equibop",
     "version": "2.0.0",
     "private": true,
     "description": "A fork of Vesktop pre-packaged with Equicord",
     "keywords": [],
-    "homepage": "https://github.com/Equicord/Equitop",
+    "homepage": "https://github.com/Equicord/Equibop",
     "license": "GPL-3.0",
     "author": "Equicord",
     "main": "dist/js/main.js",
@@ -62,8 +62,8 @@
         "pnpm": ">=8"
     },
     "build": {
-        "appId": "com.thororen.equitop",
-        "productName": "Equitop",
+        "appId": "com.thororen.equibop",
+        "productName": "Equibop",
         "files": [
             "!*",
             "!node_modules",
@@ -108,11 +108,11 @@
                 }
             ],
             "desktop": {
-                "Name": "Equitop",
+                "Name": "Equibop",
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;equitop;vesktop;vencord;equicord;electron;chat;"
+                "Keywords": "discord;equibop;vesktop;vencord;equicord;electron;chat;"
             }
         },
         "mac": {

@@ -76,7 +76,7 @@ function init() {
     });
 
     app.whenReady().then(async () => {
-        if (process.platform === "win32") app.setAppUserModelId("com.thororen.equitop");
+        if (process.platform === "win32") app.setAppUserModelId("com.thororen.equibop");
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
@@ -94,10 +94,10 @@ function init() {
 
 if (!app.requestSingleInstanceLock({ IS_DEV })) {
     if (IS_DEV) {
-        console.log("Equitop is already running. Quitting previous instance...");
+        console.log("Equibop is already running. Quitting previous instance...");
         init();
     } else {
-        console.log("Equitop is already running. Quitting...");
+        console.log("Equibop is already running. Quitting...");
         app.quit();
     }
 } else {

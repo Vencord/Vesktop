@@ -44,7 +44,7 @@ export async function githubGet(endpoint: string) {
 }
 
 export async function downloadVencordFiles() {
-    const release = await githubGet("/repos/Equicord/Equitop/releases/latest");
+    const release = await githubGet("/repos/Equicord/Equibop/releases/latest");
 
     const { assets }: ReleaseData = await release.json();
 

@@ -17,7 +17,7 @@ interface AutoStart {
 function makeAutoStartLinux(): AutoStart {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
-    const file = join(dir, "equitop.desktop");
+    const file = join(dir, "equibop.desktop");
 
     // IM STUPID
     const legacyName = join(dir, "equicord.desktop");
@@ -34,8 +34,8 @@ function makeAutoStartLinux(): AutoStart {
             const desktopFile = `
 [Desktop Entry]
 Type=Application
-Name=Equitop
-Comment=Equitop autostart script
+Name=Equibop
+Comment=Equibop autostart script
 Exec=${commandLine}
 StartupNotify=false
 Terminal=false

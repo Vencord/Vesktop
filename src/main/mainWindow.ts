@@ -99,7 +99,7 @@ function initTray(win: BrowserWindow) {
             }
         },
         {
-            label: "Reset Equitop",
+            label: "Reset Equibop",
             async click() {
                 await clearData(win);
             }
@@ -124,15 +124,15 @@ function initTray(win: BrowserWindow) {
     ]);
 
     tray = new Tray(ICON_PATH);
-    tray.setToolTip("Equitop");
+    tray.setToolTip("Equibop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
 }
 
 async function clearData(win: BrowserWindow) {
     const { response } = await dialog.showMessageBox(win, {
-        message: "Are you sure you want to reset Equitop?",
-        detail: "This will log you out, clear caches and reset all your settings!\n\nEquitop will automatically restart after this operation.",
+        message: "Are you sure you want to reset Equibop?",
+        detail: "This will log you out, clear caches and reset all your settings!\n\nEquibop will automatically restart after this operation.",
         buttons: ["Yes", "No"],
         cancelId: MessageBoxChoice.Cancel,
         defaultId: MessageBoxChoice.Default,
@@ -161,7 +161,7 @@ function initMenuBar(win: BrowserWindow) {
 
     const subMenu = [
         {
-            label: "About Equitop",
+            label: "About Equibop",
             click: createAboutWindow
         },
         {
@@ -171,14 +171,14 @@ function initMenuBar(win: BrowserWindow) {
                 app.relaunch();
                 app.quit();
             },
-            toolTip: "Equitop will automatically restart after this operation"
+            toolTip: "Equibop will automatically restart after this operation"
         },
         {
-            label: "Reset Equitop",
+            label: "Reset Equibop",
             async click() {
                 await clearData(win);
             },
-            toolTip: "Equitop will automatically restart after this operation"
+            toolTip: "Equibop will automatically restart after this operation"
         },
         {
             label: "Relaunch",
@@ -247,7 +247,7 @@ function initMenuBar(win: BrowserWindow) {
 
     const menu = Menu.buildFromTemplate([
         {
-            label: "Equitop",
+            label: "Equibop",
             role: "appMenu",
             submenu: subMenu.filter(isTruthy)
         },
@@ -424,7 +424,7 @@ function createMainWindow() {
             transparencyOption !== "none" && {
                 transparent: true
             }),
-        ...(staticTitle && { title: "Equitop" }),
+        ...(staticTitle && { title: "Equibop" }),
         ...(process.platform === "darwin" && getDarwinOptions()),
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu

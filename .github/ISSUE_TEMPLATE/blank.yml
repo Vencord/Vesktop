@@ -7,7 +7,7 @@ body:
           value: |
               # READ THIS BEFORE OPENING AN ISSUE
 
-              This form is only meant for Vesktop/Equitop developers. If you don't know what you're doing,
+              This form is only meant for Vesktop/Equibop developers. If you don't know what you're doing,
               please use the bug report or feature request templates instead.
 
     - type: textarea

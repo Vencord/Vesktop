@@ -50,7 +50,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "staticTitle",
             title: "Static Title",
-            description: 'Makes the window title "Equitop" instead of changing to the current page',
+            description: 'Makes the window title "Equibop" instead of changing to the current page',
             defaultValue: false
         },
         {
@@ -72,14 +72,14 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "tray",
             title: "Tray Icon",
-            description: "Add a tray icon for Equitop",
+            description: "Add a tray icon for Equibop",
             defaultValue: true,
             invisible: () => isMac
         },
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
-            description: "Hitting X will make Equitop minimize to the tray instead of closing",
+            description: "Hitting X will make Equibop minimize to the tray instead of closing",
             defaultValue: true,
             invisible: () => isMac,
             disabled: () => Settings.store.tray === false
@@ -87,7 +87,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
-            description: "Left clicking tray icon will toggle the equitop window visibility.",
+            description: "Left clicking tray icon will toggle the equibop window visibility.",
             defaultValue: false
         },
         {
@@ -115,7 +115,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",
-            description: "Opens links in a new Equitop window instead of your web browser",
+            description: "Opens links in a new Equibop window instead of your web browser",
             defaultValue: false
         }
     ],
@@ -161,7 +161,7 @@ export default function SettingsUi() {
     return (
         <Forms.FormSection>
             <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
-                Equitop Settings
+                Equibop Settings
             </Text>
 
             <SettingsSections />
