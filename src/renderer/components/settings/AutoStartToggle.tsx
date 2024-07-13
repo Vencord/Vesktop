@@ -18,7 +18,7 @@ export const AutoStartToggle: SettingsComponent = () => {
                 await VesktopNative.autostart[v ? "enable" : "disable"]();
                 setAutoStartEnabled(v);
             }}
-            note="Automatically start Vesktop on computer start-up"
+            note="Automatically start Equitop on computer start-up"
         >
             Start With System
         </Switch>

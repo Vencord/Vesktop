@@ -75,8 +75,8 @@ export async function askToApplySteamLayout(win: BrowserWindow) {
 
     // Touch screen breaks in some menus when native touch mode is enabled on latest SteamOS beta, remove most of the update specific text once that's fixed.
     const { response } = await dialog.showMessageBox(win, {
-        message: `${update ? "Update" : "Apply"} Vesktop Steam Input Layout?`,
-        detail: `Would you like to ${update ? "Update" : "Apply"} Vesktop's recommended Steam Deck controller settings?
+        message: `${update ? "Update" : "Apply"} Equitop Steam Input Layout?`,
+        detail: `Would you like to ${update ? "Update" : "Apply"} Equitop's recommended Steam Deck controller settings?
 ${update ? "Click yes using the touchpad" : "Tap yes"}, then press the X button or tap Apply Layout to confirm.${
             update ? " Doing so will undo any customizations you have made." : ""
         }

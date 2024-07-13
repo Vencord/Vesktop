@@ -27,7 +27,7 @@ export async function initArRPC() {
             mainWin.webContents
                 // Safety: Result of JSON.stringify should always be safe to equal
                 // Also, just to be super super safe, invite is regex validated above
-                .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
+                .executeJavaScript(`Equitop.openInviteModal(${JSON.stringify(invite)})`)
                 .then(callback);
         });
     } catch (e) {

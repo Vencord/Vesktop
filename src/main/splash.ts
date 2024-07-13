@@ -20,7 +20,7 @@ export function createSplashWindow(startMinimized = false) {
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
 
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath } = Settings.store;
 
     if (splashTheming) {
         if (splashColor) {
@@ -33,6 +33,18 @@ export function createSplashWindow(startMinimized = false) {
         if (splashBackground) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
+    }
+
+    if (splashAnimationPath) {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "splash-animation://img";
+        `);
+    }
+    else {
+        splash.webContents.insertCSS(`img {image-rendering: pixelated}`)
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "../shiggy.gif";
+        `);
     }
 
     return splash;

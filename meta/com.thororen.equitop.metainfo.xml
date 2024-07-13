@@ -1,93 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop-application">
   <!--Created with jdAppStreamEdit 7.1-->
-  <id>dev.vencord.Vesktop</id>
-  <name>Vesktop</name>
-  <summary>Snappier Discord app with Vencord</summary>
-  <developer_name>Vencord Contributors</developer_name>
-  <launchable type="desktop-id">dev.vencord.Vesktop.desktop</launchable>
+  <id>com.thororen.equitop</id>
+  <name>Equitop</name>
+  <summary>Snappier Discord app with Equicord</summary>
+  <developer_name>Equicord Contributors</developer_name>
+  <launchable type="desktop-id">com.thororen.equitop.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
-  <project_group>Vencord</project_group>
+  <project_group>Equicord</project_group>
   <description>
-    <p>Vesktop is a cross platform desktop app aiming to give you a snappier Discord experience with Vencord pre-installed.</p>
-    <p>Vesktop comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
+    <p>Equicord is a cross-platform Vesktop Fork desktop app aiming to give you extra plugins but still give you a snappier Discord experience, with Equicord pre-installed.</p>
+    <p>Which comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
   </description>
-  <screenshots>
-    <screenshot type="default">
-      <caption>Vencord settings page and about window open</caption>
-      <image type="source">https://vencord.dev/assets/screenshots/vesktop-1-appstream.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>A dialog showing screenshare options</caption>
-      <image type="source">https://vencord.dev/assets/screenshots/vesktop-2-appstream.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>A screenshot of a Discord server</caption>
-      <image type="source">https://vencord.dev/assets/screenshots/vesktop-3-appstream.png</image>
-    </screenshot>
-  </screenshots>
+
   <releases>
-    <release version="1.5.3" date="2024-07-04" type="stable">
-      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.3</url>
-      <description>
-        <p>Features</p>
-        <ul>
-          <li>added arm64 Windows support</li>
-          <li>windows &amp; macOS builds are now universal</li>
-          <li>added option to configure spellcheck languages</li>
-          <li>will auto-update from now on</li>
-          <li>updated electron to 31 &amp; Chromium to 126</li>
-          <li>macOS: Added customized dmg background by @khcrysalis</li>
-          <li>Windows Portable: store settings in portable folder by @MrGarlic1</li>
-          <li>linux audioshare: added granular selection, more options, better ui by @Curve</li>
-          <li>changed default screen-sharing quality to 720p 30 FPS by @Tiagoquix</li>
-        </ul>
-        <p>Fixes</p>
-        <ul>
-          <li>macOS: Added workaround for making things in draggable area clickable by @HAHALOSAH</li>
-          <li>fixed Screenshare UI for non-linux systems by @PolisanTheEasyNick</li>
-          <li>fixed opening on screen that was disconnected by @MrGarlic1</li>
-          <li>mac: hide native window controls with custom titlebar enabled by @MrGarlic1</li>
-          <li>fixed some broken patches by @D3SOX</li>
-          <li>fixed framerate in constraints by @kittykel</li>
-          <li>fixed some first launch switches not applying</li>
-          <li>fixed potential sandbox escape via custom vencord location</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.5.2" date="2024-05-01" type="stable">
-      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.2</url>
-      <description>
-        <p>What's Changed</p>
-        <ul>
-          <li>Fixed scrollbars looking wrong (actually Discord's fault)</li>
-          <li>Tray: Added left click hide/show feature by @0bCdian</li>
-          <li>MacOS: Fixed the app not properly requesting microphone permissions by @ssalggnikool</li>
-          <li>Linux: Various fixed related to audio screenshare by @Curve</li>
-          <li>Linux: Overhauled &amp; improved screenshare with better framerate by @kaitlynkittyy</li>
-          <li>Users can now pass --enable/disable-features command line flags by @takase1121</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.5.1" date="2024-03-12" type="stable">
-      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.1</url>
-      <description>
-        <p>New Features</p>
-        <ul>
-          <li>Added categories to Vesktop settings to reduce visual clutter by @justin13888</li>
-          <li>Added support for Vencord's transparent window options</li>
-        </ul>
-        <p>Fixes</p>
-        <ul>
-          <li>Fixed ugly error popups when starting Vesktop without working internet connection</li>
-          <li>Fixed popout title bars on Windows</li>
-          <li>Fixed spellcheck entries</li>
-          <li>Fixed screenshare audio using microphone on debian, by @Curve</li>
-          <li>Fixed a bug where autostart on Linux won't preserve command line flags</li>
-        </ul>
-      </description>
-    </release>
     <release version="1.5.0" date="2024-01-16" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.0</url>
       <description>
@@ -202,12 +129,11 @@
       <url>https://github.com/Vencord/Vesktop/releases/tag/v0.1.0</url>
     </release>
   </releases>
-  <url type="homepage">https://vencord.dev/</url>
-  <url type="bugtracker">https://github.com/Vencord/Vesktop/issues</url>
-  <url type="faq">https://vencord.dev/faq/</url>
-  <url type="help">https://github.com/Vencord/Vesktop/issues</url>
+  <url type="homepage">https://github.com/Equicord/Equitop</url>
+  <url type="bugtracker">https://github.com/Equicord/Equitop/issues</url>
+  <url type="help">https://github.com/Equicord/Equitop/issues</url>
   <url type="donation">https://github.com/sponsors/Vendicated</url>
-  <url type="vcs-browser">https://github.com/Vencord/Vesktop</url>
+  <url type="vcs-browser">https://github.com/Equicord/Equitop</url>
   <categories>
     <category>InstantMessaging</category>
     <category>Network</category>
@@ -231,6 +157,8 @@
   </content_rating>
   <keywords>
     <keyword>Discord</keyword>
+    <keyword>Equitop</keyword>
+    <keyword>Equicord</keyword>
     <keyword>Vencord</keyword>
     <keyword>Vesktop</keyword>
     <keyword>Privacy</keyword>

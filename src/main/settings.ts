@@ -34,9 +34,9 @@ function loadSettings<T extends object = any>(file: string, name: string) {
     return store;
 }
 
-export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
+export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Equitop settings");
 
-export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings");
+export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Equicord settings");
 
 if (Object.hasOwn(Settings.plain, "firstLaunch") && !existsSync(STATE_FILE)) {
     console.warn("legacy state in settings.json detected. migrating to state.json");
@@ -49,4 +49,4 @@ if (Object.hasOwn(Settings.plain, "firstLaunch") && !existsSync(STATE_FILE)) {
     writeFileSync(STATE_FILE, JSON.stringify(state, null, 4));
 }
 
-export const State = loadSettings<TState>(STATE_FILE, "Vesktop state");
+export const State = loadSettings<TState>(STATE_FILE, "Equitop state");

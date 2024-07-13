@@ -16,6 +16,7 @@ import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
+import { CustomSplashAnimation } from "./CustomSplashAnimation";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
@@ -49,7 +50,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "staticTitle",
             title: "Static Title",
-            description: 'Makes the window title "Vesktop" instead of changing to the current page',
+            description: 'Makes the window title "Equitop" instead of changing to the current page',
             defaultValue: false
         },
         {
@@ -71,14 +72,14 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "tray",
             title: "Tray Icon",
-            description: "Add a tray icon for Vesktop",
+            description: "Add a tray icon for Equitop",
             defaultValue: true,
             invisible: () => isMac
         },
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
-            description: "Hitting X will make Vesktop minimize to the tray instead of closing",
+            description: "Hitting X will make Equitop minimize to the tray instead of closing",
             defaultValue: true,
             invisible: () => isMac,
             disabled: () => Settings.store.tray === false
@@ -86,7 +87,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
-            description: "Left clicking tray icon will toggle the vesktop window visibility.",
+            description: "Left clicking tray icon will toggle the equitop window visibility.",
             defaultValue: false
         },
         {
@@ -114,11 +115,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",
-            description: "Opens links in a new Vesktop window instead of your web browser",
+            description: "Opens links in a new Equitop window instead of your web browser",
             defaultValue: false
         }
     ],
-    "Vencord Location": [VencordLocationPicker]
+    "Custom Splash Animation":[CustomSplashAnimation],
+    "Equicord Location": [VencordLocationPicker]
 };
 
 function SettingsSections() {
@@ -159,7 +161,7 @@ export default function SettingsUi() {
     return (
         <Forms.FormSection>
             <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
-                Vesktop Settings
+                Equitop Settings
             </Text>
 
             <SettingsSections />

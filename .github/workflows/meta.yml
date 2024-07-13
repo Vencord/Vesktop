@@ -12,7 +12,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
-            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+            - uses: pnpm/action-setup@v4
 
             - name: Use Node.js 20
               uses: actions/setup-node@v4
@@ -27,12 +27,12 @@ jobs:
 
             - name: Commit and merge in changes
               run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git config --global user.name 'thororen1234'
+                  git config --global user.email '78185467+thororen1234@users.noreply.github.com'
                   git checkout -b ci/meta-update
-                  git add meta/dev.vencord.Vesktop.metainfo.xml
+                  git add meta/com.thororen.equitop.metainfo.xml
                   git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
-                  git push origin ci/meta-update
-                  gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @lewisakura @Vendicated"
+                  git push origin ci/meta-update --force
+                  gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @Equicord"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

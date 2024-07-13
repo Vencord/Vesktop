@@ -43,14 +43,14 @@ function generateDescription(description: string, descriptionNode: Element) {
     }
 }
 
-const latestReleaseInformation = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases/latest", {
+const latestReleaseInformation = await fetch("https://api.github.com/repos/Equicord/Equitop/releases/latest", {
     headers: {
         Accept: "application/vnd.github+json",
         "X-Github-Api-Version": "2022-11-28"
     }
 }).then(res => res.json());
 
-const metaInfo = await fs.readFile("./meta/dev.vencord.Vesktop.metainfo.xml", "utf-8");
+const metaInfo = await fs.readFile("./meta/com.thororen.equitop.metainfo.xml", "utf-8");
 
 const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
@@ -90,4 +90,4 @@ const output = xmlFormat(new XMLSerializer().serializeToString(parser), {
     indentation: "  "
 });
 
-await fs.writeFile("./meta/dev.vencord.Vesktop.metainfo.xml", output, "utf-8");
+await fs.writeFile("./meta/com.thororen.equitop.metainfo.xml", output, "utf-8");

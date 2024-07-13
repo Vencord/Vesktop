@@ -51,7 +51,7 @@ export function registerScreenShareHandler() {
             if (video) {
                 const stream = await request.frame
                     .executeJavaScript(
-                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
+                        `Equitop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
                     )
                     .catch(() => null);
                 if (stream === null) return callback({});
@@ -62,7 +62,7 @@ export function registerScreenShareHandler() {
         }
 
         const choice = await request.frame
-            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
+            .executeJavaScript(`Equitop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
             .then(e => e as StreamPick)
             .catch(e => {
                 console.error("Error during screenshare picker", e);

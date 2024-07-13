@@ -1,5 +1,5 @@
 name: 🐛 Bug / Crash Report
-description: Create a bug or crash report for Vesktop
+description: Create a bug or crash report for Equitop
 labels: [bug]
 title: "[Bug] <title>"
 
@@ -9,20 +9,17 @@ body:
           value: |
               **Thanks 🩷 for taking the time to fill out this bug report! Before proceeding, please read the following**
 
-              Make sure a similar issue doesn't already exist by [searching the existing issues](https://github.com/Vencord/Vesktop/issues?q=is%3Aissue) for keywords!
+              Make sure a similar issue doesn't already exist by [searching the existing issues](https://github.com/Equicord/Equitop/issues?q=is%3Aissue) for keywords!
 
-              Make sure both Vesktop and Vencord are fully up to date. You can update Vencord by right-clicking the Vesktop tray icon and pressing "Update Vencord"
+              Make sure both Equitop and Equicord are fully up to date. You can update Equicord by right-clicking the Equitop tray icon and pressing "Update Equicord"
 
               **DO NOT REPORT** any of the following issues:
-              - GPU related issues. These are **you** issues and you have to fix them. You can disable hardware acceleration or run with --disable-gpu. 
-                - Purely graphical glitches like flickering, scaling issues
-                - App crashing with mentions of the gpu process in the stacktrace
-                - Screenshare not starting, black screening or crashing
+              - Purely graphical glitches like flickering, scaling issues, etc: Issue with your gpu. Nothing we can do, update drivers or disable hardware acceleration
               - Vencord related issues: This is the Vesktop repo, not Vencord
-              
-              Linux users: Please only report issues with supported packages (flatpak and any builds from the README / releases).
-              We do not support other packages, like the AUR or Nix packages, so please first make sure your issue is reproducible with official releases,
-              like [our Flatpak](https://flathub.org/apps/dev.vencord.Vesktop) or [AppImage](https://vencord.dev/download/vesktop/amd64/appimage)
+              - **SCREENSHARE NOT STARTING** / black screening on Linux: Issue with your desktop environment, specifically its xdg-desktop-portal.
+                If that also doesn't work, you have to fix your systen. Inspect errors and google around.
+
+              Linux users: Please only report issues with officially published packages
 
     - type: input
       id: discord
@@ -51,15 +48,6 @@ body:
       validations:
           required: false
 
-    - type: input
-      id: install-type
-      attributes:
-          label: Package Type
-          description: What kind of Vesktop package are you using? (Setup exe, Portable, Flatpak, AppImage, Deb, etc)
-          placeholder: Flatpak
-      validations:
-          required: true
-
     - type: textarea
       id: bug-description
       attributes:
@@ -74,7 +62,7 @@ body:
       attributes:
           label: What is the expected behaviour?
           description: Simply detail what the expected behaviour is.
-          placeholder: I expect Vencord/Discord to open the ... page instead of ..., it prevents me from doing ...
+          placeholder: I expect Equicord/Discord to open the ... page instead of ..., it prevents me from doing ...
       validations:
           required: true
 
@@ -95,7 +83,7 @@ body:
       id: debug-logs
       attributes:
           label: Debug Logs
-          description: Run vesktop from the command line. Include the relevant command line output here. If there are any lines that seem relevant, try googling them or searching existing issues
+          description: Run equicord from the command line. Include the relevant command line output here
           value: |
               ```
               Replace this text with your crash-log. Do not remove the backticks
@@ -107,11 +95,11 @@ body:
       id: agreement-check
       attributes:
           label: Request Agreement
-          description: We only accept reports for bugs that happen on supported and up to date Vesktop releases
+          description: We only accept reports for bugs that happen on supported and up to date Equitop releases
           options:
               - label: I have searched the existing issues and found no similar issue
                 required: true
-              - label: I am using the latest Vesktop and Vencord versions
+              - label: I am using the latest Equitop and Equicord versions
                 required: true
-              - label: This issue occurs on an official release (not just the AUR or Nix packages)
+              - label: This issue occurs on an official release (not just the AUR packages)
                 required: true

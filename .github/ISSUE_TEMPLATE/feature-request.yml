@@ -1,5 +1,5 @@
 name: 🛠️ Feature Request
-description: Request a feature for Vesktop
+description: Request a feature for Equitop
 labels: [enhancement]
 title: "[Feature Request] <title>"
 
@@ -9,10 +9,10 @@ body:
           value: |
               **Thanks 🩷 for taking the time to fill out this request! Before proceeding, please read the following**
 
-              Make sure a similar request doesn't already exist by [searching the existing issues](https://github.com/Vencord/Vesktop/issues?q=is%3Aissue) for keywords!
+              Make sure a similar request doesn't already exist by [searching the existing issues](https://github.com/Equicord/Equitop/issues?q=is%3Aissue) for keywords!
 
-              This form is only meant for **Vesktop feature requests**.
-              For plugin requests or Vencord feature requests, go [here](https://github.com/Vencord/plugin-requests/issues/new?template=request.yml) instead!
+              This form is only meant for **Equitop feature requests**.
+              For plugin requests or Vencord feature requests, suggest them on the discord instead: https://discord.gg/5Xh2W87egW
 
     - type: input
       id: discord
@@ -62,11 +62,11 @@ body:
       id: agreement-check
       attributes:
           label: Request Agreement
-          description: This form is only for Vesktop feature requests. If the following don't apply, re-read the introduction text
+          description: This form is only for Equitop feature requests. If the following don't apply, re-read the introduction text
           options:
               - label: I have searched the existing issues and found no similar issue
                 required: true
               - label: This is not a plugin request
                 required: true
-              - label: This is not a Vencord feature request
+              - label: This is not a Equicord feature request
                 required: true

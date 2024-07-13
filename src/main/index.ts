@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow, nativeTheme } from "electron";
+import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
 import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
@@ -24,10 +24,10 @@ if (IS_DEV) {
 }
 
 // Make the Vencord files use our DATA_DIR
-process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
+process.env.EQUICORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
     const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
@@ -76,11 +76,14 @@ function init() {
     });
 
     app.whenReady().then(async () => {
-        if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
+        if (process.platform === "win32") app.setAppUserModelId("com.thororen.equitop");
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
-
+        //register file handler so we can load the custom splash animation from the user's filesystem
+        protocol.handle("splash-animation", () => {
+            return net.fetch("file:///"+splashAnimationPath);
+        });
         bootstrap();
 
         app.on("activate", () => {
@@ -91,10 +94,10 @@ function init() {
 
 if (!app.requestSingleInstanceLock({ IS_DEV })) {
     if (IS_DEV) {
-        console.log("Vesktop is already running. Quitting previous instance...");
+        console.log("Equitop is already running. Quitting previous instance...");
         init();
     } else {
-        console.log("Vesktop is already running. Quitting...");
+        console.log("Equitop is already running. Quitting...");
         app.quit();
     }
 } else {

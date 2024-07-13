@@ -8,16 +8,16 @@ import { app } from "electron";
 import { existsSync, mkdirSync, readdirSync, renameSync, rmdirSync } from "fs";
 import { dirname, join } from "path";
 
-const vesktopDir = dirname(process.execPath);
+const equitopDir = dirname(process.execPath);
 
 export const PORTABLE =
     process.platform === "win32" &&
     !process.execPath.toLowerCase().endsWith("electron.exe") &&
-    !existsSync(join(vesktopDir, "Uninstall Vesktop.exe"));
+    !existsSync(join(equitopDir, "Uninstall Equitop.exe"));
 
-const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
+const LEGACY_DATA_DIR = join(app.getPath("appData"), "EquicordDesktop", "EquicordDesktop");
 export const DATA_DIR =
-    process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
+    process.env.EQUICORD_USER_DATA_DIR || (PORTABLE ? join(equitopDir, "Data") : join(app.getPath("userData")));
 
 mkdirSync(DATA_DIR, { recursive: true });
 
@@ -30,7 +30,7 @@ if (existsSync(LEGACY_DATA_DIR)) {
         }
         rmdirSync(LEGACY_DATA_DIR);
         renameSync(
-            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
+            join(app.getPath("appData"), "EquicordDesktop", "IndexedDB"),
             join(DATA_DIR, "sessionData", "IndexedDB")
         );
     } catch (e) {
@@ -49,9 +49,9 @@ export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
 // as otherwise "DATA_DIR" (which is used by ./settings) will be uninitialised
 export const VENCORD_FILES_DIR =
     (require("./settings") as typeof import("./settings")).State.store.vencordDir ||
-    join(SESSION_DATA_DIR, "vencordFiles");
+    join(SESSION_DATA_DIR, "equicordFiles");
 
-export const USER_AGENT = `Vesktop/${app.getVersion()} (https://github.com/Vencord/Vesktop)`;
+export const USER_AGENT = `Equitop/${app.getVersion()} (https://github.com/Equicord/Equitop)`;
 
 // dimensions shamelessly stolen from Discord Desktop :3
 export const MIN_WIDTH = 940;

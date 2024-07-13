@@ -1,12 +1,12 @@
 {
-    "name": "vesktop",
+    "name": "equitop",
     "version": "1.5.3",
     "private": true,
-    "description": "",
+    "description": "A fork of Vesktop pre-packaged with Equicord",
     "keywords": [],
-    "homepage": "https://vencord.dev/",
+    "homepage": "https://github.com/Equicord/Equitop",
     "license": "GPL-3.0",
-    "author": "Vendicated <vendicated@riseup.net>",
+    "author": "Equicord",
     "main": "dist/js/main.js",
     "scripts": {
         "build": "tsx scripts/build/build.mts",
@@ -62,8 +62,8 @@
         "pnpm": ">=8"
     },
     "build": {
-        "appId": "dev.vencord.vesktop",
-        "productName": "Vesktop",
+        "appId": "com.thororen.equitop",
+        "productName": "Equitop",
         "files": [
             "!*",
             "!node_modules",
@@ -76,7 +76,7 @@
         "linux": {
             "icon": "build/icon.icns",
             "category": "Network",
-            "maintainer": "vendicated+vesktop@riseup.net",
+            "maintainer": "no-reply@thororen.com",
             "target": [
                 {
                     "target": "deb",
@@ -108,11 +108,11 @@
                 }
             ],
             "desktop": {
-                "Name": "Vesktop",
+                "Name": "Equitop",
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;vencord;electron;chat;"
+                "Keywords": "discord;equitop;vesktop;vencord;equicord;electron;chat;"
             }
         },
         "mac": {

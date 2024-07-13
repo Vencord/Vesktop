@@ -16,7 +16,7 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
     return (
         <>
             <Forms.FormText>
-                Vencord files are loaded from{" "}
+                Equicord files are loaded from{" "}
                 {vencordDir ? (
                     <a
                         href="about:blank"
@@ -41,7 +41,7 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                                 break;
                             case "ok":
                                 Toasts.show({
-                                    message: "Vencord install changed. Fully restart Vesktop to apply.",
+                                    message: "Equicord install changed. Fully restart Equitop to apply.",
                                     id: Toasts.genId(),
                                     type: Toasts.Type.SUCCESS
                                 });
@@ -49,7 +49,7 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                             case "invalid":
                                 Toasts.show({
                                     message:
-                                        "You did not choose a valid Vencord install. Make sure you're selecting the dist dir!",
+                                        "You did not choose a valid Equicord install. Make sure you're selecting the dist dir!",
                                     id: Toasts.genId(),
                                     type: Toasts.Type.FAILURE
                                 });
