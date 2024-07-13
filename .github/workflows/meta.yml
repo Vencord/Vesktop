@@ -28,7 +28,7 @@ jobs:
             - name: Commit and merge in changes
               run: |
                   git config user.name "thororen1234"
-                  git config user.email "78185467+thororen1234[bot]@users.noreply.github.com"
+                  git config user.email "78185467+thororen1234@users.noreply.github.com"
                   git checkout -b ci/meta-update
                   git add meta/com.thororen.equitop.metainfo.xml
                   git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
