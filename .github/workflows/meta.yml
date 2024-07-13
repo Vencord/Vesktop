@@ -13,7 +13,8 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                token: ${{ secrets.EQTOKEN }}
+                token: ${{ secrets.ETOKEN }}
+
             - uses: pnpm/action-setup@v4
 
             - name: Use Node.js 20
@@ -37,4 +38,4 @@ jobs:
                   git push origin ci/meta-update --force
                   gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @thororen1234"
               env:
-                  GITHUB_TOKEN: ${{ secrets.EQTOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.ETOKEN }}
