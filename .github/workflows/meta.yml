@@ -12,6 +12,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
+              with:
+                token: ${{ secrets.EQTOKEN }}
             - uses: pnpm/action-setup@v4
 
             - name: Use Node.js 20
