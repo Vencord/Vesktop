@@ -80,9 +80,9 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
-        //register file handler so we can load the custom splash animation from the user's filesystem
+        // register file handler so we can load the custom splash animation from the user's filesystem
         protocol.handle("splash-animation", () => {
-            return net.fetch("file:///"+splashAnimationPath);
+            return net.fetch("file:///" + splashAnimationPath);
         });
         bootstrap();
 

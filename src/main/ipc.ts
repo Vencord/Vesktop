@@ -129,9 +129,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
 handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openFile"],
-        filters: [
-            {name: "Images", extensions: ["apng", "avif", "gif", "jpeg", "png", "svg", "webp"]}
-        ]
+        filters: [{ name: "Images", extensions: ["apng", "avif", "gif", "jpeg", "png", "svg", "webp"] }]
     });
     if (!res.filePaths.length) return "cancelled";
     return res.filePaths[0];

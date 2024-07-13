@@ -12,11 +12,11 @@ import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
+import { CustomSplashAnimation } from "./CustomSplashAnimation";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
-import { CustomSplashAnimation } from "./CustomSplashAnimation";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
@@ -119,7 +119,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Custom Splash Animation":[CustomSplashAnimation],
+    "Custom Splash Animation": [CustomSplashAnimation],
     "Equicord Location": [VencordLocationPicker]
 };
 
