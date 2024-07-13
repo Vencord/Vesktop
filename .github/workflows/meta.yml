@@ -27,12 +27,12 @@ jobs:
 
             - name: Commit and merge in changes
               run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "78185467+github-actions[bot]@users.noreply.github.com"
+                  git config user.name "thororen1234"
+                  git config user.email "78185467+thororen1234[bot]@users.noreply.github.com"
                   git checkout -b ci/meta-update
                   git add meta/com.thororen.equitop.metainfo.xml
                   git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
                   git push origin ci/meta-update --force
                   gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @thororen1234"
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.ETOKEN }}
