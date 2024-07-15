@@ -4,11 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { findByPropsLazy } from "@vencord/types/webpack";
+import { findByCodeLazy } from "@vencord/types/webpack";
 import { keybindCallbacks } from "renderer";
 
 import { addPatch } from "./shared";
-const { toString } = findByPropsLazy("keyToCode");
+const toShortcutString = findByCodeLazy('return"gamepad".');
 
 addPatch({
     patches: [
@@ -52,7 +52,7 @@ addPatch({
 
     registerKeybind: function (id, shortcut, callback, options) {
         keybindCallbacks[id] = callback;
-        VesktopNative.keybind.register(id, toString(shortcut), options);
+        VesktopNative.keybind.register(id, toShortcutString(shortcut), options);
     },
     unregisterKeybind: function (id) {
         delete keybindCallbacks[id];
