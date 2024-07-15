@@ -42,7 +42,7 @@ export function createSplashWindow(startMinimized = false) {
     } else {
         splash.webContents.insertCSS(`img {image-rendering: pixelated}`);
         splash.webContents.executeJavaScript(`
-            document.getElementById("animation").src = "../shiggy.gif";
+            document.getElementById("animation").src = "../blocks.gif";
         `);
     }
 
