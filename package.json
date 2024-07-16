@@ -133,7 +133,6 @@
             }
         },
         "dmg": {
-            "background": "build/background.tiff",
             "icon": "build/icon.icns",
             "iconSize": 105,
             "window": {
