@@ -14,6 +14,10 @@
     <p>Which comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
   </description>
   <releases>
+    <release version="v2.0.2" date="2024-07-16" type="stable">
+      <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.2</url>
+      <description/>
+    </release>
     <release version="v2.0.1" date="2024-07-15" type="stable">
       <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.1</url>
       <description/>
