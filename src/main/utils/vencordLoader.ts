@@ -37,7 +37,7 @@ export async function githubGet(endpoint: string) {
 
 export async function downloadVencordAsar() {
     await downloadFile(
-        "https://github.com/Vendicated/Vencord/releases/latest/download/desktop.asar",
+        "https://github.com/Vendicated/Vencord/releases/latest/download/vesktop.asar",
         VENCORD_ASAR_FILE,
         {},
         { retryOnNetworkError: true }

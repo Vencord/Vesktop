@@ -22,7 +22,7 @@ const NodeCommonOpts: BuildOptions = {
     ...CommonOpts,
     format: "cjs",
     platform: "node",
-    external: ["electron"],
+    external: ["electron", "original-fs"],
     target: ["esnext"],
     define: {
         IS_DEV: JSON.stringify(isDev)
