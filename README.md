@@ -39,7 +39,7 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-These work on both M series and Intel Series Macs
+These work on both M Series and Intel Series Macs
 -   [DMG](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-mac-universal.dmg)
 -   [ZIP](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-mac-universal.zip)
 
