@@ -7,7 +7,7 @@
 import "./ipc";
 
 import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
-import { checkUpdates } from "updater/main";
+import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
@@ -19,6 +19,8 @@ import { isDeckGameMode } from "./utils/steamOS";
 
 if (IS_DEV) {
     require("source-map-support").install();
+} else {
+    autoUpdater.checkForUpdatesAndNotify();
 }
 
 // Make the Vencord files use our DATA_DIR
@@ -74,7 +76,6 @@ function init() {
     });
 
     app.whenReady().then(async () => {
-        checkUpdates();
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
 
         registerScreenShareHandler();

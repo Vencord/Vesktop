@@ -103,15 +103,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Notifications & Updates": [
-        NotificationBadgeToggle,
-        {
-            key: "checkUpdates",
-            title: "Check for updates",
-            description: "Automatically check for Vesktop updates",
-            defaultValue: true
-        }
-    ],
+    Notifications: [NotificationBadgeToggle],
     Miscelleanous: [
         {
             key: "arRPC",

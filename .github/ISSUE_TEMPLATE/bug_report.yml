@@ -13,11 +13,13 @@ body:
 
               Make sure both Vesktop and Vencord are fully up to date. You can update Vencord by right-clicking the Vesktop tray icon and pressing "Update Vencord"
 
-              Do not report any of the following issues:
-              - Purely graphical glitches like flickering, scaling issues, etc: Issue with your gpu. Nothing we can do, update drivers or disable hardware acceleration
+              **DO NOT REPORT** any of the following issues:
+              - GPU related issues. These are **you** issues and you have to fix them. You can disable hardware acceleration or run with --disable-gpu. 
+                - Purely graphical glitches like flickering, scaling issues
+                - App crashing with mentions of the gpu process in the stacktrace
+                - Screenshare not starting, black screening or crashing
               - Vencord related issues: This is the Vesktop repo, not Vencord
-              - Screenshare not starting / black screening on Linux: Issue with your desktop environment, specifically its xdg-desktop-portal
-
+              
               Linux users: Please only report issues with supported packages (flatpak and any builds from the README / releases).
               We do not support other packages, like the AUR or Nix packages, so please first make sure your issue is reproducible with official releases,
               like [our Flatpak](https://flathub.org/apps/dev.vencord.Vesktop) or [AppImage](https://vencord.dev/download/vesktop/amd64/appimage)
@@ -48,6 +50,15 @@ body:
           placeholder: Gnome on Wayland
       validations:
           required: false
+
+    - type: input
+      id: install-type
+      attributes:
+          label: Package Type
+          description: What kind of Vesktop package are you using? (Setup exe, Portable, Flatpak, AppImage, Deb, etc)
+          placeholder: Flatpak
+      validations:
+          required: true
 
     - type: textarea
       id: bug-description
@@ -84,7 +95,7 @@ body:
       id: debug-logs
       attributes:
           label: Debug Logs
-          description: Run vesktop from the command line. Include the relevant command line output here
+          description: Run vesktop from the command line. Include the relevant command line output here. If there are any lines that seem relevant, try googling them or searching existing issues
           value: |
               ```
               Replace this text with your crash-log. Do not remove the backticks

@@ -28,6 +28,34 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.3" date="2024-07-04" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.3</url>
+      <description>
+        <p>Features</p>
+        <ul>
+          <li>added arm64 Windows support</li>
+          <li>windows &amp; macOS builds are now universal</li>
+          <li>added option to configure spellcheck languages</li>
+          <li>will auto-update from now on</li>
+          <li>updated electron to 31 &amp; Chromium to 126</li>
+          <li>macOS: Added customized dmg background by @khcrysalis</li>
+          <li>Windows Portable: store settings in portable folder by @MrGarlic1</li>
+          <li>linux audioshare: added granular selection, more options, better ui by @Curve</li>
+          <li>changed default screen-sharing quality to 720p 30 FPS by @Tiagoquix</li>
+        </ul>
+        <p>Fixes</p>
+        <ul>
+          <li>macOS: Added workaround for making things in draggable area clickable by @HAHALOSAH</li>
+          <li>fixed Screenshare UI for non-linux systems by @PolisanTheEasyNick</li>
+          <li>fixed opening on screen that was disconnected by @MrGarlic1</li>
+          <li>mac: hide native window controls with custom titlebar enabled by @MrGarlic1</li>
+          <li>fixed some broken patches by @D3SOX</li>
+          <li>fixed framerate in constraints by @kittykel</li>
+          <li>fixed some first launch switches not applying</li>
+          <li>fixed potential sandbox escape via custom vencord location</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.2" date="2024-05-01" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.2</url>
       <description>
@@ -182,7 +210,7 @@
   <url type="vcs-browser">https://github.com/Vencord/Vesktop</url>
   <categories>
     <category>InstantMessaging</category>
-    <category>AudioVideo</category>
+    <category>Network</category>
   </categories>
   <requires>
     <control>pointing</control>
