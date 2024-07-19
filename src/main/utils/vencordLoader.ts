@@ -45,7 +45,7 @@ export async function downloadVencordAsar() {
 }
 
 export function isValidVencordInstall(dir: string) {
-    return existsSync(join(dir, "equibop.asar"));
+    return existsSync(join(dir, "vesktop.asar"));
 }
 
 export async function ensureVencordFiles() {
