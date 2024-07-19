@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { BrowserWindow, webContents } from "electron";
+import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";

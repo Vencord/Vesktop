@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { Button, Forms, Toasts } from "@vencord/types/webpack/common";
+import { Button, Forms } from "@vencord/types/webpack/common";
 
 import { SettingsComponent } from "./Settings";
 
@@ -13,19 +13,27 @@ export const CustomSplashAnimation: SettingsComponent = ({ settings }) => {
         <>
         
         <Forms.FormText>
-            The animation on the splash window is loaded from{" "}
             {settings.splashAnimationPath ? (
-                <a
-                    href="about:blank"
-                    onClick={e => {
-                        e.preventDefault();
-                        VesktopNative.fileManager.showItemInFolder(settings.splashAnimationPath!);
-                    }}
-                >
-                    {settings.splashAnimationPath}
-                </a>
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px"
+                }}>
+                    <img src="splash-animation:///" width="64px" height="64px"></img>
+                    <p>The custom splash animation is enabled. It is loaded from 
+                        <a
+                            href="about:blank"
+                            onClick={e => {
+                                e.preventDefault();
+                                VesktopNative.fileManager.showItemInFolder(settings.splashAnimationPath!);
+                            }}
+                        >
+                            {" " + settings.splashAnimationPath}
+                        </a>
+                    </p>
+                </div>
             ) : (
-                "the default location"
+                "A custom splash animation is not set."
             )}
         </Forms.FormText>
         <div className="vcd-location-btns" style={{marginBottom: 20}}>
@@ -36,7 +44,7 @@ export const CustomSplashAnimation: SettingsComponent = ({ settings }) => {
                     if (choice === "cancelled") return;
                     settings.splashAnimationPath = choice;
                 }}
-            >
+            >   
                 Change
             </Button>
             <Button
