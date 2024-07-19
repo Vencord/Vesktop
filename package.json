@@ -64,6 +64,7 @@
     },
     "build": {
         "appId": "com.thororen.equibop",
+        "artifactName": "${productName}-${os}-${arch}.${ext}",
         "productName": "Equibop",
         "files": [
             "!*",
