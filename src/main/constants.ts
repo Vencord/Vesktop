@@ -47,11 +47,9 @@ export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
 
 // needs to be inline require because of circular dependency
 // as otherwise "DATA_DIR" (which is used by ./settings) will be uninitialised
-export const VENCORD_ASAR_FILE = (() => {
+export const VENCORD_DIR = (() => {
     const { State } = require("./settings") as typeof import("./settings");
-    return State.store.vencordDir
-        ? join(State.store.vencordDir, "equibop.asar")
-        : join(SESSION_DATA_DIR, "equicord.asar");
+    return State.store.vencordDir ? join(State.store.vencordDir, "equibop") : join(SESSION_DATA_DIR, "equicord.asar");
 })();
 
 export const USER_AGENT = `Equibop/${app.getVersion()} (https://github.com/Equicord/Equibop)`;

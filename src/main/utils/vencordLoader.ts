@@ -7,7 +7,7 @@
 import { existsSync } from "fs";
 import { join } from "path";
 
-import { USER_AGENT, VENCORD_ASAR_FILE } from "../constants";
+import { USER_AGENT, VENCORD_DIR } from "../constants";
 import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";
@@ -38,18 +38,18 @@ export async function githubGet(endpoint: string) {
 export async function downloadVencordAsar() {
     await downloadFile(
         "https://github.com/Equicord/Equicord/releases/latest/download/equibop.asar",
-        VENCORD_ASAR_FILE,
+        VENCORD_DIR,
         {},
         { retryOnNetworkError: true }
     );
 }
 
 export function isValidVencordInstall(dir: string) {
-    return existsSync(join(dir, "equibop.asar"));
+    return existsSync(join(dir, "equibop/main.js"));
 }
 
 export async function ensureVencordFiles() {
-    if (existsSync(VENCORD_ASAR_FILE)) return;
+    if (existsSync(VENCORD_DIR)) return;
 
     await downloadVencordAsar();
 }

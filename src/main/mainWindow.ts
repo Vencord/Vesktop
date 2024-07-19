@@ -34,7 +34,7 @@ import {
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
-    VENCORD_ASAR_FILE
+    VENCORD_DIR
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
@@ -465,7 +465,7 @@ function createMainWindow() {
     return win;
 }
 
-const runVencordMain = once(() => require(VENCORD_ASAR_FILE));
+const runVencordMain = once(() => require(VENCORD_DIR));
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
