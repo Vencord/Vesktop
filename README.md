@@ -29,31 +29,34 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 
 If you don't know the difference, pick the Installer.
 
--   [Installer](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-Setup-2.0.4.exe)
+-   Installer
+    -   [Universal](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-win.exe)
+    -   [x64 / amd64](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-win-x64.exe)
+    -   [arm64](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-win-arm64.exe)
 -   Portable
-    -   [x64 / amd64](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-2.0.4-win.zip)
-    -   [arm64](https://github.com/Equicord/Equibop/releases/download/v2.0.4/Equibop-2.0.4-arm64-win.zip)
+    -   [x64 / amd64](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-win-x64.zip)
+    -   [arm64](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-win-arm64.zip)
 
 ### Mac
 
-If you don't know the difference, pick the Intel build.
-
--   [Equibop.dmg](https://github.com/Equicord/Equibop/releases/download/v2.0.4/Equibop-2.0.4-universal.dmg)
+These work on both M series and Intel Series Macs
+-   [DMG](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-mac-universal.dmg)
+-   [ZIP](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-mac-universal.zip)
 
 ### Linux
 
 If you don't know the difference, pick amd64.
 
 -   amd64 / x86_64
-    -   [AppImage](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-2.0.4.AppImage)
-    -   [Ubuntu/Debian (.deb)](https://github.com/Equicord/Equibop/releases/latest/download/equibop_2.0.4_amd64.deb)
-    -   [Fedora/RHEL (.rpm)](https://github.com/Equicord/Equibop/releases/latest/download/equibop-2.0.4.x86_64.rpm)
-    -   [tarball](https://github.com/Equicord/Equibop/releases/latest/download/equibop-2.0.4.tar.gz)
+    -   [AppImage](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-x86_64.AppImage)
+    -   [Ubuntu/Debian (.deb)](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-amd64.deb)
+    -   [Fedora/RHEL (.rpm)](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-x86_64.rpm)
+    -   [tarball](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-x64.tar.gz)
 -   arm64 / aarch64
-    -   [AppImage](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-2.0.4-arm64.AppImage)
-    -   [Ubuntu/Debian (.deb)](https://github.com/Equicord/Equibop/releases/latest/download/equibop_2.0.4_arm64.deb)
-    -   [Fedora/RHEL (.rpm)](https://github.com/Equicord/Equibop/releases/latest/download/equibop-2.0.4.aarch64.rpm)
-    -   [tarball](https://github.com/Equicord/Equibop/releases/latest/download/equibop-2.0.4-arm64.tar.gz)
+    -   [AppImage](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-arm64.AppImage)
+    -   [Ubuntu/Debian (.deb)](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-arm64.deb)
+    -   [Fedora/RHEL (.rpm)](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-aarch64.rpm)
+    -   [tarball](https://github.com/Equicord/Equibop/releases/download/latest/Equibop-linux-arm64.tar.gz)
 
 ## Building from Source
 
