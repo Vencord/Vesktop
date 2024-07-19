@@ -34,13 +34,13 @@ import {
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
-    VENCORD_FILES_DIR
+    VENCORD_ASAR_FILE
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordAsar, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 let tray: Tray;
@@ -93,7 +93,7 @@ function initTray(win: BrowserWindow) {
         {
             label: "Repair Equicord",
             async click() {
-                await downloadVencordFiles();
+                await downloadVencordAsar();
                 app.relaunch();
                 app.quit();
             }
@@ -167,7 +167,7 @@ function initMenuBar(win: BrowserWindow) {
         {
             label: "Force Update Equicord",
             async click() {
-                await downloadVencordFiles();
+                await downloadVencordAsar();
                 app.relaunch();
                 app.quit();
             },
@@ -465,7 +465,7 @@ function createMainWindow() {
     return win;
 }
 
-const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+const runVencordMain = once(() => require(VENCORD_ASAR_FILE));
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
