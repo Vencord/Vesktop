@@ -4,19 +4,24 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import axios from "axios";
-import { writeFileSync } from "fs";
+import { createWriteStream } from "original-fs";
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { setTimeout } from "timers/promises";
 
 interface FetchieOptions {
     retryOnNetworkError?: boolean;
 }
 
-export async function downloadFile(url: string, file: string) {
-    const res = await axios.get(url, {
-        responseType: "blob"
-    });
-    writeFileSync(file, res.data);
+export async function downloadFile(url: string, file: string, options: RequestInit = {}, fetchieOpts?: FetchieOptions) {
+    const res = await fetchie(url, options, fetchieOpts);
+    await pipeline(
+        // @ts-expect-error odd type error
+        Readable.fromWeb(res.body!),
+        createWriteStream(file, {
+            autoClose: true
+        })
+    );
 }
 
 const ONE_MINUTE_MS = 1000 * 60;
@@ -35,7 +40,7 @@ export async function fetchie(url: string, options?: RequestInit, { retryOnNetwo
                 try {
                     res = await fetch(url, options);
                     break;
-                } catch {}
+                } catch { }
             }
         }
 
