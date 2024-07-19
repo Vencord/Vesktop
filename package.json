@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24",
+        "axios": "^1.7.2",
         "electron-updater": "^6.2.1"
     },
     "optionalDependencies": {
