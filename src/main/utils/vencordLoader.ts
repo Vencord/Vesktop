@@ -36,11 +36,11 @@ export async function githubGet(endpoint: string) {
 }
 
 export async function downloadVencordAsar() {
-    await downloadFile("https://github.com/Equicord/Equicord/releases/latest/download/vesktop.asar", VENCORD_ASAR_FILE);
+    await downloadFile("https://github.com/Equicord/Equicord/releases/latest/download/equibop.asar", VENCORD_ASAR_FILE);
 }
 
 export function isValidVencordInstall(dir: string) {
-    return existsSync(join(dir, "vesktop.asar"));
+    return existsSync(join(dir, "equibop.asar"));
 }
 
 export async function ensureVencordFiles() {

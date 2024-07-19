@@ -50,7 +50,7 @@ export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
 export const VENCORD_ASAR_FILE = (() => {
     const { State } = require("./settings") as typeof import("./settings");
     return State.store.vencordDir
-        ? join(State.store.vencordDir, "vesktop.asar")
+        ? join(State.store.vencordDir, "equibop.asar")
         : join(SESSION_DATA_DIR, "equicord.asar");
 })();
 
