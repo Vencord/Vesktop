@@ -40,7 +40,7 @@ export async function fetchie(url: string, options?: RequestInit, { retryOnNetwo
                 try {
                     res = await fetch(url, options);
                     break;
-                } catch { }
+                } catch {}
             }
         }
 
