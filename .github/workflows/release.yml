@@ -51,3 +51,6 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   CSC_LINK: ${{ secrets.APPLE_SIGNING_CERT }}
+                  APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+                  APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
