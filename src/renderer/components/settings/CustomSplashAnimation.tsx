@@ -21,17 +21,7 @@ export const CustomSplashAnimation: SettingsComponent = ({ settings }) => {
                 }}>
                     {/* adding the Math.random() here ensures that a new image is fetched when the user changes the path */}
                     <img src={"splash-animation:///" + Math.random()} width="64px" height="64px"></img>
-                    <p>The custom splash animation is enabled. It is loaded from 
-                        <a
-                            href="about:blank"
-                            onClick={e => {
-                                e.preventDefault();
-                                VesktopNative.fileManager.showItemInFolder(settings.splashAnimationPath!);
-                            }}
-                        >
-                            {" " + settings.splashAnimationPath}
-                        </a>
-                    </p>
+                    <p>The custom splash animation is enabled.</p>
                 </div>
             ) : (
                 "A custom splash animation is not set."
@@ -51,7 +41,10 @@ export const CustomSplashAnimation: SettingsComponent = ({ settings }) => {
             <Button
                 size={Button.Sizes.SMALL}
                 color={Button.Colors.RED}
-                onClick={() => (settings.splashAnimationPath = void 0)}
+                onClick={() => {
+                    //todo: delete the image after resetting the path?
+                    settings.splashAnimationPath = undefined
+                }}
             >
                 Reset
             </Button>

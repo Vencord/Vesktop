@@ -6,10 +6,11 @@
 
 import "./ipc";
 
+import { join } from "path";
 import { app, BrowserWindow, nativeTheme, net, protocol, session } from "electron";
 import { autoUpdater } from "electron-updater";
 
-import { DATA_DIR } from "./constants";
+import { DATA_DIR, VESKTOP_SPLASH_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
@@ -84,7 +85,8 @@ function init() {
         //register file handler so we can load the custom splash animation from the user's filesystem
         protocol.handle("splash-animation", () => {
             const { splashAnimationPath } = Settings.store;
-            return net.fetch("file:///"+splashAnimationPath);
+            const fullPath = join(VESKTOP_SPLASH_DIR, splashAnimationPath as string);
+            return net.fetch("file:///"+fullPath);
         });
 
         //this patches the discord csp to allow the splash-animation:// protocol 

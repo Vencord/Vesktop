@@ -9,15 +9,16 @@ if (process.platform === "linux") import("./venmic");
 import { execFile } from "child_process";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
-import { open, readFile } from "fs/promises";
+import { open, readFile, copyFile, mkdir, rmdir } from "fs/promises";
 import { release } from "os";
-import { join } from "path";
+import { randomBytes } from "crypto";
+import { join, extname } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
-import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
+import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR, VESKTOP_SPLASH_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
@@ -134,7 +135,17 @@ handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
         ]
     });
     if (!res.filePaths.length) return "cancelled";
-    return res.filePaths[0];
+
+    const originalPath = res.filePaths[0];
+    const uuid = randomBytes(16).toString("hex");
+    const imageName = "splash_" + uuid + extname(originalPath);
+    const destPath = join(VESKTOP_SPLASH_DIR, imageName);
+
+    await rmdir(VESKTOP_SPLASH_DIR, {recursive: true})
+    await mkdir(VESKTOP_SPLASH_DIR, {recursive: true});
+    await copyFile(originalPath, destPath);
+
+    return imageName;
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
