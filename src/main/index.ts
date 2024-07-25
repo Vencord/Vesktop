@@ -27,7 +27,7 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
     const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
@@ -83,6 +83,7 @@ function init() {
         
         //register file handler so we can load the custom splash animation from the user's filesystem
         protocol.handle("splash-animation", () => {
+            const { splashAnimationPath } = Settings.store;
             return net.fetch("file:///"+splashAnimationPath);
         });
 

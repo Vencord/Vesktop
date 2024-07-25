@@ -19,7 +19,8 @@ export const CustomSplashAnimation: SettingsComponent = ({ settings }) => {
                     alignItems: "center",
                     gap: "16px"
                 }}>
-                    <img src="splash-animation:///" width="64px" height="64px"></img>
+                    {/* adding the Math.random() here ensures that a new image is fetched when the user changes the path */}
+                    <img src={"splash-animation:///" + Math.random()} width="64px" height="64px"></img>
                     <p>The custom splash animation is enabled. It is loaded from 
                         <a
                             href="about:blank"
