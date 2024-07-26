@@ -8,7 +8,7 @@ if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
-import { mkdirSync, readFileSync, watch } from "fs";
+import { mkdirSync, readFileSync, watch, existsSync } from "fs";
 import { open, readFile, copyFile, mkdir, rmdir } from "fs/promises";
 import { release } from "os";
 import { randomBytes } from "crypto";
@@ -141,7 +141,9 @@ handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
     const imageName = "splash_" + uuid + extname(originalPath);
     const destPath = join(VESKTOP_SPLASH_DIR, imageName);
 
-    await rmdir(VESKTOP_SPLASH_DIR, {recursive: true})
+    if (existsSync(VESKTOP_SPLASH_DIR)) {
+        await rmdir(VESKTOP_SPLASH_DIR, {recursive: true});
+    }
     await mkdir(VESKTOP_SPLASH_DIR, {recursive: true});
     await copyFile(originalPath, destPath);
 
