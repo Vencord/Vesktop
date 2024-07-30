@@ -11,16 +11,33 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
+export let splash: BrowserWindow;
+
 export function createSplashWindow(startMinimized = false) {
-    const splash = new BrowserWindow({
-        ...SplashProps,
-        icon: ICON_PATH,
-        show: !startMinimized
-    });
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath, splashDetailed } = Settings.store;
 
-    splash.loadFile(join(VIEW_DIR, "splash.html"));
+    if (splashDetailed) {
+        splash = new BrowserWindow({
+            ...SplashProps,
+            icon: ICON_PATH,
+            show: !startMinimized,
+            height: 400,
+            width: 500,
+            closable: false
+        });
 
-    const { splashBackground, splashColor, splashTheming, splashAnimationPath } = Settings.store;
+        splash.loadFile(join(VIEW_DIR, "splash_v2.html"));
+    } else {
+        splash = new BrowserWindow({
+            ...SplashProps,
+            icon: ICON_PATH,
+            show: !startMinimized,
+            width: 300,
+            closable: false
+        });
+
+        splash.loadFile(join(VIEW_DIR, "splash.html"));
+    }
 
     if (splashTheming) {
         if (splashColor) {
@@ -45,6 +62,5 @@ export function createSplashWindow(startMinimized = false) {
             document.getElementById("animation").src = "../troll.gif";
         `);
     }
-
     return splash;
 }
