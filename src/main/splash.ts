@@ -59,7 +59,7 @@ export function createSplashWindow(startMinimized = false) {
     } else {
         splash.webContents.insertCSS(`img {image-rendering: pixelated}`);
         splash.webContents.executeJavaScript(`
-            document.getElementById("animation").src = "../viggy.gif";
+            document.getElementById("animation").src = "../troll.gif";
         `);
     }
     return splash;
