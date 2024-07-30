@@ -4,7 +4,6 @@
     --fg-secondary: #313338;
     --fg-semi-trans: rgb(0 0 0 / 0.2);
     --link: #006ce7;
-    --progress-fg: #603a8b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,7 +13,6 @@
         --fg-secondary: #b5bac1;
         --fg-semi-trans: rgb(255 255 255 / 0.2);
         --link: #00a8fc;
-        --progress-fg: #9948f7;
     }
 }
 
