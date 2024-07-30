@@ -31,7 +31,6 @@ export function addSplashLog(text: string) {
     if (splash !== null) {
         doneTasks++;
         const completedNum = (doneTasks / totalTasks).toFixed(2);
-        console.log("adding item: " + text, "done: " + doneTasks, "what?: " + completedNum);
         splashWindow.webContents.executeJavaScript(`
             document.getElementById("detailedlogs").appendChild(Object.assign(document.createElement("li"), {className: "logitem", innerHTML: "${text}"}));
             document.getElementById("tasks-completed").innerHTML = "(${doneTasks}/${totalTasks})";
