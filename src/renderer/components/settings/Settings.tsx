@@ -117,6 +117,13 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Open Links in app (experimental)",
             description: "Opens links in a new Equibop window instead of your web browser",
             defaultValue: false
+        },
+
+        {
+            key: "splashDetailed",
+            title: "Show detailed process in splash",
+            description: "Splash redesign with additional information while Equicord loads",
+            defaultValue: false
         }
     ],
     "Custom Splash Animation": [CustomSplashAnimation],

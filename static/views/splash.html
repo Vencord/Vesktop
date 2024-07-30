@@ -3,19 +3,24 @@
 
     <style>
         body {
-            user-select: none;
             -webkit-app-region: drag;
+            user-select: none;
         }
 
         .wrapper {
             box-sizing: border-box;
             height: 100%;
             display: flex;
+            border-radius: 8px;
+            border: 1px solid var(--fg-semi-trans);
+        }
+
+        .loading {
+            display: flex;
+            width: 300px;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 8px;
-            border: 1px solid var(--fg-semi-trans);
         }
 
         p {
@@ -30,9 +35,11 @@
 
 <body>
     <div class="wrapper">
-        <!-- the data url is here to ensure there isn't an empty frame before the image is loaded -->
-        <img id="animation" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-            draggable="false" alt="animation" role="presentation" />
-        <p>Loading Equibop...</p>
+        <div class="loading">
+            <!-- the data url is here to ensure there isn't an empty frame before the image is loaded -->
+            <img id="animation" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                draggable="false" alt="animation" role="presentation" />
+            <p>Loading Equibop...</p>
+        </div>
     </div>
 </body>

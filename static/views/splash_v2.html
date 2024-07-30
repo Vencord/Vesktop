@@ -1,0 +1,131 @@
+<head>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+
+    <style>
+        body {
+            -webkit-app-region: drag;
+            user-select: none;
+        }
+
+        .wrapper {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            border: 1px solid var(--fg-semi-trans);
+        }
+
+        .detailedupper {
+            display: flex;
+            height: 100%;
+            flex-direction: row;
+        }
+
+        .imgcontainer {
+            padding-top: 10px;
+            padding-left: 10px;
+            width: 100px;
+        }
+        #detailedlogs {
+            padding-left: 20px;
+            font-size: 14px;
+            width: 400px;
+        }
+        .logitem {
+            margin-left: 20px;
+            font-size: 12px;
+        }
+
+        .detailedlower {
+            border-top: 1px solid var(--fg-semi-trans);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-section {
+            height: 75px;
+            width: auto;
+            padding-bottom: 2px;
+            padding-top: 2px;
+            padding-left: 10px;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .progressbar {
+            height: 20px;
+            width: auto;
+            box-sizing: border-box;
+            margin-top: 10px;
+            background-color: color-mix(in srgb, var(--bg), black 20%);
+            border: 1px solid color-mix(in srgb, var(--fg-semi-trans), white 40%);
+            border-radius: 4px;
+        }
+        .progressbar #progress {
+            height: 100%;
+            width: 0%;
+            max-width: 100%;
+            background-color: color-mix(in srgb, var(--fg-semi-trans), white 20%);
+            border-radius: 4px;
+            transition: width 0.5s ease-in;
+        }
+
+        .progress-section #progress-percentage {
+            font-size: 12px;
+            padding-left: 2px;
+        }
+
+        .footer {
+            display: flex;
+            align-items: end;
+            font-size: 12px;
+            padding-bottom: 4px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        #version {
+            margin-left: auto;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        img {
+            width: 96px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="detailedupper">
+            <div class="imgcontainer">
+                <!-- the data url is here to ensure there isn't an empty frame before the image is loaded -->
+                <img id="animation" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                draggable="false" alt="animation" role="presentation" />
+            </div>
+            <ul id="detailedlogs">
+                <span class="tasks-text">Tasks </span><span id="tasks-completed">(0/0):</span>
+            </ul>
+        </div>
+        <div class="detailedlower">
+            <div class="progress-section">
+                <span id="progress-percentage">99%</span>
+                <div class="progressbar">
+                    <div id="progress"></div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footertext">
+                    Equibop is a fork of Vesktop.
+                </div>
+                <div id="version">v0.0.0</div> 
+            </div>
+        </div>
+    </div>
+</body>
