@@ -28,7 +28,7 @@ export function initSplashLog(splash: BrowserWindow) {
  * Adds a new log element to the splash
  */
 export function addSplashLog(text: string) {
-    if (splash !== null) {
+    if (!splash.isDestroyed()) {
         doneTasks++;
         const completedNum = (doneTasks / totalTasks).toFixed(2);
         splashWindow.webContents.executeJavaScript(`
