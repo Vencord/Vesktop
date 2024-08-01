@@ -47,6 +47,7 @@ jobs:
             - name: Run Electron Builder
               if: ${{ matrix.platform == 'mac' }}
               run: |
+                  echo "$API_KEY" > apple.p8
                   pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
                   GH_TOKEN: ${{ secrets.ETOKEN }}
