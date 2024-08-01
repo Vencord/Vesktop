@@ -78,7 +78,7 @@ function init() {
     });
 
     app.whenReady().then(async () => {
-        if (process.platform === "win32") app.setAppUserModelId("com.thororen.equibop");
+        if (process.platform === "win32") app.setAppUserModelId("io.github.thororen.equibop");
 
         const splash = createSplashWindow();
         initSplashLog(splash);

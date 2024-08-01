@@ -50,7 +50,7 @@ const latestReleaseInformation = await fetch("https://api.github.com/repos/Equic
     }
 }).then(res => res.json());
 
-const metaInfo = await fs.readFile("./meta/com.thororen.equibop.metainfo.xml", "utf-8");
+const metaInfo = await fs.readFile("./meta/io.github.thororen.equibop.metainfo.xml", "utf-8");
 
 const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
@@ -90,4 +90,4 @@ const output = xmlFormat(new XMLSerializer().serializeToString(parser), {
     indentation: "  "
 });
 
-await fs.writeFile("./meta/com.thororen.equibop.metainfo.xml", output, "utf-8");
+await fs.writeFile("./meta/io.github.thororen.equibop.metainfo.xml", output, "utf-8");
