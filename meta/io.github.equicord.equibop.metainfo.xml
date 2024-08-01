@@ -5,7 +5,7 @@
   <name>Equibop</name>
   <summary>Snappier Discord app with Equicord</summary>
   <developer_name>Equicord Contributors</developer_name>
-  <launchable type="desktop-id">io.github.equicord.equibop</launchable>
+  <launchable type="desktop-id">io.github.equicord.equibop.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
   <project_group>Equicord</project_group>
@@ -13,6 +13,20 @@
     <p>Equicord is a cross-platform Vesktop Fork desktop app aiming to give you extra plugins but still give you a snappier Discord experience, with Equicord pre-installed.</p>
     <p>Which comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
   </description>
+    <screenshots>
+    <screenshot type="default">
+      <caption>Equicord settings page and about window open</caption>
+      <image type="source">https://files.catbox.moe/4medht.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>A dialog showing screenshare options</caption>
+      <image type="source">https://files.catbox.moe/22q8fx.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>A screenshot of a Discord server</caption>
+      <image type="source">https://files.catbox.moe/a2rz3y.png</image>
+    </screenshot>
+  </screenshots>
   <releases>
     <release version="v2.0.6" date="2024-07-20" type="stable">
       <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.6</url>
