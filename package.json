@@ -133,8 +133,7 @@
                 "NSCameraUsageDescription": "This app needs access to the camera",
                 "com.apple.security.device.audio-input": true,
                 "com.apple.security.device.camera": true
-            },
-            "notarize": true
+            }
         },
         "dmg": {
             "icon": "build/icon.icns",
