@@ -63,7 +63,7 @@
         "pnpm": ">=8"
     },
     "build": {
-        "appId": "io.github.thororen.equibop",
+        "appId": "io.github.equicord.equibop",
         "artifactName": "${productName}-${os}-${arch}.${ext}",
         "productName": "Equibop",
         "files": [

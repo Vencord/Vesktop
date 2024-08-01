@@ -33,7 +33,7 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
                   git checkout -b ci/meta-update
-                  git add meta/io.github.thororen.equibop.metainfo.xml
+                  git add meta/io.github.equicord.equibop.metainfo.xml
                   git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
                   git push origin ci/meta-update --force
                   gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @thororen1234"

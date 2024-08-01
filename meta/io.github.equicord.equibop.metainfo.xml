@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop-application">
   <!--Created with jdAppStreamEdit 7.1-->
-  <id>io.github.thororen.equibop</id>
+  <id>io.github.equicord.equibop</id>
   <name>Equibop</name>
   <summary>Snappier Discord app with Equicord</summary>
   <developer_name>Equicord Contributors</developer_name>
-  <launchable type="desktop-id">io.github.thororen.equibop.desktop</launchable>
+  <launchable type="desktop-id">io.github.equicord.equibop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
   <project_group>Equicord</project_group>
