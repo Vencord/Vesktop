@@ -13,7 +13,7 @@
     <p>Equicord is a cross-platform Vesktop Fork desktop app aiming to give you extra plugins but still give you a snappier Discord experience, with Equicord pre-installed.</p>
     <p>Which comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
   </description>
-    <screenshots>
+  <screenshots>
     <screenshot type="default">
       <caption>Equicord settings page and about window open</caption>
       <image type="source">https://files.catbox.moe/4medht.png</image>
@@ -28,6 +28,10 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="v2.0.7" date="2024-08-02" type="stable">
+      <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.7</url>
+      <description/>
+    </release>
     <release version="v2.0.6" date="2024-07-20" type="stable">
       <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.6</url>
       <description/>
