@@ -78,5 +78,10 @@ export const VesktopNative = {
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
+    },
+    keybind: {
+        register: (id: number, shortcut: string, options: any) =>
+            invoke<void>(IpcEvents.KEYBIND_REGISTER, id, shortcut),
+        unregister: (id: number) => invoke<void>(IpcEvents.KEYBIND_UNREGISTER, id)
     }
 };
