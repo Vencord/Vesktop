@@ -7,6 +7,7 @@
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
+import { execFile } from "child_process";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -24,8 +25,21 @@ let lastIndex: null | number = -1;
 export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
-            if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            if (typeof count !== "number") { //sanitize
+                throw new Error("count must be a number");
+            }
+            
+            execFile ("gdbus", [
+                "emit",
+                "--session",
+                "--object-path",
+                "/",
+                "--signal",
+                "com.canonical.Unity.LauncherEntry.Update",
+                "application://vesktop.desktop",
+                `{\'count\': <int64 ${count === -1 ? 0 : count}>, \'count-visible\': <${count !== 0}>}`
+            ]);
+
             break;
         case "darwin":
             if (count === 0) {
