@@ -8,7 +8,6 @@ import type { Rectangle } from "electron";
 
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
-    vencordDir?: string;
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     trayBadge?: boolean;
@@ -22,15 +21,27 @@ export interface Settings {
     appBadge?: boolean;
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
-    /** @deprecated use customTitleBar */
-    discordWindowsTitleBar?: boolean;
     customTitleBar?: boolean;
-
-    checkUpdates?: boolean;
 
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
+
+    spellCheckLanguages?: string[];
+
+    audio?: {
+        workaround?: boolean;
+
+        deviceSelect?: boolean;
+        granularSelect?: boolean;
+
+        ignoreVirtual?: boolean;
+        ignoreDevices?: boolean;
+        ignoreInputMedia?: boolean;
+
+        onlySpeakers?: boolean;
+        onlyDefaultSpeakers?: boolean;
+    };
 }
 
 export interface State {
@@ -39,8 +50,9 @@ export interface State {
     windowBounds?: Rectangle;
     displayid: int;
 
-    skippedUpdate?: string;
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+
+    vencordDir?: string;
 }

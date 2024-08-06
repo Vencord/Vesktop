@@ -4,9 +4,9 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
-import type { LiteralUnion } from "type-fest";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpc";
@@ -33,14 +33,15 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        selectVencordDir: () => invoke<LiteralUnion<"cancelled" | "invalid", string>>(IpcEvents.SELECT_VENCORD_DIR)
+        getVencordDir: () => sendSync<string | undefined>(IpcEvents.GET_VENCORD_DIR),
+        selectVencordDir: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_VENCORD_DIR, value)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
         set: (settings: Settings, path?: string) => invoke<void>(IpcEvents.SET_SETTINGS, settings, path)
     },
     spellcheck: {
-        setLanguages: (languages: readonly string[]) => invoke<void>(IpcEvents.SPELLCHECK_SET_LANGUAGES, languages),
+        getAvailableLanguages: () => sendSync<string[]>(IpcEvents.SPELLCHECK_GET_AVAILABLE_LANGUAGES),
         onSpellcheckResult(cb: SpellCheckerResultCallback) {
             spellCheckCallbacks.add(cb);
         },
@@ -63,11 +64,10 @@ export const VesktopNative = {
     virtmic: {
         list: () =>
             invoke<
-                { ok: false; isGlibCxxOutdated: boolean } | { ok: true; targets: string[]; hasPipewirePulse: boolean }
+                { ok: false; isGlibCxxOutdated: boolean } | { ok: true; targets: Node[]; hasPipewirePulse: boolean }
             >(IpcEvents.VIRT_MIC_LIST),
-        start: (targets: string[], workaround?: boolean) => invoke<void>(IpcEvents.VIRT_MIC_START, targets, workaround),
-        startSystem: (workaround?: boolean, onlyDefaultSpeakers?: boolean) =>
-            invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, workaround, onlyDefaultSpeakers),
+        start: (include: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, include),
+        startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     arrpc: {
