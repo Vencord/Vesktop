@@ -18,8 +18,17 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { mainWin } from "./mainWindow";
+import { getAccentColor, mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
+import {
+    createTrayIcon,
+    generateTrayIcons,
+    getIconWithBadge,
+    getTrayIconFile,
+    getTrayIconFileSync,
+    pickTrayIcon,
+    setTrayIcon
+} from "./tray";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -165,3 +174,14 @@ watch(
         mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
     })
 );
+
+handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
+handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
+handleSync(IpcEvents.GET_TRAY_ICON_SYNC, (_, iconPath) => getTrayIconFileSync(iconPath));
+handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => getAccentColor());
+handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon, isSvg) =>
+    createTrayIcon(iconName, dataURL, isCustomIcon, isSvg)
+);
+handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());
+handle(IpcEvents.SELECT_TRAY_ICON, async (_, iconName) => pickTrayIcon(iconName));
+handle(IpcEvents.GET_ICON_WITH_BADGE, async (_, dataURL) => getIconWithBadge(dataURL));

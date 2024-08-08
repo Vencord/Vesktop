@@ -24,7 +24,8 @@ export const VesktopNative = {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
-        supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY)
+        supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
+        getAccentColor: () => invoke<string>(IpcEvents.GET_SYSTEM_ACCENT_COLOR)
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
@@ -33,6 +34,8 @@ export const VesktopNative = {
     },
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
+        selectTrayIcon: (iconName: string) =>
+            invoke<"cancelled" | "invalid" | string>(IpcEvents.SELECT_TRAY_ICON, iconName),
         getVencordDir: () => sendSync<string | undefined>(IpcEvents.GET_VENCORD_DIR),
         selectVencordDir: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_VENCORD_DIR, value),
         selectImagePath: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_IMAGE_PATH, value)
@@ -79,5 +82,31 @@ export const VesktopNative = {
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
+    },
+    tray: {
+        setIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
+        getIcon: (iconName: string) => invoke<string>(IpcEvents.GET_TRAY_ICON, iconName),
+        getIconSync: (iconName: string) => sendSync<string>(IpcEvents.GET_TRAY_ICON_SYNC, iconName),
+        createIconResponse: (
+            iconName: string,
+            iconDataURL: string,
+            isCustomIcon: boolean = true,
+            isSvg: boolean = true
+        ) => invoke<void>(IpcEvents.CREATE_TRAY_ICON_RESPONSE, iconName, iconDataURL, isCustomIcon, isSvg),
+        createIconRequest: (listener: (iconName: string, svg: string) => void) => {
+            ipcRenderer.on(IpcEvents.CREATE_TRAY_ICON_REQUEST, (_, iconPath: string, svg: string) =>
+                listener(iconPath, svg)
+            );
+        },
+        generateTrayIcons: () => invoke<void>(IpcEvents.GENERATE_TRAY_ICONS),
+        setCurrentVoiceIcon: (listener: (...args: any[]) => void) => {
+            ipcRenderer.on(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON, listener);
+        },
+        addBadgeToIcon: (listener: (iconDataURL: string, badgeDataURL: string) => void) => {
+            ipcRenderer.on(IpcEvents.ADD_BADGE_TO_ICON, (_, iconDataURL: string, badgeDataURL: string) =>
+                listener(iconDataURL, badgeDataURL)
+            );
+        },
+        returnIconWithBadge: (dataURL: string) => invoke<void>(IpcEvents.GET_ICON_WITH_BADGE, dataURL)
     }
 };

@@ -15,6 +15,13 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { CustomSplashAnimation } from "./CustomSplashAnimation";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import {
+    CustomizeTraySwitch,
+    TrayColorTypeSelect,
+    TrayFillColorSwitch,
+    TrayIconPicker,
+    TraySwitch
+} from "./TraySettings";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -68,28 +75,28 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         WindowsTransparencyControls
     ],
-    Behaviour: [
-        {
-            key: "tray",
-            title: "Tray Icon",
-            description: "Add a tray icon for Equibop",
-            defaultValue: true,
-            invisible: () => isMac
-        },
+    Tray: [
+        TraySwitch,
+        CustomizeTraySwitch,
+        TrayColorTypeSelect,
+        TrayIconPicker,
+        TrayFillColorSwitch,
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
             description: "Hitting X will make Equibop minimize to the tray instead of closing",
             defaultValue: true,
-            invisible: () => isMac,
-            disabled: () => Settings.store.tray === false
+            invisible: () => isMac || Settings.store.tray === false
         },
         {
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
             description: "Left clicking tray icon will toggle the equibop window visibility.",
-            defaultValue: false
-        },
+            defaultValue: false,
+            invisible: () => Settings.store.tray === false
+        }
+    ],
+    Behaviour: [
         {
             key: "disableMinSize",
             title: "Disable minimum window size",

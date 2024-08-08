@@ -10,6 +10,14 @@ export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
+    trayColor?: string;
+    trayColorType?: "default" | "system" | "custom";
+    trayAutoFill?: "auto" | "white" | "black";
+    trayMainOverride?: boolean;
+    trayIdleOverride?: boolean;
+    trayMutedOverride?: boolean;
+    traySpeakingOverride?: boolean;
+    trayDeafenedOverride?: boolean;
     minimizeToTray?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
