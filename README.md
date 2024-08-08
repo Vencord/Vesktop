@@ -17,6 +17,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 
 -   Equicord preinstalled
 -   Custom Splash animations from [this PR](https://github.com/Vencord/Vesktop/pull/355)
+-   Tray Customization & Voice detection and Badge from [this PR](https://github.com/Vencord/Vesktop/pull/517)
 
 **Not yet supported**:
 
