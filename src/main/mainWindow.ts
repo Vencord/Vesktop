@@ -455,12 +455,20 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const subdomain =
-        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
-            ? `${Settings.store.discordBranch}.`
-            : "";
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    const uri = process.argv.find(arg => arg.startsWith("discord://"));
 
-    win.loadURL(`https://${subdomain}discord.com/app`);
+    const loadUrl = (url: string | undefined) => {
+        win.loadURL(`https://${subdomain}discord.com${url?.substring("discord://".length) || "/app"}`);
+    };
+
+    let uriFiredDarwin = false;
+    app.on("open-url", (_, url) => {
+        uriFiredDarwin = true;
+        loadUrl(url);
+    });
+    uriFiredDarwin || loadUrl(uri);
 
     return win;
 }
