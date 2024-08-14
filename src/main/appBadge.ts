@@ -4,10 +4,10 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import dbus from "@homebridge/dbus-native";
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
-import { execFile } from "child_process";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -25,21 +25,28 @@ let lastIndex: null | number = -1;
 export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
-            if (typeof count !== "number") { //sanitize
-                throw new Error("count must be a number");
+            if (typeof count !== "number") {
+                throw new Error("count must be a number"); // sanitize
             }
-            
-            execFile ("gdbus", [
-                "emit",
-                "--session",
-                "--object-path",
-                "/",
-                "--signal",
-                "com.canonical.Unity.LauncherEntry.Update",
-                "application://vesktop.desktop",
-                `{\'count\': <int64 ${count === -1 ? 0 : count}>, \'count-visible\': <${count !== 0}>}`
-            ]);
 
+            const sessionBus = dbus.sessionBus();
+            sessionBus.connection.message({
+                type: dbus.messageType.signal,
+                serial: 1,
+                path: "/",
+                interface: "com.canonical.Unity.LauncherEntry",
+                member: "Update",
+                signature: "sa{sv}",
+                body: [
+                    process.env.container === "1"
+                        ? "application://dev.vencord.Vesktop.desktop" // flatpak handling
+                        : "application://vesktop.desktop",
+                    [
+                        ["count", ["i", count === -1 ? 0 : count]],
+                        ["count-visible", ["b", count !== 0]]
+                    ]
+                ]
+            });
             break;
         case "darwin":
             if (count === 0) {

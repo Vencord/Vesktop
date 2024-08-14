@@ -446,9 +446,9 @@ function createMainWindow() {
 
     if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
     else if (Settings.store.appBadge)
-    	mainWin.webContents.on("page-title-updated", (_, title) => {
-	        mainWin.setTitle(title.replace(/^\(\d+\)\s*|•\s/, ""));    
-	    });
+        mainWin.webContents.on("page-title-updated", (_, title) => {
+            mainWin.setTitle(title.replace(/^\(\d+\)\s*|•\s/, ""));
+        });
 
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
