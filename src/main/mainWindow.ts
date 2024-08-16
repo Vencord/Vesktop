@@ -460,7 +460,7 @@ function createMainWindow() {
     const uri = process.argv.find(arg => arg.startsWith("discord://"));
 
     const loadUrl = (url: string | undefined) => {
-        win.loadURL(`https://${subdomain}discord.com${url?.substring("discord://".length) || "/app"}`);
+        win.loadURL(`https://${subdomain}discord.com/${url?.replace(RegExp("^discord://[^/]*/?"), "") || "app"}`);
     };
 
     let uriFiredDarwin = false;
