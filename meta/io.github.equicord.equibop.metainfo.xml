@@ -28,6 +28,10 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.1.0" date="2024-08-17" type="stable">
+      <url>https://github.com/Equicord/Equibop/releases/tag/v2.1.0</url>
+      <description/>
+    </release>
     <release version="v2.0.7" date="2024-08-02" type="stable">
       <url>https://github.com/Equicord/Equibop/releases/tag/v2.0.7</url>
       <description/>
