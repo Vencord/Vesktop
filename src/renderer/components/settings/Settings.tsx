@@ -71,7 +71,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "splashTheming",
             title: "Splash theming",
             description: "Adapt the splash window colors to your custom theme",
-            defaultValue: false
+            defaultValue: true
         },
         WindowsTransparencyControls
     ],
