@@ -506,7 +506,7 @@ export async function createWindows() {
     initArRPC();
 }
 
-export function getAccentColor() {
+export function getAccentColor(): Promise<string> {
     if (process.platform === "linux") {
         return new Promise((resolve, reject) => {
             const sessionBus = dbus.sessionBus();
