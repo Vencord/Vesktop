@@ -14,31 +14,35 @@ import { handle } from "./utils/ipcWrappers";
 
 let venbind: VenbindType | null = null;
 export function obtainVenbind() {
-    // TODO?: make binary outputs consistant with node's apis
-    let os: string;
-    switch (process.platform) {
-        case "linux":
-            os = "linux";
-            break;
-        // case "win32":
-        //     os = "windows";
-        // case "darwin":
-        //     os = "darwin";
-        default:
-            return null;
-    };
-    let arch: string;
-    switch (process.arch) {
-        case "x64":
-            arch = "x86_64";
-            break;
-        // case "arm64":
-        //     arch = "aarch64";
-        //     break;
-        default:
-            return null;
-    };
-    if (venbind == null) venbind = require(join(STATIC_DIR, `dist/venbind-${os}-${arch}.node`));
+    if (venbind == null) {
+        // TODO?: make binary outputs consistant with node's apis
+        let os: string;
+        let arch: string;
+
+        switch (process.platform) {
+            case "linux":
+                os = "linux";
+                break;
+            // case "win32":
+            //     os = "windows";
+            // case "darwin":
+            //     os = "darwin";
+            default:
+                return null;
+        }
+        switch (process.arch) {
+            case "x64":
+                arch = "x86_64";
+                break;
+            // case "arm64":
+            //     arch = "aarch64";
+            //     break;
+            default:
+                return null;
+        }
+
+        venbind = require(join(STATIC_DIR, `dist/venbind-${os}-${arch}.node`));
+    }
     return venbind;
 }
 

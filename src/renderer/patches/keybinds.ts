@@ -43,8 +43,8 @@ addPatch({
                 },
                 {
                     // eslint-disable-next-line no-useless-escape
-                    match: /inputEventUnregister\((parseInt\(\i,10\))\);else if\(\i\[\i\]\)\{/,
-                    replace: "$&$self.unregisterKeybind($1);return;"
+                    match: /inputEventUnregister\((parseInt\(\i,10\))\);else/,
+                    replace: "$&{$self.unregisterKeybind($1);return;}"
                 }
             ]
         }
