@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { execFileSync } from "child_process";
+import dbus from "@homebridge/dbus-native";
 import {
     app,
     BrowserWindow,
@@ -508,35 +508,36 @@ export async function createWindows() {
 
 export function getAccentColor() {
     if (process.platform === "linux") {
-        var accentColor = execFileSync("gdbus", [
-            "call",
-            "--session",
-            "--dest",
-            "org.freedesktop.portal.Desktop",
-            "--object-path",
-            "/org/freedesktop/portal/desktop",
-            "--method",
-            "org.freedesktop.portal.Settings.Read",
-            "org.freedesktop.appearance",
-            "accent-color"
-        ]);
-        const rgbMatch = accentColor.toString().match(/\((\d+\.\d+),\s*(\d+\.\d+),\s*(\d+\.\d+)\)/);
+        return new Promise((resolve, reject) => {
+            const sessionBus = dbus.sessionBus();
+            sessionBus
+                .getService("org.freedesktop.portal.Desktop")
+                .getInterface(
+                    "/org/freedesktop/portal/desktop",
+                    "org.freedesktop.portal.Settings",
+                    function (err, settings) {
+                        if (err) {
+                            resolve("");
+                            return;
+                        }
+                        settings.Read("org.freedesktop.appearance", "accent-color", function (err, result) {
+                            if (err) {
+                                resolve("");
+                                return;
+                            }
+                            const [r, g, b] = result[1][0][1][0];
+                            const r255 = Math.round(r * 255);
+                            const g255 = Math.round(g * 255);
+                            const b255 = Math.round(b * 255);
 
-        if (rgbMatch) {
-            const r = parseFloat(rgbMatch[1]);
-            const g = parseFloat(rgbMatch[2]);
-            const b = parseFloat(rgbMatch[3]);
-
-            const r255 = Math.round(r * 255);
-            const g255 = Math.round(g * 255);
-            const b255 = Math.round(b * 255);
-
-            const toHex = (value: number) => value.toString(16).padStart(2, "0");
-            const hexColor = `#${toHex(r255)}${toHex(g255)}${toHex(b255)}`;
-            return hexColor;
-        }
-        return "";
+                            const toHex = (value: number) => value.toString(16).padStart(2, "0");
+                            const hexColor = `#${toHex(r255)}${toHex(g255)}${toHex(b255)}`;
+                            resolve(hexColor);
+                        });
+                    }
+                );
+        });
     } else {
-        return `#${systemPreferences.getAccentColor?.() || ""}`;
+        return Promise.resolve(`#${systemPreferences.getAccentColor?.() || ""}`);
     }
 }
