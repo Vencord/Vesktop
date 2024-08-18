@@ -45,16 +45,22 @@ async function copyVenmic() {
         copyFile(
             "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
             "./static/dist/venmic-arm64.node"
-        ),
-        copyFile(
-            "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
-            "./static/dist/venbind-linux-x86_64.node"
         )
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyVenbind() {
+    return Promise.all([
+        copyFile(
+            "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
+            "./static/dist/venbind-linux-x86_64.node"
+        )
+    ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+}
+
 await Promise.all([
     copyVenmic(),
+    copyVenbind(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
