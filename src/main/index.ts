@@ -16,6 +16,7 @@ import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { isDeckGameMode } from "./utils/steamOS";
+import { startVenbind } from "./venbind";
 
 if (IS_DEV) {
     require("source-map-support").install();
@@ -91,6 +92,7 @@ function init() {
     app.whenReady().then(async () => {
         if (process.platform === "win32") app.setAppUserModelId("dev.vencord.vesktop");
 
+        startVenbind();
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
 
