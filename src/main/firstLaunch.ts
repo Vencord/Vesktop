@@ -50,7 +50,13 @@ export function createFirstLaunchTour() {
         Settings.store.minimizeToTray = !!data.minimizeToTray;
         Settings.store.arRPC = !!data.richPresence;
         Settings.store.tray = true;
-        Settings.store.trayColor = getAccentColor()?.slice(1);
+        getAccentColor().then(color => {
+            if (color) {
+                Settings.store.trayColor = color.slice(1);
+            } else {
+                Settings.store.trayColor = "F6BFAC";
+            }
+        });
 
         if (data.autoStart) autoStart.enable();
 
