@@ -29,7 +29,8 @@
         "electron-updater": "^6.2.1"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^6.1.0"
+        "@vencord/venmic": "^6.1.0",
+        "@homebridge/dbus-native": "0.6.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
