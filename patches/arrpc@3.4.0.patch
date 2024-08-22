@@ -1,5 +1,5 @@
 diff --git a/src/process/index.js b/src/process/index.js
-index 97ea651..28f0eb5 100644
+index 97ea651..29e964e 100644
 --- a/src/process/index.js
 +++ b/src/process/index.js
 @@ -1,12 +1,7 @@
@@ -16,27 +16,18 @@ index 97ea651..28f0eb5 100644
  
  import * as Natives from './native/index.js';
  const Native = Natives[process.platform];
-@@ -38,7 +33,7 @@ export default class ProcessServer {
-       const path = _path.toLowerCase().replaceAll('\\', '/');
-       const toCompare = [];
-       const splitPath = path.split('/');
--      for (let i = 1; i < splitPath.length; i++) {
-+      for (let i = 0; i < splitPath.length; i++) {
-         toCompare.push(splitPath.slice(-i).join('/'));
-       }
- 
 diff --git a/update_db.js b/update_db.js
-index ed94923..3170685 100644
+index ed94923..24deace 100644
 --- a/update_db.js
 +++ b/update_db.js
 @@ -1,5 +1,5 @@
  #!/usr/bin/env node
 -import { createWriteStream, readFileSync } from 'fs';
-+import { createWriteStream, readFileSync, writeFileSync} from 'fs';
++import { createWriteStream, readFileSync, writeFileSync } from 'fs';
  import { get } from 'https';
  
  import { dirname, join } from 'path';
-@@ -25,5 +25,21 @@ get('https://discord.com/api/v9/applications/detectable', res => {
+@@ -25,5 +25,19 @@ get('https://discord.com/api/v9/applications/detectable', res => {
      const oldNames = current.map(x => x.name);
      const newNames = updated.map(x => x.name);
      console.log(newNames.filter(x => !oldNames.includes(x)));
@@ -56,3 +47,4 @@ index ed94923..3170685 100644
 +    writeFileSync(path, JSON.stringify(updated), 'utf8');
    })
  });
+\ No newline at end of file
