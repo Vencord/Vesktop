@@ -12,7 +12,7 @@ import { autoUpdater } from "electron-updater";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
-import { registerMediaPermissionsHandler } from "./mediaPermissions";
+import { registerMicrophonePermissionsHandler, registerVideoPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { createSplashWindow } from "./splash";
@@ -87,7 +87,8 @@ function init() {
 
         addSplashLog("Registering handlers");
         registerScreenShareHandler();
-        registerMediaPermissionsHandler();
+        registerMicrophonePermissionsHandler();
+        registerVideoPermissionsHandler();
         // register file handler so we can load the custom splash animation from the user's filesystem
         addSplashLog("Registering splash animation handler");
         protocol.handle("splash-animation", () => {
