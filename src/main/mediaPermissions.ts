@@ -15,7 +15,7 @@ export function registerMicrophonePermissionsHandler() {
         if ("mediaTypes" in details) {
             if (details.mediaTypes?.includes("audio")) {
                 if (systemPreferences.getMediaAccessStatus("microphone") !== "granted") {
-                    await systemPreferences.askForMediaAccess("microphone").then(e => granted = e);
+                    await systemPreferences.askForMediaAccess("microphone").then(e => (granted = e));
                 }
             }
         }
@@ -33,7 +33,7 @@ export function registerVideoPermissionsHandler() {
         if ("mediaTypes" in details) {
             if (details.mediaTypes?.includes("video")) {
                 if (systemPreferences.getMediaAccessStatus("camera") !== "granted") {
-                    await systemPreferences.askForMediaAccess("camera").then(e => granted = e);
+                    await systemPreferences.askForMediaAccess("camera").then(e => (granted = e));
                 }
             }
         }
