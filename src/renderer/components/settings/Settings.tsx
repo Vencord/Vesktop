@@ -9,7 +9,7 @@ import "./settings.css";
 import { Forms, Switch, Text } from "@vencord/types/webpack/common";
 import { ComponentType } from "react";
 import { Settings, useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { isLinux, isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
 import { CustomSplashAnimation } from "./CustomSplashAnimation";
@@ -112,6 +112,13 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     ],
     Notifications: [NotificationBadgeToggle],
     Miscelleanous: [
+        {
+            key: "middleClickAutoscroll", 
+            title: "Middle Click Autoscroll", 
+            description: "Enables middle-click scrolling (Requires a full restart)",
+            defaultValue: false,
+            invisible: () => isLinux
+        },
         {
             key: "arRPC",
             title: "Rich Presence",
