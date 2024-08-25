@@ -113,8 +113,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     Notifications: [NotificationBadgeToggle],
     Miscelleanous: [
         {
-            key: "middleClickAutoscroll", 
-            title: "Middle Click Autoscroll", 
+            key: "middleClickAutoscroll",
+            title: "Middle Click Autoscroll",
             description: "Enables middle-click scrolling (Requires a full restart)",
             defaultValue: false,
             invisible: () => isLinux
