@@ -13,7 +13,7 @@
         "build:dev": "pnpm build --dev",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mts,.mjs",
+        "lint": "eslint .",
         "lint:fix": "pnpm lint --fix",
         "start": "pnpm build && electron .",
         "start:dev": "pnpm build:dev && electron .",
