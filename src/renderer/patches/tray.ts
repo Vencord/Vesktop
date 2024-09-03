@@ -48,16 +48,36 @@ VesktopNative.tray.createIconRequest(async (iconName: string, svgIcon: string = 
         var svg = svgIcon || (await VesktopNative.tray.getIcon(iconName));
         svg = changeColorsInSvg(svg, "#f6bfac", (await VesktopNative.app.getAccentColor()).substring(1));
 
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svg, "image/svg+xml");
+        const svgElement = svgDoc.documentElement;
+
+        if (!svgElement.hasAttribute("viewBox")) {
+            const width = parseFloat(svgElement.getAttribute("width") || "128");
+            const height = parseFloat(svgElement.getAttribute("height") || "128");
+            svgElement.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        }
+        svg = new XMLSerializer().serializeToString(svgElement);
+
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const img = new Image();
-        img.width = 128;
-        img.height = 128;
         img.onload = () => {
             const ctx = canvas.getContext("2d");
             if (ctx) {
-                ctx.drawImage(img, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const scaleX = canvas.width / img.width;
+                const scaleY = canvas.height / img.height;
+                const scale = Math.max(scaleX, scaleY);
+
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+
+                const offsetX = (canvas.width - scaledWidth) / 2;
+                const offsetY = (canvas.height - scaledHeight) / 2;
+                ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+
                 const dataURL = canvas.toDataURL("image/png");
                 const isSvg = svgIcon !== "";
                 VesktopNative.tray.createIconResponse(iconName, dataURL, isSvg, isSvg); // custom if svgIcon is provided
