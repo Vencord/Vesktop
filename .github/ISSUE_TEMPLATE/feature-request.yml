@@ -1,7 +1,7 @@
 name: 🛠️ Feature Request
-description: Create a feature request for Vesktop
-labels: [bug]
-title: "[Bug] <title>"
+description: Request a feature for Vesktop
+labels: [enhancement]
+title: "[Feature Request] <title>"
 
 body:
     - type: markdown
@@ -13,6 +13,8 @@ body:
 
               This form is only meant for **Vesktop feature requests**.
               For plugin requests or Vencord feature requests, go [here](https://github.com/Vencord/plugin-requests/issues/new?template=request.yml) instead!
+
+              **DO NOT** make any icon related requests or you will be blocked.
 
     - type: input
       id: discord

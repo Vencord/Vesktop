@@ -11,17 +11,6 @@
     gap: 1em;
 }
 
-.vcd-screen-picker-settings-grid {
-    gap: 1em;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-
-.vcd-screen-picker-settings-grid>div {
-    display: flex;
-    flex-direction: column;
-}
-
 .vcd-screen-picker-card {
     flex-grow: 1;
 }
@@ -38,7 +27,7 @@
 }
 
 .vcd-screen-picker-selected img {
-    border: 2px solid var(--brand-experiment);
+    border: 2px solid var(--brand-500);
     border-radius: 3px;
 }
 
@@ -49,7 +38,7 @@
 }
 
 .vcd-screen-picker-grid label:hover {
-    outline: 2px solid var(--brand-experiment);
+    outline: 2px solid var(--brand-500);
 }
 
 
@@ -68,7 +57,7 @@
 }
 
 .vcd-screen-picker-preview-img-linux {
-    width: 100%;
+    width: 60%;
     margin-bottom: 0.5em;
 }
 
@@ -101,8 +90,8 @@
 }
 
 .vcd-screen-picker-radio[data-checked="true"] {
-    background-color: var(--brand-experiment);
-    border-color: var(--brand-experiment);
+    background-color: var(--brand-500);
+    border-color: var(--brand-500);
 }
 
 .vcd-screen-picker-radio[data-checked="true"] h2 {
@@ -118,6 +107,11 @@
 
 .vcd-screen-picker-quality section {
     flex: 1 1 auto;
+}
+
+.vcd-screen-picker-settings-button {
+    margin-left: auto;
+    margin-top: 0.3rem;
 }
 
 .vcd-screen-picker-radios {

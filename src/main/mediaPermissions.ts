@@ -12,11 +12,13 @@ export function registerMediaPermissionsHandler() {
     session.defaultSession.setPermissionRequestHandler(async (_webContents, permission, callback, details) => {
         let granted = true;
 
-        if (details.mediaTypes?.includes("audio")) {
-            granted = await systemPreferences.askForMediaAccess("microphone");
-        }
-        if (details.mediaTypes?.includes("video")) {
-            granted &&= await systemPreferences.askForMediaAccess("camera");
+        if ("mediaTypes" in details) {
+            if (details.mediaTypes?.includes("audio")) {
+                granted &&= await systemPreferences.askForMediaAccess("microphone");
+            }
+            if (details.mediaTypes?.includes("video")) {
+                granted &&= await systemPreferences.askForMediaAccess("camera");
+            }
         }
 
         callback(granted);

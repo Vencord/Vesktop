@@ -41,14 +41,7 @@ export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord
 if (Object.hasOwn(Settings.plain, "firstLaunch") && !existsSync(STATE_FILE)) {
     console.warn("legacy state in settings.json detected. migrating to state.json");
     const state = {} as TState;
-    for (const prop of [
-        "firstLaunch",
-        "maximized",
-        "minimized",
-        "skippedUpdate",
-        "steamOSLayoutVersion",
-        "windowBounds"
-    ] as const) {
+    for (const prop of ["firstLaunch", "maximized", "minimized", "steamOSLayoutVersion", "windowBounds"] as const) {
         state[prop] = Settings.plain[prop];
         delete Settings.plain[prop];
     }

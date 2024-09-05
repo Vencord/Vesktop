@@ -93,7 +93,7 @@ function initTray(win: BrowserWindow) {
             click: createAboutWindow
         },
         {
-            label: "Update Vencord",
+            label: "Repair Vencord",
             async click() {
                 await downloadVencordFiles();
                 app.relaunch();
@@ -110,14 +110,14 @@ function initTray(win: BrowserWindow) {
             type: "separator"
         },
         {
-            label: "Relaunch",
+            label: "Restart",
             click() {
                 app.relaunch();
                 app.quit();
             }
         },
         {
-            label: "Quit Vesktop",
+            label: "Quit",
             click() {
                 isQuitting = true;
                 app.quit();
@@ -405,7 +405,9 @@ function createMainWindow() {
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
-            spellcheck: true
+            spellcheck: true,
+            // disable renderer backgrounding to prevent the app from unloading when in the background
+            backgroundThrottling: false
         },
         icon: ICON_PATH,
         frame: !noFrame,
@@ -430,6 +432,7 @@ function createMainWindow() {
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
+    if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
