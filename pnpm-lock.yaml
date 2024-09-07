@@ -24,8 +24,8 @@ importers:
         version: 6.2.1
     optionalDependencies:
       '@equicord/equimic':
-        specifier: ^6.1.0
-        version: 6.1.0
+        specifier: ^6.2.0
+        version: 6.2.0
       '@homebridge/dbus-native':
         specifier: 0.6.0
         version: 0.6.0
@@ -134,8 +134,8 @@ packages:
     resolution: {integrity: sha512-kbgXxyEauPJiQQUNG2VgUeyfQNFk6hBF11ISN2PNI6agUgPl55pv4eQmaqHzTAzchBvqZ2tQuRVaPStGf0mxGw==}
     engines: {node: '>=8.6'}
 
-  '@equicord/equimic@6.1.0':
-    resolution: {integrity: sha512-NlI44NSLefPXld4XXCeC49GApO08kYmnOU7EEQH2HsFkG3P6V4bj4sukoNLqfYY7TJ5CgsFeQ5raKLnayo/rzw==}
+  '@equicord/equimic@6.2.0':
+    resolution: {integrity: sha512-mMIOlubkCSI5JWMzlAt3SbM5OOShDuN/3BF8phoTXIQGOVFupXmgDzTo2jF8WxNbqkY0tYDgZblVNcjXW+5vsw==}
     engines: {node: '>=14.15'}
     os: [linux]
 
@@ -2720,7 +2720,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@equicord/equimic@6.1.0':
+  '@equicord/equimic@6.2.0':
     dependencies:
       cmake-js: 7.3.0
       node-addon-api: 8.1.0
