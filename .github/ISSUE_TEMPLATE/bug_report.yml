@@ -21,6 +21,14 @@ body:
 
               Linux users: Please only report issues with officially published packages
 
+
+              [^1]: GPU issue. Disable hardware acceleration in Vesktop Settings or run with `--disable-gpu`
+              [^2]: System issue. You will have to fix it
+              [^3]: If you are receiving a lot of captchas, it means Discord thinks you might be a bot. Make sure you're not using a VPN/Proxy
+              [^4]: These things are handled by Chromium / Electron, not us. If they don't work, it's either an issue with your system or a bug with Chromium.
+              [^5]: You are likely using the Vesktop flatpak and trying to drop a file the flatpak can't access. You can fix this by installing Flatseal and using it to grant Vesktop full access to your files
+              [^6]: Issue on your end, you have to fix it. Try changing your DNS to [1.1.1.1 (Cloudflare DNS)](https://developers.cloudflare.com/1.1.1.1/setup/)
+              
     - type: input
       id: discord
       attributes:

@@ -14,6 +14,8 @@ body:
               This form is only meant for **Equibop feature requests**.
               For plugin requests or Vencord feature requests, suggest them on the discord instead: https://discord.gg/5Xh2W87egW
 
+              **DO NOT** make any icon related requests or you will be blocked.
+
     - type: input
       id: discord
       attributes:
