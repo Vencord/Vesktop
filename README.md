@@ -64,7 +64,7 @@ If you don't know the difference, pick amd64.
 Packaging will create builds in the dist/ folder
 
 > [!NOTE]
-> On Windows, if you run the test script, you will get test errors about venmic, you can ignore these as it's a linux only module.
+> On Windows, if you run the test script, you will get test errors about equimic, you can ignore these as it's a linux only module.
 
 ```sh
 git clone https://github.com/Equicord/Equibop

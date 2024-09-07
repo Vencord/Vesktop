@@ -11,7 +11,7 @@
   <project_group>Equicord</project_group>
   <description>
     <p>Equicord is a cross-platform Vesktop Fork desktop app aiming to give you extra plugins but still give you a snappier Discord experience, with Equicord pre-installed.</p>
-    <p>Which comes bundled with Venmic, a purpose-built library to provide functioning audio screenshare.</p>
+    <p>Which comes bundled with Equimic, a purpose-built library to provide functioning audio screenshare.</p>
   </description>
   <screenshots>
     <screenshot type="default">

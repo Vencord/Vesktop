@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import type { LinkData, Node, PatchBay as PatchBayType } from "@vencord/venmic";
+import type { LinkData, Node, PatchBay as PatchBayType } from "@equicord/equimic";
 import { app, ipcMain } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -21,7 +21,7 @@ let initialized = false;
 let hasPipewirePulse = false;
 let isGlibCxxOutdated = false;
 
-function importVenmic() {
+function importEquimic() {
     if (imported) {
         return;
     }
@@ -29,19 +29,20 @@ function importVenmic() {
     imported = true;
 
     try {
-        PatchBay = (require(join(STATIC_DIR, `dist/venmic-${process.arch}.node`)) as typeof import("@vencord/venmic"))
-            .PatchBay;
+        PatchBay = (
+            require(join(STATIC_DIR, `dist/equimic-${process.arch}.node`)) as typeof import("@equicord/equimic")
+        ).PatchBay;
 
         hasPipewirePulse = PatchBay.hasPipeWire();
     } catch (e: any) {
-        console.error("Failed to import venmic", e);
+        console.error("Failed to import equimic", e);
         isGlibCxxOutdated = (e?.stack || e?.message || "").toLowerCase().includes("glibc");
     }
 }
 
-function obtainVenmic() {
+function obtainEquimic() {
     if (!imported) {
-        importVenmic();
+        importEquimic();
     }
 
     if (PatchBay && !initialized) {
@@ -50,7 +51,7 @@ function obtainVenmic() {
         try {
             patchBayInstance = new PatchBay();
         } catch (e: any) {
-            console.error("Failed to instantiate venmic", e);
+            console.error("Failed to instantiate equimic", e);
         }
     }
 
@@ -71,7 +72,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
 
     const { granularSelect } = Settings.store.audio ?? {};
 
-    const targets = obtainVenmic()
+    const targets = obtainEquimic()
         ?.list(granularSelect ? ["node.name"] : undefined)
         .filter(s => s["application.process.id"] !== audioPid);
 
@@ -100,7 +101,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
-    return obtainVenmic()?.link(data);
+    return obtainEquimic()?.link(data);
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
@@ -129,7 +130,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
         data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
-    return obtainVenmic()?.link(data);
+    return obtainEquimic()?.link(data);
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());
+ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainEquimic()?.unlink());

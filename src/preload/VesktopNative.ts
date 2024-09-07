@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { Node } from "@vencord/venmic";
+import { Node } from "@equicord/equimic";
 import { ipcRenderer } from "electron";
 import type { Settings } from "shared/settings";
 
