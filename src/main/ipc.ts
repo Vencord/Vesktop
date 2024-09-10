@@ -18,7 +18,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { getAccentColor, mainWin } from "./mainWindow";
+import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import {
     createTrayIcon,
@@ -178,7 +178,6 @@ watch(
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
 handleSync(IpcEvents.GET_TRAY_ICON_SYNC, (_, iconPath) => getTrayIconFileSync(iconPath));
-handle(IpcEvents.GET_SYSTEM_ACCENT_COLOR, () => getAccentColor());
 handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon, isSvg) =>
     createTrayIcon(iconName, dataURL, isCustomIcon, isSvg)
 );

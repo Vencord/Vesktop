@@ -29,10 +29,6 @@ const presets = [
     "#FC18EC" // pink
 ];
 
-VesktopNative.app.getAccentColor().then(color => {
-    if (color) presets.unshift(color);
-});
-
 const statusToSettingsKey = {
     icon: { key: "trayMainOverride", label: "Default" },
     idle: { key: "trayIdleOverride", label: "Idle" },
@@ -198,7 +194,6 @@ export const TrayColorTypeSelect: SettingsComponent = ({ settings }) => {
                 placeholder="Default"
                 options={[
                     { label: "Default", value: "default", default: true },
-                    { label: "System Accent", value: "system" },
                     { label: "Custom", value: "custom" }
                 ]}
                 closeOnSelect={true}
