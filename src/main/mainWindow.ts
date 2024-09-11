@@ -455,24 +455,25 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const branch = Settings.store.discordBranch;
-    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
-    const uri = process.argv.find(arg => arg.startsWith("discord://"));
-
-    const loadUrl = (url: string | undefined) => {
-        win.loadURL(`https://${subdomain}discord.com/${url?.replace(RegExp("^discord://[^/]*/?"), "") || "app"}`);
-    };
-
     let uriFiredDarwin = false;
     app.on("open-url", (_, url) => {
         uriFiredDarwin ? restoreVesktop() : loadUrl(url);
         uriFiredDarwin = true;
     });
+
+    const uri = process.argv.find(arg => arg.startsWith("discord://"));
     uriFiredDarwin || loadUrl(uri);
+
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export function loadUrl(uri: string | undefined) {
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri?.replace(RegExp("^discord://[^/]*/?"), "") || "app"}`);
+}
 
 export function restoreVesktop() {
     if (mainWin) {
