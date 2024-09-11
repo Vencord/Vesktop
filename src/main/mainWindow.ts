@@ -465,15 +465,22 @@ function createMainWindow() {
 
     let uriFiredDarwin = false;
     app.on("open-url", (_, url) => {
+        uriFiredDarwin ? restoreVesktop() : loadUrl(url);
         uriFiredDarwin = true;
-        loadUrl(url);
     });
     uriFiredDarwin || loadUrl(uri);
-
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export function restoreVesktop() {
+    if (mainWin) {
+        if (mainWin.isMinimized()) mainWin.restore();
+        if (!mainWin.isVisible()) mainWin.show();
+        mainWin.focus();
+    }
+}
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");

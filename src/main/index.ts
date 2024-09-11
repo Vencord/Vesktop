@@ -11,7 +11,7 @@ import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, mainWin } from "./mainWindow";
+import { createWindows, restoreVesktop } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -69,12 +69,7 @@ function init() {
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        if (data.IS_DEV) app.quit();
-        else if (mainWin) {
-            if (mainWin.isMinimized()) mainWin.restore();
-            if (!mainWin.isVisible()) mainWin.show();
-            mainWin.focus();
-        }
+        data.IS_DEV ? app.quit() : restoreVesktop();
     });
 
     app.whenReady().then(async () => {
