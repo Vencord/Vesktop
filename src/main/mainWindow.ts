@@ -37,8 +37,8 @@ import {
     VENCORD_DIR
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
+import { addSplashLog, splash } from "./splash";
 import { setTrayIcon } from "./tray";
-import { addOneTaskSplash, addSplashLog, getSplash } from "./utils/detailedLog";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordAsar, ensureVencordFiles } from "./utils/vencordLoader";
@@ -53,7 +53,6 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
-export let splash: BrowserWindow;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -387,12 +386,14 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
-function createMainWindow(splash: BrowserWindow) {
+function createMainWindow() {
+    addSplashLog();
+
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    addSplashLog("Removed listeners");
+    addSplashLog();
 
     const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
 
@@ -437,6 +438,8 @@ function createMainWindow(splash: BrowserWindow) {
     }));
     win.setMenuBarVisibility(false);
 
+    addSplashLog();
+
     if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
@@ -456,7 +459,8 @@ function createMainWindow(splash: BrowserWindow) {
         mainWin.webContents.on("page-title-updated", (_, title) => {
             mainWin.setTitle(title.replace(/^\(\d+\)\s*|•\s/, ""));
         });
-    addSplashLog("Initialized Main Window params");
+
+    addSplashLog();
 
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
@@ -465,17 +469,17 @@ function createMainWindow(splash: BrowserWindow) {
     initSettingsListeners(win);
     initSpellCheck(win);
 
-    addSplashLog("Initialized Main Window utils");
+    addSplashLog();
 
     win.webContents.setUserAgent(BrowserUserAgent);
-    addSplashLog("UserAgent set");
+    addSplashLog();
 
     const subdomain =
         Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
             ? `${Settings.store.discordBranch}.`
             : "";
 
-    addSplashLog(`Loading discord web`);
+    addSplashLog();
     win.loadURL(`https://${subdomain}discord.com/app`);
 
     return win;
@@ -485,34 +489,25 @@ const runVencordMain = once(() => require(VENCORD_DIR));
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
-    splash = getSplash();
     // SteamOS letterboxes and scales it terribly, so just full screen it
     if (isDeckGameMode) {
         splash.setFullScreen(true);
-        addOneTaskSplash();
-        addSplashLog("Set Fullscreen (Deck GameMode)");
     }
 
-    addSplashLog("Checking Equicord files");
+    addSplashLog();
     await ensureVencordFiles();
-
-    addSplashLog("Running main Equicord files");
     runVencordMain();
 
-    addSplashLog("Initializing Main Window");
-    mainWin = createMainWindow(splash);
+    addSplashLog();
+    mainWin = createMainWindow();
 
     mainWin.webContents.on("did-finish-load", () => {
         if (!startMinimized) {
-            addOneTaskSplash();
-            addSplashLog("Showing main window");
             mainWin!.show();
             if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
         }
 
         if (isDeckGameMode) {
-            addOneTaskSplash();
-            addSplashLog("Deck GameMode, Setting fullscreen");
             // always use entire display
             mainWin!.setFullScreen(true);
             askToApplySteamLayout(mainWin);
@@ -520,19 +515,14 @@ export async function createWindows() {
 
         mainWin.once("show", () => {
             if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
-                addOneTaskSplash();
-                addSplashLog("Maximizing main window");
                 mainWin!.maximize();
             }
         });
 
         if (splash) {
-            addSplashLog("Closing splash window");
-            // delay on purpose just to show it completed everything :3
-            // wish there was an easier way to make it fade out smoothly
             setTimeout(() => {
                 splash.destroy();
-            }, 1000);
+            }, 100);
         }
     });
 

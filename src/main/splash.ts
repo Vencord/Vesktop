@@ -13,31 +13,20 @@ import { Settings } from "./settings";
 
 export let splash: BrowserWindow;
 
+const totalTasks = 12;
+let doneTasks = 0;
+
 export function createSplashWindow(startMinimized = false) {
-    const { splashBackground, splashColor, splashTheming, splashAnimationPath, splashDetailed } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath, splashProgress } = Settings.store;
 
-    if (splashDetailed) {
-        splash = new BrowserWindow({
-            ...SplashProps,
-            icon: ICON_PATH,
-            show: !startMinimized,
-            height: 400,
-            width: 500,
-            closable: false
-        });
+    splash = new BrowserWindow({
+        ...SplashProps,
+        icon: ICON_PATH,
+        show: !startMinimized,
+        width: 300
+    });
 
-        splash.loadFile(join(VIEW_DIR, "splash_v2.html"));
-    } else {
-        splash = new BrowserWindow({
-            ...SplashProps,
-            icon: ICON_PATH,
-            show: !startMinimized,
-            width: 300,
-            closable: false
-        });
-
-        splash.loadFile(join(VIEW_DIR, "splash.html"));
-    }
+    splash.loadFile(join(VIEW_DIR, "splash.html"));
 
     if (splashTheming) {
         if (splashColor) {
@@ -62,5 +51,37 @@ export function createSplashWindow(startMinimized = false) {
             document.getElementById("animation").src = "../troll.gif";
         `);
     }
+
+    if (splashProgress) {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("progress-percentage").innerHTML = "${doneTasks}%";
+        `);
+    } else {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("progress-section").style.display = "none";
+        `);
+    }
+
+    return splash;
+}
+
+/**
+ * Adds a new log count to the splash
+ */
+export function addSplashLog() {
+    if (!splash.isDestroyed()) {
+        doneTasks++;
+        const completedNum = (doneTasks / totalTasks).toFixed(2);
+        splash.webContents.executeJavaScript(`
+            document.getElementById("progress").style.width = "${Number(completedNum) * 100}%";
+            document.getElementById("progress-percentage").innerHTML = "${Number(completedNum) * 100}%";
+        `);
+    }
+}
+
+/**
+ * Returns the splash window
+ */
+export function getSplash() {
     return splash;
 }

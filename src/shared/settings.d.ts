@@ -35,7 +35,7 @@ export interface Settings {
     splashColor?: string;
     splashAnimationPath?: string;
     splashBackground?: string;
-    splashDetailed?: boolean;
+    splashProgress?: boolean;
 
     spellCheckLanguages?: string[];
 

@@ -15,8 +15,7 @@ import { createWindows, mainWin } from "./mainWindow";
 import { registerMicrophonePermissionsHandler, registerVideoPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
-import { createSplashWindow } from "./splash";
-import { addOneTaskSplash, addSplashLog, initSplashLog } from "./utils/detailedLog";
+import { addSplashLog, createSplashWindow } from "./splash";
 import { isDeckGameMode } from "./utils/steamOS";
 
 if (IS_DEV) {
@@ -80,23 +79,20 @@ function init() {
     app.whenReady().then(async () => {
         if (process.platform === "win32") app.setAppUserModelId("io.github.equicord.equibop");
 
-        const splash = createSplashWindow();
-        initSplashLog(splash);
-        addSplashLog("Electron app is ready");
-        addSplashLog("Created splash window");
+        createSplashWindow();
+        addSplashLog();
 
-        addSplashLog("Registering handlers");
         registerScreenShareHandler();
         registerMicrophonePermissionsHandler();
         registerVideoPermissionsHandler();
         // register file handler so we can load the custom splash animation from the user's filesystem
-        addSplashLog("Registering splash animation handler");
         protocol.handle("splash-animation", () => {
             return net.fetch("file:///" + splashAnimationPath);
         });
+        addSplashLog();
+
         bootstrap();
 
-        addSplashLog("Activating");
         app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) {
                 createWindows();
@@ -119,13 +115,11 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
 
 async function bootstrap() {
     if (!Object.hasOwn(State.store, "firstLaunch")) {
-        addOneTaskSplash();
-        addSplashLog("Starting initial setup");
         createFirstLaunchTour();
+        addSplashLog();
     } else {
-        addOneTaskSplash();
-        addSplashLog("Creating main window");
         createWindows();
+        addSplashLog();
     }
 }
 
