@@ -54,7 +54,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Enables the application menu bar. Press ALT to toggle visibility.",
             defaultValue: false,
             invisible: () => isMac,
-            disabled: () => Settings.store.customTitleBar ?? isWindows
+            disabled: () => Settings.store.titleBar === "custom" ?? isWindows
         },
     ],
     "User Interface": [
