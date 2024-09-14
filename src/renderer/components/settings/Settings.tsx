@@ -55,7 +55,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false,
             invisible: () => isMac,
             disabled: () => Settings.store.titleBar === "custom" ?? isWindows
-        },
+        }
     ],
     "User Interface": [
         {

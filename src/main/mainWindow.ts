@@ -424,15 +424,16 @@ function createMainWindow() {
             transparencyOption !== "none" && {
                 transparent: true
             }),
-        
         ...(staticTitle && { title: "Vesktop" }),
         ...(process.platform === "darwin" && titleBar !== "shown" && getDarwinOptions()),  // Show/Hide titlebar depending on settings on Mac
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && titleBar === "custom") { win.setWindowButtonVisibility(false); } // Hide the traffic lights
-    
+    if (process.platform === "darwin" && titleBar === "custom") { 
+        win.setWindowButtonVisibility(false); // Hide the traffic lights
+    }
+
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;

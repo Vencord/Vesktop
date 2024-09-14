@@ -16,6 +16,7 @@ export const TitleBarPicker: SettingsComponent = ({ settings }) => {
             <Forms.FormText className={Margins.bottom8}>
                 Customize apps title bar. Pick Discord if you want to use Discord's custom title bar. Requires a full restart
             </Forms.FormText>
+            
             <Select
                 placeholder="Hidden"
                 options={[
