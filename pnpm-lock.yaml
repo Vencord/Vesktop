@@ -19,6 +19,9 @@ importers:
       electron-updater:
         specifier: ^6.2.1
         version: 6.2.1
+      venbind:
+        specifier: ^0.0.2
+        version: 0.0.2
     optionalDependencies:
       '@vencord/venmic':
         specifier: ^6.1.0
@@ -2784,6 +2787,9 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  venbind@0.0.2:
+    resolution: {integrity: sha512-TlkghnnV43lmINTMOuZWvgRIIZJ3I5oNykXbGZPC22GE7gdoen9uPBWWEKLtN7BG4wjtT/dIAv2Xz9gHz9P4Gw==}
+
   verror@1.10.1:
     resolution: {integrity: sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==}
     engines: {node: '>=0.6.0'}
@@ -3441,7 +3447,7 @@ snapshots:
 
   app-builder-bin@5.0.0-alpha.6: {}
 
-  app-builder-lib@24.13.3(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
+  app-builder-lib@24.13.3(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.2.1
@@ -3455,7 +3461,7 @@ snapshots:
       builder-util-runtime: 9.2.4
       chromium-pickle-js: 0.2.0
       debug: 4.3.5
-      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3)
       ejs: 3.1.10
       electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.0.1)
       electron-publish: 24.13.1
@@ -3475,7 +3481,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  app-builder-lib@25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
+  app-builder-lib@25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.3.2
@@ -3490,7 +3496,7 @@ snapshots:
       builder-util-runtime: 9.2.5
       chromium-pickle-js: 0.2.0
       debug: 4.3.5
-      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3)
       ejs: 3.1.10
       electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.0.1)
       electron-publish: 25.0.1
@@ -4051,9 +4057,9 @@ snapshots:
       '@types/react': 17.0.2
       moment: 2.30.1
 
-  dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
+  dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3):
     dependencies:
-      app-builder-lib: 25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      app-builder-lib: 25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
       builder-util: 25.0.1
       builder-util-runtime: 9.2.5
       fs-extra: 10.1.0
@@ -4104,7 +4110,7 @@ snapshots:
 
   electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1):
     dependencies:
-      app-builder-lib: 24.13.3(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      app-builder-lib: 24.13.3(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
       archiver: 5.3.2
       builder-util: 24.13.1
       fs-extra: 10.1.0
@@ -4114,11 +4120,11 @@ snapshots:
 
   electron-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)):
     dependencies:
-      app-builder-lib: 25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1)))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      app-builder-lib: 25.0.1(dmg-builder@25.0.1(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
       builder-util: 25.0.1
       builder-util-runtime: 9.2.5
       chalk: 4.1.2
-      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.0.1))
+      dmg-builder: 25.0.1(electron-builder-squirrel-windows@24.13.3)
       fs-extra: 10.1.0
       is-ci: 3.0.1
       lazy-val: 1.0.5
@@ -5982,6 +5988,8 @@ snapshots:
   utf8-byte-length@1.0.5: {}
 
   util-deprecate@1.0.2: {}
+
+  venbind@0.0.2: {}
 
   verror@1.10.1:
     dependencies:
