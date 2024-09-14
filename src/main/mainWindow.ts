@@ -389,11 +389,11 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, titleBar } = Settings.store;
 
     const { frameless, transparent } = VencordSettings.store;
 
-    const noFrame = frameless === true || customTitleBar === true;
+    const noFrame = frameless === true || titleBar === "hidden";
 
     const win = (mainWin = new BrowserWindow({
         show: false,
@@ -419,19 +419,20 @@ function createMainWindow() {
                 backgroundMaterial: transparencyOption
             }),
         // Fix transparencyOption for custom discord titlebar
-        ...(customTitleBar &&
+        ...(titleBar === "custom" &&
             transparencyOption &&
             transparencyOption !== "none" && {
                 transparent: true
             }),
+        
         ...(staticTitle && { title: "Vesktop" }),
-        ...(process.platform === "darwin" && getDarwinOptions()),
+        ...(process.platform === "darwin" && titleBar !== "shown" && getDarwinOptions()),  // Show/Hide titlebar depending on settings on Mac
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
-
+    if (process.platform === "darwin" && titleBar === "custom") { win.setWindowButtonVisibility(false); } // Hide the traffic lights
+    
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;

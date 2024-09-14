@@ -37,7 +37,7 @@ const DEFAULT_POPOUT_OPTIONS: BrowserWindowConstructorOptions = {
     backgroundColor: "#2f3136",
     minWidth: MIN_POPOUT_WIDTH,
     minHeight: MIN_POPOUT_HEIGHT,
-    frame: Settings.store.customTitleBar !== true,
+    frame: Settings.store.titleBar !== "custom",
     titleBarStyle: process.platform === "darwin" ? "hidden" : undefined,
     trafficLightPosition:
         process.platform === "darwin"

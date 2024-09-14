@@ -22,7 +22,7 @@ addPatch({
     ],
 
     getPlatformClass() {
-        if (Settings.store.customTitleBar) return "platform-win";
+        if (Settings.store.titleBar !== "hidden") return "platform-win";
         if (isMac) return "platform-osx";
         return "platform-web";
     }
