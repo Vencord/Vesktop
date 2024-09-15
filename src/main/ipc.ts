@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-if (process.platform === "linux") import("./venmic");
+if (process.platform === "linux") import("./equimic");
 
 import { execFile } from "child_process";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";

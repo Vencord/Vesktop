@@ -23,12 +23,12 @@ importers:
         specifier: ^6.2.1
         version: 6.2.1
     optionalDependencies:
+      '@equicord/equimic':
+        specifier: ^6.2.0
+        version: 6.2.0
       '@homebridge/dbus-native':
         specifier: 0.6.0
         version: 0.6.0
-      '@vencord/venmic':
-        specifier: ^6.1.0
-        version: 6.1.0
     devDependencies:
       '@fal-works/esbuild-plugin-global-externals':
         specifier: ^2.1.2
@@ -133,6 +133,11 @@ packages:
   '@electron/universal@1.5.1':
     resolution: {integrity: sha512-kbgXxyEauPJiQQUNG2VgUeyfQNFk6hBF11ISN2PNI6agUgPl55pv4eQmaqHzTAzchBvqZ2tQuRVaPStGf0mxGw==}
     engines: {node: '>=8.6'}
+
+  '@equicord/equimic@6.2.0':
+    resolution: {integrity: sha512-mMIOlubkCSI5JWMzlAt3SbM5OOShDuN/3BF8phoTXIQGOVFupXmgDzTo2jF8WxNbqkY0tYDgZblVNcjXW+5vsw==}
+    engines: {node: '>=14.15'}
+    os: [linux]
 
   '@esbuild/aix-ppc64@0.20.2':
     resolution: {integrity: sha512-D+EBOJHXdNZcLJRBkhENNG8Wji2kgc9AZ9KiPr1JuZjsNtyHzrsfLRrY0tk2H2aoFu6RANO1y1iPPUCDYWkb5g==}
@@ -616,11 +621,6 @@ packages:
 
   '@vencord/types@1.8.4':
     resolution: {integrity: sha512-ogLqIOHVO+5zxKUVxAfGIAUZoEfIomrlg6f0cZ/2yd5vBAn1fA9Gi/NASoKfHZuJt8ZcYw329bgn0ah/VufqMg==}
-
-  '@vencord/venmic@6.1.0':
-    resolution: {integrity: sha512-YiCtzml/W8tYbGhu3jm5jfbbEnl2slKKARNK0jO+8qV979k9eFnfIRTxvhMN/SWq1h8ZNJdXVwvXpffQwq0RuA==}
-    engines: {node: '>=14.15'}
-    os: [linux]
 
   '@xmldom/xmldom@0.8.10':
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
@@ -2720,6 +2720,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@equicord/equimic@6.2.0':
+    dependencies:
+      cmake-js: 7.3.0
+      node-addon-api: 8.1.0
+      pkg-prebuilds: 0.2.1
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
   '@esbuild/aix-ppc64@0.20.2':
     optional: true
 
@@ -3120,15 +3129,6 @@ snapshots:
       discord-types: 1.3.26
       standalone-electron-types: 1.0.0
       type-fest: 3.13.1
-
-  '@vencord/venmic@6.1.0':
-    dependencies:
-      cmake-js: 7.3.0
-      node-addon-api: 8.1.0
-      pkg-prebuilds: 0.2.1
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
 
   '@xmldom/xmldom@0.8.10': {}
 
