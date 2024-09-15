@@ -8,7 +8,7 @@
 import "./enableNotificationsByDefault";
 import "./platformClass";
 import "./hideSwitchDevice";
-import "./hideEquimicInput";
+import "./hideVenmicInput";
 import "./screenShareFixes";
 import "./spellCheck";
 import "./windowsTitleBar";

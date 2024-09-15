@@ -6,7 +6,6 @@
 
 import "./screenSharePicker.css";
 
-import { Node } from "@equicord/equimic";
 import { closeModal, Logger, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
 import { findStoreLazy, onceReady } from "@vencord/types/webpack";
 import {
@@ -20,6 +19,7 @@ import {
     UserStore,
     useState
 } from "@vencord/types/webpack/common";
+import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
 import { useSettings } from "renderer/settings";
@@ -188,7 +188,7 @@ function AudioSettingsModal({
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
             <Modals.ModalHeader className="vcd-screen-picker-header">
-                <Forms.FormTitle tag="h2">Equimic Settings</Forms.FormTitle>
+                <Forms.FormTitle tag="h2">Venmic Settings</Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
             <Modals.ModalContent className="vcd-screen-picker-modal">
@@ -598,8 +598,8 @@ function AudioSourcePickerLinux({
         return (
             <Forms.FormText>
                 Failed to retrieve Audio Sources because your C++ library is too old to run
-                <a href="https://github.com/Equicord/Equimic" target="_blank">
-                    equimic
+                <a href="https://github.com/Vencord/venmic" target="_blank">
+                    venmic
                 </a>
                 . See{" "}
                 <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">

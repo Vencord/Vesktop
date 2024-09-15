@@ -34,23 +34,23 @@ async function createContext(options: BuildOptions) {
     contexts.push(await context(options));
 }
 
-async function copyEquimic() {
+async function copyVenmic() {
     if (process.platform !== "linux") return;
 
     return Promise.all([
         copyFile(
-            "./node_modules/@equicord/equimic/prebuilds/equimic-addon-linux-x64/node-napi-v7.node",
-            "./static/dist/equimic-x64.node"
+            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
+            "./static/dist/venmic-x64.node"
         ),
         copyFile(
-            "./node_modules/@equicord/equimic/prebuilds/equimic-addon-linux-arm64/node-napi-v7.node",
-            "./static/dist/equimic-arm64.node"
+            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
+            "./static/dist/venmic-arm64.node"
         )
-    ]).catch(() => console.warn("Failed to copy equimic. Building without equimic support"));
+    ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
 await Promise.all([
-    copyEquimic(),
+    copyVenmic(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
