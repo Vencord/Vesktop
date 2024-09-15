@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2024 Vendicated and Vencord contributors
+ * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
 import { Margins } from "@vencord/types/utils";
@@ -14,9 +14,10 @@ export const TitleBarPicker: SettingsComponent = ({ settings }) => {
     return (
         <>
             <Forms.FormText className={Margins.bottom8}>
-                Customize apps title bar. Pick Discord if you want to use Discord's custom title bar. Requires a full restart
+                Customize apps title bar. Pick Discord if you want to use Discord's custom title bar. Requires a full 
+                restart
             </Forms.FormText>
-            
+
             <Select
                 placeholder="Hidden"
                 options={[

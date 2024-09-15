@@ -425,12 +425,12 @@ function createMainWindow() {
                 transparent: true
             }),
         ...(staticTitle && { title: "Vesktop" }),
-        ...(process.platform === "darwin" && titleBar !== "shown" && getDarwinOptions()),  // Show/Hide titlebar depending on settings on Mac
+        ...(process.platform === "darwin" && titleBar !== "shown" && getDarwinOptions()), // Show/Hide titlebar depending on settings on Mac
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
     }));
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && titleBar === "custom") { 
+    if (process.platform === "darwin" && titleBar === "custom") {
         win.setWindowButtonVisibility(false); // Hide the traffic lights
     }
 

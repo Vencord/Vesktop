@@ -14,9 +14,9 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { TitleBarPicker } from "./TitleBarPicker";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
-import { TitleBarPicker } from "./TitleBarPicker";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
