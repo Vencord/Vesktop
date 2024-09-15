@@ -5,7 +5,7 @@
  */
 
 import { Margins } from "@vencord/types/utils";
-import { Select, Forms } from "@vencord/types/webpack/common";
+import { Forms, Select } from "@vencord/types/webpack/common";
 import { isMac, isWindows } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
@@ -14,7 +14,7 @@ export const TitleBarPicker: SettingsComponent = ({ settings }) => {
     return (
         <>
             <Forms.FormText className={Margins.bottom8}>
-                Customize apps title bar. Pick Discord if you want to use Discord's custom title bar. Requires a full 
+                Customize apps title bar. Pick Discord if you want to use Discord's custom title bar. Requires a full
                 restart
             </Forms.FormText>
 
