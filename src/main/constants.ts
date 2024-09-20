@@ -69,7 +69,6 @@ const BrowserUserAgents = {
 };
 
 export const BrowserUserAgent = BrowserUserAgents[process.platform] || BrowserUserAgents.windows;
-console.log(BrowserUserAgent);
 
 export const enum MessageBoxChoice {
     Default,
