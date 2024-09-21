@@ -47,7 +47,13 @@ jobs:
             - name: Run Electron Builder
               if: ${{ matrix.platform == 'mac' }}
               run: |
+                  echo "$API_KEY" > apple.p8
                   pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  CSC_LINK: ${{ secrets.APPLE_SIGNING_CERT }}
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                CSC_LINK: ${{ secrets.APPLE_SIGNING_CERT }}
+                CSC_KEY_PASSWORD: ${{ secrets.APPLE_SIGNING_CERT_PASSWORD }}
+                API_KEY: ${{ secrets.APPLE_API_KEY }}
+                APPLE_API_KEY: apple.p8
+                APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}

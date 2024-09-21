@@ -91,7 +91,7 @@ function initTray(win: BrowserWindow) {
             click: createAboutWindow
         },
         {
-            label: "Update Vencord",
+            label: "Repair Vencord",
             async click() {
                 await downloadVencordFiles();
                 app.relaunch();
@@ -108,14 +108,14 @@ function initTray(win: BrowserWindow) {
             type: "separator"
         },
         {
-            label: "Relaunch",
+            label: "Restart",
             click() {
                 app.relaunch();
                 app.quit();
             }
         },
         {
-            label: "Quit Vesktop",
+            label: "Quit",
             click() {
                 isQuitting = true;
                 app.quit();
@@ -501,6 +501,18 @@ export async function createWindows() {
                 mainWin!.maximize();
             }
         });
+    });
+
+    // evil hack to fix electron 32 regression that makes devtools always light theme
+    // https://github.com/electron/electron/issues/43367
+    // TODO: remove once fixed
+    mainWin.webContents.on("devtools-opened", () => {
+        if (!nativeTheme.shouldUseDarkColors) return;
+
+        nativeTheme.themeSource = "light";
+        setTimeout(() => {
+            nativeTheme.themeSource = "dark";
+        }, 100);
     });
 
     initArRPC();
