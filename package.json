@@ -13,7 +13,7 @@
         "build:dev": "pnpm build --dev",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mts,.mjs",
+        "lint": "eslint",
         "lint:fix": "pnpm lint --fix",
         "start": "pnpm build && electron .",
         "start:dev": "pnpm build:dev && electron .",
@@ -24,36 +24,35 @@
         "updateMeta": "tsx scripts/utils/updateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24",
-        "electron-updater": "^6.2.1"
+        "arrpc": "github:OpenAsar/arrpc#5aadc307cb9bf4479f0a12364a253b07a77ace22",
+        "electron-updater": "^6.3.4"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@types/node": "^20.14.11",
-        "@types/react": "^18.3.3",
-        "@typescript-eslint/eslint-plugin": "^7.17.0",
-        "@typescript-eslint/parser": "^7.17.0",
+        "@stylistic/eslint-plugin": "^2.8.0",
+        "@types/node": "^22.5.5",
+        "@types/react": "^18.3.8",
         "@vencord/types": "^1.8.4",
         "dotenv": "^16.4.5",
-        "electron": "^31.2.1",
-        "electron-builder": "^25.0.1",
-        "esbuild": "^0.20.2",
-        "eslint": "^8.57.0",
-        "eslint-config-prettier": "^9.1.0",
+        "electron": "^32.1.2",
+        "electron-builder": "^25.0.5",
+        "esbuild": "^0.23.1",
+        "eslint": "^9.11.0",
         "eslint-import-resolver-alias": "^1.1.2",
-        "eslint-plugin-license-header": "^0.6.1",
-        "eslint-plugin-path-alias": "^1.1.0",
+        "eslint-plugin-path-alias": "^2.1.0",
         "eslint-plugin-prettier": "^5.2.1",
+        "eslint-plugin-simple-header": "^1.2.1",
         "eslint-plugin-simple-import-sort": "^12.1.1",
-        "eslint-plugin-unused-imports": "^3.2.0",
+        "eslint-plugin-unused-imports": "^4.1.4",
         "prettier": "^3.3.3",
         "source-map-support": "^0.5.21",
-        "tsx": "^4.16.2",
-        "type-fest": "^4.23.0",
-        "typescript": "^5.5.4",
+        "tsx": "^4.19.1",
+        "type-fest": "^4.26.1",
+        "typescript": "^5.6.2",
+        "typescript-eslint": "^8.6.0",
         "xml-formatter": "^3.6.3"
     },
     "packageManager": "pnpm@9.1.0",
@@ -181,15 +180,14 @@
             "provider": "github"
         },
         "rpm": {
-              "fpm": [
+            "fpm": [
                 "--rpm-rpmbuild-define=_build_id_links none"
-              ]
+            ]
         }
     },
     "pnpm": {
         "patchedDependencies": {
-            "arrpc@3.4.0": "patches/arrpc@3.4.0.patch"
+            "arrpc@3.5.0": "patches/arrpc@3.5.0.patch"
         }
     }
 }
-
