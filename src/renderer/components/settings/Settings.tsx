@@ -14,6 +14,7 @@ import { isMac, isWindows } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { TitleBarPicker } from "./TitleBarPicker";
 import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -39,13 +40,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: true
         }
     ],
-    "User Interface": [
-        {
-            key: "customTitleBar",
-            title: "Discord Titlebar",
-            description: "Use Discord's custom title bar instead of the native system one. Requires a full restart.",
-            defaultValue: isWindows
-        },
+    "Title Bar": [
+        TitleBarPicker,
         {
             key: "staticTitle",
             title: "Static Title",
@@ -57,8 +53,11 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Enable Menu Bar",
             description: "Enables the application menu bar. Press ALT to toggle visibility.",
             defaultValue: false,
-            disabled: () => Settings.store.customTitleBar ?? isWindows
-        },
+            invisible: () => isMac,
+            disabled: () => Settings.store.titleBar === "custom" || isWindows
+        }
+    ],
+    "User Interface": [
         {
             key: "splashTheming",
             title: "Splash theming",
