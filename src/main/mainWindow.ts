@@ -455,17 +455,34 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const subdomain =
-        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
-            ? `${Settings.store.discordBranch}.`
-            : "";
+    let uriFiredDarwin = false;
+    app.on("open-url", (_, url) => {
+        if (uriFiredDarwin) restoreVesktop();
+        else loadUrl(url);
+        uriFiredDarwin = true;
+    });
 
-    win.loadURL(`https://${subdomain}discord.com/app`);
+    const uri = process.argv.find(arg => arg.startsWith("discord://"));
+    if (!uriFiredDarwin) loadUrl(uri);
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export function loadUrl(uri: string | undefined) {
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+}
+
+export function restoreVesktop() {
+    if (mainWin) {
+        if (mainWin.isMinimized()) mainWin.restore();
+        if (!mainWin.isVisible()) mainWin.show();
+        mainWin.focus();
+    }
+}
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");

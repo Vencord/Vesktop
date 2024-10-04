@@ -11,7 +11,7 @@ import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, mainWin } from "./mainWindow";
+import { createWindows, restoreVesktop } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -27,6 +27,8 @@ if (IS_DEV) {
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
+    app.setAsDefaultProtocolClient("discord");
+
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
@@ -71,11 +73,7 @@ function init() {
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
-        else if (mainWin) {
-            if (mainWin.isMinimized()) mainWin.restore();
-            if (!mainWin.isVisible()) mainWin.show();
-            mainWin.focus();
-        }
+        else restoreVesktop();
     });
 
     app.whenReady().then(async () => {
