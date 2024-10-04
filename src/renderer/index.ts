@@ -12,7 +12,7 @@ import "./themedSplash";
 console.log("read if cute :3");
 
 export * as Components from "./components";
-import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
+import { findByPropsLazy, findStore, onceReady } from "@vencord/types/webpack";
 import { Alerts, FluxDispatcher } from "@vencord/types/webpack/common";
 
 import SettingsUi from "./components/settings/Settings";
@@ -56,8 +56,14 @@ VesktopNative.arrpc.onActivity(async data => {
     if (!Settings.store.arRPC) return;
 
     await onceReady;
-
-    arRPC.handleEvent(new MessageEvent("message", { data }));
+    const StreamerModeStore = findStore("StreamerModeStore");
+    if (JSON.parse(data).socketId === "STREAMERMODE" && StreamerModeStore.autoToggle) {
+        FluxDispatcher.dispatch({
+            type: "STREAMER_MODE_UPDATE",
+            key: "enabled",
+            value: JSON.parse(data).activity?.application_id === "STREAMERMODE"
+        });
+    } else arRPC.handleEvent(new MessageEvent("message", { data }));
 });
 
 // TODO: remove soon
