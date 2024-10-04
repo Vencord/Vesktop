@@ -135,7 +135,7 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
     });
 });
 
-handle(IpcEvents.FOUROHFOUR_PAGE_HANDLER, _ => {
+handle(IpcEvents.PAGE_NOT_FOUND_HANDLER, _ => {
     loadUrl(undefined);
     console.warn("caught incomplete uri scheme. dumping to main app");
 });
