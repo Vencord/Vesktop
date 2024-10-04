@@ -457,12 +457,13 @@ function createMainWindow() {
 
     let uriFiredDarwin = false;
     app.on("open-url", (_, url) => {
-        uriFiredDarwin ? restoreVesktop() : loadUrl(url);
+        if (uriFiredDarwin) restoreVesktop();
+        else loadUrl(url);
         uriFiredDarwin = true;
     });
 
     const uri = process.argv.find(arg => arg.startsWith("discord://"));
-    uriFiredDarwin || loadUrl(uri);
+    if (!uriFiredDarwin) loadUrl(uri);
 
     return win;
 }
@@ -472,7 +473,7 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
-    mainWin.loadURL(`https://${subdomain}discord.com/${uri?.replace(RegExp("^discord://[^/]*/?"), "") || "app"}`);
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
 }
 
 export function restoreVesktop() {

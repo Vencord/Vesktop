@@ -72,7 +72,8 @@ function init() {
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        data.IS_DEV ? app.quit() : restoreVesktop();
+        if (data.IS_DEV) app.quit();
+        else restoreVesktop();
     });
 
     app.whenReady().then(async () => {
