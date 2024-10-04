@@ -33,14 +33,15 @@
 
 .vcd-screen-picker-grid label {
     overflow: hidden;
-    padding: 4px 0px;
+    padding: 8px;
     cursor: pointer;
+    display: grid;
+    justify-items: center;
 }
 
 .vcd-screen-picker-grid label:hover {
     outline: 2px solid var(--brand-500);
 }
-
 
 .vcd-screen-picker-grid div {
     white-space: nowrap;
@@ -101,7 +102,6 @@
 .vcd-screen-picker-quality {
     display: flex;
     gap: 1em;
-
     margin-bottom: 0.5em;
 }
 
