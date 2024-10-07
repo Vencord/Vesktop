@@ -24,7 +24,7 @@ If you don't know the difference, pick the Installer.
 - [Installer](https://vencord.dev/download/vesktop/universal/windows)
 - Portable:
   - [x64 / amd64](https://vencord.dev/download/vesktop/amd64/windows-portable)
-  - [arm64](https://vencord.dev/download/vesktop/arm64/windows-portable)
+  - [Arm® 64](https://vencord.dev/download/vesktop/arm64/windows-portable)
 
 ### Mac
 
@@ -41,7 +41,7 @@ If you don't know the difference, pick amd64.
   - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/amd64/deb)
   - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/amd64/rpm)
   - [tarball](https://vencord.dev/download/vesktop/amd64/tar)
-- arm64 / aarch64
+- Arm® 64 / aarch64
   - [AppImage](https://vencord.dev/download/vesktop/arm64/appimage)
   - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/arm64/deb)
   - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/arm64/rpm)

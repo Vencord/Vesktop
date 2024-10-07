@@ -499,5 +499,17 @@ export async function createWindows() {
         });
     });
 
+    // evil hack to fix electron 32 regression that makes devtools always light theme
+    // https://github.com/electron/electron/issues/43367
+    // TODO: remove once fixed
+    mainWin.webContents.on("devtools-opened", () => {
+        if (!nativeTheme.shouldUseDarkColors) return;
+
+        nativeTheme.themeSource = "light";
+        setTimeout(() => {
+            nativeTheme.themeSource = "dark";
+        }, 100);
+    });
+
     initArRPC();
 }
