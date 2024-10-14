@@ -31,11 +31,13 @@ import {
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
+    isWayland,
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
     VENCORD_DIR
 } from "./constants";
+import { initKeybinds } from "./keybinds";
 import { Settings, State, VencordSettings } from "./settings";
 import { addSplashLog, splash } from "./splash";
 import { setTrayIcon } from "./tray";
@@ -527,4 +529,5 @@ export async function createWindows() {
     });
 
     initArRPC();
+    if (isWayland) initKeybinds();
 }

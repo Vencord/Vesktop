@@ -60,6 +60,10 @@ VesktopNative.arrpc.onActivity(async data => {
     arRPC.handleEvent(new MessageEvent("message", { data }));
 });
 
+const VoiceActions = findByPropsLazy("toggleSelfMute");
+VesktopNative.voice.onToggleSelfMute(() => VoiceActions.toggleSelfMute());
+VesktopNative.voice.onToggleSelfDeaf(() => VoiceActions.toggleSelfDeaf());
+
 // TODO: remove soon
 const vencordDir = "vencordDir" as keyof typeof Settings.store;
 if (Settings.store[vencordDir]) {
