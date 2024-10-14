@@ -31,7 +31,6 @@ import {
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
-    isWayland,
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
@@ -529,5 +528,5 @@ export async function createWindows() {
     });
 
     initArRPC();
-    if (isWayland) initKeybinds();
+    initKeybinds();
 }
