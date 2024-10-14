@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { execSync } from "child_process";
 import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
@@ -49,8 +50,15 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function updateArrpcDb() {
+    return Promise.all([execSync("node node_modules/arrpc/update_db.js")]).catch(() =>
+        console.warn("Error running update_db.js Auto streamermode will not work.")
+    );
+}
+
 await Promise.all([
     copyVenmic(),
+    updateArrpcDb(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
