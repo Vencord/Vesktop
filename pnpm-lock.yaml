@@ -5,17 +5,17 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  arrpc@3.4.0:
+  arrpc@3.5.0:
     hash: biyukfa6dww2wxujy4eyvkhrti
-    path: patches/arrpc@3.4.0.patch
+    path: patches/arrpc@3.5.0.patch
 
 importers:
 
   .:
     dependencies:
       arrpc:
-        specifier: github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24
-        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/c62ec6a04c8d870530aa6944257fe745f6c59a24(patch_hash=biyukfa6dww2wxujy4eyvkhrti)
+        specifier: github:OpenAsar/arrpc#5aadc307cb9bf4479f0a12364a253b07a77ace22
+        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=biyukfa6dww2wxujy4eyvkhrti)
       axios:
         specifier: ^1.7.2
         version: 1.7.3(debug@4.3.6)
@@ -737,9 +737,9 @@ packages:
     resolution: {integrity: sha512-bMxMKAjg13EBSVscxTaYA4mRc5t1UAXa2kXiGTNfZ079HIWXEkKmkgFrh/nJqamaLSrXO5H4WFFkPEaLJWbs3A==}
     engines: {node: '>= 0.4'}
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/c62ec6a04c8d870530aa6944257fe745f6c59a24:
-    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/c62ec6a04c8d870530aa6944257fe745f6c59a24}
-    version: 3.4.0
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22}
+    version: 3.5.0
     hasBin: true
 
   assert-plus@1.0.0:
@@ -3304,7 +3304,7 @@ snapshots:
       is-array-buffer: 3.0.4
       is-shared-array-buffer: 1.0.3
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/c62ec6a04c8d870530aa6944257fe745f6c59a24(patch_hash=biyukfa6dww2wxujy4eyvkhrti):
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=biyukfa6dww2wxujy4eyvkhrti):
     dependencies:
       ws: 8.18.0
     transitivePeerDependencies:
