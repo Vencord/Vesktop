@@ -25,19 +25,15 @@
         img {
             width: 128px;
             height: 128px;
-            image-rendering: pixelated;
         }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <img
-            draggable="false"
-            src="../shiggy.gif"
-            alt="shiggy"
-            role="presentation"
-        />
+        <!-- the data url is here to ensure there isn't an empty frame before the image is loaded -->
+        <img id="animation" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+            draggable="false" alt="animation" role="presentation" />
         <p>Loading Vesktop...</p>
     </div>
 </body>
