@@ -470,7 +470,7 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
-export function loadUrl(uri: string | undefined) {
+function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
     mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
@@ -514,6 +514,14 @@ export async function createWindows() {
                 mainWin!.maximize();
             }
         });
+    });
+
+    mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
+        // check url to ensure app doesn't loop
+        if (new URL(url).pathname !== `/app` && responseCode >= 300) {
+            loadUrl(undefined);
+            console.warn(`Caught bad page response: ${responseCode}, dumping to main app`);
+        }
     });
 
     // evil hack to fix electron 32 regression that makes devtools always light theme

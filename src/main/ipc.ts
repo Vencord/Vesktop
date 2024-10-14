@@ -18,7 +18,7 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
-import { loadUrl, mainWin } from "./mainWindow";
+import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -133,11 +133,6 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
         html: `<img src="${src.replaceAll('"', '\\"')}">`,
         image: nativeImage.createFromBuffer(Buffer.from(buf))
     });
-});
-
-handle(IpcEvents.PAGE_NOT_FOUND_HANDLER, _ => {
-    loadUrl(undefined);
-    console.warn("caught incomplete uri scheme. dumping to main app");
 });
 
 function readCss() {

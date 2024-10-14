@@ -24,10 +24,6 @@ const style = document.createElement("style");
 style.id = "vcd-css-core";
 style.textContent = readFileSync(rendererCss, "utf-8");
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (document.title === "Page Not Found | Discord") ipcRenderer.invoke(IpcEvents.PAGE_NOT_FOUND_HANDLER);
-});
-
 if (document.readyState === "complete") {
     document.documentElement.appendChild(style);
 } else {
