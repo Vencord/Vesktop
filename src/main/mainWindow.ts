@@ -455,17 +455,34 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const subdomain =
-        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
-            ? `${Settings.store.discordBranch}.`
-            : "";
+    let uriFiredDarwin = false;
+    app.on("open-url", (_, url) => {
+        if (uriFiredDarwin) restoreVesktop();
+        else loadUrl(url);
+        uriFiredDarwin = true;
+    });
 
-    win.loadURL(`https://${subdomain}discord.com/app`);
+    const uri = process.argv.find(arg => arg.startsWith("discord://"));
+    if (!uriFiredDarwin) loadUrl(uri);
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+function loadUrl(uri: string | undefined) {
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+}
+
+export function restoreVesktop() {
+    if (mainWin) {
+        if (mainWin.isMinimized()) mainWin.restore();
+        if (!mainWin.isVisible()) mainWin.show();
+        mainWin.focus();
+    }
+}
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
@@ -497,6 +514,14 @@ export async function createWindows() {
                 mainWin!.maximize();
             }
         });
+    });
+
+    mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
+        // check url to ensure app doesn't loop
+        if (new URL(url).pathname !== `/app` && responseCode >= 300) {
+            loadUrl(undefined);
+            console.warn(`Caught bad page response: ${responseCode}, dumping to main app`);
+        }
     });
 
     // evil hack to fix electron 32 regression that makes devtools always light theme
