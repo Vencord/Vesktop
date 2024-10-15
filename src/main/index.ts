@@ -8,9 +8,11 @@ import "./ipc";
 
 import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
 import { autoUpdater } from "electron-updater";
+import { appendFileSync } from "fs";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { socketFile } from "./keybinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMicrophonePermissionsHandler, registerVideoPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
@@ -18,6 +20,15 @@ import { Settings, State } from "./settings";
 import { addSplashLog, createSplashWindow } from "./splash";
 import { isDeckGameMode } from "./utils/steamOS";
 
+if (process.platform === "linux") {
+    const hasToggleMic = process.argv.includes("--toggle-mic");
+    const hasToggleDeafen = process.argv.includes("--toggle-deafen");
+    if (hasToggleMic || hasToggleDeafen) {
+        const command = hasToggleMic ? "VCD_TOGGLE_SELF_MUTE\n" : "VCD_TOGGLE_SELF_DEAF\n";
+        appendFileSync(socketFile, command);
+        process.exit(0);
+    }
+}
 if (IS_DEV) {
     require("source-map-support").install();
 } else {

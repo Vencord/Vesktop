@@ -14,7 +14,7 @@ import { IpcEvents } from "shared/IpcEvents";
 import { mainWin } from "./mainWindow";
 
 const xdgRuntimeDir = process.env.XDG_RUNTIME_DIR || process.env.TMP || "/tmp";
-const socketFile = join(xdgRuntimeDir, "vesktop-ipc");
+export const socketFile = join(xdgRuntimeDir, "vesktop-ipc");
 
 const Actions = new Set([IpcEvents.TOGGLE_SELF_DEAF, IpcEvents.TOGGLE_SELF_MUTE]);
 

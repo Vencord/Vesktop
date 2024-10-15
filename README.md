@@ -21,8 +21,11 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 -   Global Keybind to Toggle voice status from [this PR](https://github.com/Vencord/Vesktop/pull/609)
 -   Remove (#) title prefix when Notification Badge option is toggled from [this PR](https://github.com/Vencord/Vesktop/pull/686)
 
-**Not yet supported**:
+**Linux Note**:
+-   You can use the `--toggle-mic` & `--toggle-deafen` flags to toggle your microphone and deafen status from the terminal.
 
+**Not fully Supported**:
+<!-- not supported on windows yet lol-->
 -   Global Keybinds
 
 ## Installing
