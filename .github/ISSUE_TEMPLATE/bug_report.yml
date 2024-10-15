@@ -11,7 +11,7 @@ body:
 
               Make sure a similar issue doesn't already exist by [searching the existing issues](https://github.com/Equicord/Equibop/issues?q=is%3Aissue) for keywords!
 
-              Make sure both Equibop and Equicord are fully up to date. You can update Equicord by right-clicking the Equibop tray icon and pressing "Update Equicord"
+              Make sure both Equibop and Equicord are fully up to date. You can update Equicord by right-clicking the Equibop tray icon and pressing "Repair Equicord"
 
               **DO NOT REPORT** any of the following issues:
               - Purely graphical glitches like flickering, scaling issues, etc: Issue with your gpu. Nothing we can do, update drivers or disable hardware acceleration
