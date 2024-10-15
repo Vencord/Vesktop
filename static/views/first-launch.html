@@ -4,15 +4,19 @@
     <style>
         body {
             height: 100vh;
-
             padding: 1.5em;
             padding-bottom: 1em;
-
             border: 1px solid var(--fg-semi-trans);
             border-top: none;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
         }
 
         select {
@@ -46,6 +50,10 @@
         label:has(input[type="checkbox"]),
         select {
             cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            accent-color: rgb(55, 50, 50);
         }
 
         label:not(:last-child)::after {
@@ -85,7 +93,7 @@
 
         button {
             padding: 0.6em;
-            background: red;
+            background: rgb(255, 27, 27);
             color: white;
             border-radius: 6px;
             border: none;
@@ -96,24 +104,28 @@
         button:hover {
             filter: brightness(0.8);
         }
-
         #submit {
-            background: green;
+            background: rgb(20, 113, 20);
         }
     </style>
 </head>
 
 <body>
-    <h1>Welcome to Equibop</h1>
-    <p>Let's customise your experience!</p>
+    <div style="display: flex; align-items: center;">
+        <img src="../../static/icon.png" alt="Equibop Logo" style="height: 110px; margin-right: 10px; margin-bottom: 15px;" />
+        <div>
+            <h1>Welcome to Equibop</h1>
+            <p>Let's customise your experience!</p>
+        </div>
+    </div>
 
     <form>
         <label>
             <h2>Discord Branch</h2>
             <select name="discordBranch">
-                <option value="stable">stable</option>
-                <option value="canary">canary</option>
-                <option value="ptb">ptb</option>
+                <option value="stable">Stable</option>
+                <option value="canary">Canary</option>
+                <option value="ptb">PTB</option>
             </select>
         </label>
 
