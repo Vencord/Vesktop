@@ -60,6 +60,9 @@ function init() {
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
     disabledFeatures.push("WinRetrieveSuggestionsOnlyOnDemand", "HardwareMediaKeyHandling", "MediaSessionService");
 
+    // Support TTS on Linux using speech-dispatcher
+    app.commandLine.appendSwitch("enable-speech-dispatcher");
+
     app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
     app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
 
