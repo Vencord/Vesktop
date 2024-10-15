@@ -18,10 +18,14 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 -   Equicord preinstalled
 -   Custom Splash animations from [this PR](https://github.com/Vencord/Vesktop/pull/355)
 -   Tray Customization & Voice detection and Badge from [this PR](https://github.com/Vencord/Vesktop/pull/517)
+-   Global Keybind to Toggle voice status from [this PR](https://github.com/Vencord/Vesktop/pull/609)
 -   Remove (#) title prefix when Notification Badge option is toggled from [this PR](https://github.com/Vencord/Vesktop/pull/686)
 
-**Not yet supported**:
+**Linux Note**:
+-   You can use the `--toggle-mic` & `--toggle-deafen` flags to toggle your microphone and deafen status from the terminal.
 
+**Not fully Supported**:
+<!-- not supported on windows yet lol-->
 -   Global Keybinds
 
 ## Installing
@@ -45,6 +49,7 @@ These work on both M Series and Intel Series Macs
 -   [ZIP](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-mac-universal.zip)
 
 ### Linux
+[![equibop](https://img.shields.io/badge/AVAILABLE_ON_THE_AUR-333232?style=for-the-badge&logo=arch-linux&logoColor=0F94D2&labelColor=%23171717)](https://aur.archlinux.org/packages?O=0&K=equibop)
 
 If you don't know the difference, pick amd64.
 

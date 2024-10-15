@@ -75,3 +75,6 @@ export const enum MessageBoxChoice {
     Default,
     Cancel
 }
+
+export const isWayland =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
