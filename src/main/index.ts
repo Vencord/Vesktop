@@ -8,6 +8,7 @@ import "./ipc";
 
 import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
 import { autoUpdater } from "electron-updater";
+import { writeFileSync } from "fs";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
@@ -18,7 +19,6 @@ import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { addSplashLog, createSplashWindow } from "./splash";
 import { isDeckGameMode } from "./utils/steamOS";
-import { writeFileSync } from "fs";
 
 if (process.platform === "linux") {
     const hasToggleMic = process.argv.includes("--toggle-mic");
