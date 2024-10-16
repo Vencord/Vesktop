@@ -65,7 +65,9 @@ function openFIFO() {
 
 function cleanup() {
     try {
-        unlinkSync(socketFile);
+        if (existsSync(socketFile)) {
+            unlinkSync(socketFile);
+        }
     } catch (err) {
         console.error("Failed to remove mkfifo file:", err);
     }
