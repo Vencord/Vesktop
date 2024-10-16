@@ -39,12 +39,7 @@ if (IS_DEV) {
 process.env.EQUICORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
-    const {
-        disableSmoothScroll,
-        hardwareAcceleration,
-        splashAnimationPath,
-        arguments: additionalArgs
-    } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, splashAnimationPath } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
     const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
@@ -58,15 +53,6 @@ function init() {
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
-
-    if (additionalArgs && Array.isArray(additionalArgs)) {
-        additionalArgs.forEach(arg => {
-            const [switchName, switchValue] = arg.split("=");
-            app.commandLine.appendSwitch(switchName, switchValue);
-        });
-    }
-    app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
-    app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
 
     // disable renderer backgrounding to prevent the app from unloading when in the background
     // https://github.com/electron/electron/issues/2822
@@ -88,6 +74,9 @@ function init() {
 
     // Support TTS on Linux using speech-dispatcher
     app.commandLine.appendSwitch("enable-speech-dispatcher");
+
+    app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
+    app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
 
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
