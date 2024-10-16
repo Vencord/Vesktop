@@ -42,12 +42,13 @@ export default tseslint.config(
             }
         },
         rules: {
-            "header/header": [
-                "error",
-                {
-                    files: ["scripts/header.txt"]
-                }
-            ],
+            "header/header": ["error", {
+                text: [
+                    "SPDX-License-Identifier: GPL-3.0",
+                    "Vesktop, a desktop app aiming to give you a snappier Discord Experience",
+                    "Copyright (c) 2023 Vendicated and Vencord contributors"
+                ]
+            }],
 
             // ESLint Rules
 
