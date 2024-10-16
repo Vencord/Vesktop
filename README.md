@@ -50,7 +50,10 @@ These work on both M Series and Intel Series Macs
 
 ### Linux
 [![equibop](https://img.shields.io/badge/AVAILABLE_ON_THE_AUR-333232?style=for-the-badge&logo=arch-linux&logoColor=0F94D2&labelColor=%23171717)](https://aur.archlinux.org/packages?O=0&K=equibop)
-[![Download on Flathub](https://flathub.org/api/badge?svg)](https://flathub.org/apps/io.github.equicord.equibop)
+<br>
+<a href="https://flathub.org/apps/io.github.equicord.equibop">
+  <img src="https://flathub.org/api/badge?svg" alt="Download on Flathub" style="width:220px; height:auto;">
+</a>
 
 If you don't know the difference, pick amd64.
 
