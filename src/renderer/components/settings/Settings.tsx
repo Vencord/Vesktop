@@ -11,6 +11,7 @@ import { ComponentType } from "react";
 import { Settings, useSettings } from "renderer/settings";
 import { isLinux, isMac, isWindows } from "renderer/utils";
 
+import { Arguments } from "./Arguments";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { CustomSplashAnimation } from "./CustomSplashAnimation";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
@@ -97,6 +98,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         }
     ],
     Behaviour: [
+        Arguments,
         {
             key: "disableMinSize",
             title: "Disable minimum window size",

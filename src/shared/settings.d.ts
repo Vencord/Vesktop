@@ -30,7 +30,7 @@ export interface Settings {
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
-
+    arguments?: string;
     splashTheming?: boolean;
     splashColor?: string;
     splashAnimationPath?: string;
