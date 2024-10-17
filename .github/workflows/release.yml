@@ -69,6 +69,13 @@ jobs:
               env:
                 GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
+            - name: Sign binary
+              uses: lando/code-sign-action@v2
+              with:
+                file:  macos/Equibop-mac-universal.dmg
+                certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+                certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+
             - name: Upload artifact
               uses: actions/upload-artifact@v3
               with:
@@ -117,39 +124,10 @@ jobs:
                   dist/Equibop-win.exe
                   dist/Equibop-win.exe.blockmap
                   dist/latest.yml
-      
-    sign:
-      runs-on: macos-11
-      needs: [build-mac]
-
-      steps:
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: Equibop-macos
-          path: macos
-
-      - name: Sign binary
-        uses: lando/code-sign-action@v2
-        with:
-          file:  macos/Equibop-mac-universal.dmg
-          certificate-data: ${{ secrets.APPLE_CERT_DATA }}
-          certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Equibop-sign-macos
-          path: |
-            macos/Equibop-mac-universal.dmg
-            macos/Equibop-mac-universal.dmg.blockmap
-            macos/Equibop-mac-universal.zip
-            macos/Equibop-mac-universal.zip.blockmap
-            macos/latest-mac.yml
 
     release:
       runs-on: ubuntu-latest
-      needs: [build-linux, sign, build-windows]
+      needs: [build-linux, build-mac, build-windows]
 
       steps:
       - name: Checkout code
