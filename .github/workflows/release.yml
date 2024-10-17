@@ -43,6 +43,8 @@ jobs:
                   dist/Equibop-linux-x64.tar.gz
                   dist/Equibop-linux-x86_64.AppImage
                   dist/Equibop-linux-x86_64.rpm
+                  dist/linux-arm64.yml
+                  dist/linux.yml
 
     build-mac:
       runs-on: macos-latest
@@ -77,6 +79,7 @@ jobs:
                 path: |
                   dist/Equibop-mac-universal.dmg
                   dist/Equibop-mac-universal.zip
+                  dist/latest-mac.yml
 
     build-windows:
         runs-on: windows-latest
@@ -110,6 +113,7 @@ jobs:
                   dist/Equibop-win-arm64.zip
                   dist/Equibop-win.exe
                   dist/Equibop-win-x64.zip
+                  dist/latest.yml
       
 
     release:
@@ -122,17 +126,17 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: Equilotl-linux
+          name: Equibop-linux
           path: linux
 
       - uses: actions/download-artifact@v3
         with:
-          name: Equilotl-macos
+          name: Equibop-macos
           path: macos
 
       - uses: actions/download-artifact@v3
         with:
-          name: Equilotl-windows
+          name: Equibop-windows
           path: windows
 
       - name: Create the release
@@ -158,3 +162,7 @@ jobs:
             windows/Equibop-win-arm64.zip
             windows/Equibop-win.exe
             windows/Equibop-win-x64.zip
+            dist/latest-linux-arm64.yml
+            dist/latest-linux.yml
+            dist/latest-mac.yml
+            dist/latest.yml
