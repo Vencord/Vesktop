@@ -7,19 +7,81 @@ on:
     workflow_dispatch:
 
 jobs:
-    release:
-        runs-on: ${{ matrix.os }}
+    build-linux:
+      runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest, windows-latest]
-                include:
-                    - os: macos-latest
-                      platform: mac
-                    - os: ubuntu-latest
-                      platform: linux
-                    - os: windows-latest
-                      platform: windows
+      steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: |
+                pnpm build
+                pnpm package
+              env:
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-linux
+                path: |
+                  dist/Equibop-linux-aarch64.rpm
+                  dist/Equibop-linux-amd64.deb
+                  dist/Equibop-linux-arm64.AppImage
+                  dist/Equibop-linux-arm64.deb
+                  dist/Equibop-linux-arm64.tar.gz
+                  dist/Equibop-linux-x64.tar.gz
+                  dist/Equibop-linux-x86_64.AppImage
+                  dist/Equibop-linux-x86_64.rpm
+                  dist/latest-linux-arm64.yml
+                  dist/latest-linux.yml
+
+    build-mac:
+      runs-on: macos-latest
+
+      steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: |
+                pnpm build
+                pnpm package
+              env:
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-macos
+                path: |
+                  dist/Equibop-mac-universal.dmg
+                  dist/Equibop-mac-universal.dmg.blockmap
+                  dist/Equibop-mac-universal.zip
+                  dist/Equibop-mac-universal.zip.blockmap
+                  dist/latest-mac.yml
+
+    build-windows:
+        runs-on: windows-latest
 
         steps:
             - uses: actions/checkout@v4
@@ -35,18 +97,80 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Build
-              run: pnpm build
-
-            - name: Run Electron Builder
-              if: ${{ matrix.platform != 'mac' }}
               run: |
-                  pnpm electron-builder --${{ matrix.platform }} --publish always
+                pnpm build
+                pnpm package
               env:
-                  GH_TOKEN: ${{ secrets.ETOKEN }}
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
-            - name: Run Electron Builder
-              if: ${{ matrix.platform == 'mac' }}
-              run: |
-                  pnpm electron-builder --${{ matrix.platform }} --publish always
-              env:
-                  GH_TOKEN: ${{ secrets.ETOKEN }}
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-windows
+                path: |
+                  dist/Equibop-win-arm64.exe
+                  dist/Equibop-win-arm64.exe.blockmap
+                  dist/Equibop-win-arm64.zip
+                  dist/Equibop-win-x64.exe
+                  dist/Equibop-win-x64.exe.blockmap
+                  dist/Equibop-win-x64.zip
+                  dist/Equibop-win.exe
+                  dist/Equibop-win.exe.blockmap
+                  dist/latest.yml
+
+    release:
+      runs-on: ubuntu-latest
+      needs: [build-linux, build-mac, build-windows]
+
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equibop-linux
+          path: linux
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equibop-macos
+          path: macos
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equibop-windows
+          path: windows
+
+      - name: Create the release
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ETOKEN }}
+        with:
+          name: ${{ github.ref_name }}
+          prerelease: false
+          draft: false
+          files: |
+            linux/Equibop-linux-aarch64.rpm
+            linux/Equibop-linux-amd64.deb
+            linux/Equibop-linux-arm64.AppImage
+            linux/Equibop-linux-arm64.deb
+            linux/Equibop-linux-arm64.tar.gz
+            linux/Equibop-linux-x64.tar.gz
+            linux/Equibop-linux-x86_64.AppImage
+            linux/Equibop-linux-x86_64.rpm
+            linux/latest-linux-arm64.yml
+            linux/latest-linux.yml
+            macos/Equibop-mac-universal.dmg
+            macos/Equibop-mac-universal.dmg.blockmap
+            macos/Equibop-mac-universal.zip
+            macos/Equibop-mac-universal.zip.blockmap
+            macos/latest-mac.yml
+            windows/Equibop-win-arm64.exe
+            windows/Equibop-win-arm64.exe.blockmap
+            windows/Equibop-win-arm64.zip
+            windows/Equibop-win-x64.exe
+            windows/Equibop-win-x64.exe.blockmap
+            windows/Equibop-win-x64.zip
+            windows/Equibop-win.exe
+            windows/Equibop-win.exe.blockmap
+            windows/latest.yml
