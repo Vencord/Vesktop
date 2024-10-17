@@ -28,8 +28,7 @@ interface Data {
 
 export function createFirstLaunchTour() {
     if (process.platform === "darwin") {
-        const pathForApp = join(__dirname, `../../${app.getAppPath()}`);
-        exec(`codesign --force --deep --sign - ${pathForApp}.app`, error => {
+        exec(`codesign --force --deep --sign - /Applications/Equibop.app`, error => {
             if (error) return;
         });
     }
