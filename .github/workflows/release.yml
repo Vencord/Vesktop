@@ -78,7 +78,9 @@ jobs:
                 name: Equibop-macos
                 path: |
                   dist/Equibop-mac-universal.dmg
+                  dist/Equibop-mac-universal.dmg.blockmap
                   dist/Equibop-mac-universal.zip
+                  dist/Equibop-mac-universal.zip.blockmap
                   dist/latest-mac.yml
 
     build-windows:
@@ -110,9 +112,13 @@ jobs:
                 name: Equibop-windows
                 path: |
                   dist/Equibop-win-arm64.exe
+                  dist/Equibop-win-arm64.exe.blockmap
                   dist/Equibop-win-arm64.zip
-                  dist/Equibop-win.exe
+                  dist/Equibop-win-x64.exe
+                  dist/Equibop-win-x64.exe.blockmap
                   dist/Equibop-win-x64.zip
+                  dist/Equibop-win.exe
+                  dist/Equibop-win.exe.blockmap
                   dist/latest.yml
       
 
@@ -156,13 +162,19 @@ jobs:
             linux/Equibop-linux-x64.tar.gz
             linux/Equibop-linux-x86_64.AppImage
             linux/Equibop-linux-x86_64.rpm
+            linux/latest-linux-arm64.yml
+            linux/latest-linux.yml
             macos/Equibop-mac-universal.dmg
+            macos/Equibop-mac-universal.dmg.blockmap
             macos/Equibop-mac-universal.zip
+            macos/Equibop-mac-universal.zip.blockmap
+            macos/latest-mac.yml
             windows/Equibop-win-arm64.exe
+            windows/Equibop-win-arm64.exe.blockmap
             windows/Equibop-win-arm64.zip
-            windows/Equibop-win.exe
+            windows/Equibop-win-x64.exe
+            windows/Equibop-win-x64.exe.blockmap
             windows/Equibop-win-x64.zip
-            dist/latest-linux-arm64.yml
-            dist/latest-linux.yml
-            dist/latest-mac.yml
-            dist/latest.yml
+            windows/Equibop-win.exe
+            windows/Equibop-win.exe.blockmap
+            windows/latest.yml
