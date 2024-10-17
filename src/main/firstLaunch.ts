@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { exec } from "child_process";
 import { app } from "electron";
 import { BrowserWindow } from "electron/main";
 import { copyFileSync, mkdirSync, readdirSync } from "fs";
@@ -26,6 +27,9 @@ interface Data {
 }
 
 export function createFirstLaunchTour() {
+    exec("codesign --force --deep --sign - /Applications/Equibop.app", error => {
+        if (error) return;
+    });
     const win = new BrowserWindow({
         ...SplashProps,
         frame: true,
