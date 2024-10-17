@@ -43,8 +43,8 @@ jobs:
                   dist/Equibop-linux-x64.tar.gz
                   dist/Equibop-linux-x86_64.AppImage
                   dist/Equibop-linux-x86_64.rpm
-                  dist/linux-arm64.yml
-                  dist/linux.yml
+                  dist/latest-linux-arm64.yml
+                  dist/latest-linux.yml
 
     build-mac:
       runs-on: macos-latest
