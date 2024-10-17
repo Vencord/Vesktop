@@ -69,13 +69,6 @@ jobs:
               env:
                 GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
-            - name: Sign binary
-              uses: lando/code-sign-action@v2
-              with:
-                file: dist/Equibop-mac-universal.dmg
-                certificate-data: ${{ secrets.APPLE_CERT_DATA }}
-                certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
-
             - name: Upload artifact
               uses: actions/upload-artifact@v3
               with:
