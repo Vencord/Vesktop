@@ -27,6 +27,8 @@ jobs:
               run: |
                 pnpm build
                 pnpm package
+              env:
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@v3
@@ -62,6 +64,8 @@ jobs:
               run: |
                 pnpm build
                 pnpm package
+              env:
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
             - name: Sign
               run: codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
@@ -94,6 +98,8 @@ jobs:
               run: |
                 pnpm build
                 pnpm package
+              env:
+                GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
             - name: Upload artifact
               uses: actions/upload-artifact@v3
