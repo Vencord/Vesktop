@@ -59,7 +59,9 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Build
-              run: pnpm build
+              run: |
+                pnpm build
+                pnpm package
 
             - name: Sign
               run: codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
@@ -89,7 +91,9 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Build
-              run: pnpm build
+              run: |
+                pnpm build
+                pnpm package
 
             - name: Upload artifact
               uses: actions/upload-artifact@v3
