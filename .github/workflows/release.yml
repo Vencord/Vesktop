@@ -35,14 +35,14 @@ jobs:
               with:
                 name: Equibop-linux
                 path: |
-                  Equibop-linux-aarch64.rpm
-                  Equibop-linux-amd64.deb
-                  Equibop-linux-arm64.AppImage
-                  Equibop-linux-arm64.deb
-                  Equibop-linux-arm64.tar.gz
-                  Equibop-linux-x64.tar.gz
-                  Equibop-linux-x86_64.AppImage
-                  Equibop-linux-x86_64.rpm
+                  dist/Equibop-linux-aarch64.rpm
+                  dist/Equibop-linux-amd64.deb
+                  dist/Equibop-linux-arm64.AppImage
+                  dist/Equibop-linux-arm64.deb
+                  dist/Equibop-linux-arm64.tar.gz
+                  dist/Equibop-linux-x64.tar.gz
+                  dist/Equibop-linux-x86_64.AppImage
+                  dist/Equibop-linux-x86_64.rpm
 
     build-mac:
       runs-on: macos-latest
@@ -75,8 +75,8 @@ jobs:
               with:
                 name: Equibop-macos
                 path: |
-                  Equibop-mac-universal.dmg
-                  Equibop-mac-universal.zip
+                  dist/Equibop-mac-universal.dmg
+                  dist/Equibop-mac-universal.zip
 
     build-windows:
         runs-on: windows-latest
@@ -106,10 +106,10 @@ jobs:
               with:
                 name: Equibop-windows
                 path: |
-                  Equibop-win-arm64.exe
-                  Equibop-win-arm64.zip
-                  Equibop-win.exe
-                  Equibop-win-x64.zip
+                  dist/Equibop-win-arm64.exe
+                  dist/Equibop-win-arm64.zip
+                  dist/Equibop-win.exe
+                  dist/Equibop-win-x64.zip
       
 
     release:
