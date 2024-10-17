@@ -69,9 +69,6 @@ jobs:
               env:
                 GITHUB_TOKEN: ${{ secrets.ETOKEN }}
 
-            - name: Sign
-              run: codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
-
             - name: Upload artifact
               uses: actions/upload-artifact@v3
               with:
@@ -121,6 +118,33 @@ jobs:
                   dist/Equibop-win.exe.blockmap
                   dist/latest.yml
       
+    sign:
+      runs-on: macos-11
+
+      steps:
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equibop-macos
+          path: macos
+
+      - name: Sign binary
+        uses: lando/code-sign-action@v2
+        with:
+          file:  macos/Equibop-mac-universal.dmg
+          certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+          certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Equibop-sign-macos
+          path: |
+            macos/Equibop-mac-universal.dmg
+            macos/Equibop-mac-universal.dmg.blockmap
+            macos/Equibop-mac-universal.zip
+            macos/Equibop-mac-universal.zip.blockmap
+            macos/latest-mac.yml
 
     release:
       runs-on: ubuntu-latest
@@ -137,7 +161,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: Equibop-macos
+          name: Equibop-sign-macos
           path: macos
 
       - uses: actions/download-artifact@v3
