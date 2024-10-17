@@ -47,6 +47,7 @@ jobs:
             - name: Run Electron Builder
               if: ${{ matrix.platform == 'mac' }}
               run: |
+                  ls
                   codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
                   pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
