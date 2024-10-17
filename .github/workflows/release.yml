@@ -7,19 +7,73 @@ on:
     workflow_dispatch:
 
 jobs:
-    release:
-        runs-on: ${{ matrix.os }}
+    build-linux:
+      runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest, windows-latest]
-                include:
-                    - os: macos-latest
-                      platform: mac
-                    - os: ubuntu-latest
-                      platform: linux
-                    - os: windows-latest
-                      platform: windows
+      steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: |
+                pnpm build
+                pnpm package
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-linux
+                path: |
+                  Equibop-linux-aarch64.rpm
+                  Equibop-linux-amd64.deb
+                  Equibop-linux-arm64.AppImage
+                  Equibop-linux-arm64.deb
+                  Equibop-linux-arm64.tar.gz
+                  Equibop-linux-x64.tar.gz
+                  Equibop-linux-x86_64.AppImage
+                  Equibop-linux-x86_64.rpm
+
+    build-mac:
+      runs-on: macos-latest
+
+      steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: pnpm build
+
+            - name: Sign
+              run: codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-macos
+                path: |
+                  Equibop-mac-universal.dmg
+                  Equibop-mac-universal.zip
+
+    build-windows:
+        runs-on: windows-latest
 
         steps:
             - uses: actions/checkout@v4
@@ -37,18 +91,60 @@ jobs:
             - name: Build
               run: pnpm build
 
-            - name: Run Electron Builder
-              if: ${{ matrix.platform != 'mac' }}
-              run: |
-                  pnpm electron-builder --${{ matrix.platform }} --publish always
-              env:
-                  GH_TOKEN: ${{ secrets.ETOKEN }}
+            - name: Upload artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: Equibop-windows
+                path: |
+                  Equibop-win-arm64.exe
+                  Equibop-win-arm64.zip
+                  Equibop-win.exe
+                  Equibop-win-x64.zip
+      
 
-            - name: Run Electron Builder
-              if: ${{ matrix.platform == 'mac' }}
-              run: |
-                  ls dist
-                  codesign --force --deep --sign - dist/Equibop-mac-universal.dmg
-                  pnpm electron-builder --${{ matrix.platform }} --publish always
-              env:
-                  GH_TOKEN: ${{ secrets.ETOKEN }}
+    release:
+      runs-on: ubuntu-latest
+      needs: [build-linux, build-mac, build-windows]
+
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equilotl-linux
+          path: linux
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equilotl-macos
+          path: macos
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Equilotl-windows
+          path: windows
+
+      - name: Create the release
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ETOKEN }}
+        with:
+          name: ${{ github.ref_name }}
+          prerelease: false
+          draft: false
+          files: |
+            linux/Equibop-linux-aarch64.rpm
+            linux/Equibop-linux-amd64.deb
+            linux/Equibop-linux-arm64.AppImage
+            linux/Equibop-linux-arm64.deb
+            linux/Equibop-linux-arm64.tar.gz
+            linux/Equibop-linux-x64.tar.gz
+            linux/Equibop-linux-x86_64.AppImage
+            linux/Equibop-linux-x86_64.rpm
+            macos/Equibop-mac-universal.dmg
+            macos/Equibop-mac-universal.zip
+            windows/Equibop-win-arm64.exe
+            windows/Equibop-win-arm64.zip
+            windows/Equibop-win.exe
+            windows/Equibop-win-x64.zip
