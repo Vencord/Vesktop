@@ -133,7 +133,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: Equibop-sign-macos
+          name: Equibop-macos
           path: macos
 
       - uses: actions/download-artifact@v3
