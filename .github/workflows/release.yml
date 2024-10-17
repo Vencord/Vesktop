@@ -120,6 +120,7 @@ jobs:
       
     sign:
       runs-on: macos-11
+      needs: [build-mac]
 
       steps:
 
