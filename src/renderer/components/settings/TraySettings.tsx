@@ -11,6 +11,7 @@ import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
 import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
+import { isLinux } from "renderer/utils";
 
 import { SettingsComponent } from "./Settings";
 
@@ -188,6 +189,11 @@ export const CustomizeTraySwitch: SettingsComponent = ({ settings }) => {
 
 export const TrayColorTypeSelect: SettingsComponent = ({ settings }) => {
     if (!settings.tray) return null;
+    const options = [{ label: "Default", value: "default", default: true }];
+    // @ts-expect-error I couldn't figure it out ref mainwindow L547-549
+    if (!isLinux) options.push({ label: "System Accent", value: "system" });
+    // @ts-expect-error I wanted the old sorting
+    options.push({ label: "Custom", value: "custom" });
     return (
         <div className="vcd-tray-settings">
             <div className="vcd-tray-settings-labels">
@@ -196,11 +202,7 @@ export const TrayColorTypeSelect: SettingsComponent = ({ settings }) => {
 
             <Select
                 placeholder="Default"
-                options={[
-                    { label: "Default", value: "default", default: true },
-                    { label: "System Accent", value: "system" },
-                    { label: "Custom", value: "custom" }
-                ]}
+                options={options}
                 closeOnSelect={true}
                 select={v => {
                     settings.trayColorType = v;
