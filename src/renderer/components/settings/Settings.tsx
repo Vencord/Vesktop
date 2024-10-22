@@ -105,7 +105,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         }
     ],
     Notifications: [NotificationBadgeToggle],
-    Miscelleanous: [
+    Miscellaneous: [
         {
             key: "arRPC",
             title: "Rich Presence",
