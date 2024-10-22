@@ -49,7 +49,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "staticTitle",
             title: "Static Title",
-            description: 'Makes the window title "Vesktop" instead of changing to the current page',
+            description: 'Makes the window title "Vesktop" instead of changing to the current page. Requires a full restart.',
             defaultValue: false
         },
         {
