@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   arrpc@3.5.0:
-    hash: biyukfa6dww2wxujy4eyvkhrti
+    hash: 5y62pyz5uz22dpw2tkbo3xeuo4
     path: patches/arrpc@3.5.0.patch
 
 importers:
@@ -15,7 +15,7 @@ importers:
     dependencies:
       arrpc:
         specifier: github:OpenAsar/arrpc#5aadc307cb9bf4479f0a12364a253b07a77ace22
-        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=biyukfa6dww2wxujy4eyvkhrti)
+        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=5y62pyz5uz22dpw2tkbo3xeuo4)
       electron-updater:
         specifier: ^6.3.4
         version: 6.3.4
@@ -3214,7 +3214,7 @@ snapshots:
 
   app-builder-bin@5.0.0-alpha.7: {}
 
-  app-builder-lib@25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)):
+  app-builder-lib@25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.3.2
@@ -3229,7 +3229,7 @@ snapshots:
       builder-util-runtime: 9.2.5
       chromium-pickle-js: 0.2.0
       debug: 4.3.7
-      dmg-builder: 25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
+      dmg-builder: 25.0.5(electron-builder-squirrel-windows@25.0.5)
       ejs: 3.1.10
       electron-builder-squirrel-windows: 25.0.5(dmg-builder@25.0.5)
       electron-publish: 25.0.3
@@ -3350,7 +3350,7 @@ snapshots:
       is-array-buffer: 3.0.4
       is-shared-array-buffer: 1.0.3
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=biyukfa6dww2wxujy4eyvkhrti):
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/5aadc307cb9bf4479f0a12364a253b07a77ace22(patch_hash=5y62pyz5uz22dpw2tkbo3xeuo4):
     dependencies:
       ws: 8.18.0
     transitivePeerDependencies:
@@ -3744,9 +3744,9 @@ snapshots:
       '@types/react': 17.0.2
       moment: 2.30.1
 
-  dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)):
+  dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5):
     dependencies:
-      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
+      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
       builder-util: 25.0.3
       builder-util-runtime: 9.2.5
       fs-extra: 10.1.0
@@ -3789,7 +3789,7 @@ snapshots:
 
   electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5):
     dependencies:
-      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
+      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
       archiver: 5.3.2
       builder-util: 25.0.3
       fs-extra: 10.1.0
@@ -3800,11 +3800,11 @@ snapshots:
 
   electron-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)):
     dependencies:
-      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5)))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
+      app-builder-lib: 25.0.5(dmg-builder@25.0.5(electron-builder-squirrel-windows@25.0.5))(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
       builder-util: 25.0.3
       builder-util-runtime: 9.2.5
       chalk: 4.1.2
-      dmg-builder: 25.0.5(electron-builder-squirrel-windows@25.0.5(dmg-builder@25.0.5))
+      dmg-builder: 25.0.5(electron-builder-squirrel-windows@25.0.5)
       fs-extra: 10.1.0
       is-ci: 3.0.1
       lazy-val: 1.0.5
