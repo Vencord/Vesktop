@@ -20,7 +20,7 @@ export interface Settings {
     appBadge?: boolean;
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
-    customTitleBar?: boolean;
+    titleBar?: "hidden" | "shown" | "custom";
 
     splashTheming?: boolean;
     splashColor?: string;
