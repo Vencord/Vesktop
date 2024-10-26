@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import dbus from "@homebridge/dbus-native";
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
@@ -24,8 +25,28 @@ let lastIndex: null | number = -1;
 export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
-            if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            if (typeof count !== "number") {
+                throw new Error("count must be a number"); // sanitize
+            }
+
+            const sessionBus = dbus.sessionBus();
+            sessionBus.connection.message({
+                type: dbus.messageType.signal,
+                serial: 1,
+                path: "/",
+                interface: "com.canonical.Unity.LauncherEntry",
+                member: "Update",
+                signature: "sa{sv}",
+                body: [
+                    process.env.container === "1"
+                        ? "application://dev.vencord.Vesktop.desktop" // flatpak handling
+                        : "application://vesktop.desktop",
+                    [
+                        ["count", ["i", count === -1 ? 0 : count]],
+                        ["count-visible", ["b", count !== 0]]
+                    ]
+                ]
+            });
             break;
         case "darwin":
             if (count === 0) {
