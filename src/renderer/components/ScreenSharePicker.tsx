@@ -33,6 +33,7 @@ import {
 } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
+import { patchOverrideDevices } from "renderer/patches/screenShareFixes";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
@@ -59,6 +60,8 @@ interface AudioItem {
 
 interface StreamSettings {
     audio: boolean;
+    overrideAudioDevice?: string;
+    overrideVideoDevice?: string;
     contentHint?: string;
     includeSources?: AudioSources;
     excludeSources?: AudioSources;
@@ -163,6 +166,11 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                                 await VesktopNative.virtmic.start(v.includeSources);
                             }
                         }
+
+                        patchOverrideDevices({
+                            audio: v.overrideAudioDevice,
+                            video: v.overrideVideoDevice
+                        });
 
                         resolve(v);
                     }}
@@ -371,6 +379,17 @@ function StreamSettingsUi({
         }
     );
 
+    const [[audioDevices, videoDevices], , devicesPending] = useAwaiter(
+        () =>
+            navigator.mediaDevices
+                .enumerateDevices()
+                .then(devices => [
+                    devices.filter(device => device.kind === "audioinput"),
+                    devices.filter(device => device.kind === "videoinput")
+                ]),
+        { fallbackValue: [[], []] }
+    );
+
     const openSettings = () => {
         openModal(props => (
             <AudioSettingsModal
@@ -432,6 +451,43 @@ function StreamSettingsUi({
                                 a much sharper and clearer image.
                             </Paragraph>
                         </div>
+
+                        <div>
+                            <Heading>{devicesPending ? "Loading audio devices..." : "Audio devices"}</Heading>
+                            <Select
+                                options={audioDevices.map(({ label, deviceId }) => ({
+                                    label,
+                                    value: deviceId
+                                }))}
+                                isSelected={d => settings.overrideAudioDevice === d}
+                                select={d => {
+                                    setSettings(v => ({ ...v, overrideAudioDevice: d }));
+                                }}
+                                serialize={String}
+                                popoutPosition="top"
+                                closeOnSelect
+                                isDisabled={devicesPending}
+                            />
+                        </div>
+
+                        <div>
+                            <Heading>{devicesPending ? "Loading video devices..." : "Video devices"}</Heading>
+                            <Select
+                                options={videoDevices.map(({ label, deviceId }) => ({
+                                    label,
+                                    value: deviceId
+                                }))}
+                                isSelected={d => settings.overrideVideoDevice === d}
+                                select={d => {
+                                    setSettings(v => ({ ...v, overrideVideoDevice: d }));
+                                }}
+                                serialize={String}
+                                popoutPosition="top"
+                                closeOnSelect
+                                isDisabled={devicesPending}
+                            />
+                        </div>
+
                         {isWindows && (
                             <FormSwitch
                                 title="Stream With Audio"
