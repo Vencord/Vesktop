@@ -11,7 +11,7 @@ import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, restoreVesktop } from "./mainWindow";
+import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -73,7 +73,11 @@ function init() {
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
-        else restoreVesktop();
+        else if (mainWin) {
+            if (mainWin.isMinimized()) mainWin.restore();
+            if (!mainWin.isVisible()) mainWin.show();
+            mainWin.focus();
+        }
     });
 
     app.whenReady().then(async () => {
@@ -109,6 +113,12 @@ async function bootstrap() {
         createWindows();
     }
 }
+
+// MacOS only event
+export var darwinURL: string | undefined;
+app.on("open-url", (_, url) => {
+    darwinURL = url;
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();

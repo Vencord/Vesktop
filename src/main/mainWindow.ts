@@ -36,6 +36,7 @@ import {
     MIN_WIDTH,
     VENCORD_FILES_DIR
 } from "./constants";
+import { darwinURL } from "./index";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -455,33 +456,18 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    let uriFiredDarwin = false;
-    app.on("open-url", (_, url) => {
-        if (uriFiredDarwin) restoreVesktop();
-        else loadUrl(url);
-        uriFiredDarwin = true;
-    });
-
-    const uri = process.argv.find(arg => arg.startsWith("discord://"));
-    if (!uriFiredDarwin) loadUrl(uri);
+    // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
+    loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
-function loadUrl(uri: string | undefined) {
+export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
     mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
-}
-
-export function restoreVesktop() {
-    if (mainWin) {
-        if (mainWin.isMinimized()) mainWin.restore();
-        if (!mainWin.isVisible()) mainWin.show();
-        mainWin.focus();
-    }
 }
 
 export async function createWindows() {
