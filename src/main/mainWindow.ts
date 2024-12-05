@@ -384,7 +384,7 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
-function createMainWindow() {
+function createMainWindow(splash: boolean) {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
@@ -395,8 +395,10 @@ function createMainWindow() {
 
     const noFrame = frameless === true || customTitleBar === true;
 
+    const { splashBackground, splashTheming } = Settings.store;
     const win = (mainWin = new BrowserWindow({
-        show: false,
+        show: splash,
+        backgroundColor: splashTheming ? splashBackground : "#313338",
         webPreferences: {
             nodeIntegration: false,
             sandbox: false,
@@ -469,19 +471,25 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
-    const splash = createSplashWindow(startMinimized);
-    // SteamOS letterboxes and scales it terribly, so just full screen it
-    if (isDeckGameMode) splash.setFullScreen(true);
+    const noSplash = process.argv.includes("--no-splash");
+    let splash;
+    if (!noSplash) {
+        splash = createSplashWindow(startMinimized);
+        // SteamOS letterboxes and scales it terribly, so just full screen it
+        if (isDeckGameMode) splash.setFullScreen(true);
+    }
     await ensureVencordFiles();
     runVencordMain();
 
-    mainWin = createMainWindow();
+    mainWin = createMainWindow(noSplash);
 
     mainWin.webContents.on("did-finish-load", () => {
-        splash.destroy();
+        if (splash) {
+            splash.destroy();
+        }
 
         if (!startMinimized) {
-            mainWin!.show();
+            if (!noSplash) mainWin!.show();
             if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
         }
 
