@@ -28,6 +28,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.4" date="2024-12-05" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.4</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Upgraded electron to version 33 which brings many improvements and bug fixes</li>
+          <li>AudioShare: add even more granular selection, Allow device sharing by @Curve</li>
+          <li>Enable speech-dispatcher support for TTS on linux by @adryd325</li>
+          <li>fixed screenshare picker window subtitle alignment by @ryawaa</li>
+          <li>fixed splash corners by @Covkie</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.3" date="2024-07-04" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.3</url>
       <description>
