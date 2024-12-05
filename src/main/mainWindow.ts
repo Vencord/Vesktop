@@ -154,6 +154,15 @@ async function clearData(win: BrowserWindow) {
 
 type MenuItemList = Array<MenuItemConstructorOptions | false>;
 
+function setTrafficLightPositions(win: BrowserWindow) {
+    const horizontalOffset = (7 * win.webContents.zoomLevel) + 10;
+    const verticalOffset = (5 * win.webContents.zoomLevel) + (10 / win.webContents.zoomFactor);
+    win.setWindowButtonPosition({
+        x: horizontalOffset,
+        y: verticalOffset
+    });
+};
+
 function initMenuBar(win: BrowserWindow) {
     const isWindows = process.platform === "win32";
     const isDarwin = process.platform === "darwin";
@@ -235,14 +244,67 @@ function initMenuBar(win: BrowserWindow) {
             click() {
                 app.quit();
             }
-        },
-        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-        {
-            label: "Zoom in (hidden, hack for Qwertz and others)",
-            accelerator: "CmdOrCtrl+=",
-            role: "zoomIn",
-            visible: false
         }
+    ] satisfies MenuItemList;
+    const viewSubMenu = [
+        {
+            label: "Reload",
+            accelerator: "Command+R",
+            click() {
+                win.webContents.reload();
+            }
+        },
+        {
+            label: "Force Reload",
+            accelerator: "Command+Shift+R",
+            click() {
+                win.webContents.reloadIgnoringCache();
+            }
+        },
+        {
+            label: "Toggle Developer Tools",
+            accelerator: "Alt+Command+I",
+            click() {
+                win.webContents.toggleDevTools();
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            label: "Actual Size",
+            accelerator: "CmdOrCtrl+0",
+            click() {
+                win.webContents.zoomLevel = 0;
+                setTrafficLightPositions(win);
+            }
+        },
+        {
+            label: "Zoom In",
+            accelerator: "CmdOrCtrl+=",
+            click() {
+                win.webContents.zoomLevel += 0.5;
+                setTrafficLightPositions(win);
+            }
+        },
+        {
+            label: "Zoom Out",
+            accelerator: "CmdOrCtrl+-",
+            click() {
+                win.webContents.zoomLevel -= 0.5;
+                setTrafficLightPositions(win);
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            label: "Toggle Full Screen",
+            role: "togglefullscreen",
+            click() {
+                win.setFullScreen(!win.isFullScreen());
+            }
+        },
     ] satisfies MenuItemList;
 
     const menu = Menu.buildFromTemplate([
@@ -253,7 +315,10 @@ function initMenuBar(win: BrowserWindow) {
         },
         { role: "fileMenu" },
         { role: "editMenu" },
-        { role: "viewMenu" },
+        { 
+            role: "viewMenu",
+            ...(isDarwin && { submenu: viewSubMenu })
+        },
         { role: "windowMenu" }
     ]);
 
@@ -477,8 +542,11 @@ export async function createWindows() {
 
     mainWin = createMainWindow();
 
+    
     mainWin.webContents.on("did-finish-load", () => {
         splash.destroy();
+        
+        setTrafficLightPositions(mainWin);
 
         if (!startMinimized) {
             mainWin!.show();
