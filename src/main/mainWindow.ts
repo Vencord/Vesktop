@@ -18,10 +18,11 @@ import {
     systemPreferences,
     Tray
 } from "electron";
+import { existsSync } from "fs";
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
-import { ICON_PATH } from "shared/paths";
+import { ICON_PATH, ICONS_DIR } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
@@ -40,7 +41,6 @@ import {
 } from "./constants";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
-import { setTrayIcon } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
@@ -126,8 +126,11 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(ICON_PATH);
-    setTrayIcon("icon");
+    if (Settings.store.trayMainOverride && existsSync(join(ICONS_DIR, "icon_custom.png"))) {
+        tray = new Tray(join(ICONS_DIR, "icon_custom.png"));
+    } else {
+        tray = new Tray(ICON_PATH);
+    }
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
