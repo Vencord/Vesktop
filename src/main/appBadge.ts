@@ -42,7 +42,7 @@ export function setBadgeCount(count: number) {
                         ? "application://dev.vencord.Vesktop.desktop" // flatpak handling
                         : "application://vesktop.desktop",
                     [
-                        ["count", ["i", count === -1 ? 0 : count]],
+                        ["count", ["x", count === -1 ? 0 : count]],
                         ["count-visible", ["b", count !== 0]]
                     ]
                 ]
