@@ -26,6 +26,9 @@ export async function initArRPC() {
 
             await sendRendererCommand(IpcCommands.RPC_INVITE, invite).then(callback);
         });
+        server.on("link", (data: any, deepCallback: (valid: boolean) => void) => {
+            mainWin.webContents.executeJavaScript(`Vesktop.openDeepLink(${JSON.stringify(data)})`).then(deepCallback);
+        });
     } catch (e) {
         console.error("Failed to start arRPC server", e);
     }
