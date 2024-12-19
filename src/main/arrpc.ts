@@ -30,6 +30,9 @@ export async function initArRPC() {
                 .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
                 .then(callback);
         });
+        server.on("link", (data: any, deep_callback: (valid: boolean) => void) => {
+            mainWin.webContents.executeJavaScript(`Vesktop.openDeepLink(${JSON.stringify(data)})`).then(deep_callback);
+        });
     } catch (e) {
         console.error("Failed to start arRPC server", e);
     }
