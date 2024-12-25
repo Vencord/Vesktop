@@ -4,10 +4,11 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import dbus from "@homebridge/dbus-native";
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
+
+import { dbus, getSessionBus } from "./utils/dbus";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -29,7 +30,7 @@ export function setBadgeCount(count: number) {
                 throw new Error("count must be a number"); // sanitize
             }
 
-            const sessionBus = dbus.sessionBus();
+            const sessionBus = getSessionBus();
             sessionBus.connection.message({
                 type: dbus.messageType.signal,
                 serial: 1,
