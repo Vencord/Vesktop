@@ -33,6 +33,6 @@ jobs:
                   git add meta/dev.vencord.Vesktop.metainfo.xml
                   git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
                   git push origin ci/meta-update
-                  gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @lewisakura @Vendicated"
+                  gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}."
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
