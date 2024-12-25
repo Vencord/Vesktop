@@ -7,14 +7,17 @@
 import "./traySetting.css";
 
 import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
-import { findByCodeLazy, findByPropsLazy } from "@vencord/types/webpack";
+import { findByPropsLazy, findComponentByCodeLazy } from "@vencord/types/webpack";
 import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
 
-const ColorPicker = findByCodeLazy(".Messages.USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR", ".BACKGROUND_PRIMARY)");
+const ColorPicker = findComponentByCodeLazy(
+    "#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}",
+    ".BACKGROUND_PRIMARY)"
+);
 const { PencilIcon } = findByPropsLazy("PencilIcon");
 
 const presets = [
