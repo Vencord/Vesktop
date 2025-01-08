@@ -23,10 +23,12 @@ export function obtainVenbind() {
             case "linux":
                 os = "linux";
                 break;
-            // case "win32":
-            //     os = "windows";
+            case "win32":
+                os = "windows";
+                break;
             // case "darwin":
             //     os = "darwin";
+            //     break;
             default:
                 return null;
         }
