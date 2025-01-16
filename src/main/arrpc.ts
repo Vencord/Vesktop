@@ -4,31 +4,62 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import Server from "arrpc";
+import { resolve } from "path";
 import { IpcEvents } from "shared/IpcEvents";
+import { MessageChannel, Worker } from "worker_threads";
 
 import { mainWin } from "./mainWindow";
 import { Settings } from "./settings";
+import { ArrpcEvent, ArrpcHostEvent } from "./utils/arrpcWorkerTypes";
 
-let server: any;
+let worker: any;
 
 const inviteCodeRegex = /^(\w|-)+$/;
 
 export async function initArRPC() {
-    if (server || !Settings.store.arRPC) return;
+    if (worker || !Settings.store.arRPC) return;
 
     try {
-        server = await new Server();
-        server.on("activity", (data: any) => mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, JSON.stringify(data)));
-        server.on("invite", (invite: string, callback: (valid: boolean) => void) => {
-            invite = String(invite);
-            if (!inviteCodeRegex.test(invite)) return callback(false);
+        const { port1: hostPort, port2: workerPort } = new MessageChannel();
+        worker = new Worker(resolve(__dirname, "./arrpcWorker.js"), {
+            workerData: {
+                workerPort
+            },
+            transferList: [workerPort]
+        });
+        hostPort.on("message", (e: ArrpcEvent) => {
+            switch (e.eventType) {
+                case IpcEvents.ARRPC_ACTIVITY: {
+                    mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, e.data);
+                    break;
+                }
+                case "invite": {
+                    const invite = String(e.data);
 
-            mainWin.webContents
-                // Safety: Result of JSON.stringify should always be safe to equal
-                // Also, just to be super super safe, invite is regex validated above
-                .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
-                .then(callback);
+                    if (!inviteCodeRegex.test(invite)) {
+                        const hostEvent: ArrpcHostEvent = {
+                            eventType: "ack-invite",
+                            data: false,
+                            inviteId: e.inviteId
+                        };
+                        return hostPort.postMessage(hostEvent);
+                    }
+
+                    mainWin.webContents
+                        // Safety: Result of JSON.stringify should always be safe to equal
+                        // Also, just to be super super safe, invite is regex validated above
+                        .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
+                        .then(() => {
+                            const hostEvent: ArrpcHostEvent = {
+                                eventType: "ack-invite",
+                                data: true,
+                                inviteId: e.inviteId
+                            };
+                            hostPort.postMessage(hostEvent);
+                        });
+                    break;
+                }
+            }
         });
     } catch (e) {
         console.error("Failed to start arRPC server", e);
