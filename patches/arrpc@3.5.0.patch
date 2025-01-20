@@ -1,14 +1,20 @@
 diff --git a/src/process/index.js b/src/process/index.js
-index 97ea6514b54dd9c5df588c78f0397d31ab5f882a..c2bdbd6aaa5611bc6ff1d993beeb380b1f5ec575 100644
+index 04b3898..205f96b 100644
 --- a/src/process/index.js
 +++ b/src/process/index.js
-@@ -5,8 +5,7 @@ import fs from 'node:fs';
- import { dirname, join } from 'path';
- import { fileURLToPath } from 'url';
+@@ -2,12 +2,11 @@ const rgb = (r, g, b, msg) => `\x1b[38;2;${r};${g};${b}m${msg}\x1b[0m`;
+ const log = (...args) => console.log(`[${rgb(88, 101, 242, 'arRPC')} > ${rgb(237, 66, 69, 'process')}]`, ...args);
+ 
+ import fs from 'node:fs';
+-import { dirname, join } from 'path';
+-import { fileURLToPath } from 'url';
++import { join } from 'path';
+ import { get } from 'https';
  
 -const __dirname = dirname(fileURLToPath(import.meta.url));
--const DetectableDB = JSON.parse(fs.readFileSync(join(__dirname, 'detectable.json'), 'utf8'));
-+const DetectableDB = require('./detectable.json');
+-const databasePath = join(__dirname, 'detectable.json');
++import { app } from 'electron';
++const databasePath = join(app.getPath('userData'), 'detectable.json');
  
- import * as Natives from './native/index.js';
- const Native = Natives[process.platform];
+ async function getDatabase() {
+   return new Promise((resolve, reject) => {
