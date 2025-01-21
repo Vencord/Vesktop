@@ -82,6 +82,8 @@ export const VesktopNative = {
     keybind: {
         register: (id: number, shortcut: string, options: any) =>
             invoke<void>(IpcEvents.KEYBIND_REGISTER, id, shortcut),
-        unregister: (id: number) => invoke<void>(IpcEvents.KEYBIND_UNREGISTER, id)
+        unregister: (id: number) => invoke<void>(IpcEvents.KEYBIND_UNREGISTER, id),
+        shouldPreRegister: () => sendSync<boolean>(IpcEvents.KEYBIND_SHOULD_PREREGISTER),
+        preRegister: (actions: { id: number; name: string }[]) => invoke<void>(IpcEvents.KEYBIND_PREREGISTER, actions)
     }
 };

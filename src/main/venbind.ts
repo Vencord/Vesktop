@@ -10,7 +10,7 @@ import { STATIC_DIR } from "shared/paths";
 import type { Venbind as VenbindType } from "venbind";
 
 import { mainWin } from "./mainWindow";
-import { handle } from "./utils/ipcWrappers";
+import { handle, handleSync } from "./utils/ipcWrappers";
 
 let venbind: VenbindType | null = null;
 export function obtainVenbind() {
@@ -50,7 +50,7 @@ export function obtainVenbind() {
 
 export function startVenbind() {
     const venbind = obtainVenbind();
-    venbind?.startKeybinds(null, x => {
+    venbind?.startKeybinds(x => {
         mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${x}](false)`);
     });
 }
@@ -60,4 +60,18 @@ handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string, options: an
 });
 handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
     obtainVenbind()?.unregisterKeybind(id);
+});
+handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
+    if (
+        process.platform === "linux" &&
+        (process.env.XDG_SESSION_TYPE === "wayland" ||
+            !!process.env.WAYLAND_DISPLAY ||
+            !!process.env.VENBIND_USE_XDG_PORTAL)
+    ) {
+        return true;
+    }
+    return false;
+});
+handle(IpcEvents.KEYBIND_PREREGISTER, (_, actions: { id: number; name: string }[]) => {
+    obtainVenbind()?.preregisterKeybinds(actions);
 });
