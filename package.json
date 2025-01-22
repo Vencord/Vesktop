@@ -21,7 +21,9 @@
         "test": "pnpm lint && pnpm testTypes",
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch",
-        "updateMeta": "tsx scripts/utils/updateMeta.mts"
+        "updateMeta": "tsx scripts/utils/updateMeta.mts",
+        "updateArrpcDB": "node ./node_modules/arrpc/update_db.js",
+        "postinstall": "pnpm updateArrpcDB"
     },
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
