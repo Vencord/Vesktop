@@ -7,7 +7,7 @@
 import "./screenSharePicker.css";
 
 import { closeModal, Logger, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
-import { findStoreLazy, onceReady } from "@vencord/types/webpack";
+import { findExportedComponentLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
 import {
     Button,
     Card,
@@ -255,11 +255,11 @@ function AudioSettingsModal({
                 <Switch
                     hideBorder
                     onChange={v =>
-                        (Settings.audio = {
-                            ...Settings.audio,
-                            ignoreDevices: v,
-                            deviceSelect: v ? false : Settings.audio?.deviceSelect
-                        })
+                    (Settings.audio = {
+                        ...Settings.audio,
+                        ignoreDevices: v,
+                        deviceSelect: v ? false : Settings.audio?.deviceSelect
+                    })
                     }
                     value={Settings.audio?.ignoreDevices ?? true}
                     note={<>Exclude device nodes, such as nodes belonging to microphones or speakers.</>}
@@ -315,6 +315,8 @@ function StreamSettings({
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
     skipPicker: boolean;
 }) {
+    const Checkbox = findExportedComponentLazy("Checkbox", "Switch");
+
     const Settings = useSettings();
 
     const [thumb] = useAwaiter(
@@ -455,22 +457,15 @@ function StreamSettings({
             </Card>
 
             <div className="vcd-screen-picker-save-settings">
-                <label htmlFor="" className="vcd-screen-picker-save-label">
+                <Checkbox
+                    onChange={(v: React.ChangeEvent<HTMLInputElement>) => {
+                        Settings.stream = { ...Settings.stream, preferred: v.target.checked };
+                    }}
+                    value={Settings.stream?.preferred ?? true}
+                    type={"inverted"}
+                >
                     Remember stream settings
-                </label>
-                <div className="vcd-screen-picker-save-control">
-                    <div
-                        className={`vcd-screen-picker-save-checkbox ${Settings.stream?.preferred && "checked"}`}
-                        onClick={() => {
-                            Settings.stream = { ...Settings.stream, preferred: !Settings.stream?.preferred };
-                        }}
-                    >
-                        <div className="vcd-screen-picker-save-knob">
-                            <div className="vcd-screen-picker-save-line"></div>
-                            <div className="vcd-screen-picker-save-line2"></div>
-                        </div>
-                    </div>
-                </div>
+                </Checkbox>
             </div>
         </div>
     );
@@ -651,9 +646,9 @@ function AudioSourcePickerLinux({
 
     const allSources = sources.ok
         ? [...specialSources, ...sources.targets]
-              .map(target => mapToAudioItem(target, granularSelect, deviceSelect))
-              .flat()
-              .filter(uniqueName)
+            .map(target => mapToAudioItem(target, granularSelect, deviceSelect))
+            .flat()
+            .filter(uniqueName)
         : [];
 
     return (
@@ -801,7 +796,6 @@ function ModalComponent({
                                 }
                             }, 100);
 
-                            // Update the preferred stream value if it has changed.
                             if (Settings.stream?.preferred) {
                                 if (settings.resolution !== Settings.stream?.resolution) {
                                     Settings.stream.resolution = settings.resolution;
