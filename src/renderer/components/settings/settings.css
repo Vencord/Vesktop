@@ -1,4 +1,4 @@
-.vcd-location-btns {
+.vcd-settings-button-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5em;
