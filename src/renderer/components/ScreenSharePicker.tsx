@@ -25,7 +25,7 @@ import { addPatch } from "renderer/patches/shared";
 import { useSettings } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
 
-const StreamResolutions = ["480", "720", "1080", "1440"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
 const StreamFps = ["15", "30", "60"] as const;
 
 const MediaEngineStore = findStoreLazy("MediaEngineStore");
