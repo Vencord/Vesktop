@@ -453,6 +453,25 @@ function StreamSettings({
                     />
                 )}
             </Card>
+
+            <div className="vcd-screen-picker-save-settings">
+                <label htmlFor="" className="vcd-screen-picker-save-label">
+                    Remember stream settings
+                </label>
+                <div className="vcd-screen-picker-save-control">
+                    <div
+                        className={`vcd-screen-picker-save-checkbox ${Settings.stream?.preferred && "checked"}`}
+                        onClick={() => {
+                            Settings.stream = { ...Settings.stream, preferred: !Settings.stream?.preferred };
+                        }}
+                    >
+                        <div className="vcd-screen-picker-save-knob">
+                            <div className="vcd-screen-picker-save-line"></div>
+                            <div className="vcd-screen-picker-save-line2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
@@ -699,11 +718,13 @@ function ModalComponent({
     close: () => void;
     skipPicker: boolean;
 }) {
+    const Settings = useSettings();
+
     const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
-        resolution: "720",
-        fps: "30",
-        contentHint: "motion",
+        resolution: Settings.stream?.preferred ? (Settings.stream.resolution as StreamResolution) : "720",
+        fps: Settings.stream?.preferred ? (Settings.stream.fps as StreamFps) : "30",
+        contentHint: Settings.stream?.preferred ? Settings.stream.contentHint : "motion",
         audio: true,
         includeSources: "None"
     });
@@ -779,6 +800,19 @@ function ModalComponent({
                                     logger.error("Failed to apply constraints.", e);
                                 }
                             }, 100);
+
+                            // Update the preferred stream value if it has changed.
+                            if (Settings.stream?.preferred) {
+                                if (settings.resolution !== Settings.stream?.resolution) {
+                                    Settings.stream.resolution = settings.resolution;
+                                }
+                                if (settings.fps !== Settings.stream?.fps) {
+                                    Settings.stream.fps = settings.fps;
+                                }
+                                if (settings.contentHint !== Settings.stream?.contentHint) {
+                                    Settings.stream.contentHint = settings.contentHint;
+                                }
+                            }
                         } catch (error) {
                             logger.error("Error while submitting stream.", error);
                         }

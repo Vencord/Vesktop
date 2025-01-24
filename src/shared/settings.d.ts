@@ -41,6 +41,13 @@ export interface Settings {
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
+
+    stream?: {
+        preferred?: boolean;
+        resolution?: string;
+        fps?: string;
+        contentHint?: string;
+    };
 }
 
 export interface State {

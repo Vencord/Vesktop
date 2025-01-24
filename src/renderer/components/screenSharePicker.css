@@ -143,3 +143,87 @@
     line-height: 20px;
     font-weight: 400;
 }
+
+.vcd-screen-picker-save-settings {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+.vcd-screen-picker-save-label {
+    flex: 1;
+    display: block;
+    overflow: hidden;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: var(--header-primary);
+    line-height: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    word-wrap: break-word;
+    cursor: pointer;
+}
+
+.vcd-screen-picker-save-control{
+    flex: 0 0 auto;
+}
+
+.vcd-screen-picker-save-checkbox {
+    position: relative;
+    margin: 10px 10px;
+    width: 40px;
+    height: 24px;
+    border-radius: 60px;
+    cursor: pointer;
+    background: #72767d;
+    transition: background 0.3s linear;
+  }
+  .vcd-screen-picker-save-knob {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 3px;
+    left: 3px;
+    background: #fff;
+    border-radius: 30px;
+    transition: left 0.3s ease-out;
+  }
+  .vcd-screen-picker-save-line,
+  .vcd-screen-picker-save-line2 {
+      position: absolute;
+      top: 8px;
+      left: 3px;
+      width: 12px;
+      height: 2px;
+      background: #72767d;
+      transition: transform 0.3s ease-out, background-color 0.3s ease-out; /* Add transitions */
+  }
+  
+  .vcd-screen-picker-save-line {
+      transform: rotateZ(0deg); /* Start at 0deg */
+  }
+  
+  .vcd-screen-picker-save-line2 {
+      transform: rotateZ(0deg); /* Start at 0deg */
+  }
+  
+  .vcd-screen-picker-save-checkbox.checked {
+      background: var(--brand-500);
+  }
+  
+  .vcd-screen-picker-save-checkbox.checked .vcd-screen-picker-save-knob {
+      left: 19px; /* Directly set the final position */
+  }
+  
+  .vcd-screen-picker-save-checkbox.checked .vcd-screen-picker-save-line {
+      transform: rotateZ(45deg);
+      background-color: var(--brand-500);
+  }
+  
+  .vcd-screen-picker-save-checkbox.checked .vcd-screen-picker-save-line2 {
+      transform: rotateZ(-45deg);
+      background-color: var(--brand-500);
+  }
