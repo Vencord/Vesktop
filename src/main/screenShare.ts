@@ -1,13 +1,83 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
 import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcEvents } from "shared/IpcEvents";
 import { handle } from "./utils/ipcWrappers";
 import * as path from "path";
+import { execSync } from 'child_process';
+
+interface AudioRoutingConfig {
+    virtualDeviceId?: string;
+    excludedProcesses?: string[];
+}
+
+class AudioRouter {
+    private config: AudioRoutingConfig = {
+        excludedProcesses: ['vesktop.exe', 'electron.exe']
+    };
+
+    private getVirtualAudioDevices(): string[] {
+        try {
+            switch (process.platform) {
+                case 'win32':
+                    // PowerShell command to list virtual audio devices
+                    const devices = execSync('powershell "Get-AudioDevice -List | Where-Object {$_.Type -eq \'Playback\'}"')
+                        .toString()
+                        .split('\n')
+                        .filter(line => line.includes('Virtual Cable'));
+                    return devices;
+                
+                case 'darwin':
+                    // macOS virtual audio device detection (placeholder)
+                    return [];
+                
+                case 'linux':
+                    // Linux virtual audio device detection (placeholder)
+                    return [];
+                
+                default:
+                    return [];
+            }
+        } catch (error) {
+            console.error('Audio device detection failed', error);
+            return [];
+        }
+    }
+
+    configureAudioRouting(source: any, choice: StreamPick): Streams | null {
+        if (process.platform !== 'win32' || !choice.audio) return null;
+
+        const virtualDevices = this.getVirtualAudioDevices();
+        if (virtualDevices.length === 0) return null;
+
+        try {
+            return {
+                video: source,
+                audio: 'loopback',
+                audioConstraints: {
+                    mandatory: {
+                        sourceId: virtualDevices[0],
+                        excludedProcesses: this.config.excludedProcesses
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('Audio routing configuration failed', error);
+            return null;
+        }
+    }
+}
 
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
 export function registerScreenShareHandler() {
+    const audioRouter = new AudioRouter();
+
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
         const sources = await desktopCapturer.getSources({
             types: ["window", "screen"],
@@ -67,33 +137,10 @@ export function registerScreenShareHandler() {
         const source = sources.find(s => s.id === choice.id);
         if (!source) return callback({});
 
-        const streams: Streams = {
-            video: source
-        };
-
-        // Windows-specific virtual audio cable setup
-        if (process.platform === "win32" && choice.audio) {
-            // Virtual audio cable configuration
-            streams.audio = "loopback";
-
-            // Optional: Additional audio device filtering
-            const appPath = process.execPath;
-            const appName = path.basename(appPath).toLowerCase();
-            
-            // Exclude Vesktop from audio routing
-            if (appName !== "vesktop.exe") {
-                // You might need to implement specific virtual audio cable routing here
-                // This could involve using a library like node-audio-routing or 
-                // Windows-specific audio APIs to route audio
-                streams.audioConstraints = {
-                    mandatory: {
-                        // Potential constraints for excluding specific applications
-                        // Note: Actual implementation depends on specific virtual audio cable solution
-                    }
-                };
-            }
-        }
-
-        callback(streams);
+        // Configure audio routing for Windows
+        const audioConfig = audioRouter.configureAudioRouting(source, choice);
+        
+        // Fallback to default video stream if audio routing fails
+        callback(audioConfig || { video: source });
     });
 }
