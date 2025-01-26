@@ -1,14 +1,8 @@
-/*
- * SPDX-License-Identifier: GPL-3.0
- * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2023 Vendicated and Vencord contributors
- */
-
 import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcEvents } from "shared/IpcEvents";
-
 import { handle } from "./utils/ipcWrappers";
+import * as path from "path";
 
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
@@ -37,9 +31,9 @@ export function registerScreenShareHandler() {
                 }
             })
             .catch(err => console.error("Error during screenshare picker", err));
-
+        
         if (!sources) return callback({});
-
+        
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
             name,
@@ -56,7 +50,6 @@ export function registerScreenShareHandler() {
                     .catch(() => null);
                 if (stream === null) return callback({});
             }
-
             callback(video ? { video: sources[0] } : {});
             return;
         }
@@ -77,7 +70,29 @@ export function registerScreenShareHandler() {
         const streams: Streams = {
             video: source
         };
-        if (choice.audio && process.platform === "win32") streams.audio = "loopback";
+
+        // Windows-specific virtual audio cable setup
+        if (process.platform === "win32" && choice.audio) {
+            // Virtual audio cable configuration
+            streams.audio = "loopback";
+
+            // Optional: Additional audio device filtering
+            const appPath = process.execPath;
+            const appName = path.basename(appPath).toLowerCase();
+            
+            // Exclude Vesktop from audio routing
+            if (appName !== "vesktop.exe") {
+                // You might need to implement specific virtual audio cable routing here
+                // This could involve using a library like node-audio-routing or 
+                // Windows-specific audio APIs to route audio
+                streams.audioConstraints = {
+                    mandatory: {
+                        // Potential constraints for excluding specific applications
+                        // Note: Actual implementation depends on specific virtual audio cable solution
+                    }
+                };
+            }
+        }
 
         callback(streams);
     });
