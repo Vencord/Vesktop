@@ -8,6 +8,7 @@ import { findByCodeLazy } from "@vencord/types/webpack";
 import { keybindCallbacks } from "renderer";
 
 import { addPatch } from "./shared";
+import { ErrorCard } from "@vencord/types/components";
 const toShortcutString = findByCodeLazy('return"gamepad".');
 const actionReadableNames: { [key: string]: string } = {
     PUSH_TO_TALK: "Push To Talk",
@@ -26,6 +27,11 @@ addPatch({
         {
             find: "keybindActionTypes",
             replacement: [
+                {
+                    // eslint-disable-next-line no-useless-escape
+                    match: /(\i\.isPlatformEmbedded\?)(.+renderEmpty\(\i\)\]\}\)\]\}\))/,
+                    replace: "$1$self.xdpWarning($2)"
+                },
                 {
                     // eslint-disable-next-line no-useless-escape
                     match: /\i\.isPlatformEmbedded/g,
@@ -58,6 +64,7 @@ addPatch({
                     replace: "$&{$self.unregisterKeybind($1);return;}"
                 },
                 {
+                    // eslint-disable-next-line no-useless-escape
                     match: /let{keybinds:(\i)}=\i;/,
                     replace: "$&$self.preRegisterKeybinds($1);"
                 }
@@ -85,7 +92,7 @@ addPatch({
             onTrigger: Function;
         };
     }) {
-        let actions: { id: number; name: string }[] = [];
+        const actions: { id: number; name: string }[] = [];
         if (!VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
@@ -113,9 +120,26 @@ addPatch({
             // and switch to voice channel which requires a channel parameter which is provided through discord's ui
             // except we can't really provide that with xdp so i'll just skip it for now
             keybindCallbacks[id] = (keyState: boolean) => val.onTrigger(keyState, undefined);
-            actions.push({ id, name: actionReadableNames[key] });
+            actions.push({ id, name: actionReadableNames[key] || key });
             id++;
         });
         VesktopNative.keybind.preRegister(actions);
+    },
+    xdpWarning: function (keybinds) {
+        if (!VesktopNative.keybind.shouldPreRegister()) {
+            return keybinds;
+        }
+        return (
+            <ErrorCard>
+                <p>
+                    You appear to be using Vesktop on a platform that requires XDG desktop portals for using keybinds.
+                    You can configure keybinds using your desktop environment's built-in settings page.
+                </p>
+                <p>
+                    If your desktop environment does not support the GlobalShortcuts portal you have to manually bind
+                    your desired keybinds to CLI triggers.
+                </p>
+            </ErrorCard>
+        );
     }
 });
