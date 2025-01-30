@@ -3,12 +3,14 @@
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
+
 import { desktopCapturer, session, Streams } from "electron";
+import { execSync } from "child_process";
+import * as path from "path";
+
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcEvents } from "shared/IpcEvents";
 import { handle } from "./utils/ipcWrappers";
-import * as path from "path";
-import { execSync } from 'child_process';
 
 interface AudioRoutingConfig {
     virtualDeviceId?: string;
@@ -17,25 +19,25 @@ interface AudioRoutingConfig {
 
 class AudioRouter {
     private config: AudioRoutingConfig = {
-        excludedProcesses: ['vesktop.exe', 'electron.exe']
+        excludedProcesses: ["vesktop.exe", "electron.exe"]
     };
 
     private getVirtualAudioDevices(): string[] {
         try {
             switch (process.platform) {
-                case 'win32':
+                case "win32":
                     // PowerShell command to list virtual audio devices
-                    const devices = execSync('powershell "Get-AudioDevice -List | Where-Object {$_.Type -eq \'Playback\'}"')
+                    const devices = execSync("powershell \"Get-AudioDevice -List | Where-Object {$_.Type -eq 'Playback'}\"")
                         .toString()
-                        .split('\n')
-                        .filter(line => line.includes('Virtual Cable'));
+                        .split("\n")
+                        .filter(line => line.includes("Virtual Cable"));
                     return devices;
                 
-                case 'darwin':
+                case "darwin":
                     // macOS virtual audio device detection (placeholder)
                     return [];
                 
-                case 'linux':
+                case "linux":
                     // Linux virtual audio device detection (placeholder)
                     return [];
                 
@@ -43,13 +45,13 @@ class AudioRouter {
                     return [];
             }
         } catch (error) {
-            console.error('Audio device detection failed', error);
+            console.error("Audio device detection failed", error);
             return [];
         }
     }
 
     configureAudioRouting(source: any, choice: StreamPick): Streams | null {
-        if (process.platform !== 'win32' || !choice.audio) return null;
+        if (process.platform !== "win32" || !choice.audio) return null;
 
         const virtualDevices = this.getVirtualAudioDevices();
         if (virtualDevices.length === 0) return null;
@@ -57,7 +59,7 @@ class AudioRouter {
         try {
             return {
                 video: source,
-                audio: 'loopback',
+                audio: "loopback",
                 audioConstraints: {
                     mandatory: {
                         sourceId: virtualDevices[0],
@@ -66,7 +68,7 @@ class AudioRouter {
                 }
             };
         } catch (error) {
-            console.error('Audio routing configuration failed', error);
+            console.error("Audio routing configuration failed", error);
             return null;
         }
     }
