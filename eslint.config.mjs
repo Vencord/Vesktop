@@ -3,9 +3,7 @@
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
-
 //@ts-check
-
 import stylistic from "@stylistic/eslint-plugin";
 import pathAlias from "eslint-plugin-path-alias";
 import header from "eslint-plugin-simple-header";
@@ -16,7 +14,6 @@ import prettier from "eslint-plugin-prettier";
 
 export default tseslint.config(
     { ignores: ["dist"] },
-
     {
         files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}"],
         plugins: {
@@ -48,9 +45,7 @@ export default tseslint.config(
                     files: ["scripts/header.txt"]
                 }
             ],
-
             // ESLint Rules
-
             yoda: "error",
             eqeqeq: ["error", "always", { null: "ignore" }],
             "prefer-destructuring": [
@@ -86,14 +81,30 @@ export default tseslint.config(
             "use-isnan": "error",
             "prefer-const": "error",
             "prefer-spread": "error",
-
+            
             // Styling Rules
             "stylistic/spaced-comment": ["error", "always", { markers: ["!"] }],
             "stylistic/no-extra-semi": "error",
-
+            "stylistic/quotes": ["error", "double", { "avoidEscape": true }],
+            
+            // Import Sorting Rules
+            "simple-import-sort/imports": ["error", {
+                "groups": [
+                    // Built-in Node.js modules
+                    ["^node:"],
+                    // External packages (electron etc)
+                    ["^electron"],
+                    ["^@?\\w"],
+                    // Internal modules
+                    ["^(renderer|shared|utils)(/.*|$)"],
+                    // Parent and sibling imports
+                    ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+                    ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"]
+                ]
+            }],
+            "simple-import-sort/exports": "error",
+            
             // Plugin Rules
-            "importSort/imports": "error",
-            "importSort/exports": "error",
             "unusedImports/no-unused-imports": "error",
             "pathAlias/no-relative": "error",
             "prettier/prettier": "error"
