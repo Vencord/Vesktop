@@ -6,3 +6,4 @@ bracketSpacing: true
 arrowParens: avoid
 useTabs: false
 endOfLine: lf
+singleQuote: false
