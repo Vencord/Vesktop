@@ -27,20 +27,22 @@ class AudioRouter {
             switch (process.platform) {
                 case "win32":
                     // PowerShell command to list virtual audio devices
-                    const devices = execSync("powershell \"Get-AudioDevice -List | Where-Object {$_.Type -eq 'Playback'}\"")
+                    const devices = execSync(
+                        "powershell \"Get-AudioDevice -List | Where-Object {$_.Type -eq 'Playback'}\""
+                    )
                         .toString()
                         .split("\n")
                         .filter(line => line.includes("Virtual Cable"));
                     return devices;
-                
+
                 case "darwin":
                     // macOS virtual audio device detection (placeholder)
                     return [];
-                
+
                 case "linux":
                     // Linux virtual audio device detection (placeholder)
                     return [];
-                
+
                 default:
                     return [];
             }
@@ -103,9 +105,9 @@ export function registerScreenShareHandler() {
                 }
             })
             .catch(err => console.error("Error during screenshare picker", err));
-        
+
         if (!sources) return callback({});
-        
+
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
             name,
@@ -141,7 +143,7 @@ export function registerScreenShareHandler() {
 
         // Configure audio routing for Windows
         const audioConfig = audioRouter.configureAudioRouting(source, choice);
-        
+
         // Fallback to default video stream if audio routing fails
         callback(audioConfig || { video: source });
     });

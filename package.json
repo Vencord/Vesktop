@@ -42,7 +42,7 @@
         "electron": "^34.0.1",
         "electron-builder": "^25.1.8",
         "esbuild": "^0.24.2",
-        "eslint": "^9.18.0",
+        "eslint": "^8.0.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "^2.1.0",
         "eslint-plugin-prettier": "^5.2.3",
