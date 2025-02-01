@@ -12,9 +12,9 @@ import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
+import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { VencordLocationPicker } from "./VencordLocationPicker";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 import { CustomSplashAnimation } from "./CustomSplashAnimation";
 
@@ -120,7 +120,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         }
     ],
     "Custom Splash Animation":[CustomSplashAnimation],
-    "Vencord Location": [VencordLocationPicker]
+    "Developer Options": [DeveloperOptionsButton]
 };
 
 function SettingsSections() {
