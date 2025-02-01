@@ -49,8 +49,18 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyVenbus() {
+    if (process.platform !== "linux") return;
+
+    return Promise.all([
+        copyFile("./node_modules/@vencord/venbus/venbus.linux-x64-gnu.node", "./static/dist/venbus-x64.node"),
+        copyFile("./node_modules/@vencord/venbus/venbus.linux-arm64-gnu.node", "./static/dist/venbus-arm64.node")
+    ]).catch(() => console.warn("Failed to copy venbus. Building without venbus support"));
+}
+
 await Promise.all([
     copyVenmic(),
+    copyVenbus(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

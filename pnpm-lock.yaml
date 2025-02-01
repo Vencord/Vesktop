@@ -13,6 +13,9 @@ importers:
 
   .:
     dependencies:
+      '@vencord/venbus':
+        specifier: file:../venbus
+        version: file:../venbus
       arrpc:
         specifier: github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77
         version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=biyukfa6dww2wxujy4eyvkhrti)
@@ -660,6 +663,10 @@ packages:
 
   '@vencord/types@1.8.4':
     resolution: {integrity: sha512-ogLqIOHVO+5zxKUVxAfGIAUZoEfIomrlg6f0cZ/2yd5vBAn1fA9Gi/NASoKfHZuJt8ZcYw329bgn0ah/VufqMg==}
+
+  '@vencord/venbus@file:../venbus':
+    resolution: {directory: ../venbus, type: directory}
+    engines: {node: '>=18', pnpm: '>=8'}
 
   '@vencord/venmic@6.1.0':
     resolution: {integrity: sha512-YiCtzml/W8tYbGhu3jm5jfbbEnl2slKKARNK0jO+8qV979k9eFnfIRTxvhMN/SWq1h8ZNJdXVwvXpffQwq0RuA==}
@@ -2009,6 +2016,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
@@ -3491,6 +3499,8 @@ snapshots:
       discord-types: 1.3.26
       standalone-electron-types: 1.0.0
       type-fest: 3.13.1
+
+  '@vencord/venbus@file:../venbus': {}
 
   '@vencord/venmic@6.1.0':
     dependencies:

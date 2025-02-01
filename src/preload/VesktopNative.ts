@@ -70,6 +70,16 @@ export const VesktopNative = {
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
+    venbus: {
+        onToggleMute(cb: () => void) {
+            ipcRenderer.on(IpcEvents.AUDIO_TOGGLE_MUTE, _ => cb());
+        },
+        onToggleDeafen(cb: () => void) {
+            ipcRenderer.on(IpcEvents.AUDIO_TOGGLE_DEAFEN, _ => cb());
+        },
+        updateMutedState: (state: boolean) => invoke<void>(IpcEvents.AUDIO_UPDATE_STATE_MUTED, state),
+        updateDeafenedState: (state: boolean) => invoke<void>(IpcEvents.AUDIO_UPDATE_STATE_DEAFENED, state)
+    },
     arrpc: {
         onActivity(cb: (data: string) => void) {
             ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));

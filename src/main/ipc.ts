@@ -5,6 +5,7 @@
  */
 
 if (process.platform === "linux") import("./venmic");
+if (process.platform === "linux") import("./venbus");
 
 import { execFile } from "child_process";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";

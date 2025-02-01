@@ -8,6 +8,7 @@ import "./fixes";
 import "./appBadge";
 import "./patches";
 import "./themedSplash";
+import "./venbus";
 
 console.log("read if cute :3");
 
