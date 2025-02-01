@@ -39,13 +39,12 @@ export function createSplashWindow(startMinimized = false) {
         splash.webContents.executeJavaScript(`
             document.getElementById("animation").src = "splash-animation://img";
         `);
-    }
-    else {
-        splash.webContents.insertCSS(`img {image-rendering: pixelated}`)
+    } else {
+        splash.webContents.insertCSS(`img {image-rendering: pixelated}`);
         splash.webContents.executeJavaScript(`
             document.getElementById("animation").src = "../shiggy.gif";
         `);
     }
-    
+
     return splash;
 }
