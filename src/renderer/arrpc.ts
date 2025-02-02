@@ -5,7 +5,7 @@
  */
 
 import { onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
+import { FluxDispatcher, InviteActions, NavigationRouter } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { onIpcCommand } from "./ipcCommands";
@@ -37,4 +37,21 @@ onIpcCommand(IpcCommands.RPC_INVITE, async code => {
     });
 
     return true;
+});
+
+onIpcCommand(IpcCommands.RPC_DEEP_LINK, async data => {
+    // console.log(data);
+    if (data.type === "CHANNEL") {
+        // I am unaware of any other types but ensure just in case.
+        const { guildId, channelId, messageId } = data.params;
+        if (!guildId) return false; // ensure at least guildId exists
+
+        const path = [guildId, channelId, messageId].filter(Boolean).join("/");
+        NavigationRouter.transitionTo(`/channels/${path}`);
+
+        return true;
+    } else {
+        console.warn("Unhandled deep link type: ", data.type);
+        return false;
+    }
 });

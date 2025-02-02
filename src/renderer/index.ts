@@ -21,23 +21,6 @@ import SettingsUi from "./components/settings/Settings";
 import { Settings } from "./settings";
 export { Settings };
 
-export async function openDeepLink(data: any) {
-    console.log(data);
-    if (data.type === "CHANNEL") {
-        // I am unaware of any other types but ensure just in case.
-        const { guildId, channelId, messageId } = data.params;
-        if (!guildId) return false; // ensure at least guildId exists
-
-        const path = [guildId, channelId, messageId].filter(Boolean).join("/");
-        Vencord.Webpack.Common.NavigationRouter.transitionTo(`/channels/${path}`);
-
-        return true;
-    } else {
-        console.warn("Unhandled deep link type: ", data.type);
-        return false;
-    }
-}
-
 const customSettingsSections = (
     Vencord.Plugins.plugins.Settings as any as { customSections: ((ID: Record<string, unknown>) => any)[] }
 ).customSections;
