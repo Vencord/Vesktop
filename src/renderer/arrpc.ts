@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { onceReady } from "@vencord/types/webpack";
+import { findStore, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
@@ -19,8 +19,14 @@ onIpcCommand(IpcCommands.RPC_ACTIVITY, async data => {
     if (!Settings.store.arRPC) return;
 
     await onceReady;
-
-    arRPC.handleEvent(new MessageEvent("message", { data }));
+    const StreamerModeStore = findStore("StreamerModeStore");
+    if (JSON.parse(data).socketId === "STREAMERMODE" && StreamerModeStore.autoToggle) {
+        FluxDispatcher.dispatch({
+            type: "STREAMER_MODE_UPDATE",
+            key: "enabled",
+            value: JSON.parse(data).activity?.application_id === "STREAMERMODE"
+        });
+    } else arRPC.handleEvent(new MessageEvent("message", { data }));
 });
 
 onIpcCommand(IpcCommands.RPC_INVITE, async code => {

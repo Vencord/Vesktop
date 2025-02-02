@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   arrpc@3.5.0:
-    hash: biyukfa6dww2wxujy4eyvkhrti
+    hash: ihapxqddk745b4z6riokiei27i
     path: patches/arrpc@3.5.0.patch
 
 importers:
@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       arrpc:
-        specifier: github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77
-        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=biyukfa6dww2wxujy4eyvkhrti)
+        specifier: github:OpenAsar/arrpc#32c6c76a2129e42a786f17883b2e9f806f45dfb9
+        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/32c6c76a2129e42a786f17883b2e9f806f45dfb9(patch_hash=ihapxqddk745b4z6riokiei27i)
       electron-updater:
         specifier: ^6.3.9
         version: 6.3.9
@@ -792,8 +792,8 @@ packages:
     resolution: {integrity: sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==}
     engines: {node: '>= 0.4'}
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77:
-    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77}
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/32c6c76a2129e42a786f17883b2e9f806f45dfb9:
+    resolution: {tarball: https://codeload.github.com/OpenAsar/arrpc/tar.gz/32c6c76a2129e42a786f17883b2e9f806f45dfb9}
     version: 3.5.0
     hasBin: true
 
@@ -2009,6 +2009,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
@@ -3689,7 +3690,7 @@ snapshots:
       get-intrinsic: 1.2.7
       is-array-buffer: 3.0.5
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=biyukfa6dww2wxujy4eyvkhrti):
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/32c6c76a2129e42a786f17883b2e9f806f45dfb9(patch_hash=ihapxqddk745b4z6riokiei27i):
     dependencies:
       ws: 8.18.0
     transitivePeerDependencies:
