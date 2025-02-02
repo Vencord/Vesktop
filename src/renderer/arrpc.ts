@@ -4,8 +4,8 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, InviteActions, NavigationRouter } from "@vencord/types/webpack/common";
+import { findLazy, onceReady } from "@vencord/types/webpack";
+import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { onIpcCommand } from "./ipcCommands";
@@ -39,19 +39,13 @@ onIpcCommand(IpcCommands.RPC_INVITE, async code => {
     return true;
 });
 
+const { DEEP_LINK } = findLazy(m => m.DEEP_LINK?.handler);
+
 onIpcCommand(IpcCommands.RPC_DEEP_LINK, async data => {
-    // console.log(data);
-    if (data.type === "CHANNEL") {
-        // I am unaware of any other types but ensure just in case.
-        const { guildId, channelId, messageId } = data.params;
-        if (!guildId) return false; // ensure at least guildId exists
-
-        const path = [guildId, channelId, messageId].filter(Boolean).join("/");
-        NavigationRouter.transitionTo(`/channels/${path}`);
-
+    try {
+        DEEP_LINK.handler({ args: data });
         return true;
-    } else {
-        console.warn("Unhandled deep link type: ", data.type);
+    } catch {
         return false;
     }
 });
