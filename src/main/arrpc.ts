@@ -5,9 +5,9 @@
  */
 
 import Server from "arrpc";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcCommands } from "shared/IpcEvents";
 
-import { mainWin } from "./mainWindow";
+import { sendRendererCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 
 let server: any;
@@ -19,16 +19,12 @@ export async function initArRPC() {
 
     try {
         server = await new Server();
-        server.on("activity", (data: any) => mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, JSON.stringify(data)));
-        server.on("invite", (invite: string, callback: (valid: boolean) => void) => {
+        server.on("activity", (data: any) => sendRendererCommand(IpcCommands.RPC_ACTIVITY, JSON.stringify(data)));
+        server.on("invite", async (invite: string, callback: (valid: boolean) => void) => {
             invite = String(invite);
             if (!inviteCodeRegex.test(invite)) return callback(false);
 
-            mainWin.webContents
-                // Safety: Result of JSON.stringify should always be safe to equal
-                // Also, just to be super super safe, invite is regex validated above
-                .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
-                .then(callback);
+            await sendRendererCommand(IpcCommands.RPC_INVITE, invite).then(callback);
         });
     } catch (e) {
         console.error("Failed to start arRPC server", e);
