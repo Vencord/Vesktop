@@ -26,7 +26,7 @@
         "postinstall": "pnpm updateArrpcDB"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#32c6c76a2129e42a786f17883b2e9f806f45dfb9",
+        "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
         "electron-updater": "^6.3.9"
     },
     "optionalDependencies": {
@@ -34,19 +34,19 @@
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@stylistic/eslint-plugin": "^2.13.0",
-        "@types/node": "^22.10.7",
+        "@stylistic/eslint-plugin": "^3.0.1",
+        "@types/node": "^22.13.1",
         "@types/react": "^18.3.12",
         "@vencord/types": "^1.8.4",
         "dotenv": "^16.4.7",
-        "electron": "^34.0.1",
+        "electron": "^34.0.2",
         "electron-builder": "^25.1.8",
         "esbuild": "^0.24.2",
-        "eslint": "^9.18.0",
+        "eslint": "^9.19.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "^2.1.0",
         "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-simple-header": "^1.2.1",
+        "eslint-plugin-simple-header": "^1.2.2",
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unused-imports": "^4.1.4",
         "prettier": "^3.4.2",
@@ -54,8 +54,8 @@
         "tsx": "^4.19.2",
         "type-fest": "^4.33.0",
         "typescript": "^5.7.3",
-        "typescript-eslint": "^8.21.0",
-        "xml-formatter": "^3.6.3"
+        "typescript-eslint": "^8.23.0",
+        "xml-formatter": "^3.6.4"
     },
     "packageManager": "pnpm@9.1.0",
     "engines": {
