@@ -14,8 +14,8 @@ addPatch({
                 {
                     // TODO: Fix eslint rule
                     // eslint-disable-next-line no-useless-escape
-                    match: /switch\(\i.\i.focus\(\)/,
-                    replace: "switch(VesktopNative.win.focus()"
+                    match: /(?<=\.DEEP_LINK.{0,200}?)\i\.\i\.focus\(\)/,
+                    replace: "VesktopNative.win.focus()"
                 }
             ]
         }
