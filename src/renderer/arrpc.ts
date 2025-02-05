@@ -4,7 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { onceReady } from "@vencord/types/webpack";
+import { findLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
@@ -37,4 +37,16 @@ onIpcCommand(IpcCommands.RPC_INVITE, async code => {
     });
 
     return true;
+});
+
+const { DEEP_LINK } = findLazy(m => m.DEEP_LINK?.handler);
+
+onIpcCommand(IpcCommands.RPC_DEEP_LINK, async data => {
+    try {
+        DEEP_LINK.handler({ args: data });
+        return true;
+    } catch (err) {
+        console.error("[RPC]", "Failed to open deep link:", err, data);
+        return false;
+    }
 });
