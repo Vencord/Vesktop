@@ -11,9 +11,10 @@ addPatch({
         {
             find: ".STREAMER_MODE_ENABLE,",
             replacement: {
+                // remove if (platformEmbedded) check from streamer mode toggle
                 // eslint-disable-next-line no-useless-escape
-                match: /\i\.isPlatformEmbedded/g,
-                replace: "true"
+                match: /if\(\i\.\i\)(?=return.{0,200}?"autoToggle")/g,
+                replace: ""
             }
         }
     ]
