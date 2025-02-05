@@ -45,7 +45,8 @@ onIpcCommand(IpcCommands.RPC_DEEP_LINK, async data => {
     try {
         DEEP_LINK.handler({ args: data });
         return true;
-    } catch {
+    } catch (err) {
+        console.error("[RPC]", "Failed to open deep link:", err, data);
         return false;
     }
 });
