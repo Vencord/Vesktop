@@ -4,23 +4,36 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import { findLazy, onceReady } from "@vencord/types/webpack";
+import { findLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { onIpcCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 
+const StreamerModeStore = findStoreLazy("StreamerModeStore");
+
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
     handleEvent(e: MessageEvent): void;
 };
 
-onIpcCommand(IpcCommands.RPC_ACTIVITY, async data => {
+onIpcCommand(IpcCommands.RPC_ACTIVITY, async jsonData => {
     if (!Settings.store.arRPC) return;
 
     await onceReady;
 
-    arRPC.handleEvent(new MessageEvent("message", { data }));
+    const data = JSON.parse(jsonData);
+
+    if (data.socketId === "STREAMERMODE" && StreamerModeStore.autoToggle) {
+        FluxDispatcher.dispatch({
+            type: "STREAMER_MODE_UPDATE",
+            key: "enabled",
+            value: data.activity?.application_id === "STREAMERMODE"
+        });
+        return;
+    }
+
+    arRPC.handleEvent(new MessageEvent("message", { data: jsonData }));
 });
 
 onIpcCommand(IpcCommands.RPC_INVITE, async code => {

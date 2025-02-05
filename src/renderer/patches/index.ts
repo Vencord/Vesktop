@@ -12,4 +12,5 @@ import "./hideVenmicInput";
 import "./screenShareFixes";
 import "./spellCheck";
 import "./windowsTitleBar";
+import "./streamerMode";
 import "./nativeFocus";
