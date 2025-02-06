@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+import { Logger } from "@vencord/types/utils";
 import { findLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
@@ -11,6 +12,7 @@ import { IpcCommands } from "shared/IpcEvents";
 import { onIpcCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 
+const logger = new Logger("VesktopRPC", "#5865f2");
 const StreamerModeStore = findStoreLazy("StreamerModeStore");
 
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
@@ -55,11 +57,12 @@ onIpcCommand(IpcCommands.RPC_INVITE, async code => {
 const { DEEP_LINK } = findLazy(m => m.DEEP_LINK?.handler);
 
 onIpcCommand(IpcCommands.RPC_DEEP_LINK, async data => {
+    logger.debug("Opening deep link:", data);
     try {
         DEEP_LINK.handler({ args: data });
         return true;
     } catch (err) {
-        console.error("[RPC]", "Failed to open deep link:", err, data);
+        logger.error("Failed to open deep link:", err);
         return false;
     }
 });

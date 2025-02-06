@@ -11,13 +11,15 @@ import "./patches";
 import "./fixes";
 import "./arrpc";
 
-console.log("read if cute :3");
-
 export * as Components from "./components";
 
 import SettingsUi from "./components/settings/Settings";
+import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
 export { Settings };
+
+VesktopLogger.log("read if cute :3");
+VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
 const customSettingsSections = (
     Vencord.Plugins.plugins.Settings as any as { customSections: ((ID: Record<string, unknown>) => any)[] }
