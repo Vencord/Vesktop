@@ -73,6 +73,12 @@
             "package.json",
             "LICENSE"
         ],
+        "protocols": {
+            "name": "Discord",
+            "schemes": [
+                "discord"
+            ]
+        },
         "beforePack": "scripts/build/sandboxFix.js",
         "linux": {
             "icon": "build/icon.icns",
@@ -113,7 +119,8 @@
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;vencord;electron;chat;"
+                "Keywords": "discord;vencord;electron;chat;",
+                "MimeType": "x-scheme-handler/discord"
             }
         },
         "mac": {

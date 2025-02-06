@@ -29,6 +29,8 @@ console.log("Vesktop v" + app.getVersion());
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
+    app.setAsDefaultProtocolClient("discord");
+
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
@@ -118,6 +120,12 @@ async function bootstrap() {
         createWindows();
     }
 }
+
+// MacOS only event
+export let darwinURL: string | undefined;
+app.on("open-url", (_, url) => {
+    darwinURL = url;
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();

@@ -36,6 +36,7 @@ import {
     MIN_WIDTH,
     VENCORD_FILES_DIR
 } from "./constants";
+import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
@@ -454,17 +455,19 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const subdomain =
-        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
-            ? `${Settings.store.discordBranch}.`
-            : "";
-
-    win.loadURL(`https://${subdomain}discord.com/app`);
+    // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
+    loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
+
+export function loadUrl(uri: string | undefined) {
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+}
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
@@ -496,6 +499,14 @@ export async function createWindows() {
                 mainWin!.maximize();
             }
         });
+    });
+
+    mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
+        // check url to ensure app doesn't loop
+        if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
+            loadUrl(undefined);
+            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
+        }
     });
 
     initArRPC();
