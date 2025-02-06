@@ -333,6 +333,7 @@ function initSettingsListeners(win: BrowserWindow) {
         if (enable) initTray(win);
         else tray?.destroy();
     });
+
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
             // 0 no work
@@ -382,6 +383,21 @@ function initSpellCheck(win: BrowserWindow) {
     });
 
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
+}
+
+function initStaticTitle(win: BrowserWindow) {
+    const listener = (e: { preventDefault: Function }) => e.preventDefault();
+
+    if (Settings.store.staticTitle) win.on("page-title-updated", listener);
+
+    addSettingsListener("staticTitle", enabled => {
+        if (enabled) {
+            win.setTitle("Vesktop");
+            win.on("page-title-updated", listener);
+        } else {
+            win.off("page-title-updated", listener);
+        }
+    });
 }
 
 function createMainWindow() {
@@ -444,14 +460,13 @@ function createMainWindow() {
         return false;
     });
 
-    if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
-
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
+    initStaticTitle(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
