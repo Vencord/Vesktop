@@ -299,7 +299,7 @@ function getDarwinOptions(): BrowserWindowConstructorOptions {
         options.vibrancy = "sidebar";
         options.backgroundColor = "#ffffff00";
     } else {
-        if (splashTheming) {
+        if (splashTheming !== false) {
             options.backgroundColor = splashBackground;
         } else {
             options.backgroundColor = nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
@@ -405,14 +405,18 @@ function createMainWindow() {
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
+        Settings.store;
 
     const { frameless, transparent } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
+    const backgroundColor =
+        splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const win = (mainWin = new BrowserWindow({
-        show: false,
+        show: Settings.store.enableSplashScreen === false,
+        backgroundColor,
         webPreferences: {
             nodeIntegration: false,
             sandbox: false,
@@ -504,7 +508,7 @@ export async function createWindows() {
         splash?.destroy();
 
         if (!startMinimized) {
-            mainWin!.show();
+            if (splash) mainWin!.show();
             if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
         }
 

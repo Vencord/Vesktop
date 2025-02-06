@@ -63,15 +63,15 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "enableSplashScreen",
             title: "Enable Splash Screen",
-            description: "Shows a small splash screen while Vesktop is loading",
+            description:
+                "Shows a small splash screen while Vesktop is loading. Disabling this option will show the main window earlier while it's still loading.",
             defaultValue: true
         },
         {
             key: "splashTheming",
             title: "Splash theming",
             description: "Adapt the splash window colors to your custom theme",
-            defaultValue: false,
-            disabled: () => Settings.store.enableSplashScreen === false
+            defaultValue: true
         },
         WindowsTransparencyControls
     ],
