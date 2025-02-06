@@ -13,8 +13,10 @@ import { ArrpcEvent, ArrpcHostEvent } from "./utils/arrpcWorkerTypes";
 let server: any;
 
 type InviteCallback = (valid: boolean) => void;
+type LinkCallback = InviteCallback;
 
 let inviteCallbacks: Array<InviteCallback> = [];
+let linkCallbacks: Array<LinkCallback> = [];
 
 (async function () {
     const { workerPort }: { workerPort: MessagePort } = workerData;
@@ -36,7 +38,17 @@ let inviteCallbacks: Array<InviteCallback> = [];
     });
 
     workerPort.on("message", (e: ArrpcHostEvent) => {
-        inviteCallbacks[e.inviteId](e.data);
-        inviteCallbacks = [...inviteCallbacks.slice(0, e.inviteId), ...inviteCallbacks.slice(e.inviteId + 1)];
+        switch (e.eventType) {
+            case "ack-invite": {
+                inviteCallbacks[e.inviteId](e.data);
+                inviteCallbacks = [...inviteCallbacks.slice(0, e.inviteId), ...inviteCallbacks.slice(e.inviteId + 1)];
+                break;
+            }
+            case "ack-link": {
+                linkCallbacks[e.linkId](e.data);
+                linkCallbacks = [...inviteCallbacks.slice(0, e.linkId), ...inviteCallbacks.slice(e.linkId + 1)];
+                break;
+            }
+        }
     });
 })();

@@ -6,7 +6,8 @@
 
 import { IpcEvents } from "shared/IpcEvents";
 
-export type ArrpcEvent = ArrpcActivityEvent | ArrpcInviteEvent;
+export type ArrpcEvent = ArrpcActivityEvent | ArrpcInviteEvent | ArrpcLinkEvent;
+export type ArrpcHostEvent = ArrpcHostAckInviteEvent | ArrpcHostAckLinkEvent;
 
 export interface ArrpcActivityEvent {
     eventType: IpcEvents.ARRPC_ACTIVITY;
@@ -19,8 +20,20 @@ export interface ArrpcInviteEvent {
     inviteId: number;
 }
 
-export interface ArrpcHostEvent {
+export interface ArrpcLinkEvent {
+    eventType: "link";
+    data: string;
+    linkId: number;
+}
+
+export interface ArrpcHostAckInviteEvent {
     eventType: "ack-invite";
     inviteId: number;
+    data: boolean;
+}
+
+export interface ArrpcHostAckLinkEvent {
+    eventType: "ack-link";
+    linkId: number;
     data: boolean;
 }

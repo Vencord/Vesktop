@@ -5,10 +5,10 @@
  */
 
 import { resolve } from "path";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 import { MessageChannel, Worker } from "worker_threads";
 
-import { mainWin } from "./mainWindow";
+import { sendRendererCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 import { ArrpcEvent, ArrpcHostEvent } from "./utils/arrpcWorkerTypes";
 
@@ -27,10 +27,10 @@ export async function initArRPC() {
             },
             transferList: [workerPort]
         });
-        hostPort.on("message", (e: ArrpcEvent) => {
+        hostPort.on("message", async (e: ArrpcEvent) => {
             switch (e.eventType) {
                 case IpcEvents.ARRPC_ACTIVITY: {
-                    mainWin.webContents.send(IpcEvents.ARRPC_ACTIVITY, e.data);
+                    sendRendererCommand(IpcCommands.RPC_ACTIVITY, JSON.stringify(e.data));
                     break;
                 }
                 case "invite": {
@@ -45,18 +45,37 @@ export async function initArRPC() {
                         return hostPort.postMessage(hostEvent);
                     }
 
-                    mainWin.webContents
-                        // Safety: Result of JSON.stringify should always be safe to equal
-                        // Also, just to be super super safe, invite is regex validated above
-                        .executeJavaScript(`Vesktop.openInviteModal(${JSON.stringify(invite)})`)
-                        .then(() => {
-                            const hostEvent: ArrpcHostEvent = {
-                                eventType: "ack-invite",
-                                data: true,
-                                inviteId: e.inviteId
-                            };
-                            hostPort.postMessage(hostEvent);
-                        });
+                    await sendRendererCommand(IpcCommands.RPC_INVITE, invite).then(() => {
+                        const hostEvent: ArrpcHostEvent = {
+                            eventType: "ack-invite",
+                            data: true,
+                            inviteId: e.inviteId
+                        };
+                        hostPort.postMessage(hostEvent);
+                    });
+
+                    break;
+                }
+                case "link": {
+                    const link = String(e.data);
+                    if (!inviteCodeRegex.test(link)) {
+                        const hostEvent: ArrpcHostEvent = {
+                            eventType: "ack-link",
+                            data: false,
+                            linkId: e.linkId
+                        };
+                        return hostPort.postMessage(hostEvent);
+                    }
+
+                    await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link).then(() => {
+                        const hostEvent: ArrpcHostEvent = {
+                            eventType: "ack-link",
+                            data: true,
+                            linkId: e.linkId
+                        };
+                        hostPort.postMessage(hostEvent);
+                    });
+
                     break;
                 }
             }

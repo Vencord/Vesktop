@@ -53,5 +53,15 @@ export const enum IpcEvents {
     CLIPBOARD_COPY_IMAGE = "VCD_CLIPBOARD_COPY_IMAGE",
 
     DEBUG_LAUNCH_GPU = "VCD_DEBUG_LAUNCH_GPU",
-    DEBUG_LAUNCH_WEBRTC_INTERNALS = "VCD_DEBUG_LAUNCH_WEBRTC"
+    DEBUG_LAUNCH_WEBRTC_INTERNALS = "VCD_DEBUG_LAUNCH_WEBRTC",
+
+    IPC_COMMAND = "VCD_IPC_COMMAND"
+}
+
+export const enum IpcCommands {
+    RPC_ACTIVITY = "rpc:activity",
+    RPC_INVITE = "rpc:invite",
+    RPC_DEEP_LINK = "rpc:link",
+    NAVIGATE_SETTINGS = "navigate:settings",
+    GET_LANGUAGES = "navigator.languages"
 }
