@@ -271,7 +271,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayid);
+    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayId);
 
     if (x != null && y != null && storedDisplay) {
         options.x = x;
@@ -321,7 +321,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
-        State.store.displayid = screen.getDisplayMatching(State.store.windowBounds).id;
+        State.store.displayId = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);
