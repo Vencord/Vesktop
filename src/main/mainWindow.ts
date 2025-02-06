@@ -504,9 +504,9 @@ export async function createWindows() {
 
     mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
         // check url to ensure app doesn't loop
-        if (new URL(url).pathname !== `/app` && responseCode >= 300) {
+        if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
             loadUrl(undefined);
-            console.warn(`Caught bad page response: ${responseCode}, dumping to main app`);
+            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
         }
     });
 

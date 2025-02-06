@@ -115,7 +115,7 @@ async function bootstrap() {
 }
 
 // MacOS only event
-export var darwinURL: string | undefined;
+export let darwinURL: string | undefined;
 app.on("open-url", (_, url) => {
     darwinURL = url;
 });
