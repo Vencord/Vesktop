@@ -61,10 +61,17 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             disabled: () => Settings.store.customTitleBar ?? isWindows
         },
         {
+            key: "enableSplashScreen",
+            title: "Enable Splash Screen",
+            description: "Shows a small splash screen while Vesktop is loading",
+            defaultValue: true
+        },
+        {
             key: "splashTheming",
             title: "Splash theming",
             description: "Adapt the splash window colors to your custom theme",
-            defaultValue: false
+            defaultValue: false,
+            disabled: () => Settings.store.enableSplashScreen === false
         },
         WindowsTransparencyControls
     ],

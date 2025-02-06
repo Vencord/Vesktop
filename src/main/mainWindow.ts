@@ -486,16 +486,22 @@ export function loadUrl(uri: string | undefined) {
 
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
-    const splash = createSplashWindow(startMinimized);
-    // SteamOS letterboxes and scales it terribly, so just full screen it
-    if (isDeckGameMode) splash.setFullScreen(true);
+
+    let splash: BrowserWindow | undefined;
+    if (Settings.store.enableSplashScreen !== false) {
+        splash = createSplashWindow(startMinimized);
+
+        // SteamOS letterboxes and scales it terribly, so just full screen it
+        if (isDeckGameMode) splash.setFullScreen(true);
+    }
+
     await ensureVencordFiles();
     runVencordMain();
 
     mainWin = createMainWindow();
 
     mainWin.webContents.on("did-finish-load", () => {
-        splash.destroy();
+        splash?.destroy();
 
         if (!startMinimized) {
             mainWin!.show();

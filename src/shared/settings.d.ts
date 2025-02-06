@@ -22,6 +22,7 @@ export interface Settings {
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
 
+    enableSplashScreen?: boolean;
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
