@@ -4,6 +4,7 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
+// Discord deletes this from the window so we need to capture it in a variable
 export const { localStorage } = window;
 
 export const isFirstRun = (() => {

@@ -22,7 +22,7 @@ import {
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
-import { useSettings } from "renderer/settings";
+import { State, useSettings, useVesktopState } from "renderer/settings";
 import { classNameFactory, isLinux, isWindows } from "renderer/utils";
 
 const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
@@ -46,8 +46,6 @@ interface AudioItem {
 }
 
 interface StreamSettings {
-    resolution: StreamResolution;
-    fps: StreamFps;
     audio: boolean;
     contentHint?: string;
     includeSources?: AudioSources;
@@ -79,10 +77,11 @@ addPatch({
         }
     ],
     patchStreamQuality(opts: any) {
-        if (!currentSettings) return;
+        const { screenshareQuality } = State.store;
+        if (!screenshareQuality) return;
 
-        const framerate = Number(currentSettings.fps);
-        const height = Number(currentSettings.resolution);
+        const framerate = Number(screenshareQuality.frameRate);
+        const height = Number(screenshareQuality.resolution);
         const width = Math.round(height * (16 / 9));
 
         Object.assign(opts, {
@@ -316,14 +315,14 @@ function AudioSettingsModal({
     );
 }
 
-function OptionRadio(props: {
+function OptionRadio<Settings extends object, Key extends keyof Settings>(props: {
     options: Array<string> | ReadonlyArray<string>;
     labels?: Array<string>;
-    settingsKey: string;
-    settings: StreamSettings;
-    setSettings: Dispatch<SetStateAction<StreamSettings>>;
+    settings: Settings;
+    settingsKey: Key;
+    onChange: (option: string) => void;
 }) {
-    const { options, setSettings, settings, settingsKey, labels } = props;
+    const { options, settings, settingsKey, labels, onChange } = props;
 
     return (
         <div className={cl("option-radios")}>
@@ -336,7 +335,7 @@ function OptionRadio(props: {
                         name="fps"
                         value={option}
                         checked={settings[settingsKey] === option}
-                        onChange={() => setSettings(s => ({ ...s, [settingsKey]: option }))}
+                        onChange={() => onChange(option)}
                     />
                 </label>
             ))}
@@ -344,7 +343,7 @@ function OptionRadio(props: {
     );
 }
 
-function StreamSettings({
+function StreamSettingsUi({
     source,
     settings,
     setSettings,
@@ -356,6 +355,7 @@ function StreamSettings({
     skipPicker: boolean;
 }) {
     const Settings = useSettings();
+    const qualitySettings = State.store.screenshareQuality!;
 
     const [thumb] = useAwaiter(
         () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
@@ -393,9 +393,9 @@ function StreamSettings({
                         <Forms.FormTitle>Resolution</Forms.FormTitle>
                         <OptionRadio
                             options={StreamResolutions}
+                            settings={qualitySettings}
                             settingsKey="resolution"
-                            settings={settings}
-                            setSettings={setSettings}
+                            onChange={value => (qualitySettings.resolution = value)}
                         />
                     </section>
 
@@ -403,9 +403,9 @@ function StreamSettings({
                         <Forms.FormTitle>Frame Rate</Forms.FormTitle>
                         <OptionRadio
                             options={StreamFps}
-                            settingsKey="fps"
-                            settings={settings}
-                            setSettings={setSettings}
+                            settings={qualitySettings}
+                            settingsKey="frameRate"
+                            onChange={value => (qualitySettings.frameRate = value)}
                         />
                     </section>
                 </div>
@@ -416,9 +416,9 @@ function StreamSettings({
                             <OptionRadio
                                 options={["motion", "detail"]}
                                 labels={["Prefer Smoothness", "Prefer Clarity"]}
-                                settingsKey="contentHint"
                                 settings={settings}
-                                setSettings={setSettings}
+                                settingsKey="contentHint"
+                                onChange={option => setSettings(s => ({ ...s, contentHint: option }))}
                             />
                             <div className={cl("hint-description")}>
                                 <p>
@@ -696,11 +696,13 @@ function ModalComponent({
 }) {
     const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
-        resolution: "720",
-        fps: "30",
         contentHint: "motion",
         audio: true,
         includeSources: "None"
+    });
+    const qualitySettings = (useVesktopState().screenshareQuality ??= {
+        resolution: "720",
+        frameRate: "30"
     });
 
     return (
@@ -713,7 +715,7 @@ function ModalComponent({
                 {!selected ? (
                     <ScreenPicker screens={screens} chooseScreen={setSelected} />
                 ) : (
-                    <StreamSettings
+                    <StreamSettingsUi
                         source={screens.find(s => s.id === selected)!}
                         settings={settings}
                         setSettings={setSettings}
@@ -727,8 +729,8 @@ function ModalComponent({
                     onClick={() => {
                         currentSettings = settings;
                         try {
-                            const frameRate = Number(settings.fps);
-                            const height = Number(settings.resolution);
+                            const frameRate = Number(qualitySettings.frameRate);
+                            const height = Number(qualitySettings.resolution);
                             const width = Math.round(height * (16 / 9));
 
                             const conn = [...MediaEngineStore.getMediaEngine().connections].find(
