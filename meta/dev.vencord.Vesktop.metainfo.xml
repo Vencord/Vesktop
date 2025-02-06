@@ -28,6 +28,34 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.5" date="2025-02-06" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.5</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Now remembers your previous Screenshare resolution &amp; FPS</li>
+          <li>You can now disable the splash screen in Vesktop Settings</li>
+          <li>Now supports deep links (opening Discord Message Links in Vesktop) by @Covkie</li>
+          <li>Now supports discord:// uri scheme, allowing it to open things like invites from your Browser even while closed by @Covkie</li>
+          <li>Added 4k resolution to screenshare by @makindotcc</li>
+          <li>Fixed some performance issues caused by a recent Discord update</li>
+          <li>Updated Electron to v34 &amp; chromium to v132, bringing new features and fixes</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.5.4" date="2024-12-05" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.4</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Upgraded electron to version 33 which brings many improvements and bug fixes</li>
+          <li>AudioShare: add even more granular selection, Allow device sharing by @Curve</li>
+          <li>Enable speech-dispatcher support for TTS on linux by @adryd325</li>
+          <li>fixed screenshare picker window subtitle alignment by @ryawaa</li>
+          <li>fixed splash corners by @Covkie</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.3" date="2024-07-04" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.3</url>
       <description>

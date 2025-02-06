@@ -8,7 +8,9 @@ import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebFrameMain } from "electro
 import { DISCORD_HOSTNAMES } from "main/constants";
 import { IpcEvents } from "shared/IpcEvents";
 
-export function validateSender(frame: WebFrameMain) {
+export function validateSender(frame: WebFrameMain | null) {
+    if (!frame) throw new Error("ipc: No sender frame");
+
     const { hostname, protocol } = new URL(frame.url);
     if (protocol === "file:") return;
 

@@ -23,10 +23,14 @@ if (IS_DEV) {
     autoUpdater.checkForUpdatesAndNotify();
 }
 
+console.log("Vesktop v" + app.getVersion());
+
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
+    app.setAsDefaultProtocolClient("discord");
+
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
@@ -35,7 +39,12 @@ function init() {
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
     } else {
-        enabledFeatures.push("VaapiVideoDecodeLinuxGL", "VaapiVideoEncoder", "VaapiVideoDecoder");
+        enabledFeatures.push(
+            "AcceleratedVideoDecodeLinuxGL",
+            "AcceleratedVideoEncoder",
+            "AcceleratedVideoDecoder",
+            "AcceleratedVideoDecodeLinuxZeroCopyGL"
+        );
     }
 
     if (disableSmoothScroll) {
@@ -59,6 +68,9 @@ function init() {
     //
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
     disabledFeatures.push("WinRetrieveSuggestionsOnlyOnDemand", "HardwareMediaKeyHandling", "MediaSessionService");
+
+    // Support TTS on Linux using speech-dispatcher
+    app.commandLine.appendSwitch("enable-speech-dispatcher");
 
     app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
     app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
@@ -108,6 +120,12 @@ async function bootstrap() {
         createWindows();
     }
 }
+
+// MacOS only event
+export let darwinURL: string | undefined;
+app.on("open-url", (_, url) => {
+    darwinURL = url;
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
