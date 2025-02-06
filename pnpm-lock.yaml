@@ -34,8 +34,8 @@ importers:
         specifier: ^22.13.1
         version: 22.13.1
       '@types/react':
-        specifier: ^18.3.12
-        version: 18.3.18
+        specifier: 18.3.12
+        version: 18.3.12
       '@vencord/types':
         specifier: ^1.8.4
         version: 1.8.4
@@ -43,8 +43,8 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       electron:
-        specifier: ^34.0.2
-        version: 34.0.2
+        specifier: ^34.1.0
+        version: 34.1.0
       electron-builder:
         specifier: ^25.1.8
         version: 25.1.8(electron-builder-squirrel-windows@25.1.8(dmg-builder@25.1.8))
@@ -599,8 +599,8 @@ packages:
   '@types/react@17.0.2':
     resolution: {integrity: sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==}
 
-  '@types/react@18.3.18':
-    resolution: {integrity: sha512-t4yC+vtgnkYjNSKlFx1jkAhH8LgTo2N/7Qvi83kdEaUtMDiwpbLAktKDaAMlRcJ5eSxZkH74eEGt1ky31d7kfQ==}
+  '@types/react@18.3.12':
+    resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==}
 
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
@@ -1189,8 +1189,8 @@ packages:
   electron-updater@6.3.9:
     resolution: {integrity: sha512-2PJNONi+iBidkoC5D1nzT9XqsE8Q1X28Fn6xRQhO3YX8qRRyJ3mkV4F1aQsuRnYPqq6Hw+E51y27W75WgDoofw==}
 
-  electron@34.0.2:
-    resolution: {integrity: sha512-u3F+DSUlg9NaGS+9qnYmSRN8VjAnc3LJDDk1ye1uISJnh4gjG76y3681qLowsPMx4obvCP2eBINnmbLo0yT5WA==}
+  electron@34.1.0:
+    resolution: {integrity: sha512-ZUid8XrGPA0dfes97PPADc8ecWOUX/qYRNp1glze9coZLEYc+PsMvgjVDCHSvjfHfiI+V3unwngSVpBouX71YQ==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -3385,16 +3385,16 @@ snapshots:
 
   '@types/prop-types@15.7.14': {}
 
-  '@types/react-dom@18.3.5(@types/react@18.3.18)':
+  '@types/react-dom@18.3.5(@types/react@18.3.12)':
     dependencies:
-      '@types/react': 18.3.18
+      '@types/react': 18.3.12
 
   '@types/react@17.0.2':
     dependencies:
       '@types/prop-types': 15.7.14
       csstype: 3.1.3
 
-  '@types/react@18.3.18':
+  '@types/react@18.3.12':
     dependencies:
       '@types/prop-types': 15.7.14
       csstype: 3.1.3
@@ -3492,8 +3492,8 @@ snapshots:
     dependencies:
       '@types/lodash': 4.17.15
       '@types/node': 18.19.75
-      '@types/react': 18.3.18
-      '@types/react-dom': 18.3.5(@types/react@18.3.18)
+      '@types/react': 18.3.12
+      '@types/react-dom': 18.3.5(@types/react@18.3.12)
       discord-types: 1.3.26
       standalone-electron-types: 1.0.0
       type-fest: 3.13.1
@@ -4202,7 +4202,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@34.0.2:
+  electron@34.1.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.17.17
