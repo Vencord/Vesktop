@@ -18,7 +18,7 @@ import {
 } from "electron";
 import { rm } from "fs/promises";
 import { join } from "path";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
@@ -37,6 +37,7 @@ import {
     VENCORD_FILES_DIR
 } from "./constants";
 import { darwinURL } from "./index";
+import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -199,9 +200,7 @@ function initMenuBar(win: BrowserWindow) {
                       label: "Settings",
                       accelerator: "CmdOrCtrl+,",
                       async click() {
-                          mainWin.webContents.executeJavaScript(
-                              "Vencord.Webpack.Common.SettingsRouter.open('My Account')"
-                          );
+                          sendRendererCommand(IpcCommands.NAVIGATE_SETTINGS);
                       }
                   },
                   {
@@ -367,7 +366,7 @@ function initSettingsListeners(win: BrowserWindow) {
 }
 
 async function initSpellCheckLanguages(win: BrowserWindow, languages?: string[]) {
-    languages ??= await win.webContents.executeJavaScript("[...new Set(navigator.languages)]").catch(() => []);
+    languages ??= await sendRendererCommand(IpcCommands.GET_LANGUAGES);
     if (!languages) return;
 
     const ses = session.defaultSession;
