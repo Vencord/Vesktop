@@ -18,9 +18,6 @@ import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
 export { Settings };
 
-
-const InviteActions = findByPropsLazy("resolveInvite");
-
 export const keybindCallbacks: {
     [id: number]: {
         onTrigger: Function;
@@ -30,22 +27,6 @@ export const keybindCallbacks: {
         };
     };
 } = {};
-
-export async function openInviteModal(code: string) {
-    const { invite } = await InviteActions.resolveInvite(code, "Desktop Modal");
-    if (!invite) return false;
-
-    VesktopNative.win.focus();
-
-    FluxDispatcher.dispatch({
-        type: "INVITE_MODAL_OPEN",
-        invite,
-        code,
-        context: "APP"
-    });
-
-    return true;
-}
 
 VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
