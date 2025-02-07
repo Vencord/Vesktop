@@ -9,7 +9,7 @@ import { keybindCallbacks } from "renderer";
 
 import { addPatch } from "./shared";
 import { ErrorCard } from "@vencord/types/components";
-const toShortcutString = findByCodeLazy('return"gamepad".');
+const toShortcutString = findByCodeLazy('.MOUSE_BUTTON?"mouse".concat(');
 const actionReadableNames: { [key: string]: string } = {
     PUSH_TO_TALK: "Push To Talk",
     PUSH_TO_TALK_PRIORITY: "Push To Talk (Priority)",
