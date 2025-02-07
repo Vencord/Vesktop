@@ -24,6 +24,7 @@ body:
               - Issues with Input Methods[^4]
               - Issues with File Drag and Drop[^5] 
               - Network Errors[^6]
+              - Anything about Screenshare Performance[^7]
 
               Linux users: Please only report issues with supported packages (flatpak and any builds from the README / releases).
               We do not support other packages, like the AUR or Nix packages, so please first make sure your issue is reproducible with official releases,
@@ -36,6 +37,8 @@ body:
               [^4]: These things are handled by Chromium / Electron, not us. If they don't work, it's either an issue with your system or a bug with Chromium.
               [^5]: You are likely using the Vesktop flatpak and trying to drop a file the flatpak can't access. You can fix this by installing Flatseal and using it to grant Vesktop full access to your files
               [^6]: Issue on your end, you have to fix it. Try changing your DNS to [1.1.1.1 (Cloudflare DNS)](https://developers.cloudflare.com/1.1.1.1/setup/)
+              [^7]: Screensharing is managed entirely by Chromium and your System. For optimal performance, make sure you [enable Hardware Acceleration](https://wiki.archlinux.org/title/Chromium#Hardware_video_acceleration).
+                    Depending on GPU driver, it might not be supported. We are actively working on making this work out of the box everywhere.
               
     - type: input
       id: discord
@@ -109,10 +112,8 @@ body:
       attributes:
           label: Debug Logs
           description: Run vesktop from the command line. Include the relevant command line output here. If there are any lines that seem relevant, try googling them or searching existing issues
-          value: |
-              ```
-              Replace this text with your crash-log. Do not remove the backticks
-              ```
+          placeholder: Paste your crash-log here.
+          render: shell
       validations:
           required: true
 

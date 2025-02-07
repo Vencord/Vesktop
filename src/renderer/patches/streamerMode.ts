@@ -1,6 +1,6 @@
 /*
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2023 Vendicated and Vencord contributors
+ * Copyright (c) 2025 Vendicated and Vencord contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -9,12 +9,12 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: '"NotificationSettingsStore',
+            find: ".STREAMER_MODE_ENABLE,",
             replacement: {
-                // FIXME: fix eslint rule
+                // remove if (platformEmbedded) check from streamer mode toggle
                 // eslint-disable-next-line no-useless-escape
-                match: /\.isPlatformEmbedded(?=\?\i\.\i\.ALL)/g,
-                replace: "$&||true"
+                match: /if\(\i\.\i\)(?=return.{0,200}?"autoToggle")/g,
+                replace: ""
             }
         }
     ]
