@@ -14,3 +14,4 @@ import "./spellCheck";
 import "./windowsTitleBar";
 import "./streamerMode";
 import "./nativeFocus";
+import "./hideDownloadAppsButton";
