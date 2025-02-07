@@ -77,3 +77,9 @@ pnpm package --linux pacman
 # Or package to a directory only
 pnpm package:dir
 ```
+
+## License
+**Vesktop** is licensed under the GNU General Public License version 3 or (at your option) any later version. See the [`LICENSE`](LICENSE) file for more details.
+
+## Contact
+You can contact us via our Discord server (`#🖥-vesktop-development` channel): https://discord.gg/D9uwnFnqmd
