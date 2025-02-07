@@ -21,7 +21,15 @@ export { Settings };
 
 const InviteActions = findByPropsLazy("resolveInvite");
 
-export const keybindCallbacks: { [id: number]: Function } = {};
+export const keybindCallbacks: {
+    [id: number]: {
+        onTrigger: Function;
+        keyEvents: {
+            keyup: boolean;
+            keydown: boolean;
+        };
+    };
+} = {};
 
 export async function openInviteModal(code: string) {
     const { invite } = await InviteActions.resolveInvite(code, "Desktop Modal");
@@ -37,6 +45,15 @@ export async function openInviteModal(code: string) {
     });
 
     return true;
+}
+
+export async function triggerKeybind(id: number, keyup: boolean) {
+    var cb = keybindCallbacks[id];
+    if (cb.keyEvents.keyup && keyup) {
+        cb.onTrigger(false);
+    } else if (cb.keyEvents.keydown && !keyup) {
+        cb.onTrigger(true);
+    }
 }
 
 const customSettingsSections = (

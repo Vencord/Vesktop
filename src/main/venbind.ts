@@ -50,12 +50,12 @@ export function obtainVenbind() {
 
 export function startVenbind() {
     const venbind = obtainVenbind();
-    venbind?.startKeybinds(x => {
-        mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${x}](false)`);
+    venbind?.startKeybinds((id, keyup) => {
+        mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind(${id}, ${keyup})`);
     });
 }
 
-handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string, options: any) => {
+handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string) => {
     obtainVenbind()?.registerKeybind(shortcut, id);
 });
 handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {

@@ -76,10 +76,10 @@ function init() {
         if (keybindIndex !== -1) {
             if (cmdLine[keybindIndex + 2] === "keyup" || cmdLine[keybindIndex + 2] === "keydown") {
                 mainWin.webContents.executeJavaScript(
-                    `Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](${cmdLine[keybindIndex + 2] === "keydown" ? "true" : "false"})`
+                    `Vesktop.triggerKeybind(${cmdLine[keybindIndex + 1]}, ${cmdLine[keybindIndex + 2] === "keydown" ? "false" : "true"})`
                 );
             } else {
-                mainWin.webContents.executeJavaScript(`Vesktop.keybindCallbacks[${cmdLine[keybindIndex + 1]}](false)`);
+                mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind(${cmdLine[keybindIndex + 1]}, true)`);
             }
         } else if (data.IS_DEV) app.quit();
         else if (mainWin) {

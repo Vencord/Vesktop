@@ -22,6 +22,7 @@ const actionReadableNames: { [key: string]: string } = {
     NAVIGATE_FORWARD: "Navigate Forward",
     DISCONNECT_FROM_VOICE_CHANNEL: "Disconnect From Voice Channel"
 };
+const actions: { id: number; name: string }[] = [];
 addPatch({
     patches: [
         {
@@ -72,12 +73,23 @@ addPatch({
         }
     ],
 
-    registerKeybind: function (id, shortcut, callback, options) {
+    registerKeybind: function (
+        id,
+        shortcut,
+        callback: Function,
+        options: {
+            keyup: boolean;
+            keydown: boolean;
+        }
+    ) {
         if (VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
-        keybindCallbacks[id] = callback;
-        VesktopNative.keybind.register(id, toShortcutString(shortcut), options);
+        keybindCallbacks[id] = {
+            onTrigger: callback,
+            keyEvents: options
+        };
+        VesktopNative.keybind.register(id, toShortcutString(shortcut));
     },
     unregisterKeybind: function (id) {
         if (VesktopNative.keybind.shouldPreRegister()) {
@@ -90,9 +102,12 @@ addPatch({
     preRegisterKeybinds: function (allActions: {
         [action: string]: {
             onTrigger: Function;
+            keyEvents: {
+                keyup: boolean;
+                keydown: boolean;
+            };
         };
     }) {
-        const actions: { id: number; name: string }[] = [];
         if (!VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
@@ -102,6 +117,7 @@ addPatch({
                 [
                     "UNASSIGNED",
                     "SWITCH_TO_VOICE_CHANNEL",
+                    "PUSH_TO_TALK",
                     "TOGGLE_OVERLAY",
                     "TOGGLE_OVERLAY_INPUT_LOCK",
                     "TOGGLE_PRIORITY_SPEAKER",
@@ -115,20 +131,21 @@ addPatch({
             ) {
                 return;
             }
-            // the second argument in onTrigger seems to hold some context in some specific actions
-            // as far as i can tell these are the only actions that use it: push to talk (except it doesn't seem to do anything there??)
-            // and switch to voice channel which requires a channel parameter which is provided through discord's ui
-            // except we can't really provide that with xdp so i'll just skip it for now
-            keybindCallbacks[id] = (keyState: boolean) => val.onTrigger(keyState, undefined);
+            keybindCallbacks[id] = {
+                // TODO: the "undefined" here is supposed to be a context. basically only used by push to talk to determine if you are in ptt mode or not
+                // (it's also used by switch to channel to determine the channel but you can't really define that through xdp)
+                onTrigger: (keyState: boolean) => val.onTrigger(keyState, undefined),
+                keyEvents: val.keyEvents
+            };
             actions.push({ id, name: actionReadableNames[key] || key });
             id++;
         });
-        VesktopNative.keybind.preRegister(actions);
     },
     xdpWarning: function (keybinds) {
         if (!VesktopNative.keybind.shouldPreRegister()) {
             return keybinds;
         }
+        VesktopNative.keybind.preRegister(actions);
         return (
             <ErrorCard>
                 <p>
@@ -136,9 +153,17 @@ addPatch({
                     You can configure keybinds using your desktop environment's built-in settings page.
                 </p>
                 <p>
-                    If your desktop environment does not support the GlobalShortcuts portal you have to manually bind
-                    your desired keybinds to CLI triggers.
+                    If your desktop environment does not support the GlobalShortcuts portal (which you would know if its
+                    settings page didn't open just now) you have to manually bind your desired keybinds to CLI triggers.
                 </p>
+                <p>List of valid keybind IDs to use with the CLI:</p>
+                <ul>
+                    {actions.map(keybind => (
+                        <li>
+                            {keybind.id}: {keybind.name}
+                        </li>
+                    ))}
+                </ul>
             </ErrorCard>
         );
     }
