@@ -5,7 +5,7 @@
     "description": "Vesktop is a custom Discord desktop app",
     "keywords": [],
     "homepage": "https://vencord.dev/",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
     "scripts": {
