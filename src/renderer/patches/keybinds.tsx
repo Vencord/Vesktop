@@ -117,7 +117,6 @@ addPatch({
                 [
                     "UNASSIGNED",
                     "SWITCH_TO_VOICE_CHANNEL",
-                    "PUSH_TO_TALK",
                     "TOGGLE_OVERLAY",
                     "TOGGLE_OVERLAY_INPUT_LOCK",
                     "TOGGLE_PRIORITY_SPEAKER",
@@ -132,9 +131,11 @@ addPatch({
                 return;
             }
             keybindCallbacks[id] = {
-                // TODO: the "undefined" here is supposed to be a context. basically only used by push to talk to determine if you are in ptt mode or not
-                // (it's also used by switch to channel to determine the channel but you can't really define that through xdp)
-                onTrigger: (keyState: boolean) => val.onTrigger(keyState, undefined),
+                onTrigger: (keyState: boolean) =>
+                    val.onTrigger(keyState, {
+                        // switch to channel also requires some extra properties that would have to be supplied here
+                        context: undefined
+                    }),
                 keyEvents: val.keyEvents
             };
             actions.push({ id, name: actionReadableNames[key] || key });
