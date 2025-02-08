@@ -7,7 +7,7 @@
 declare global {
     export var VesktopNative: typeof import("preload/VesktopNative").VesktopNative;
     export var Vesktop: typeof import("renderer/index");
-    export var VesktopPatchGlobals: any;
+    export var VCDP: any;
 
     export var IS_DEV: boolean;
 }

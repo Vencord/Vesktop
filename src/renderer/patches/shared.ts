@@ -6,7 +6,7 @@
 
 import { Patch } from "@vencord/types/utils/types";
 
-window.VesktopPatchGlobals = {};
+window.VCDP = {};
 
 interface PatchData {
     patches: Omit<Patch, "plugin">[];
@@ -16,11 +16,15 @@ interface PatchData {
 export function addPatch<P extends PatchData>(p: P) {
     const { patches, ...globals } = p;
 
-    for (const patch of patches) {
-        // @ts-expect-error outdated types don't have addPatch yet
-        // TODO: Update types
-        Vencord.Plugins.addPatch(patch, "Vesktop", "VesktopPatchGlobals");
+    for (const patch of patches as Patch[]) {
+        if (!Array.isArray(patch.replacement)) patch.replacement = [patch.replacement];
+        for (const r of patch.replacement) {
+            if (typeof r.replace === "string") r.replace = r.replace.replaceAll("$self", "VCDP");
+        }
+
+        patch.plugin = "Vesktop";
+        Vencord.Plugins.patches.push(patch);
     }
 
-    Object.assign(VesktopPatchGlobals, globals);
+    Object.assign(VCDP, globals);
 }
