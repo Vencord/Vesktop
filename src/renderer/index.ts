@@ -13,6 +13,8 @@ import "./arrpc";
 
 export * as Components from "./components";
 
+import { findByPropsLazy } from "@vencord/types/webpack";
+
 import SettingsUi from "./components/settings/Settings";
 import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
