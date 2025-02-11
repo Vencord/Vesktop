@@ -81,7 +81,7 @@ export const VesktopNative = {
         },
         onToggleSelfDeaf: (listener: (...args: any[]) => void) => {
             ipcRenderer.on(IpcEvents.TOGGLE_SELF_DEAF, listener);
-        },
+        }
     },
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
