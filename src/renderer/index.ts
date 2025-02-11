@@ -32,20 +32,7 @@ customSettingsSections.push(() => ({
     className: "vc-vesktop-settings"
 }));
 
-const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
-    handleEvent(e: MessageEvent): void;
-};
-
-VesktopNative.arrpc.onActivity(async data => {
-    if (!Settings.store.arRPC) return;
-
-    await onceReady;
-
-    arRPC.handleEvent(new MessageEvent("message", { data }));
-});
-
 const VoiceActions = findByPropsLazy("toggleSelfMute");
 
 VesktopNative.voice.onToggleSelfMute(() => VoiceActions.toggleSelfMute());
-
 VesktopNative.voice.onToggleSelfDeaf(() => VoiceActions.toggleSelfDeaf());
