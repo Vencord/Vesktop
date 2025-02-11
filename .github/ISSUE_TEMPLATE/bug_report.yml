@@ -112,10 +112,8 @@ body:
       attributes:
           label: Debug Logs
           description: Run vesktop from the command line. Include the relevant command line output here. If there are any lines that seem relevant, try googling them or searching existing issues
-          value: |
-              ```
-              Replace this text with your crash-log. Do not remove the backticks
-              ```
+          placeholder: Paste your crash-log here.
+          render: shell
       validations:
           required: true
 

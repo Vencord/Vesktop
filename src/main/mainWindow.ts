@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import {
@@ -18,7 +18,7 @@ import {
 } from "electron";
 import { rm } from "fs/promises";
 import { join } from "path";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
@@ -36,6 +36,8 @@ import {
     MIN_WIDTH,
     VENCORD_FILES_DIR
 } from "./constants";
+import { darwinURL } from "./index";
+import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -198,9 +200,7 @@ function initMenuBar(win: BrowserWindow) {
                       label: "Settings",
                       accelerator: "CmdOrCtrl+,",
                       async click() {
-                          mainWin.webContents.executeJavaScript(
-                              "Vencord.Webpack.Common.SettingsRouter.open('My Account')"
-                          );
+                          sendRendererCommand(IpcCommands.NAVIGATE_SETTINGS);
                       }
                   },
                   {
@@ -271,7 +271,7 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayid);
+    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayId);
 
     if (x != null && y != null && storedDisplay) {
         options.x = x;
@@ -299,7 +299,7 @@ function getDarwinOptions(): BrowserWindowConstructorOptions {
         options.vibrancy = "sidebar";
         options.backgroundColor = "#ffffff00";
     } else {
-        if (splashTheming) {
+        if (splashTheming !== false) {
             options.backgroundColor = splashBackground;
         } else {
             options.backgroundColor = nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
@@ -321,7 +321,7 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
-        State.store.displayid = screen.getDisplayMatching(State.store.windowBounds).id;
+        State.store.displayId = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);
@@ -333,6 +333,7 @@ function initSettingsListeners(win: BrowserWindow) {
         if (enable) initTray(win);
         else tray?.destroy();
     });
+
     addSettingsListener("disableMinSize", disable => {
         if (disable) {
             // 0 no work
@@ -366,7 +367,7 @@ function initSettingsListeners(win: BrowserWindow) {
 }
 
 async function initSpellCheckLanguages(win: BrowserWindow, languages?: string[]) {
-    languages ??= await win.webContents.executeJavaScript("[...new Set(navigator.languages)]").catch(() => []);
+    languages ??= await sendRendererCommand(IpcCommands.GET_LANGUAGES);
     if (!languages) return;
 
     const ses = session.defaultSession;
@@ -384,19 +385,38 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
+function initStaticTitle(win: BrowserWindow) {
+    const listener = (e: { preventDefault: Function }) => e.preventDefault();
+
+    if (Settings.store.staticTitle) win.on("page-title-updated", listener);
+
+    addSettingsListener("staticTitle", enabled => {
+        if (enabled) {
+            win.setTitle("Vesktop");
+            win.on("page-title-updated", listener);
+        } else {
+            win.off("page-title-updated", listener);
+        }
+    });
+}
+
 function createMainWindow() {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
-    const { staticTitle, transparencyOption, enableMenu, customTitleBar } = Settings.store;
+    const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
+        Settings.store;
 
     const { frameless, transparent } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
+    const backgroundColor =
+        splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const win = (mainWin = new BrowserWindow({
-        show: false,
+        show: Settings.store.enableSplashScreen === false,
+        backgroundColor,
         webPreferences: {
             nodeIntegration: false,
             sandbox: false,
@@ -444,44 +464,51 @@ function createMainWindow() {
         return false;
     });
 
-    if (Settings.store.staticTitle) win.on("page-title-updated", e => e.preventDefault());
-
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
+    initStaticTitle(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
-    const subdomain =
-        Settings.store.discordBranch === "canary" || Settings.store.discordBranch === "ptb"
-            ? `${Settings.store.discordBranch}.`
-            : "";
-
-    win.loadURL(`https://${subdomain}discord.com/app`);
+    // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
+    loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
+export function loadUrl(uri: string | undefined) {
+    const branch = Settings.store.discordBranch;
+    const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+}
+
 export async function createWindows() {
     const startMinimized = process.argv.includes("--start-minimized");
-    const splash = createSplashWindow(startMinimized);
-    // SteamOS letterboxes and scales it terribly, so just full screen it
-    if (isDeckGameMode) splash.setFullScreen(true);
+
+    let splash: BrowserWindow | undefined;
+    if (Settings.store.enableSplashScreen !== false) {
+        splash = createSplashWindow(startMinimized);
+
+        // SteamOS letterboxes and scales it terribly, so just full screen it
+        if (isDeckGameMode) splash.setFullScreen(true);
+    }
+
     await ensureVencordFiles();
     runVencordMain();
 
     mainWin = createMainWindow();
 
     mainWin.webContents.on("did-finish-load", () => {
-        splash.destroy();
+        splash?.destroy();
 
         if (!startMinimized) {
-            mainWin!.show();
+            if (splash) mainWin!.show();
             if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
         }
 
@@ -497,6 +524,14 @@ export async function createWindows() {
                 mainWin!.maximize();
             }
         });
+    });
+
+    mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
+        // check url to ensure app doesn't loop
+        if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
+            loadUrl(undefined);
+            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
+        }
     });
 
     initArRPC();
