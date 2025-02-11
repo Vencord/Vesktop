@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 if (process.platform === "linux") import("./venmic");
@@ -134,6 +134,17 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
         image: nativeImage.createFromBuffer(Buffer.from(buf))
     });
 });
+
+function openDebugPage(page: string) {
+    const win = new BrowserWindow({
+        autoHideMenuBar: true
+    });
+
+    win.loadURL(page);
+}
+
+handle(IpcEvents.DEBUG_LAUNCH_GPU, () => openDebugPage("chrome://gpu"));
+handle(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS, () => openDebugPage("chrome://webrtc-internals"));
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");

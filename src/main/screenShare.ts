@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { desktopCapturer, session, Streams } from "electron";
@@ -47,8 +47,8 @@ export function registerScreenShareHandler() {
         if (isWayland) {
             const video = data[0];
             if (video) {
-                const stream = await request.frame
-                    .executeJavaScript(
+                const stream = await request
+                    .frame!.executeJavaScript(
                         `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
                     )
                     .catch(() => null);
@@ -59,8 +59,8 @@ export function registerScreenShareHandler() {
             return;
         }
 
-        const choice = await request.frame
-            .executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
+        const choice = await request
+            .frame!.executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
             .then(e => e as StreamPick)
             .catch(e => {
                 console.error("Error during screenshare picker", e);

@@ -1,14 +1,16 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebFrameMain } from "electron";
 import { DISCORD_HOSTNAMES } from "main/constants";
 import { IpcEvents } from "shared/IpcEvents";
 
-export function validateSender(frame: WebFrameMain) {
+export function validateSender(frame: WebFrameMain | null) {
+    if (!frame) throw new Error("ipc: No sender frame");
+
     const { hostname, protocol } = new URL(frame.url);
     if (protocol === "file:") return;
 

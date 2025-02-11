@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { BrowserWindow } from "electron";
@@ -22,7 +22,7 @@ export function createSplashWindow(startMinimized = false) {
 
     const { splashBackground, splashColor, splashTheming } = Settings.store;
 
-    if (splashTheming) {
+    if (splashTheming !== false) {
         if (splashColor) {
             const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
 

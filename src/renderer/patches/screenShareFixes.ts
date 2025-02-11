@@ -1,11 +1,12 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { Logger } from "@vencord/types/utils";
 import { currentSettings } from "renderer/components/ScreenSharePicker";
+import { State } from "renderer/settings";
 import { isLinux } from "renderer/utils";
 
 const logger = new Logger("VesktopStreamFixes");
@@ -27,8 +28,8 @@ if (isLinux) {
         const stream = await original.call(this, opts);
         const id = await getVirtmic();
 
-        const frameRate = Number(currentSettings?.fps);
-        const height = Number(currentSettings?.resolution);
+        const frameRate = Number(State.store.screenshareQuality?.frameRate ?? 30);
+        const height = Number(State.store.screenshareQuality?.resolution ?? 720);
         const width = Math.round(height * (16 / 9));
         const track = stream.getVideoTracks()[0];
 

@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import "./ipc";
@@ -23,10 +23,14 @@ if (IS_DEV) {
     autoUpdater.checkForUpdatesAndNotify();
 }
 
+console.log("Vesktop v" + app.getVersion());
+
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 function init() {
+    app.setAsDefaultProtocolClient("discord");
+
     const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
@@ -35,7 +39,12 @@ function init() {
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
     } else {
-        enabledFeatures.push("VaapiVideoDecodeLinuxGL", "VaapiVideoEncoder", "VaapiVideoDecoder");
+        enabledFeatures.push(
+            "AcceleratedVideoDecodeLinuxGL",
+            "AcceleratedVideoEncoder",
+            "AcceleratedVideoDecoder",
+            "AcceleratedVideoDecodeLinuxZeroCopyGL"
+        );
     }
 
     if (disableSmoothScroll) {
@@ -111,6 +120,12 @@ async function bootstrap() {
         createWindows();
     }
 }
+
+// MacOS only event
+export let darwinURL: string | undefined;
+app.on("open-url", (_, url) => {
+    darwinURL = url;
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();

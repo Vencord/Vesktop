@@ -1,11 +1,11 @@
 {
     "name": "vesktop",
-    "version": "1.5.3",
+    "version": "1.5.5",
     "private": true,
     "description": "Vesktop is a custom Discord desktop app",
     "keywords": [],
     "homepage": "https://vencord.dev/",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
     "scripts": {
@@ -21,39 +21,41 @@
         "test": "pnpm lint && pnpm testTypes",
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch",
-        "updateMeta": "tsx scripts/utils/updateMeta.mts"
+        "updateMeta": "tsx scripts/utils/updateMeta.mts",
+        "updateArrpcDB": "node ./node_modules/arrpc/update_db.js",
+        "postinstall": "pnpm updateArrpcDB"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#5aadc307cb9bf4479f0a12364a253b07a77ace22",
-        "electron-updater": "^6.3.4"
+        "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
+        "electron-updater": "^6.3.9"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@stylistic/eslint-plugin": "^2.8.0",
-        "@types/node": "^22.5.5",
-        "@types/react": "^18.3.8",
+        "@stylistic/eslint-plugin": "^3.0.1",
+        "@types/node": "^22.13.1",
+        "@types/react": "18.3.12",
         "@vencord/types": "^1.8.4",
-        "dotenv": "^16.4.5",
-        "electron": "^32.1.2",
-        "electron-builder": "^25.0.5",
-        "esbuild": "^0.23.1",
-        "eslint": "^9.11.0",
+        "dotenv": "^16.4.7",
+        "electron": "^34.1.0",
+        "electron-builder": "^25.1.8",
+        "esbuild": "^0.24.2",
+        "eslint": "^9.19.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "^2.1.0",
-        "eslint-plugin-prettier": "^5.2.1",
-        "eslint-plugin-simple-header": "^1.2.1",
+        "eslint-plugin-prettier": "^5.2.3",
+        "eslint-plugin-simple-header": "^1.2.2",
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unused-imports": "^4.1.4",
-        "prettier": "^3.3.3",
+        "prettier": "^3.4.2",
         "source-map-support": "^0.5.21",
-        "tsx": "^4.19.1",
-        "type-fest": "^4.26.1",
-        "typescript": "^5.6.2",
-        "typescript-eslint": "^8.6.0",
-        "xml-formatter": "^3.6.3"
+        "tsx": "^4.19.2",
+        "type-fest": "^4.33.0",
+        "typescript": "^5.7.3",
+        "typescript-eslint": "^8.23.0",
+        "xml-formatter": "^3.6.4"
     },
     "packageManager": "pnpm@9.1.0",
     "engines": {
@@ -71,6 +73,12 @@
             "package.json",
             "LICENSE"
         ],
+        "protocols": {
+            "name": "Discord",
+            "schemes": [
+                "discord"
+            ]
+        },
         "beforePack": "scripts/build/sandboxFix.js",
         "linux": {
             "icon": "build/icon.icns",
@@ -111,7 +119,8 @@
                 "GenericName": "Internet Messenger",
                 "Type": "Application",
                 "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;vencord;electron;chat;"
+                "Keywords": "discord;vencord;electron;chat;",
+                "MimeType": "x-scheme-handler/discord"
             }
         },
         "mac": {

@@ -6,6 +6,9 @@ on:
             - published
     workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
     update:
         runs-on: ubuntu-latest
@@ -29,10 +32,11 @@ jobs:
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git checkout -b ci/meta-update
+
+                  gh release upload "${{ github.event.release.tag_name }}" meta/dev.vencord.Vesktop.metainfo.xml
+
                   git add meta/dev.vencord.Vesktop.metainfo.xml
-                  git commit -m "Insert release changes for ${{ github.event.release.tag_name }}"
-                  git push origin ci/meta-update
-                  gh pr create -B main -H ci/meta-update -t "Metainfo for ${{ github.event.release.tag_name }}" -b "This PR updates the metainfo for release ${{ github.event.release.tag_name }}. @lewisakura @Vendicated"
+                  git commit -m "metainfo: add entry for ${{ github.event.release.tag_name }}"
+                  git push origin main
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

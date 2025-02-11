@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 export const enum IpcEvents {
@@ -52,5 +52,18 @@ export const enum IpcEvents {
 
     CLIPBOARD_COPY_IMAGE = "VCD_CLIPBOARD_COPY_IMAGE",
     TOGGLE_SELF_MUTE = "VCD_TOGGLE_SELF_MUTE",
-    TOGGLE_SELF_DEAF = "VCD_TOGGLE_SELF_DEAF"
+    TOGGLE_SELF_DEAF = "VCD_TOGGLE_SELF_DEAF",
+
+    DEBUG_LAUNCH_GPU = "VCD_DEBUG_LAUNCH_GPU",
+    DEBUG_LAUNCH_WEBRTC_INTERNALS = "VCD_DEBUG_LAUNCH_WEBRTC",
+
+    IPC_COMMAND = "VCD_IPC_COMMAND"
+}
+
+export const enum IpcCommands {
+    RPC_ACTIVITY = "rpc:activity",
+    RPC_INVITE = "rpc:invite",
+    RPC_DEEP_LINK = "rpc:link",
+    NAVIGATE_SETTINGS = "navigate:settings",
+    GET_LANGUAGES = "navigator.languages"
 }
