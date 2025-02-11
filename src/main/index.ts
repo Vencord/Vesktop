@@ -6,9 +6,9 @@
 
 import "./ipc";
 
-import { join } from "path";
 import { app, BrowserWindow, nativeTheme, net, protocol, session } from "electron";
 import { autoUpdater } from "electron-updater";
+import { join } from "path";
 
 import { DATA_DIR, VESKTOP_SPLASH_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
@@ -84,36 +84,35 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
-        
-        //register file handler so we can load the custom splash animation from the user's filesystem
+
+        // register file handler so we can load the custom splash animation from the user's filesystem
         protocol.handle("splash-animation", () => {
             const { splashAnimationPath } = Settings.store;
             const fullPath = join(VESKTOP_SPLASH_DIR, splashAnimationPath as string);
-            return net.fetch("file:///"+fullPath);
+            return net.fetch("file:///" + fullPath);
         });
 
-        //this patches the discord csp to allow the splash-animation:// protocol 
-        //the vencord:// protocol is already whitelisted, but the code for doing that is in the
-        //vencord repo, not the vesktop one. hopefully in the future, the splash image functionality
-        //can be added to the vencord:// protocol handler, or the vencord:// protocol handler can be moved here
+        // this patches the discord csp to allow the splash-animation:// protocol
+        // the vencord:// protocol is already whitelisted, but the code for doing that is in the
+        // vencord repo, not the vesktop one. hopefully in the future, the splash image functionality
+        // can be added to the vencord:// protocol handler, or the vencord:// protocol handler can be moved here
         let otherHandler: any = null;
-        session.defaultSession.webRequest.onHeadersReceived(({responseHeaders, resourceType}, callback) => {
+        session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders, resourceType }, callback) => {
             if (responseHeaders && resourceType === "mainFrame" && responseHeaders["content-security-policy"]) {
                 let csp = responseHeaders["content-security-policy"][0];
                 csp = csp.replace("img-src", "img-src splash-animation:");
                 responseHeaders["content-security-policy"] = [csp];
             }
             if (otherHandler) {
-                otherHandler({responseHeaders, resourceType}, callback);
-            }
-            else {
+                otherHandler({ responseHeaders, resourceType }, callback);
+            } else {
                 callback({ cancel: false, responseHeaders });
             }
         });
-        //we need to overwrite onHeadersReceived because normally electron only allows one handler to be active at a time
-        session.defaultSession.webRequest.onHeadersReceived = (handler) => {
+        // we need to overwrite onHeadersReceived because normally electron only allows one handler to be active at a time
+        session.defaultSession.webRequest.onHeadersReceived = handler => {
             otherHandler = handler;
-        }
+        };
 
         bootstrap();
 

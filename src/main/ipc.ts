@@ -7,12 +7,12 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
-import { mkdirSync, readFileSync, watch, existsSync } from "fs";
-import { open, readFile, copyFile, mkdir, rmdir } from "fs/promises";
-import { release } from "os";
 import { randomBytes } from "crypto";
-import { join, extname } from "path";
+import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
+import { existsSync, mkdirSync, readFileSync, watch } from "fs";
+import { copyFile, mkdir, open, readFile, rmdir } from "fs/promises";
+import { release } from "os";
+import { extname, join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
@@ -130,9 +130,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
 handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
     const res = await dialog.showOpenDialog(mainWin!, {
         properties: ["openFile"],
-        filters: [
-            {name: "Images", extensions: ["apng", "avif", "gif", "jpeg", "png", "svg", "webp"]}
-        ]
+        filters: [{ name: "Images", extensions: ["apng", "avif", "gif", "jpeg", "png", "svg", "webp"] }]
     });
     if (!res.filePaths.length) return "cancelled";
 
@@ -142,9 +140,9 @@ handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
     const destPath = join(VESKTOP_SPLASH_DIR, imageName);
 
     if (existsSync(VESKTOP_SPLASH_DIR)) {
-        await rmdir(VESKTOP_SPLASH_DIR, {recursive: true});
+        await rmdir(VESKTOP_SPLASH_DIR, { recursive: true });
     }
-    await mkdir(VESKTOP_SPLASH_DIR, {recursive: true});
+    await mkdir(VESKTOP_SPLASH_DIR, { recursive: true });
     await copyFile(originalPath, destPath);
 
     return imageName;
@@ -158,6 +156,17 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
         image: nativeImage.createFromBuffer(Buffer.from(buf))
     });
 });
+
+function openDebugPage(page: string) {
+    const win = new BrowserWindow({
+        autoHideMenuBar: true
+    });
+
+    win.loadURL(page);
+}
+
+handle(IpcEvents.DEBUG_LAUNCH_GPU, () => openDebugPage("chrome://gpu"));
+handle(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS, () => openDebugPage("chrome://webrtc-internals"));
 
 function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
