@@ -18,8 +18,27 @@ import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
 export { Settings };
 
+export const keybindCallbacks: {
+    [id: number]: {
+        onTrigger: Function;
+        keyEvents: {
+            keyup: boolean;
+            keydown: boolean;
+        };
+    };
+} = {};
+
 VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
+
+export async function triggerKeybind(id: number, keyup: boolean) {
+    var cb = keybindCallbacks[id];
+    if (cb.keyEvents.keyup && keyup) {
+        cb.onTrigger(false);
+    } else if (cb.keyEvents.keydown && !keyup) {
+        cb.onTrigger(true);
+    }
+}
 
 const customSettingsSections = (
     Vencord.Plugins.plugins.Settings as any as { customSections: ((ID: Record<string, unknown>) => any)[] }
