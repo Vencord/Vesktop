@@ -5,7 +5,7 @@
  */
 
 import { mkdirSync } from "fs";
-import { access, constants as FsConstants } from "fs/promises";
+import { access, constants as FsConstants, writeFile } from "fs/promises";
 import { join } from "path";
 
 import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
@@ -63,7 +63,8 @@ const existsAsync = (path: string) =>
         .catch(() => false);
 
 export async function isValidVencordInstall(dir: string) {
-    return Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f)))).then(arr => !arr.includes(false));
+    const results = await Promise.all(["package.json", ...FILES_TO_DOWNLOAD].map(f => existsAsync(join(dir, f))));
+    return results.every(Boolean);
 }
 
 export async function ensureVencordFiles() {
@@ -71,5 +72,5 @@ export async function ensureVencordFiles() {
 
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
-    await downloadVencordFiles();
+    await Promise.all([downloadVencordFiles(), writeFile(join(VENCORD_FILES_DIR, "package.json"), "{}")]);
 }
