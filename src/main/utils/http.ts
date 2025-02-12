@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { createWriteStream } from "fs";
+import { createWriteStream } from "original-fs";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import { setTimeout } from "timers/promises";

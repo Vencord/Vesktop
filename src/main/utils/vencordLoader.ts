@@ -4,21 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { mkdirSync } from "fs";
-import { access, constants as FsConstants } from "fs/promises";
+import { existsSync } from "fs";
 import { join } from "path";
 
-import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
+import { USER_AGENT, VENCORD_DIR } from "../constants";
 import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";
-
-export const FILES_TO_DOWNLOAD = [
-    "vencordDesktopMain.js",
-    "vencordDesktopPreload.js",
-    "vencordDesktopRenderer.js",
-    "vencordDesktopRenderer.css"
-];
 
 export interface ReleaseData {
     name: string;
@@ -43,33 +35,21 @@ export async function githubGet(endpoint: string) {
     return fetchie(API_BASE + endpoint, opts, { retryOnNetworkError: true });
 }
 
-export async function downloadVencordFiles() {
-    const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
-
-    const { assets }: ReleaseData = await release.json();
-
-    await Promise.all(
-        assets
-            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
-            .map(({ name, browser_download_url }) =>
-                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
-            )
+export async function downloadVencordAsar() {
+    await downloadFile(
+        "https://github.com/Vendicated/Vencord/releases/latest/download/vesktop.asar",
+        VENCORD_DIR,
+        {},
+        { retryOnNetworkError: true }
     );
 }
 
-const existsAsync = (path: string) =>
-    access(path, FsConstants.F_OK)
-        .then(() => true)
-        .catch(() => false);
-
-export async function isValidVencordInstall(dir: string) {
-    return Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f)))).then(arr => !arr.includes(false));
+export function isValidVencordInstall(dir: string) {
+    return existsSync(join(dir, "vesktop/main.js"));
 }
 
 export async function ensureVencordFiles() {
-    if (await isValidVencordInstall(VENCORD_FILES_DIR)) return;
+    if (existsSync(VENCORD_DIR)) return;
 
-    mkdirSync(VENCORD_FILES_DIR, { recursive: true });
-
-    await downloadVencordFiles();
+    await downloadVencordAsar();
 }
