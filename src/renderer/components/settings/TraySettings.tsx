@@ -7,7 +7,7 @@
 import "./traySetting.css";
 
 import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
-import { findByPropsLazy, findComponentByCodeLazy } from "@vencord/types/webpack";
+import { findComponentByCodeLazy } from "@vencord/types/webpack";
 import { Button, Forms, Select, Switch, Toasts } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
 import { useSettings } from "renderer/settings";
@@ -18,7 +18,6 @@ const ColorPicker = findComponentByCodeLazy(
     "#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}",
     ".BACKGROUND_PRIMARY)"
 );
-const { PencilIcon } = findByPropsLazy("PencilIcon");
 
 const presets = [
     "#3DB77F", // discord default ~
@@ -85,15 +84,20 @@ function trayEditButton(iconName: string) {
                 width="48"
                 height="48"
                 id={iconName}
-            ></img>
-            <PencilIcon
+            />
+            <div
                 className="vcd-edit-button"
-                width="40"
-                height="40"
                 onClick={async () => {
                     changeIcon(iconName, Settings);
                 }}
-            />
+            >
+                <svg role="img" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                    <path
+                        fill="white"
+                        d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"
+                    />
+                </svg>
+            </div>
         </div>
     );
 }
