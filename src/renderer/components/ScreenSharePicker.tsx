@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import "./screenSharePicker.css";
@@ -22,11 +22,13 @@ import {
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
-import { useSettings } from "renderer/settings";
-import { isLinux, isWindows } from "renderer/utils";
+import { State, useSettings, useVesktopState } from "renderer/settings";
+import { classNameFactory, isLinux, isWindows } from "renderer/utils";
 
-const StreamResolutions = ["480", "720", "1080", "1440"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
 const StreamFps = ["15", "30", "60"] as const;
+
+const cl = classNameFactory("vcd-screen-picker-");
 
 const MediaEngineStore = findStoreLazy("MediaEngineStore");
 
@@ -44,8 +46,6 @@ interface AudioItem {
 }
 
 interface StreamSettings {
-    resolution: StreamResolution;
-    fps: StreamFps;
     audio: boolean;
     contentHint?: string;
     includeSources?: AudioSources;
@@ -77,10 +77,11 @@ addPatch({
         }
     ],
     patchStreamQuality(opts: any) {
-        if (!currentSettings) return;
+        const { screenshareQuality } = State.store;
+        if (!screenshareQuality) return;
 
-        const framerate = Number(currentSettings.fps);
-        const height = Number(currentSettings.resolution);
+        const framerate = Number(screenshareQuality.frameRate);
+        const height = Number(screenshareQuality.resolution);
         const width = Math.round(height * (16 / 9));
 
         Object.assign(opts, {
@@ -161,13 +162,21 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
 
 function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (id: string) => void }) {
     return (
-        <div className="vcd-screen-picker-grid">
+        <div className={cl("screen-grid")}>
             {screens.map(({ id, name, url }) => (
-                <label key={id}>
-                    <input type="radio" name="screen" value={id} onChange={() => chooseScreen(id)} />
+                <label key={id} className={cl("screen-label")}>
+                    <input
+                        type="radio"
+                        className={cl("screen-radio")}
+                        name="screen"
+                        value={id}
+                        onChange={() => chooseScreen(id)}
+                    />
 
                     <img src={url} alt="" />
-                    <Text variant="text-sm/normal">{name}</Text>
+                    <Text className={cl("screen-name")} variant="text-sm/normal">
+                        {name}
+                    </Text>
                 </label>
             ))}
         </div>
@@ -187,11 +196,13 @@ function AudioSettingsModal({
 
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
-            <Modals.ModalHeader className="vcd-screen-picker-header">
-                <Forms.FormTitle tag="h2">Venmic Settings</Forms.FormTitle>
+            <Modals.ModalHeader className={cl("header")}>
+                <Forms.FormTitle tag="h2" className={cl("header-title")}>
+                    Venmic Settings
+                </Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
-            <Modals.ModalContent className="vcd-screen-picker-modal">
+            <Modals.ModalContent className={cl("modal")}>
                 <Switch
                     hideBorder
                     onChange={v => (Settings.audio = { ...Settings.audio, workaround: v })}
@@ -295,7 +306,7 @@ function AudioSettingsModal({
                     Device Selection
                 </Switch>
             </Modals.ModalContent>
-            <Modals.ModalFooter className="vcd-screen-picker-footer">
+            <Modals.ModalFooter className={cl("footer")}>
                 <Button color={Button.Colors.TRANSPARENT} onClick={close}>
                     Back
                 </Button>
@@ -304,7 +315,35 @@ function AudioSettingsModal({
     );
 }
 
-function StreamSettings({
+function OptionRadio<Settings extends object, Key extends keyof Settings>(props: {
+    options: Array<string> | ReadonlyArray<string>;
+    labels?: Array<string>;
+    settings: Settings;
+    settingsKey: Key;
+    onChange: (option: string) => void;
+}) {
+    const { options, settings, settingsKey, labels, onChange } = props;
+
+    return (
+        <div className={cl("option-radios")}>
+            {(options as string[]).map((option, idx) => (
+                <label className={cl("option-radio")} data-checked={settings[settingsKey] === option} key={option}>
+                    <Text variant="text-sm/bold">{labels?.[idx] ?? option}</Text>
+                    <input
+                        className={cl("option-input")}
+                        type="radio"
+                        name="fps"
+                        value={option}
+                        checked={settings[settingsKey] === option}
+                        onChange={() => onChange(option)}
+                    />
+                </label>
+            ))}
+        </div>
+    );
+}
+
+function StreamSettingsUi({
     source,
     settings,
     setSettings,
@@ -316,6 +355,7 @@ function StreamSettings({
     skipPicker: boolean;
 }) {
     const Settings = useSettings();
+    const qualitySettings = State.store.screenshareQuality!;
 
     const [thumb] = useAwaiter(
         () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
@@ -340,88 +380,47 @@ function StreamSettings({
     return (
         <div>
             <Forms.FormTitle>What you're streaming</Forms.FormTitle>
-            <Card className="vcd-screen-picker-card vcd-screen-picker-preview">
-                <img
-                    src={thumb}
-                    alt=""
-                    className={isLinux ? "vcd-screen-picker-preview-img-linux" : "vcd-screen-picker-preview-img"}
-                />
+            <Card className={cl("card", "preview")}>
+                <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
                 <Text variant="text-sm/normal">{source.name}</Text>
             </Card>
 
             <Forms.FormTitle>Stream Settings</Forms.FormTitle>
 
-            <Card className="vcd-screen-picker-card">
-                <div className="vcd-screen-picker-quality">
-                    <section>
+            <Card className={cl("card")}>
+                <div className={cl("quality")}>
+                    <section className={cl("quality-section")}>
                         <Forms.FormTitle>Resolution</Forms.FormTitle>
-                        <div className="vcd-screen-picker-radios">
-                            {StreamResolutions.map(res => (
-                                <label className="vcd-screen-picker-radio" data-checked={settings.resolution === res}>
-                                    <Text variant="text-sm/bold">{res}</Text>
-                                    <input
-                                        type="radio"
-                                        name="resolution"
-                                        value={res}
-                                        checked={settings.resolution === res}
-                                        onChange={() => setSettings(s => ({ ...s, resolution: res }))}
-                                    />
-                                </label>
-                            ))}
-                        </div>
+                        <OptionRadio
+                            options={StreamResolutions}
+                            settings={qualitySettings}
+                            settingsKey="resolution"
+                            onChange={value => (qualitySettings.resolution = value)}
+                        />
                     </section>
 
-                    <section>
+                    <section className={cl("quality-section")}>
                         <Forms.FormTitle>Frame Rate</Forms.FormTitle>
-                        <div className="vcd-screen-picker-radios">
-                            {StreamFps.map(fps => (
-                                <label className="vcd-screen-picker-radio" data-checked={settings.fps === fps}>
-                                    <Text variant="text-sm/bold">{fps}</Text>
-                                    <input
-                                        type="radio"
-                                        name="fps"
-                                        value={fps}
-                                        checked={settings.fps === fps}
-                                        onChange={() => setSettings(s => ({ ...s, fps }))}
-                                    />
-                                </label>
-                            ))}
-                        </div>
+                        <OptionRadio
+                            options={StreamFps}
+                            settings={qualitySettings}
+                            settingsKey="frameRate"
+                            onChange={value => (qualitySettings.frameRate = value)}
+                        />
                     </section>
                 </div>
-                <div className="vcd-screen-picker-quality">
-                    <section>
+                <div className={cl("quality")}>
+                    <section className={cl("quality-section")}>
                         <Forms.FormTitle>Content Type</Forms.FormTitle>
                         <div>
-                            <div className="vcd-screen-picker-radios">
-                                <label
-                                    className="vcd-screen-picker-radio"
-                                    data-checked={settings.contentHint === "motion"}
-                                >
-                                    <Text variant="text-sm/bold">Prefer Smoothness</Text>
-                                    <input
-                                        type="radio"
-                                        name="contenthint"
-                                        value="motion"
-                                        checked={settings.contentHint === "motion"}
-                                        onChange={() => setSettings(s => ({ ...s, contentHint: "motion" }))}
-                                    />
-                                </label>
-                                <label
-                                    className="vcd-screen-picker-radio"
-                                    data-checked={settings.contentHint === "detail"}
-                                >
-                                    <Text variant="text-sm/bold">Prefer Clarity</Text>
-                                    <input
-                                        type="radio"
-                                        name="contenthint"
-                                        value="detail"
-                                        checked={settings.contentHint === "detail"}
-                                        onChange={() => setSettings(s => ({ ...s, contentHint: "detail" }))}
-                                    />
-                                </label>
-                            </div>
-                            <div className="vcd-screen-picker-hint-description">
+                            <OptionRadio
+                                options={["motion", "detail"]}
+                                labels={["Prefer Smoothness", "Prefer Clarity"]}
+                                settings={settings}
+                                settingsKey="contentHint"
+                                onChange={option => setSettings(s => ({ ...s, contentHint: option }))}
+                            />
+                            <div className={cl("hint-description")}>
                                 <p>
                                     Choosing "Prefer Clarity" will result in a significantly lower framerate in exchange
                                     for a much sharper and clearer image.
@@ -433,7 +432,7 @@ function StreamSettings({
                                 value={settings.audio}
                                 onChange={checked => setSettings(s => ({ ...s, audio: checked }))}
                                 hideBorder
-                                className="vcd-screen-picker-audio"
+                                className={cl("audio")}
                             >
                                 Stream With Audio
                             </Switch>
@@ -639,7 +638,7 @@ function AudioSourcePickerLinux({
 
     return (
         <>
-            <div className={includeSources === "Entire System" ? "vcd-screen-picker-quality" : undefined}>
+            <div className={cl({ quality: includeSources === "Entire System" })}>
                 <section>
                     <Forms.FormTitle>{loading ? "Loading Sources..." : "Audio Sources"}</Forms.FormTitle>
                     <Select
@@ -675,11 +674,7 @@ function AudioSourcePickerLinux({
                     </section>
                 )}
             </div>
-            <Button
-                color={Button.Colors.TRANSPARENT}
-                onClick={openSettings}
-                className="vcd-screen-picker-settings-button"
-            >
+            <Button color={Button.Colors.TRANSPARENT} onClick={openSettings} className={cl("settings-button")}>
                 Open Audio Settings
             </Button>
         </>
@@ -701,24 +696,26 @@ function ModalComponent({
 }) {
     const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
-        resolution: "720",
-        fps: "30",
         contentHint: "motion",
         audio: true,
         includeSources: "None"
     });
+    const qualitySettings = (useVesktopState().screenshareQuality ??= {
+        resolution: "720",
+        frameRate: "30"
+    });
 
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
-            <Modals.ModalHeader className="vcd-screen-picker-header">
+            <Modals.ModalHeader className={cl("header")}>
                 <Forms.FormTitle tag="h2">ScreenShare</Forms.FormTitle>
                 <Modals.ModalCloseButton onClick={close} />
             </Modals.ModalHeader>
-            <Modals.ModalContent className="vcd-screen-picker-modal">
+            <Modals.ModalContent className={cl("modal")}>
                 {!selected ? (
                     <ScreenPicker screens={screens} chooseScreen={setSelected} />
                 ) : (
-                    <StreamSettings
+                    <StreamSettingsUi
                         source={screens.find(s => s.id === selected)!}
                         settings={settings}
                         setSettings={setSettings}
@@ -726,14 +723,14 @@ function ModalComponent({
                     />
                 )}
             </Modals.ModalContent>
-            <Modals.ModalFooter className="vcd-screen-picker-footer">
+            <Modals.ModalFooter className={cl("footer")}>
                 <Button
                     disabled={!selected}
                     onClick={() => {
                         currentSettings = settings;
                         try {
-                            const frameRate = Number(settings.fps);
-                            const height = Number(settings.resolution);
+                            const frameRate = Number(qualitySettings.frameRate);
+                            const height = Number(qualitySettings.resolution);
                             const width = Math.round(height * (16 / 9));
 
                             const conn = [...MediaEngineStore.getMediaEngine().connections].find(

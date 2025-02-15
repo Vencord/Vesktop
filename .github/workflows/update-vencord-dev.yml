@@ -1,0 +1,28 @@
+name: Update vencord.dev Vesktop version
+
+on:
+    release:
+        types:
+            - published
+
+jobs:
+    update:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Update scripts/_latestVesktopVersion.txt file in vencord.dev repo
+              run: |
+                  git config --global user.name "$USERNAME"
+                  git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+                  git clone https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git repo
+
+                  cd repo
+                  echo "${{ github.event.release.tag_name }}" > scripts/_latestVesktopVersion.txt
+                  
+                  git add scripts/_latestVesktopVersion.txt
+                  git commit -m "Update Vesktop version to ${{ github.event.release.tag_name }}"
+                  git push https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git
+              env:
+                  API_TOKEN: ${{ secrets.VENCORD_DEV_GITHUB_TOKEN }}
+                  GH_REPO: Vencord/vencord.dev
+                  USERNAME: GitHub-Actions

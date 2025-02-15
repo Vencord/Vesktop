@@ -1,14 +1,27 @@
 diff --git a/src/process/index.js b/src/process/index.js
-index 97ea6514b54dd9c5df588c78f0397d31ab5f882a..c2bdbd6aaa5611bc6ff1d993beeb380b1f5ec575 100644
+index 389b0845256a34b4536d6da99edb00d17f13a6b4..f17a0ac687e9110ebfd33cb91fd2f6250d318643 100644
 --- a/src/process/index.js
 +++ b/src/process/index.js
-@@ -5,8 +5,7 @@ import fs from 'node:fs';
+@@ -5,8 +5,20 @@ import fs from 'node:fs';
  import { dirname, join } from 'path';
  import { fileURLToPath } from 'url';
  
 -const __dirname = dirname(fileURLToPath(import.meta.url));
 -const DetectableDB = JSON.parse(fs.readFileSync(join(__dirname, 'detectable.json'), 'utf8'));
 +const DetectableDB = require('./detectable.json');
++DetectableDB.push(
++  {
++    aliases: ["Obs"],
++    executables: [
++      { is_launcher: false, name: "obs", os: "linux" },
++      { is_launcher: false, name: "obs.exe", os: "win32" },
++      { is_launcher: false, name: "obs.app", os: "darwin" }
++    ],
++    hook: true,
++    id: "STREAMERMODE",
++    name: "OBS"
++  }
++);
  
  import * as Natives from './native/index.js';
  const Native = Natives[process.platform];
