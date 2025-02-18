@@ -19,11 +19,7 @@ if (Settings.store.customTitleBar)
                         // eslint-disable-next-line no-useless-escape
                         match: /case \i\.\i\.WINDOWS:/,
                         replace: 'case "WEB":'
-                    },
-                    ...["close", "minimize", "maximize"].map(op => ({
-                        match: new RegExp(String.raw`\i\.\i\.${op}\b`),
-                        replace: `VesktopNative.win.${op}`
-                    }))
+                    }
                 ]
             }
         ]
