@@ -9,13 +9,17 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".DEEP_LINK]:{",
+            find: ",setSystemTrayApplications",
             replacement: [
+                ...["close", "minimize", "maximize"].map(op => ({
+                    match: new RegExp(String.raw`\i\.window\.${op}`),
+                    replace: `VesktopNative.win.${op}`
+                })),
                 {
                     // TODO: Fix eslint rule
                     // eslint-disable-next-line no-useless-escape
-                    match: /(?<=\.DEEP_LINK.{0,200}?)\i\.\i\.focus\(\)/,
-                    replace: "VesktopNative.win.focus()"
+                    match: /(focus(\(\i\)){).{0,150}?\.focus\(\i,\i\)/,
+                    replace: "$1VesktopNative.win.focus$2"
                 }
             ]
         }
