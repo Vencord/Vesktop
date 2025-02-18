@@ -7,14 +7,13 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
 export function createSplashWindow(startMinimized = false) {
     const splash = new BrowserWindow({
         ...SplashProps,
-        icon: ICON_PATH,
         show: !startMinimized
     });
 
