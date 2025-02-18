@@ -20,6 +20,14 @@
             background: var(--bg);
         }
 
+        .message {
+            top: 70%;
+            word-break: break-word;
+            padding: 0 16px;
+            position: absolute;
+            font-size: 14px
+        }
+
         p {
             text-align: center;
         }
@@ -32,7 +40,7 @@
     </style>
 </head>
 
-<body>
+<body style="overflow: hidden;">
     <div class="wrapper">
         <img
             draggable="false"
@@ -41,5 +49,15 @@
             role="presentation"
         />
         <p>Loading Vesktop...</p>
+        <p class="message"></p>
     </div>
 </body>
+
+<script>
+    window.onload = () => {
+        const messageElement = document.querySelector('.message');
+        window.electronAPI.onUpdateMessage((message) => {
+            messageElement.textContent = message;
+        })
+    };
+</script>
