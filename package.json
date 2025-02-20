@@ -183,7 +183,8 @@
                         "arm64"
                     ]
                 }
-            ]
+            ],
+            "icon": "icon.ico"
         },
         "publish": {
             "provider": "github"
