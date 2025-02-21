@@ -25,6 +25,7 @@ export interface Settings {
     enableSplashScreen?: boolean;
     splashTheming?: boolean;
     splashColor?: string;
+    splashAnimationPath?: string;
     splashBackground?: string;
 
     spellCheckLanguages?: string[];
