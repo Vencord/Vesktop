@@ -16,6 +16,7 @@ export interface Settings {
     enableMenu?: boolean;
     disableSmoothScroll?: boolean;
     hardwareAcceleration?: boolean;
+    videoHardwareAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
     disableMinSize?: boolean;

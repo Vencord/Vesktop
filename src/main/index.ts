@@ -31,14 +31,16 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 function init() {
     app.setAsDefaultProtocolClient("discord");
 
-    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, videoHardwareAcceleration } = Settings.store;
 
     const enabledFeatures = app.commandLine.getSwitchValue("enable-features").split(",");
     const disabledFeatures = app.commandLine.getSwitchValue("disable-features").split(",");
 
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
-    } else {
+    }
+    
+    if (hardwareAcceleration && videoHardwareAcceleration) {
         enabledFeatures.push(
             "AcceleratedVideoDecodeLinuxGL",
             "AcceleratedVideoEncoder",
