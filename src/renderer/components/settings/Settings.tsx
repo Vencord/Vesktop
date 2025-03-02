@@ -38,13 +38,6 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Hardware Acceleration",
             description: "Enable hardware acceleration",
             defaultValue: true
-        },
-        {
-            key: "videoHardwareAcceleration",
-            title: "Video Hardware Acceleration",
-            description: "Improves screensharing performance. May cause color glitches. Requires a full restart.",
-            defaultValue: true,
-            disabled: () => Settings.store.hardwareAcceleration === false
         }
     ],
     "User Interface": [

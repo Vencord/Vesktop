@@ -39,7 +39,7 @@ function init() {
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
     }
-    
+
     if (hardwareAcceleration && videoHardwareAcceleration) {
         enabledFeatures.push(
             "AcceleratedVideoDecodeLinuxGL",
