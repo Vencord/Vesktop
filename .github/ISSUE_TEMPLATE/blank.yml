@@ -1,15 +1,12 @@
 name: Blank Issue
-description: Reserved for developers. Use the bug report or feature request templates instead.
+description: Reserved for Vesktop Developers. Join our support server for support.
 
 body:
     - type: markdown
       attributes:
           value: |
               ![Are you a developer? No? This form is not for you!](https://github.com/Vencord/Vesktop/blob/main/.github/ISSUE_TEMPLATE/developer-banner.png?raw=true)
-
-
               GitHub Issues are for developers, not support. Please use our [support server](https://vencord.dev/discord) if you are not a developer.
-
     - type: textarea
       id: content
       attributes:
