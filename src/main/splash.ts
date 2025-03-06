@@ -12,6 +12,8 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 import { Settings } from "./settings";
 
 export function createSplashWindow(startMinimized = false) {
+    const { splashBackground, splashColor, splashTheming, splashAnimationPath } = Settings.store;
+
     const splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
@@ -19,8 +21,6 @@ export function createSplashWindow(startMinimized = false) {
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
-
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
 
     if (splashTheming !== false) {
         if (splashColor) {
@@ -33,6 +33,17 @@ export function createSplashWindow(startMinimized = false) {
         if (splashBackground) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
+    }
+
+    if (splashAnimationPath) {
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "splash-animation://img";
+        `);
+    } else {
+        splash.webContents.insertCSS(`img {image-rendering: pixelated}`);
+        splash.webContents.executeJavaScript(`
+            document.getElementById("animation").src = "../shiggy.gif";
+        `);
     }
 
     return splash;

@@ -7,17 +7,18 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
+import { randomBytes } from "crypto";
 import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
-import { mkdirSync, readFileSync, watch } from "fs";
-import { open, readFile } from "fs/promises";
+import { existsSync, mkdirSync, readFileSync, watch } from "fs";
+import { copyFile, mkdir, open, readFile, rmdir } from "fs/promises";
 import { release } from "os";
-import { join } from "path";
+import { extname, join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
-import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
+import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR, VESKTOP_SPLASH_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
@@ -124,6 +125,27 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
     State.store.vencordDir = dir;
 
     return "ok";
+});
+
+handle(IpcEvents.SELECT_IMAGE_PATH, async () => {
+    const res = await dialog.showOpenDialog(mainWin!, {
+        properties: ["openFile"],
+        filters: [{ name: "Images", extensions: ["apng", "avif", "gif", "jpeg", "png", "svg", "webp"] }]
+    });
+    if (!res.filePaths.length) return "cancelled";
+
+    const originalPath = res.filePaths[0];
+    const uuid = randomBytes(16).toString("hex");
+    const imageName = "splash_" + uuid + extname(originalPath);
+    const destPath = join(VESKTOP_SPLASH_DIR, imageName);
+
+    if (existsSync(VESKTOP_SPLASH_DIR)) {
+        await rmdir(VESKTOP_SPLASH_DIR, { recursive: true });
+    }
+    await mkdir(VESKTOP_SPLASH_DIR, { recursive: true });
+    await copyFile(originalPath, destPath);
+
+    return imageName;
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
