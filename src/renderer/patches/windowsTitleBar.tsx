@@ -19,11 +19,25 @@ if (Settings.store.customTitleBar)
                         // eslint-disable-next-line no-useless-escape
                         match: /case \i\.\i\.WINDOWS:/,
                         replace: 'case "WEB":'
+                    }
+                ]
+            },
+            // Visual Refresh
+            {
+                find: '"data-windows":',
+                replacement: [
+                    {
+                        // TODO: Fix eslint rule
+                        // eslint-disable-next-line no-useless-escape
+                        match: /\i===\i\.PlatformTypes\.WINDOWS/g,
+                        replace: "true"
                     },
-                    ...["close", "minimize", "maximize"].map(op => ({
-                        match: new RegExp(String.raw`\i\.\i\.${op}\b`),
-                        replace: `VesktopNative.win.${op}`
-                    }))
+                    {
+                        // TODO: Fix eslint rule
+                        // eslint-disable-next-line no-useless-escape
+                        match: /\i===\i\.PlatformTypes\.WEB/g,
+                        replace: "false"
+                    }
                 ]
             }
         ]
