@@ -65,6 +65,10 @@
     "build": {
         "appId": "dev.vencord.vesktop",
         "productName": "Vesktop",
+        "extraResources": [
+            "build",
+            "static/icon.ico"
+        ],
         "files": [
             "!*",
             "!node_modules",
@@ -183,7 +187,8 @@
                         "arm64"
                     ]
                 }
-            ]
+            ],
+            "icon": "static/icon.ico"
         },
         "publish": {
             "provider": "github"
