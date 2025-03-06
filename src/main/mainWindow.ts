@@ -395,6 +395,7 @@ function initStaticTitle(win: BrowserWindow) {
             win.setTitle("Vesktop");
             win.on("page-title-updated", listener);
         } else {
+            win.setTitle(win.getTitle().replace(/^\(\d+\)\s*|•\s/, ""));
             win.off("page-title-updated", listener);
         }
     });

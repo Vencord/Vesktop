@@ -12,6 +12,7 @@ import { Settings } from "./settings";
 
 let GuildReadStateStore: any;
 let NotificationSettingsStore: any;
+let MessageRequestStore: any;
 
 export function setBadge() {
     if (Settings.store.appBadge === false) return;
@@ -19,10 +20,11 @@ export function setBadge() {
     try {
         const mentionCount = GuildReadStateStore.getTotalMentionCount();
         const pendingRequests = RelationshipStore.getPendingCount();
+        const messageRequests = MessageRequestStore.getMessageRequestsCount();
         const hasUnread = GuildReadStateStore.hasAnyUnread();
         const disableUnreadBadge = NotificationSettingsStore.getDisableUnreadBadge();
 
-        let totalCount = mentionCount + pendingRequests;
+        let totalCount = mentionCount + pendingRequests + messageRequests;
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
         VesktopNative.app.setBadgeCount(totalCount);
@@ -45,4 +47,5 @@ function waitForAndSubscribeToStore(name: string, cb?: (m: any) => void) {
 
 waitForAndSubscribeToStore("GuildReadStateStore", store => (GuildReadStateStore = store));
 waitForAndSubscribeToStore("NotificationSettingsStore", store => (NotificationSettingsStore = store));
+waitForAndSubscribeToStore("MessageRequestStore", store => (MessageRequestStore = store));
 waitForAndSubscribeToStore("RelationshipStore");
