@@ -13,6 +13,8 @@ import "./arrpc";
 
 export * as Components from "./components";
 
+import { findByPropsLazy } from "@vencord/types/webpack";
+
 import SettingsUi from "./components/settings/Settings";
 import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
@@ -31,3 +33,8 @@ customSettingsSections.push(() => ({
     element: SettingsUi,
     className: "vc-vesktop-settings"
 }));
+
+const VoiceActions = findByPropsLazy("toggleSelfMute");
+
+VesktopNative.voice.onToggleSelfMute(() => VoiceActions.toggleSelfMute());
+VesktopNative.voice.onToggleSelfDeaf(() => VoiceActions.toggleSelfDeaf());
