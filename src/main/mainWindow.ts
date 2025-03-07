@@ -256,12 +256,6 @@ function initMenuBar(win: BrowserWindow) {
         {
             role: "viewMenu",
             submenu: [
-                { role: "resetZoom" },
-                { role: "zoomIn" },
-                { role: "zoomOut" },
-                { type: "separator" },
-                { role: "togglefullscreen" },
-                { type: "separator" },
                 {
                     role: "toggleDevTools",
                     accelerator: process.platform === 'darwin' ? 'Cmd+Shift+I' : 'Ctrl+Shift+I'
