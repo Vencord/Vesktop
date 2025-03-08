@@ -258,7 +258,7 @@ function initMenuBar(win: BrowserWindow) {
             submenu: [
                 {
                     role: "toggleDevTools",
-                    accelerator: process.platform === 'darwin' ? 'Cmd+Shift+I' : 'Ctrl+Shift+I'
+                    accelerator: process.platform === 'darwin' ? 'Cmd+Shift+I' : 'Cmd+Shift+I'
                 }
             ]
         },
