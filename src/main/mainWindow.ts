@@ -253,7 +253,15 @@ function initMenuBar(win: BrowserWindow) {
         },
         { role: "fileMenu" },
         { role: "editMenu" },
-        { role: "viewMenu" },
+        {
+            role: "viewMenu",
+            submenu: [
+                {
+                    role: "toggleDevTools",
+                    accelerator: process.platform === 'darwin' ? 'Cmd+Shift+I' : 'Cmd+Shift+I'
+                }
+            ]
+        },
         { role: "windowMenu" }
     ]);
 
