@@ -45,7 +45,7 @@ import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./u
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-let tray: Tray;
+let tray: Tray | undefined;
 
 applyDeckKeyboardFix();
 
@@ -400,7 +400,7 @@ function initStaticTitle(win: BrowserWindow) {
     });
 }
 
-function createMainWindow() {
+function createMainWindow(startMinimized = false) {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
@@ -465,7 +465,8 @@ function createMainWindow() {
     });
 
     initWindowBoundsListeners(win);
-    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (startMinimized || (Settings.store.tray ?? true)) && process.platform !== "darwin")
+        initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
@@ -502,7 +503,7 @@ export async function createWindows() {
     await ensureVencordFiles();
     runVencordMain();
 
-    mainWin = createMainWindow();
+    mainWin = createMainWindow(startMinimized);
 
     mainWin.webContents.on("did-finish-load", () => {
         splash?.destroy();
@@ -522,6 +523,11 @@ export async function createWindows() {
         mainWin.once("show", () => {
             if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
                 mainWin!.maximize();
+            }
+
+            // If launched in startMinimized mode then we need to clear tray icon upon showing
+            if (startMinimized && !Settings.store.tray) {
+                tray?.destroy();
             }
         });
     });
