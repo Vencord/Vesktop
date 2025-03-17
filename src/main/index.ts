@@ -6,7 +6,7 @@
 
 import "./ipc";
 
-import { app, BrowserWindow, nativeTheme } from "electron";
+import { app, BrowserWindow, globalShortcut, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
 
 import { DATA_DIR } from "./constants";
@@ -97,6 +97,9 @@ function init() {
 
         app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
+        });
+        globalShortcut.register("CommandOrControl+W", () => {
+            // Ignore
         });
     });
 }
