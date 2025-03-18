@@ -19,6 +19,8 @@ export const enum IpcEvents {
     MINIMIZE = "VCD_MINIMIZE",
     MAXIMIZE = "VCD_MAXIMIZE",
 
+    SET_ZOOM_FACTOR = "VCD_SET_ZOOM_FACTOR",
+
     SHOW_ITEM_IN_FOLDER = "VCD_SHOW_ITEM_IN_FOLDER",
     GET_SETTINGS = "VCD_GET_SETTINGS",
     SET_SETTINGS = "VCD_SET_SETTINGS",
@@ -63,5 +65,8 @@ export const enum IpcCommands {
     RPC_INVITE = "rpc:invite",
     RPC_DEEP_LINK = "rpc:link",
     NAVIGATE_SETTINGS = "navigate:settings",
-    GET_LANGUAGES = "navigator.languages"
+    GET_LANGUAGES = "navigator.languages",
+    ZOOM_IN = "zoom:in",
+    ZOOM_OUT = "zoom:out",
+    ZOOM_RESET = "zoom:reset"
 }
