@@ -15,3 +15,4 @@ import "./windowsTitleBar";
 import "./streamerMode";
 import "./nativeFocus";
 import "./hideDownloadAppsButton";
+import "./vesktopZoom";

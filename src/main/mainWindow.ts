@@ -236,12 +236,23 @@ function initMenuBar(win: BrowserWindow) {
                 app.quit();
             }
         },
-        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
         {
-            label: "Zoom in (hidden, hack for Qwertz and others)",
+            label: "Zoom out",
+            accelerator: "CmdOrCtrl+-",
+            visible: false,
+            click: () => sendRendererCommand(IpcCommands.ZOOM_OUT)
+        },
+        {
+            label: "Zoom in",
             accelerator: "CmdOrCtrl+=",
-            role: "zoomIn",
-            visible: false
+            visible: false,
+            click: () => sendRendererCommand(IpcCommands.ZOOM_IN)
+        },
+        {
+            label: "Reset zoom",
+            accelerator: "CmdOrCtrl+0",
+            visible: false,
+            click: () => sendRendererCommand(IpcCommands.ZOOM_RESET)
         }
     ] satisfies MenuItemList;
 
@@ -253,7 +264,6 @@ function initMenuBar(win: BrowserWindow) {
         },
         { role: "fileMenu" },
         { role: "editMenu" },
-        { role: "viewMenu" },
         { role: "windowMenu" }
     ]);
 
