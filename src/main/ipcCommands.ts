@@ -37,7 +37,7 @@ export function sendRendererCommand<T = any>(message: string, data?: any) {
         resolvers.set(nonce, { resolve, reject });
     });
 
-    mainWin.webContents.send(IpcEvents.IPC_COMMAND, { nonce, message, data });
+    mainWin?.webContents.send(IpcEvents.IPC_COMMAND, { nonce, message, data });
 
     return promise;
 }
