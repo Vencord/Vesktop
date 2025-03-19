@@ -42,7 +42,7 @@ export function setBadgeCount(count: number) {
 
             // circular import shenanigans
             const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
-            mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
+            mainWin?.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
 }
