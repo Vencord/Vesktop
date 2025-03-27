@@ -18,7 +18,7 @@ export function createSplashWindow(startMinimized = false) {
         ...SplashProps,
         icon: ICON_PATH,
         show: !startMinimized,
-        webPreferences: { preload: join(__dirname, "splash_preload.js") }
+        webPreferences: { preload: join(__dirname, "splashPreload.js") }
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));

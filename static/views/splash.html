@@ -6,6 +6,7 @@
             background: none;
             user-select: none;
             -webkit-app-region: drag;
+            overflow: hidden;
         }
 
         .wrapper {
@@ -40,7 +41,7 @@
     </style>
 </head>
 
-<body style="overflow: hidden;">
+<body>
     <div class="wrapper">
         <img
             draggable="false"
@@ -54,10 +55,10 @@
 </body>
 
 <script>
-    window.onload = () => {
+    document.addEventListener("DOMContentLoaded", () => {
         const messageElement = document.querySelector('.message');
-        window.electronAPI.onUpdateMessage((message) => {
+        VesktopSplashNative.onUpdateMessage(message => {
             messageElement.textContent = message;
         })
-    };
+    });
 </script>

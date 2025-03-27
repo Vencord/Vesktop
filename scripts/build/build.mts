@@ -66,7 +66,7 @@ await Promise.all([
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/splash.ts"],
-        outfile: "dist/js/splash_preload.js"
+        outfile: "dist/js/splashPreload.js"
     }),
     createContext({
         ...CommonOpts,
