@@ -11,21 +11,70 @@ import { isLinux } from "renderer/utils";
 
 const logger = new Logger("VesktopStreamFixes");
 
-if (isLinux) {
-    const original = navigator.mediaDevices.getDisplayMedia;
+const original = navigator.mediaDevices.getDisplayMedia;
 
-    async function getVirtmic() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const audioDevice = devices.find(({ label }) => label === "vencord-screen-share");
-            return audioDevice?.deviceId;
-        } catch (error) {
-            return null;
-        }
+interface OverrideDevices {
+    audio: string | undefined;
+    video: string | undefined;
+}
+
+let overrideDevices: OverrideDevices = { audio: undefined, video: undefined };
+
+export const patchOverrideDevices = (newOverrideDevices: OverrideDevices) => {
+    overrideDevices = newOverrideDevices;
+};
+
+async function getVirtmic() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioDevice = devices.find(({ label }) => label === "vencord-screen-share");
+        return audioDevice?.deviceId;
+    } catch (error) {
+        return null;
+    }
+}
+
+navigator.mediaDevices.getDisplayMedia = async function (opts) {
+    const stream = await original.call(this, opts);
+
+    if (overrideDevices.audio) {
+        const audio = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                deviceId: { exact: overrideDevices.audio },
+                autoGainControl: false,
+                echoCancellation: false,
+                noiseSuppression: false
+            }
+        });
+
+        stream.getAudioTracks().forEach(t => {
+            t.stop();
+            stream.removeTrack(t);
+        });
+
+        audio.getAudioTracks().forEach(t => {
+            stream.addTrack(t);
+        });
     }
 
-    navigator.mediaDevices.getDisplayMedia = async function (opts) {
-        const stream = await original.call(this, opts);
+    if (overrideDevices.video) {
+        const video = await navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: { exact: overrideDevices.video }
+            }
+        });
+
+        stream.getVideoTracks().forEach(t => {
+            t.stop();
+            stream.removeTrack(t);
+        });
+
+        video.getVideoTracks().forEach(t => {
+            stream.addTrack(t);
+        });
+    }
+
+    if (isLinux) {
         const id = await getVirtmic();
 
         const frameRate = Number(State.store.screenshareQuality?.frameRate ?? 30);
@@ -64,7 +113,7 @@ if (isLinux) {
             });
             audio.getAudioTracks().forEach(t => stream.addTrack(t));
         }
+    }
 
-        return stream;
-    };
-}
+    return stream;
+};
