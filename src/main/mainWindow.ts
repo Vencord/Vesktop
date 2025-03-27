@@ -53,7 +53,7 @@ app.on("before-quit", () => {
     isQuitting = true;
 });
 
-export let mainWin: BrowserWindow;
+export let mainWin: BrowserWindow | null = null;
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
@@ -453,7 +453,10 @@ function createMainWindow() {
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
-        if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
+        if (isQuitting || (process.platform !== "darwin" && !useTray)) {
+            mainWin = null;
+            return;
+        }
 
         e.preventDefault();
 
@@ -484,7 +487,7 @@ const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDeskto
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
-    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+    mainWin?.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
 }
 
 export async function createWindows() {
@@ -515,10 +518,10 @@ export async function createWindows() {
             // always use entire display
             mainWin!.setFullScreen(true);
 
-            askToApplySteamLayout(mainWin);
+            askToApplySteamLayout(mainWin!);
         }
 
-        mainWin.once("show", () => {
+        mainWin!.once("show", () => {
             if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
                 mainWin!.maximize();
             }

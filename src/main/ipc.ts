@@ -69,8 +69,8 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
 });
 
 handle(IpcEvents.FOCUS, () => {
-    mainWin.show();
-    mainWin.setSkipTaskbar(false);
+    mainWin?.show();
+    mainWin?.setSkipTaskbar(false);
 });
 
 handle(IpcEvents.CLOSE, (e, key?: string) => {
@@ -82,14 +82,14 @@ handle(IpcEvents.CLOSE, (e, key?: string) => {
 });
 
 handle(IpcEvents.MINIMIZE, e => {
-    mainWin.minimize();
+    mainWin?.minimize();
 });
 
 handle(IpcEvents.MAXIMIZE, e => {
-    if (mainWin.isMaximized()) {
-        mainWin.unmaximize();
+    if (mainWin?.isMaximized()) {
+        mainWin?.unmaximize();
     } else {
-        mainWin.maximize();
+        mainWin?.maximize();
     }
 });
 
