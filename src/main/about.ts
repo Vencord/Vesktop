@@ -6,7 +6,7 @@
 
 import { BrowserWindow } from "electron";
 import { join } from "path";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
@@ -14,7 +14,6 @@ export function createAboutWindow() {
     const about = new BrowserWindow({
         center: true,
         autoHideMenuBar: true,
-        icon: ICON_PATH,
         webPreferences: {
             preload: join(__dirname, "updaterPreload.js")
         }
