@@ -8,6 +8,8 @@ import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
+import { dbus, getSessionBus } from "./utils/dbus";
+
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
     const cached = imgCache.get(index);
@@ -24,8 +26,28 @@ let lastIndex: null | number = -1;
 export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
-            if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            if (typeof count !== "number") {
+                throw new Error("count must be a number"); // sanitize
+            }
+
+            const sessionBus = getSessionBus();
+            sessionBus.connection.message({
+                type: dbus.messageType.signal,
+                serial: 1,
+                path: "/",
+                interface: "com.canonical.Unity.LauncherEntry",
+                member: "Update",
+                signature: "sa{sv}",
+                body: [
+                    process.env.container === "1"
+                        ? "application://dev.vencord.Vesktop.desktop" // flatpak handling
+                        : "application://vesktop.desktop",
+                    [
+                        ["count", ["x", count === -1 ? 0 : count]],
+                        ["count-visible", ["b", count !== 0]]
+                    ]
+                ]
+            });
             break;
         case "darwin":
             if (count === 0) {
