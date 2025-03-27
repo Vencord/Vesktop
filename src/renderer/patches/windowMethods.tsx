@@ -11,10 +11,11 @@ addPatch({
         {
             find: ",setSystemTrayApplications",
             replacement: [
-                ...["close", "minimize", "maximize"].map(op => ({
-                    match: new RegExp(String.raw`\i\.window\.${op}`),
-                    replace: `VesktopNative.win.${op}`
-                })),
+                {
+                    // eslint-disable-next-line no-useless-escape
+                    match: /\i\.window\.(close|minimize|maximize)/,
+                    replace: `VesktopNative.win.$1`
+                },
                 {
                     // TODO: Fix eslint rule
                     // eslint-disable-next-line no-useless-escape

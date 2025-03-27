@@ -7,7 +7,17 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
+import {
+    app,
+    BrowserWindow,
+    clipboard,
+    dialog,
+    IpcMainInvokeEvent,
+    nativeImage,
+    RelaunchOptions,
+    session,
+    shell
+} from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -68,11 +78,8 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
     shell.showItemInFolder(path);
 });
 
-function getWindow(e, key?: string) {
-    const win = BrowserWindow.fromWebContents(e.sender) ?? mainWin;
-    if (!key) return win;
-    const popout = PopoutWindows.get(key!);
-    return popout ?? win;
+function getWindow(e: IpcMainInvokeEvent, key?: string) {
+    return key ? PopoutWindows.get(key)! : (BrowserWindow.fromWebContents(e.sender) ?? mainWin);
 }
 
 handle(IpcEvents.FOCUS, () => {
