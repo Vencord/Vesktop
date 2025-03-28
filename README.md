@@ -58,6 +58,11 @@ Below you can find unofficial packages created by the community. They are not of
 
 ## Building from Source
 
+You need to have the following dependencies installed:
+- [Git](https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/en/download)
+- pnpm: `npm install --global pnpm`
+
 Packaging will create builds in the dist/ folder
 
 ```sh
@@ -70,10 +75,12 @@ pnpm i
 # Either run it without packaging
 pnpm start
 
-# Or package
+# Or package (will build packages for your OS)
 pnpm package
-# Or only build the pacman target
+
+# Or only build the Linux Pacman package
 pnpm package --linux pacman
+
 # Or package to a directory only
 pnpm package:dir
 ```
