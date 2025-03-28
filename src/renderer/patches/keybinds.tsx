@@ -141,12 +141,12 @@ addPatch({
             actions.push({ id, name: actionReadableNames[key] || key });
             id++;
         });
+        VesktopNative.keybind.preRegister(actions);
     },
     xdpWarning: function (keybinds) {
         if (!VesktopNative.keybind.shouldPreRegister()) {
             return keybinds;
         }
-        VesktopNative.keybind.preRegister(actions);
         return (
             <ErrorCard>
                 <p>

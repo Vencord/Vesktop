@@ -49,17 +49,21 @@ export function obtainVenbind() {
 }
 
 export function startVenbind() {
-    const venbind = obtainVenbind();
+    obtainVenbind();
+    venbind?.defineErrorHandle((err: string) => {
+        console.error("venbind error:", err);
+        venbind = null;
+    });
     venbind?.startKeybinds((id, keyup) => {
         mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind(${id}, ${keyup})`);
     });
 }
 
 handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string) => {
-    obtainVenbind()?.registerKeybind(shortcut, id);
+    venbind?.registerKeybind(shortcut, id);
 });
 handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
-    obtainVenbind()?.unregisterKeybind(id);
+    venbind?.unregisterKeybind(id);
 });
 handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
     if (
@@ -73,5 +77,5 @@ handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
     return false;
 });
 handle(IpcEvents.KEYBIND_PREREGISTER, (_, actions: { id: number; name: string }[]) => {
-    obtainVenbind()?.preregisterKeybinds(actions);
+    venbind?.preregisterKeybinds(actions);
 });
