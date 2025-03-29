@@ -19,6 +19,9 @@ importers:
       electron-updater:
         specifier: ^6.3.9
         version: 6.3.9
+      venbind:
+        specifier: ^0.0.6
+        version: 0.0.6
     optionalDependencies:
       '@vencord/venmic':
         specifier: ^6.1.0
@@ -2869,6 +2872,11 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  venbind@0.0.6:
+    resolution: {integrity: sha512-D4m7tD/f99w34mPGM0BIGiN207HeqXNAo94GJWWd7ERQX3u50fr/Bh7JRaEkLTJzBwvTu8caWAXis7Jxds21bQ==}
+    cpu: [x64]
+    os: [linux, win32]
 
   verror@1.10.1:
     resolution: {integrity: sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==}
@@ -6147,6 +6155,8 @@ snapshots:
   utf8-byte-length@1.0.5: {}
 
   util-deprecate@1.0.2: {}
+
+  venbind@0.0.6: {}
 
   verror@1.10.1:
     dependencies:
