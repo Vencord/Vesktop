@@ -55,14 +55,14 @@ export function startVenbind() {
         venbind = null;
     });
     venbind?.startKeybinds((id, keyup) => {
-        mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind(${id}, ${keyup})`);
-    });
+        mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind("${id}", ${keyup})`);
+    }, "dev.vencord.Vesktop");
 }
 
-handle(IpcEvents.KEYBIND_REGISTER, (_, id: number, shortcut: string) => {
+handle(IpcEvents.KEYBIND_REGISTER, (_, id: string, shortcut: string) => {
     venbind?.registerKeybind(shortcut, id);
 });
-handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: number) => {
+handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: string) => {
     venbind?.unregisterKeybind(id);
 });
 handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
@@ -76,6 +76,6 @@ handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
     }
     return false;
 });
-handle(IpcEvents.KEYBIND_PREREGISTER, (_, actions: { id: number; name: string }[]) => {
+handle(IpcEvents.KEYBIND_PREREGISTER, (_, actions: { id: string; name: string }[]) => {
     venbind?.preregisterKeybinds(actions);
 });

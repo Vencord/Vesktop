@@ -28,7 +28,7 @@
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
         "electron-updater": "^6.3.9",
-        "venbind": "^0.0.4"
+        "venbind": "^0.0.6"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"

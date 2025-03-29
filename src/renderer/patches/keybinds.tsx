@@ -22,7 +22,7 @@ const actionReadableNames: { [key: string]: string } = {
     NAVIGATE_FORWARD: "Navigate Forward",
     DISCONNECT_FROM_VOICE_CHANNEL: "Disconnect From Voice Channel"
 };
-const actions: { id: number; name: string }[] = [];
+const actions: { id: string; name: string }[] = [];
 addPatch({
     patches: [
         {
@@ -74,7 +74,7 @@ addPatch({
     ],
 
     registerKeybind: function (
-        id,
+        id: number,
         shortcut,
         callback: Function,
         options: {
@@ -85,18 +85,20 @@ addPatch({
         if (VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
-        keybindCallbacks[id] = {
+        var idStr = id.toString();
+        keybindCallbacks[idStr] = {
             onTrigger: callback,
             keyEvents: options
         };
-        VesktopNative.keybind.register(id, toShortcutString(shortcut));
+        VesktopNative.keybind.register(idStr, toShortcutString(shortcut));
     },
-    unregisterKeybind: function (id) {
+    unregisterKeybind: function (id: number) {
         if (VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
-        delete keybindCallbacks[id];
-        VesktopNative.keybind.unregister(id);
+        var idStr = id.toString();
+        delete keybindCallbacks[idStr];
+        VesktopNative.keybind.unregister(idStr);
     },
     // only used for wayland/xdg-desktop-portal globalshortcuts
     preRegisterKeybinds: function (allActions: {
@@ -111,8 +113,8 @@ addPatch({
         if (!VesktopNative.keybind.shouldPreRegister()) {
             return;
         }
-        let id = 1;
         Object.entries(allActions).forEach(([key, val]) => {
+            console.log(key);
             if (
                 [
                     "UNASSIGNED",
@@ -130,7 +132,7 @@ addPatch({
             ) {
                 return;
             }
-            keybindCallbacks[id] = {
+            keybindCallbacks[key] = {
                 onTrigger: (keyState: boolean) =>
                     val.onTrigger(keyState, {
                         // switch to channel also requires some extra properties that would have to be supplied here
@@ -138,8 +140,7 @@ addPatch({
                     }),
                 keyEvents: val.keyEvents
             };
-            actions.push({ id, name: actionReadableNames[key] || key });
-            id++;
+            actions.push({ id: key, name: actionReadableNames[key] || key });
         });
         VesktopNative.keybind.preRegister(actions);
     },

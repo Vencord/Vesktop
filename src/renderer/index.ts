@@ -21,7 +21,7 @@ export { Settings };
 import type SettingsPlugin from "@vencord/types/plugins/_core/settings";
 
 export const keybindCallbacks: {
-    [id: number]: {
+    [id: string]: {
         onTrigger: Function;
         keyEvents: {
             keyup: boolean;
@@ -35,7 +35,7 @@ VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
 const customSettingsSections = (Vencord.Plugins.plugins.Settings as any as typeof SettingsPlugin).customSections;
 
-export async function triggerKeybind(id: number, keyup: boolean) {
+export async function triggerKeybind(id: string, keyup: boolean) {
     var cb = keybindCallbacks[id];
     if (cb.keyEvents.keyup && keyup) {
         cb.onTrigger(false);
