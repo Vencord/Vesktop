@@ -29,6 +29,8 @@ export interface Settings {
 
     spellCheckLanguages?: string[];
 
+    disableAutoGain?: boolean;
+
     audio?: {
         workaround?: boolean;
 
