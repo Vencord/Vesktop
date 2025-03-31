@@ -80,16 +80,12 @@ function init() {
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
     app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
-        const keybindIndex = cmdLine.indexOf("--keybind");
-
-        if (keybindIndex !== -1) {
-            if (cmdLine[keybindIndex + 2] === "keyup" || cmdLine[keybindIndex + 2] === "keydown") {
-                mainWin.webContents.executeJavaScript(
-                    `Vesktop.triggerKeybind(${cmdLine[keybindIndex + 1]}, ${cmdLine[keybindIndex + 2] === "keydown" ? "false" : "true"})`
-                );
-            } else {
-                mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind(${cmdLine[keybindIndex + 1]}, true)`);
-            }
+        var keybind = cmdLine.find(x => x.startsWith("--keybind"));
+        if (keybind !== undefined) {
+            var action = keybind.split("=")[1];
+            var keyup: boolean = keybind.startsWith("--keybind-up=") || keybind.startsWith("--keybind=");
+            if ((keyup || keybind.startsWith("--keybind-down=")) && action != null)
+                mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind("${action}", ${keyup})`);
         } else if (data.IS_DEV) app.quit();
         else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
@@ -114,7 +110,7 @@ function init() {
 }
 
 if (!app.requestSingleInstanceLock({ IS_DEV })) {
-    if (process.argv.includes("--keybind")) {
+    if (process.argv.some(x => x.startsWith("--keybind"))) {
         app.quit();
     } else {
         if (IS_DEV) {
@@ -126,7 +122,7 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
         }
     }
 } else {
-    if (process.argv.includes("--keybind")) {
+    if (process.argv.some(x => x.startsWith("--keybind"))) {
         console.error("No instances running! cannot issue a keybind!");
         app.quit();
     } else {

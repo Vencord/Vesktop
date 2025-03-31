@@ -18,6 +18,7 @@ const actionReadableNames: { [key: string]: string } = {
     TOGGLE_DEAFEN: "Toggle Deafen",
     TOGGLE_VOICE_MODE: "Toggle Voice Activity Mode",
     TOGGLE_STREAMER_MODE: "Toggle Streamer Mode",
+    TOGGLE_CAMERA: "Toggle Camera",
     NAVIGATE_BACK: "Navigate Back",
     NAVIGATE_FORWARD: "Navigate Forward",
     DISCONNECT_FROM_VOICE_CHANNEL: "Disconnect From Voice Channel"
@@ -114,22 +115,7 @@ addPatch({
             return;
         }
         Object.entries(allActions).forEach(([key, val]) => {
-            console.log(key);
-            if (
-                [
-                    "UNASSIGNED",
-                    "SWITCH_TO_VOICE_CHANNEL",
-                    "TOGGLE_OVERLAY",
-                    "TOGGLE_OVERLAY_INPUT_LOCK",
-                    "TOGGLE_PRIORITY_SPEAKER",
-                    "OVERLAY_ACTIVATE_REGION_TEXT_WIDGET",
-                    "TOGGLE_GO_LIVE_STREAMING", // ???
-                    "SOUNDBOARD",
-                    "SOUNDBOARD_HOLD",
-                    "SAVE_CLIP"
-                    // most of these aren't available to change through discord as far as i can tell
-                ].includes(key)
-            ) {
+            if (actionReadableNames[key] == null) {
                 return;
             }
             keybindCallbacks[key] = {
