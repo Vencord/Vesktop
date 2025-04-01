@@ -56,7 +56,7 @@ export function startVenbind() {
     });
     venbind?.startKeybinds((id, keyup) => {
         mainWin.webContents.executeJavaScript(`Vesktop.triggerKeybind("${id}", ${keyup})`);
-    }, "dev.vencord.Vesktop");
+    }, null);
 }
 
 handle(IpcEvents.KEYBIND_REGISTER, (_, id: string, shortcut: string) => {
