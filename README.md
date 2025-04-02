@@ -28,7 +28,7 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-Download the latest version from [here](https://vencord.dev/download/vesktop/universal/dmg), or use [Homebrew](https://brew.sh/)
+Download the latest [Vesktop.dmg](https://vencord.dev/download/vesktop/universal/dmg) or use [Homebrew](https://brew.sh/)
 
 ```sh
 brew install vesktop
