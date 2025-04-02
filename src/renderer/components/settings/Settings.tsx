@@ -13,6 +13,7 @@ import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
+import { CustomSplashAnimation } from "./CustomSplashAnimation";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
@@ -126,6 +127,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
+    "Custom Splash Animation": [CustomSplashAnimation],
     "Developer Options": [DeveloperOptionsButton]
 };
 

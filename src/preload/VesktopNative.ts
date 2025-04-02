@@ -35,7 +35,8 @@ export const VesktopNative = {
     fileManager: {
         showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
         getVencordDir: () => sendSync<string | undefined>(IpcEvents.GET_VENCORD_DIR),
-        selectVencordDir: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_VENCORD_DIR, value)
+        selectVencordDir: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_VENCORD_DIR, value),
+        selectImagePath: () => invoke<"cancelled" | string>(IpcEvents.SELECT_IMAGE_PATH)
     },
     settings: {
         get: () => sendSync<Settings>(IpcEvents.GET_SETTINGS),
