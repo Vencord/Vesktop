@@ -9,6 +9,7 @@ import { keybindCallbacks } from "renderer";
 
 import { addPatch } from "./shared";
 import { ErrorCard } from "@vencord/types/components";
+import { Card } from "@vencord/types/webpack/common";
 const toShortcutString = findByCodeLazy('.MOUSE_BUTTON?"mouse".concat(');
 const actionReadableNames: { [key: string]: string } = {
     PUSH_TO_TALK: "Push To Talk",
@@ -45,10 +46,9 @@ addPatch({
                     replace: "true"
                 },
                 {
-                    // THIS PATCH IS TEMPORARY
                     // eslint-disable-next-line no-useless-escape
                     match: /\.keybindGroup,\i.card\),children:\[/g,
-                    replace: "$&`ID: ${this.props.keybind.id}`,"
+                    replace: "$&$self.keybindIdComponent(this.props.keybind.id),"
                 }
             ]
         },
@@ -130,19 +130,44 @@ addPatch({
         });
         VesktopNative.keybind.preRegister(actions);
     },
+    keybindIdComponent: function (id) {
+        return <span style={{ color: "var(--text-muted)" }}>ID: {id}</span>;
+    },
     xdpWarning: function (keybinds) {
         if (!VesktopNative.keybind.shouldPreRegister()) {
-            return keybinds;
+            return (
+                <>
+                    {keybinds}
+                    <Card
+                        style={{
+                            padding: "1rem",
+                            color: "var(--text-normal)",
+                            backgroundColor: "var(--info-warning-background)",
+                            border: "1px solid var(--info-warning-foreground)"
+                        }}
+                    >
+                        The ID specified for each keybind is for use in the keybind CLI. You don't have to use this for
+                        configuring keybinds. This is just in case you want to trigger keybinds from external programs.
+                    </Card>
+                </>
+            );
         }
         return (
-            <ErrorCard>
+            <Card
+                style={{
+                    padding: "1rem",
+                    color: "var(--text-normal)",
+                    backgroundColor: "var(--info-warning-background)",
+                    border: "1px solid var(--info-warning-foreground)"
+                }}
+            >
                 <p>
                     You appear to be using Vesktop on a platform that requires XDG desktop portals for using keybinds.
-                    You can configure keybinds using your desktop environment's built-in settings page.
+                    You can configure keybinds using your desktop environment's settings.
                 </p>
                 <p>
-                    If your desktop environment does not support the GlobalShortcuts portal (which you would know if its
-                    settings page didn't open just now) you have to manually bind your desired keybinds to CLI triggers.
+                    If your desktop environment does not support the GlobalShortcuts portal you can manually bind your
+                    desired keybinds to CLI triggers.
                 </p>
                 <p>List of valid keybind IDs to use with the CLI:</p>
                 <ul>
@@ -152,7 +177,7 @@ addPatch({
                         </li>
                     ))}
                 </ul>
-            </ErrorCard>
+            </Card>
         );
     }
 });
