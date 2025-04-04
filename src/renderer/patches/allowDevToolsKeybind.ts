@@ -11,8 +11,7 @@ addPatch({
         {
             find: '"mod+alt+i"',
             replacement: {
-                // eslint-disable-next-line no-useless-escape
-                match: /\(0,\i.isWeb\)\(\)&&"discord\.com"===location\.host/,
+                match: /"discord\.com"===location\.host/,
                 replace: "false"
             }
         }
