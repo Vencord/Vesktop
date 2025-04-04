@@ -55,8 +55,8 @@ export const VesktopNative = {
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
-        minimize: () => invoke<void>(IpcEvents.MINIMIZE),
-        maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
+        minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
+        maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key)
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
