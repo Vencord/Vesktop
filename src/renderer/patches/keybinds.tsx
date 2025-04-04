@@ -8,7 +8,6 @@ import { findByCodeLazy } from "@vencord/types/webpack";
 import { keybindCallbacks } from "renderer";
 
 import { addPatch } from "./shared";
-import { ErrorCard } from "@vencord/types/components";
 import { Card } from "@vencord/types/webpack/common";
 const toShortcutString = findByCodeLazy('.MOUSE_BUTTON?"mouse".concat(');
 const actionReadableNames: { [key: string]: string } = {
@@ -24,7 +23,7 @@ const actionReadableNames: { [key: string]: string } = {
     NAVIGATE_FORWARD: "Navigate Forward",
     DISCONNECT_FROM_VOICE_CHANNEL: "Disconnect From Voice Channel"
 };
-const actions: { id: string; name: string }[] = [];
+const keybinds: { id: string; name?: string; shortcut?: string }[] = [];
 addPatch({
     patches: [
         {
@@ -67,8 +66,18 @@ addPatch({
                 },
                 {
                     // eslint-disable-next-line no-useless-escape
+                    match: /:\(\i\.\i\.disable\(\)(.*?)\i\(\)\)/,
+                    replace: "$&;$self.setKeybinds();" // for when the user opens and closes the keybinds settings page
+                },
+                {
+                    // eslint-disable-next-line no-useless-escape
                     match: /let{keybinds:(\i)}=\i;/,
-                    replace: "$&$self.preRegisterKeybinds($1);"
+                    replace: "$&$self.xdpRegisterKeybinds($1);"
+                },
+                {
+                    // eslint-disable-next-line no-useless-escape
+                    match: /location:"KeybindsStore"},\q\)\)/, // same function as above (where xdpRegisterKeybinds is called)
+                    replace: "$&;$self.setKeybinds();" // for when discord is opened
                 }
             ]
         }
@@ -83,26 +92,35 @@ addPatch({
             keydown: boolean;
         }
     ) {
-        if (VesktopNative.keybind.shouldPreRegister()) {
-            return;
-        }
+        if (VesktopNative.keybind.needsXdp()) return;
+
         var idStr = id.toString();
         keybindCallbacks[idStr] = {
             onTrigger: callback,
             keyEvents: options
         };
-        VesktopNative.keybind.register(idStr, toShortcutString(shortcut));
+
+        keybinds.push({
+            id: idStr,
+            shortcut: toShortcutString(shortcut)
+        });
     },
     unregisterKeybind: function (id: number) {
-        if (VesktopNative.keybind.shouldPreRegister()) {
-            return;
-        }
+        if (VesktopNative.keybind.needsXdp()) return;
+
         var idStr = id.toString();
         delete keybindCallbacks[idStr];
-        VesktopNative.keybind.unregister(idStr);
+        keybinds.splice(
+            keybinds.findIndex(x => x.id === idStr),
+            1
+        );
+    },
+    setKeybinds: function () {
+        if (VesktopNative.keybind.needsXdp()) return;
+        VesktopNative.keybind.setKeybinds(keybinds);
     },
     // only used for wayland/xdg-desktop-portal globalshortcuts
-    preRegisterKeybinds: function (allActions: {
+    xdpRegisterKeybinds: function (allActions: {
         [action: string]: {
             onTrigger: Function;
             keyEvents: {
@@ -111,9 +129,7 @@ addPatch({
             };
         };
     }) {
-        if (!VesktopNative.keybind.shouldPreRegister()) {
-            return;
-        }
+        if (!VesktopNative.keybind.needsXdp()) return;
         Object.entries(allActions).forEach(([key, val]) => {
             if (actionReadableNames[key] == null) {
                 return;
@@ -126,15 +142,15 @@ addPatch({
                     }),
                 keyEvents: val.keyEvents
             };
-            actions.push({ id: key, name: actionReadableNames[key] || key });
+            keybinds.push({ id: key, name: actionReadableNames[key] || key });
         });
-        VesktopNative.keybind.preRegister(actions);
+        VesktopNative.keybind.setKeybinds(keybinds);
     },
     keybindIdComponent: function (id) {
         return <span style={{ color: "var(--text-muted)" }}>ID: {id}</span>;
     },
     xdpWarning: function (keybinds) {
-        if (!VesktopNative.keybind.shouldPreRegister()) {
+        if (!VesktopNative.keybind.needsXdp()) {
             return (
                 <>
                     {keybinds}
@@ -171,7 +187,7 @@ addPatch({
                 </p>
                 <p>List of valid keybind IDs to use with the CLI:</p>
                 <ul>
-                    {actions.map(keybind => (
+                    {keybinds.map(keybind => (
                         <li>
                             {keybind.id}: {keybind.name}
                         </li>

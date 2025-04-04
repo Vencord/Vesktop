@@ -20,8 +20,8 @@ importers:
         specifier: ^6.3.9
         version: 6.3.9
       venbind:
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: ^0.1.0
+        version: 0.1.0
     optionalDependencies:
       '@vencord/venmic':
         specifier: ^6.1.0
@@ -2873,8 +2873,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  venbind@0.0.7:
-    resolution: {integrity: sha512-upiBdF2vlY8lVYcCVBP88+/qwLuMcXWvilve6VI8Fgnfwu4yAbugZtn2WNfmUELCrBf1DAaRWMj/oLV4uDQoeQ==}
+  venbind@0.1.0:
+    resolution: {integrity: sha512-aI2Uc+IrCSG6GI/x5icIlJ2jESpUefZtzeqH+WYbGn6bhvWJblnjJ3ur3qmfWTeRCTG4SJ9jVnR5QRWyyx0f0g==}
     cpu: [x64]
     os: [linux, win32]
 
@@ -6156,7 +6156,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  venbind@0.0.7: {}
+  venbind@0.1.0: {}
 
   verror@1.10.1:
     dependencies:

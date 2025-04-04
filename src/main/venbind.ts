@@ -59,13 +59,7 @@ export function startVenbind() {
     }, null);
 }
 
-handle(IpcEvents.KEYBIND_REGISTER, (_, id: string, shortcut: string) => {
-    venbind?.registerKeybind(shortcut, id);
-});
-handle(IpcEvents.KEYBIND_UNREGISTER, (_, id: string) => {
-    venbind?.unregisterKeybind(id);
-});
-handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
+handleSync(IpcEvents.KEYBIND_NEEDS_XDP, _ => {
     if (
         process.platform === "linux" &&
         (process.env.XDG_SESSION_TYPE === "wayland" ||
@@ -76,6 +70,6 @@ handleSync(IpcEvents.KEYBIND_SHOULD_PREREGISTER, _ => {
     }
     return false;
 });
-handle(IpcEvents.KEYBIND_PREREGISTER, (_, actions: { id: string; name: string }[]) => {
-    venbind?.preregisterKeybinds(actions);
+handle(IpcEvents.KEYBIND_SET_KEYBINDS, (_, keybinds: { id: string; name?: string; shortcut?: string }[]) => {
+    venbind?.setKeybinds(keybinds);
 });
