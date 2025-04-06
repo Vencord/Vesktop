@@ -149,11 +149,11 @@ addPatch({
     keybindIdComponent: function (id) {
         return <span style={{ color: "var(--text-muted)" }}>ID: {id}</span>;
     },
-    xdpWarning: function (keybinds) {
+    xdpWarning: function (keybindsList) {
         if (!VesktopNative.keybind.needsXdp()) {
             return (
                 <>
-                    {keybinds}
+                    {keybindsList}
                     <Card
                         style={{
                             padding: "1rem",
