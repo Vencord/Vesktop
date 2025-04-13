@@ -13,7 +13,7 @@ addPatch({
             replacement: [
                 {
                     // eslint-disable-next-line no-useless-escape
-                    match: /\i\.window\.(close|minimize|maximize)/,
+                    match: /\i\.window\.(close|minimize|maximize)/g,
                     replace: `VesktopNative.win.$1`
                 },
                 {
