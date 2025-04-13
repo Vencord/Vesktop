@@ -17,7 +17,8 @@ jobs:
                   git clone https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git repo
 
                   cd repo
-                  echo "${{ github.event.release.tag_name }}" > scripts/_latestVesktopVersion.txt
+                  version="${{ github.event.release.tag_name }}"
+                  echo "${version#v}" > scripts/_latestVesktopVersion.txt
                   
                   git add scripts/_latestVesktopVersion.txt
                   git commit -m "Update Vesktop version to ${{ github.event.release.tag_name }}"
