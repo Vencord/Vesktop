@@ -69,6 +69,15 @@ function init() {
     // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
     disabledFeatures.push("WinRetrieveSuggestionsOnlyOnDemand", "HardwareMediaKeyHandling", "MediaSessionService");
 
+    // FIXME: Remove this when it's fixed upstream
+    // Fix weird font rendering + fix blurry font on Linux
+    // https://github.com/googlefonts/fontations/issues/1359
+    // https://issues.chromium.org/issues/375219950
+    // https://issues.skia.org/issues/396360753
+    if (process.platform === "linux") {
+        disabledFeatures.push("FontationsFontBackend");
+    }
+
     // Support TTS on Linux using speech-dispatcher
     app.commandLine.appendSwitch("enable-speech-dispatcher");
 
