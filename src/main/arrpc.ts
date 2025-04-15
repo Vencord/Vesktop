@@ -30,7 +30,7 @@ export async function initArRPC() {
         hostPort.on("message", async (e: ArrpcEvent) => {
             switch (e.eventType) {
                 case IpcEvents.ARRPC_ACTIVITY: {
-                    sendRendererCommand(IpcCommands.RPC_ACTIVITY, JSON.stringify(e.data));
+                    sendRendererCommand(IpcCommands.RPC_ACTIVITY, e.data);
                     break;
                 }
                 case "invite": {
