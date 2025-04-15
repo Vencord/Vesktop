@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import "./themedSplash";
@@ -18,12 +18,12 @@ import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
 export { Settings };
 
+import type SettingsPlugin from "@vencord/types/plugins/_core/settings";
+
 VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
-const customSettingsSections = (
-    Vencord.Plugins.plugins.Settings as any as { customSections: ((ID: Record<string, unknown>) => any)[] }
-).customSections;
+const customSettingsSections = (Vencord.Plugins.plugins.Settings as any as typeof SettingsPlugin).customSections;
 
 customSettingsSections.push(() => ({
     section: "Vesktop",

@@ -1,13 +1,23 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
-import { app, BrowserWindow, clipboard, dialog, nativeImage, RelaunchOptions, session, shell } from "electron";
+import {
+    app,
+    BrowserWindow,
+    clipboard,
+    dialog,
+    IpcMainInvokeEvent,
+    nativeImage,
+    RelaunchOptions,
+    session,
+    shell
+} from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
 import { release } from "os";
@@ -68,28 +78,29 @@ handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
     shell.showItemInFolder(path);
 });
 
+function getWindow(e: IpcMainInvokeEvent, key?: string) {
+    return key ? PopoutWindows.get(key)! : (BrowserWindow.fromWebContents(e.sender) ?? mainWin);
+}
+
 handle(IpcEvents.FOCUS, () => {
     mainWin.show();
     mainWin.setSkipTaskbar(false);
 });
 
 handle(IpcEvents.CLOSE, (e, key?: string) => {
-    const popout = PopoutWindows.get(key!);
-    if (popout) return popout.close();
-
-    const win = BrowserWindow.fromWebContents(e.sender) ?? e.sender;
-    win.close();
+    getWindow(e, key).close();
 });
 
-handle(IpcEvents.MINIMIZE, e => {
-    mainWin.minimize();
+handle(IpcEvents.MINIMIZE, (e, key?: string) => {
+    getWindow(e, key).minimize();
 });
 
-handle(IpcEvents.MAXIMIZE, e => {
-    if (mainWin.isMaximized()) {
-        mainWin.unmaximize();
+handle(IpcEvents.MAXIMIZE, (e, key?: string) => {
+    const win = getWindow(e, key);
+    if (win.isMaximized()) {
+        win.unmaximize();
     } else {
-        mainWin.maximize();
+        win.maximize();
     }
 });
 

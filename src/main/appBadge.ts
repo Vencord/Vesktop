@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { app, NativeImage, nativeImage } from "electron";
@@ -29,10 +29,10 @@ export function setBadgeCount(count: number) {
             break;
         case "darwin":
             if (count === 0) {
-                app.dock.setBadge("");
+                app.dock!.setBadge("");
                 break;
             }
-            app.dock.setBadge(count === -1 ? "•" : count.toString());
+            app.dock!.setBadge(count === -1 ? "•" : count.toString());
             break;
         case "win32":
             const [index, description] = getBadgeIndexAndDescription(count);

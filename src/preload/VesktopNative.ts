@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { Node } from "@vencord/venmic";
@@ -55,8 +55,8 @@ export const VesktopNative = {
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
-        minimize: () => invoke<void>(IpcEvents.MINIMIZE),
-        maximize: () => invoke<void>(IpcEvents.MAXIMIZE)
+        minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
+        maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key)
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
