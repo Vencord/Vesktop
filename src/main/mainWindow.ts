@@ -504,9 +504,7 @@ const retryDelay = 1000;
 function retryUrl(url: string, description: string) {
     console.log(`retrying in ${retryDelay}ms`);
     updateSplashMessage(description);
-    setTimeout(() => {
-        loadUrl(url);
-    }, retryDelay);
+    setTimeout(() => loadUrl(url), retryDelay);
 }
 
 export async function createWindows() {
