@@ -385,6 +385,8 @@ function initSpellCheck(win: BrowserWindow) {
 }
 
 function initTitlePatches(win: BrowserWindow) {
+    // let listener: boolean;
+
     const updateTitle = (e: { preventDefault: Function }, title: string) => {
         if (Settings.store.staticTitle) {
             win.setTitle("Vesktop");
@@ -395,6 +397,21 @@ function initTitlePatches(win: BrowserWindow) {
         }
     };
     win.on("page-title-updated", updateTitle);
+    // const manageListeners = (enabled: boolean | undefined) => {
+    //     const active = Settings.store.staticTitle || Settings.store.appBadge;
+
+    //     if ((enabled || active) && !listener) {
+    //         win.on("page-title-updated", updateTitle);
+    //         listener = true;
+    //     } else if (!enabled && !active && listener) {
+    //         win.off("page-title-updated", updateTitle);
+    //         listener = false;
+    //     }
+    // };
+
+    // manageListeners(true);
+    // addSettingsListener("staticTitle", manageListeners);
+    // addSettingsListener("appBadge", manageListeners);
 }
 
 function createMainWindow() {
