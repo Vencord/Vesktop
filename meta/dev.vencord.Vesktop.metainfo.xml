@@ -28,6 +28,20 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.6" date="2025-04-13" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.6</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Fixes the new Discord titlebar @Sqaaakoi</li>
+          <li>Fixes Clipboard copy actions not working</li>
+          <li>Should now properly hide the "Download Apps" button again</li>
+          <li>No longer responds to Browser Tab shortcuts like Ctrl+W by @rushiiMachine</li>
+          <li>DevTools keybind should now work properly on Mac @ryanccn</li>
+          <li>Should no longer throw Sandbox errors on Ubuntu</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.5" date="2025-02-06" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.5</url>
       <description>

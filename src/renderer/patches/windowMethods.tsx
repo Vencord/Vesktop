@@ -9,13 +9,18 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".DEEP_LINK]:{",
+            find: ",setSystemTrayApplications",
             replacement: [
+                {
+                    // eslint-disable-next-line no-useless-escape
+                    match: /\i\.window\.(close|minimize|maximize)/g,
+                    replace: `VesktopNative.win.$1`
+                },
                 {
                     // TODO: Fix eslint rule
                     // eslint-disable-next-line no-useless-escape
-                    match: /(?<=\.DEEP_LINK.{0,200}?)\i\.\i\.focus\(\)/,
-                    replace: "VesktopNative.win.focus()"
+                    match: /(focus(\(\i\)){).{0,150}?\.focus\(\i,\i\)/,
+                    replace: "$1VesktopNative.win.focus$2"
                 }
             ]
         }

@@ -7,11 +7,12 @@
 // TODO: Possibly auto generate glob if we have more patches in the future
 import "./enableNotificationsByDefault";
 import "./platformClass";
+import "./allowDevToolsKeybind";
 import "./hideSwitchDevice";
 import "./hideVenmicInput";
 import "./screenShareFixes";
 import "./spellCheck";
 import "./windowsTitleBar";
 import "./streamerMode";
-import "./nativeFocus";
+import "./windowMethods";
 import "./hideDownloadAppsButton";
