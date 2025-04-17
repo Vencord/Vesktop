@@ -503,7 +503,7 @@ export function loadUrl(uri: string | undefined) {
 const retryDelay = 1000;
 function retryUrl(url: string, description: string) {
     console.log(`retrying in ${retryDelay}ms`);
-    updateSplashMessage(description);
+    updateSplashMessage(`Failed to load Discord: ${description}`);
     setTimeout(() => loadUrl(url), retryDelay);
 }
 
