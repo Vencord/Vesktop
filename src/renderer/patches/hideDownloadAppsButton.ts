@@ -9,12 +9,10 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".STREAMER_MODE_ENABLE,",
+            find: '"app-download-button"',
             replacement: {
-                // remove if (platformEmbedded) check from streamer mode toggle
-                // eslint-disable-next-line no-useless-escape
-                match: /if\(\i\.\i\)(?=return.{0,200}?"autoToggle")/g,
-                replace: ""
+                match: /return(?=.{0,50}id:"app-download-button")/,
+                replace: "return null;return"
             }
         }
     ]
