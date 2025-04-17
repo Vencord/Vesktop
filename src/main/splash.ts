@@ -11,11 +11,16 @@ import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
+let splash: BrowserWindow | undefined;
+
 export function createSplashWindow(startMinimized = false) {
-    const splash = new BrowserWindow({
+    splash = new BrowserWindow({
         ...SplashProps,
         icon: ICON_PATH,
-        show: !startMinimized
+        show: !startMinimized,
+        webPreferences: {
+            preload: join(__dirname, "splashPreload.js")
+        }
     });
 
     splash.loadFile(join(VIEW_DIR, "splash.html"));
@@ -36,4 +41,8 @@ export function createSplashWindow(startMinimized = false) {
     }
 
     return splash;
+}
+
+export function updateSplashMessage(message: string) {
+    if (splash && !splash.isDestroyed()) splash.webContents.send("update-splash-message", message);
 }
