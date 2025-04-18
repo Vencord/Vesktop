@@ -108,6 +108,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Disable smooth scrolling",
             description: "Disables smooth scrolling",
             defaultValue: false
+        },
+        {
+            key: "disableAutoGain",
+            title: "Disable auto gain control",
+            description: "Disables auto gain control for inputs. Requires a full restart.",
+            defaultValue: false
         }
     ],
     Notifications: [NotificationBadgeToggle],
