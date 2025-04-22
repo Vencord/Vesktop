@@ -10,8 +10,9 @@ import "./appBadge";
 import "./patches";
 import "./fixes";
 import "./arrpc";
-
+import "./keybinds";
 export * as Components from "./components";
+export { triggerKeybind } from "./keybinds";
 
 import SettingsUi from "./components/settings/Settings";
 import { VesktopLogger } from "./logger";
@@ -20,29 +21,10 @@ export { Settings };
 
 import type SettingsPlugin from "@vencord/types/plugins/_core/settings";
 
-export const keybindCallbacks: {
-    [id: string]: {
-        onTrigger: Function;
-        keyEvents: {
-            keyup: boolean;
-            keydown: boolean;
-        };
-    };
-} = {};
-
 VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
 const customSettingsSections = (Vencord.Plugins.plugins.Settings as any as typeof SettingsPlugin).customSections;
-
-export async function triggerKeybind(id: string, keyup: boolean) {
-    var cb = keybindCallbacks[id];
-    if (cb.keyEvents.keyup && keyup) {
-        cb.onTrigger(false);
-    } else if (cb.keyEvents.keydown && !keyup) {
-        cb.onTrigger(true);
-    }
-}
 
 customSettingsSections.push(() => ({
     section: "Vesktop",

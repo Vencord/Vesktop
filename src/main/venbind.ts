@@ -73,3 +73,6 @@ handleSync(IpcEvents.KEYBIND_NEEDS_XDP, _ => {
 handle(IpcEvents.KEYBIND_SET_KEYBINDS, (_, keybinds: { id: string; name?: string; shortcut?: string }[]) => {
     venbind?.setKeybinds(keybinds);
 });
+handleSync(IpcEvents.KEYBIND_GET_CURRENT_SHORTCUT, _ => {
+    return venbind?.getCurrentShortcut();
+});

@@ -93,6 +93,7 @@ export const VesktopNative = {
                 name?: string;
             }[]
         ) => invoke<void>(IpcEvents.KEYBIND_SET_KEYBINDS, keybinds),
+        getCurrentShortcut: () => sendSync<string>(IpcEvents.KEYBIND_GET_CURRENT_SHORTCUT),
         needsXdp: () => sendSync<boolean>(IpcEvents.KEYBIND_NEEDS_XDP)
     }
 };
