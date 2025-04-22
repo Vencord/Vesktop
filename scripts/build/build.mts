@@ -64,6 +64,11 @@ await Promise.all([
         footer: { js: "//# sourceURL=VCDPreload" }
     }),
     createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/preload/splash.ts"],
+        outfile: "dist/js/splashPreload.js"
+    }),
+    createContext({
         ...CommonOpts,
         globalName: "Vesktop",
         entryPoints: ["src/renderer/index.ts"],
