@@ -388,19 +388,34 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
-function initStaticTitle(win: BrowserWindow) {
-    const listener = (e: { preventDefault: Function }) => e.preventDefault();
+function initTitlePatches(win: BrowserWindow) {
+    // let listener: boolean;
 
-    if (Settings.store.staticTitle) win.on("page-title-updated", listener);
-
-    addSettingsListener("staticTitle", enabled => {
-        if (enabled) {
+    const updateTitle = (e: { preventDefault: Function }, title: string) => {
+        if (Settings.store.staticTitle) {
             win.setTitle("Vesktop");
-            win.on("page-title-updated", listener);
-        } else {
-            win.off("page-title-updated", listener);
+            e.preventDefault();
+        } else if (Settings.store.appBadge) {
+            win.setTitle(title.replace(/^\(\d+\)\s*|•\s/, ""));
+            e.preventDefault();
         }
-    });
+    };
+    win.on("page-title-updated", updateTitle);
+    // const manageListeners = (enabled: boolean | undefined) => {
+    //     const active = Settings.store.staticTitle || Settings.store.appBadge;
+
+    //     if ((enabled || active) && !listener) {
+    //         win.on("page-title-updated", updateTitle);
+    //         listener = true;
+    //     } else if (!enabled && !active && listener) {
+    //         win.off("page-title-updated", updateTitle);
+    //         listener = false;
+    //     }
+    // };
+
+    // manageListeners(true);
+    // addSettingsListener("staticTitle", manageListeners);
+    // addSettingsListener("appBadge", manageListeners);
 }
 
 function createMainWindow() {
@@ -473,7 +488,7 @@ function createMainWindow() {
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
-    initStaticTitle(win);
+    initTitlePatches(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);
 

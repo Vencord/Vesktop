@@ -1,0 +1,16 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ */
+
+import dbus from "@homebridge/dbus-native";
+
+let sessionBus: dbus.MessageBus | null;
+
+export function getSessionBus(): dbus.MessageBus {
+    if (!sessionBus) sessionBus = dbus.sessionBus();
+    return sessionBus;
+}
+
+export { dbus };
