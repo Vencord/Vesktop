@@ -121,8 +121,8 @@
                     "Type": "Application",
                     "Categories": "Network;InstantMessaging;Chat;",
                     "Keywords": "discord;vencord;electron;chat;",
-                    "MimeType": "x-scheme-handler/discord"
-                    "StartupWMClass": "vesktop",
+                    "MimeType": "x-scheme-handler/discord",
+                    "StartupWMClass": "vesktop"
                 }
             }
         },
