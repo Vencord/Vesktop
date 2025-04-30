@@ -37,6 +37,6 @@ jobs:
 
                   git add meta/dev.vencord.Vesktop.metainfo.xml
                   git commit -m "metainfo: add entry for ${{ github.event.release.tag_name }}"
-                  git push origin main
+                  git push
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

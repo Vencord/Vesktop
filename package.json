@@ -1,6 +1,6 @@
 {
     "name": "vesktop",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "private": true,
     "description": "Vesktop is a custom Discord desktop app",
     "keywords": [],
@@ -40,7 +40,7 @@
         "@types/react": "18.3.1",
         "@vencord/types": "^1.11.5",
         "dotenv": "^16.4.7",
-        "electron": "^35.1.2",
+        "electron": "^35.1.5",
         "electron-builder": "^26.0.12",
         "esbuild": "^0.25.2",
         "eslint": "^9.23.0",

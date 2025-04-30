@@ -77,7 +77,7 @@ export function registerScreenShareHandler() {
         const streams: Streams = {
             video: source
         };
-        if (choice.audio && process.platform === "win32") streams.audio = "loopbackWithMute";
+        if (choice.audio && process.platform === "win32") streams.audio = "loopback";
 
         callback(streams);
     });
