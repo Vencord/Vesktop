@@ -36,9 +36,9 @@ export function obtainVenbind() {
             case "x64":
                 arch = "x86_64";
                 break;
-            // case "arm64":
-            //     arch = "aarch64";
-            //     break;
+            case "arm64":
+                arch = "aarch64";
+                break;
             default:
                 return null;
         }

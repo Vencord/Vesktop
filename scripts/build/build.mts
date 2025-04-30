@@ -91,7 +91,7 @@ await Promise.all([
         inject: ["./scripts/build/injectReact.mjs"],
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
-        external: ["@vencord/types/*"],
+        external: ["@vencord/types/*", "/assets/*"],
         plugins: [vencordDep],
         footer: { js: "//# sourceURL=VCDRenderer" }
     })

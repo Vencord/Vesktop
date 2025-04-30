@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./keybindSettings.css";
+
 import { Flex } from "@vencord/types/components";
 import { Button, Card, Heading, Select, TextInput, useEffect, useRef, useState } from "@vencord/types/webpack/common";
 import { actionReadableNames, registerKeybinds, unregisterKeybinds } from "renderer/keybinds";
@@ -19,7 +21,7 @@ export function KeybindsSettingsPage() {
         };
     }, []);
     return (
-        <Flex flexDirection="column" style={{ gap: "2px" }}>
+        <Flex flexDirection="column" style={{ gap: "1em" }}>
             <Button
                 style={{
                     alignSelf: "flex-end",
@@ -53,21 +55,14 @@ function KeybindCard({ setKeybinds, index, action, shortcut }) {
         <Card
             type={Card.Types.PRIMARY}
             style={{
-                padding: "12px"
+                padding: "1em"
             }}
+            className="vcd-keybind-card"
         >
             <Flex flexDirection="column" style={{ gap: 0 }}>
                 <Button
-                    color={Button.Colors.RED}
-                    style={{
-                        borderRadius: "50%",
-                        width: "24px",
-                        height: "24px",
-                        backgroundImage: "url(/assets/cc9937ea92f932c3.svg)",
-                        backgroundPosition: "50% 50%",
-                        backgroundRepeat: "no-repeat",
-                        alignSelf: "flex-end"
-                    }}
+                    color={Button.Colors.CUSTOM}
+                    className="vcd-keybind-delete-button"
                     size={Button.Sizes.ICON}
                     onClick={() => {
                         setKeybinds(keybinds => keybinds.filter((_, i) => i !== index));
