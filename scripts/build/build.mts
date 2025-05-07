@@ -49,8 +49,27 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyVenbind() {
+    if (process.platform === "win32") {
+        return Promise.all([
+            copyFile(
+                "./node_modules/venbind/prebuilds/windows-x86_64/venbind-windows-x86_64.node",
+                "./static/dist/venbind-windows-x86_64.node"
+            )
+        ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+    }
+
+    return Promise.all([
+        copyFile(
+            "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
+            "./static/dist/venbind-linux-x86_64.node"
+        )
+    ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+}
+
 await Promise.all([
     copyVenmic(),
+    copyVenbind(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
@@ -77,7 +96,7 @@ await Promise.all([
         inject: ["./scripts/build/injectReact.mjs"],
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
-        external: ["@vencord/types/*"],
+        external: ["@vencord/types/*", "/assets/*"],
         plugins: [vencordDep],
         footer: { js: "//# sourceURL=VCDRenderer" }
     })

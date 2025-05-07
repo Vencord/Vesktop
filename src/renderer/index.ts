@@ -10,8 +10,9 @@ import "./appBadge";
 import "./patches";
 import "./fixes";
 import "./arrpc";
-
+import "./keybinds";
 export * as Components from "./components";
+export { triggerKeybind } from "./keybinds";
 
 import SettingsUi from "./components/settings/Settings";
 import { VesktopLogger } from "./logger";
