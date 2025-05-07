@@ -13,13 +13,17 @@ import { State } from "renderer/settings";
 
 export function KeybindsSettingsPage() {
     const [keybinds, setKeybinds] = useState(State.store.keybinds || []);
+    const keybindsRef = useRef<typeof State.store.keybinds>();
     useEffect(() => {
         unregisterKeybinds();
         return () => {
-            State.store.keybinds = keybinds.filter(x => x.action !== "");
+            State.store.keybinds = keybindsRef.current?.filter(x => x.action !== "");
             registerKeybinds();
         };
     }, []);
+    useEffect(() => {
+        keybindsRef.current = keybinds;
+    }, [keybinds]);
     return (
         <Flex flexDirection="column" style={{ gap: "1em" }}>
             <Button
