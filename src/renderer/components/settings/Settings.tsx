@@ -111,7 +111,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         {
             key: "disableAutoGain",
-            title: "Force disable Auto Gain Control",
+            title: "Force disable auto gain control",
             description: "Disables automatic microphone gain adjustment (AGC), requires a restart",
             defaultValue: false
         },
