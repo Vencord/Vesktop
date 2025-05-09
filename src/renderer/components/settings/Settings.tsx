@@ -114,6 +114,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Force disable Auto Gain Control",
             description: "Disables automatic microphone gain adjustment (AGC), requires a restart",
             defaultValue: false
+        },
+        {
+            key: "openLinksWithElectron",
+            title: "Open Links in app (experimental)",
+            description: "Opens links in a new Vesktop window instead of your web browser",
+            defaultValue: false
         }
     ],
     Notifications: [NotificationBadgeToggle],
