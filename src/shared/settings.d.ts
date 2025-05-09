@@ -27,6 +27,8 @@ export interface Settings {
     splashColor?: string;
     splashBackground?: string;
 
+    disableAutoGain?: boolean;
+
     spellCheckLanguages?: string[];
 
     audio?: {
