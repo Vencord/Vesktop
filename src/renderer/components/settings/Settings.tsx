@@ -114,12 +114,6 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Force disable auto gain control",
             description: "Disables automatic microphone gain adjustment (AGC), requires a restart",
             defaultValue: false
-        },
-        {
-            key: "openLinksWithElectron",
-            title: "Open Links in app (experimental)",
-            description: "Opens links in a new Vesktop window instead of your web browser",
-            defaultValue: false
         }
     ],
     Notifications: [NotificationBadgeToggle],
@@ -128,6 +122,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "arRPC",
             title: "Rich Presence",
             description: "Enables Rich Presence via arRPC",
+            defaultValue: false
+        },
+        {
+            key: "openLinksWithElectron",
+            title: "Open Links in app (experimental)",
+            description: "Opens links in a new Vesktop window instead of your web browser",
             defaultValue: false
         }
     ],
