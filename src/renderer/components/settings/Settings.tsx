@@ -108,6 +108,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Disable smooth scrolling",
             description: "Disables smooth scrolling",
             defaultValue: false
+        },
+        {
+            key: "disableAutoGain",
+            title: "Force disable auto gain control",
+            description: "Disables automatic microphone gain adjustment (AGC), requires a restart",
+            defaultValue: false
         }
     ],
     Notifications: [NotificationBadgeToggle],
@@ -118,7 +124,6 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Enables Rich Presence via arRPC",
             defaultValue: false
         },
-
         {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",

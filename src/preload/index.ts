@@ -9,6 +9,7 @@ import { readFileSync, watch } from "fs";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { VesktopNative } from "./VesktopNative";
+import { applyDisableAutogainPatch } from "./disableAutogain";
 
 contextBridge.exposeInMainWorld("VesktopNative", VesktopNative);
 
@@ -16,6 +17,12 @@ require(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_PRELOAD_FILE));
 
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT));
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_RENDERER_SCRIPT));
+
+// Apply patches if the setting is enabled
+if (VesktopNative.settings.get().disableAutoGain) {
+    applyDisableAutogainPatch();
+    console.log("Auto Gain Control disabled via settings.");
+}
 
 // #region css
 const rendererCss = ipcRenderer.sendSync(IpcEvents.GET_RENDERER_CSS_FILE);
