@@ -72,6 +72,9 @@ function init() {
     // Support TTS on Linux using speech-dispatcher
     app.commandLine.appendSwitch("enable-speech-dispatcher");
 
+    // Set GTK version to 3
+    app.commandLine.appendSwitch("gtk-version", "3");
+
     app.commandLine.appendSwitch("enable-features", [...new Set(enabledFeatures)].filter(Boolean).join(","));
     app.commandLine.appendSwitch("disable-features", [...new Set(disabledFeatures)].filter(Boolean).join(","));
 
