@@ -49,8 +49,40 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyVenbind() {
+    switch (process.platform) {
+        case "win32":
+            return Promise.all([
+                copyFile(
+                    "./node_modules/venbind/prebuilds/windows-x86_64/venbind-windows-x86_64.node",
+                    "./static/dist/venbind-win32-x64.node"
+                ),
+                copyFile(
+                    "./node_modules/venbind/prebuilds/windows-aarch64/venbind-windows-aarch64.node",
+                    "./static/dist/venbind-win32-arm64.node"
+                )
+            ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+        case "linux":
+            return Promise.all([
+                copyFile(
+                    "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
+                    "./static/dist/venbind-linux-x64.node"
+                ),
+                copyFile(
+                    "./node_modules/venbind/prebuilds/linux-aarch64/venbind-linux-aarch64.node",
+                    "./static/dist/venbind-linux-arm64.node"
+                )
+            ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+        default:
+            return Promise.reject().catch(() =>
+                console.warn("Venbind doesn't support this platform. Building without venbind support")
+            );
+    }
+}
+
 await Promise.all([
     copyVenmic(),
+    copyVenbind(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
@@ -77,7 +109,7 @@ await Promise.all([
         inject: ["./scripts/build/injectReact.mjs"],
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
-        external: ["@vencord/types/*"],
+        external: ["@vencord/types/*", "/assets/*"],
         plugins: [vencordDep],
         footer: { js: "//# sourceURL=VCDRenderer" }
     })
