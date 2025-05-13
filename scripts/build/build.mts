@@ -50,21 +50,34 @@ async function copyVenmic() {
 }
 
 async function copyVenbind() {
-    if (process.platform === "win32") {
-        return Promise.all([
-            copyFile(
-                "./node_modules/venbind/prebuilds/windows-x86_64/venbind-windows-x86_64.node",
-                "./static/dist/venbind-windows-x86_64.node"
-            )
-        ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+    switch (process.platform) {
+        case "win32":
+            return Promise.all([
+                copyFile(
+                    "./node_modules/venbind/prebuilds/windows-x86_64/venbind-windows-x86_64.node",
+                    "./static/dist/venbind-win32-x64.node"
+                ),
+                copyFile(
+                    "./node_modules/venbind/prebuilds/windows-aarch64/venbind-windows-aarch64.node",
+                    "./static/dist/venbind-win32-arm64.node"
+                )
+            ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+        case "linux":
+            return Promise.all([
+                copyFile(
+                    "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
+                    "./static/dist/venbind-linux-x64.node"
+                ),
+                copyFile(
+                    "./node_modules/venbind/prebuilds/linux-aarch64/venbind-linux-aarch64.node",
+                    "./static/dist/venbind-linux-arm64.node"
+                )
+            ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
+        default:
+            return Promise.reject().catch(() =>
+                console.warn("Venbind doesn't support this platform. Building without venbind support")
+            );
     }
-
-    return Promise.all([
-        copyFile(
-            "./node_modules/venbind/prebuilds/linux-x86_64/venbind-linux-x86_64.node",
-            "./static/dist/venbind-linux-x86_64.node"
-        )
-    ]).catch(() => console.warn("Failed to copy venbind. Building without venbind support"));
 }
 
 await Promise.all([
