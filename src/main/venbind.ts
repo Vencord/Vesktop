@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { existsSync } from "fs";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
@@ -11,7 +12,6 @@ import type { Venbind as VenbindType } from "venbind";
 
 import { mainWin } from "./mainWindow";
 import { handle, handleSync } from "./utils/ipcWrappers";
-import { existsSync } from "fs";
 
 let venbind: VenbindType | null = null;
 export function obtainVenbind() {
