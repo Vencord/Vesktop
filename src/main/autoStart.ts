@@ -7,6 +7,7 @@
 import { app } from "electron";
 import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
+import { stripIndent } from "shared/utils/text";
 
 interface AutoStart {
     isEnabled(): boolean;
@@ -31,15 +32,15 @@ function makeAutoStartLinux(): AutoStart {
     return {
         isEnabled: () => existsSync(file),
         enable() {
-            const desktopFile = `
-[Desktop Entry]
-Type=Application
-Name=Vesktop
-Comment=Vesktop autostart script
-Exec=${commandLine}
-StartupNotify=false
-Terminal=false
-`.trim();
+            const desktopFile = stripIndent`
+                [Desktop Entry]
+                Type=Application
+                Name=Vesktop
+                Comment=Vesktop autostart script
+                Exec=${commandLine}
+                StartupNotify=false
+                Terminal=false
+            `;
 
             mkdirSync(dir, { recursive: true });
             writeFileSync(file, desktopFile);
