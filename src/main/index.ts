@@ -17,9 +17,7 @@ import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { isDeckGameMode } from "./utils/steamOS";
 
-if (IS_DEV) {
-    require("source-map-support").install();
-} else {
+if (!IS_DEV) {
     autoUpdater.checkForUpdatesAndNotify();
 }
 
@@ -68,9 +66,7 @@ function init() {
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
     // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
-    // HardwareMediaKeyHandling,MediaSessionService: Prevent Discord from registering as a media service.
-    //
-    // WidgetLayering (Vencord Added): Fix DevTools context menus https://github.com/electron/electron/issues/38790
+    // HardwareMediaKeyHandling, MediaSessionService: Prevent Discord from registering as a media service.
     disabledFeatures.add("WinRetrieveSuggestionsOnlyOnDemand");
     disabledFeatures.add("HardwareMediaKeyHandling");
     disabledFeatures.add("MediaSessionService");
