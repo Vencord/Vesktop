@@ -5,7 +5,7 @@
  */
 
 import { app } from "electron";
-import { existsSync, mkdirSync, readdirSync, renameSync, rmdirSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 
 const vesktopDir = dirname(process.execPath);
@@ -15,28 +15,11 @@ export const PORTABLE =
     !process.execPath.toLowerCase().endsWith("electron.exe") &&
     !existsSync(join(vesktopDir, "Uninstall Vesktop.exe"));
 
-const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR =
     process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
 
 mkdirSync(DATA_DIR, { recursive: true });
 
-// TODO: remove eventually
-if (existsSync(LEGACY_DATA_DIR)) {
-    try {
-        console.warn("Detected legacy settings dir", LEGACY_DATA_DIR + ".", "migrating to", DATA_DIR);
-        for (const file of readdirSync(LEGACY_DATA_DIR)) {
-            renameSync(join(LEGACY_DATA_DIR, file), join(DATA_DIR, file));
-        }
-        rmdirSync(LEGACY_DATA_DIR);
-        renameSync(
-            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
-            join(DATA_DIR, "sessionData", "IndexedDB")
-        );
-    } catch (e) {
-        console.error("Migration failed", e);
-    }
-}
 const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
 app.setPath("sessionData", SESSION_DATA_DIR);
 

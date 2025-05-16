@@ -1,4 +1,0 @@
-/* Workaround for making things in the draggable area clickable again on macOS */
-.platform-osx [class*=topic_], .platform-osx [class*=notice_] button {
-    -webkit-app-region: no-drag;
-}

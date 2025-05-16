@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import "./fixes.css";
-
 import { localStorage } from "./utils";
 
 // Make clicking Notifications focus the window
