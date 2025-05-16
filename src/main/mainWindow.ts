@@ -32,6 +32,7 @@ import {
     DATA_DIR,
     DEFAULT_HEIGHT,
     DEFAULT_WIDTH,
+    isLinux,
     MessageBoxChoice,
     MIN_HEIGHT,
     MIN_WIDTH,
@@ -39,6 +40,7 @@ import {
 } from "./constants";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
+import { initKeybinds } from "./keybinds";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -556,4 +558,5 @@ export async function createWindows() {
     });
 
     initArRPC();
+    if (isLinux) initKeybinds();
 }
