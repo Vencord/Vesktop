@@ -16,3 +16,4 @@ import "./windowsTitleBar";
 import "./streamerMode";
 import "./windowMethods";
 import "./hideDownloadAppsButton";
+import "./fixAutoGainToggle";

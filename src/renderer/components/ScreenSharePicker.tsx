@@ -7,7 +7,7 @@
 import "./screenSharePicker.css";
 
 import { closeModal, Logger, Modals, ModalSize, openModal, useAwaiter } from "@vencord/types/utils";
-import { findStoreLazy, onceReady } from "@vencord/types/webpack";
+import { onceReady } from "@vencord/types/webpack";
 import {
     Button,
     Card,
@@ -21,6 +21,7 @@ import {
 } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
+import { MediaEngineStore } from "renderer/common";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { classNameFactory, isLinux, isWindows } from "renderer/utils";
@@ -29,8 +30,6 @@ const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
 const StreamFps = ["15", "30", "60"] as const;
 
 const cl = classNameFactory("vcd-screen-picker-");
-
-const MediaEngineStore = findStoreLazy("MediaEngineStore");
 
 export type StreamResolution = (typeof StreamResolutions)[number];
 export type StreamFps = (typeof StreamFps)[number];
