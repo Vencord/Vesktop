@@ -7,6 +7,8 @@
 import { SettingsRouter } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
+import { openScreenSharePicker } from "./components/ScreenSharePicker";
+
 type IpcCommandHandler = (data: any) => any;
 
 const handlers = new Map<string, IpcCommandHandler>();
@@ -46,4 +48,7 @@ export function offIpcCommand(channel: string) {
 onIpcCommand(IpcCommands.NAVIGATE_SETTINGS, () => {
     SettingsRouter.open("My Account");
 });
+
 onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
+
+onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data => openScreenSharePicker(data.screens, data.skipPicker));

@@ -6,8 +6,9 @@
 
 import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 
+import { sendRendererCommand } from "./ipcCommands";
 import { handle } from "./utils/ipcWrappers";
 
 const isWayland =
@@ -49,11 +50,11 @@ export function registerScreenShareHandler() {
         if (isWayland) {
             const video = data[0];
             if (video) {
-                const stream = await request
-                    .frame!.executeJavaScript(
-                        `Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify([video])},true)`
-                    )
-                    .catch(() => null);
+                const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
+                    screens: [video],
+                    skipPicker: true
+                }).catch(() => null);
+
                 if (stream === null) return callback({});
             }
 
@@ -61,13 +62,13 @@ export function registerScreenShareHandler() {
             return;
         }
 
-        const choice = await request
-            .frame!.executeJavaScript(`Vesktop.Components.ScreenShare.openScreenSharePicker(${JSON.stringify(data)})`)
-            .then(e => e as StreamPick)
-            .catch(e => {
-                console.error("Error during screenshare picker", e);
-                return null;
-            });
+        const choice = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
+            screens: data,
+            skipPicker: false
+        }).catch(e => {
+            console.error("Error during screenshare picker", e);
+            return null;
+        });
 
         if (!choice) return callback({});
 

@@ -66,6 +66,10 @@ export const enum IpcCommands {
     RPC_ACTIVITY = "rpc:activity",
     RPC_INVITE = "rpc:invite",
     RPC_DEEP_LINK = "rpc:link",
+
     NAVIGATE_SETTINGS = "navigate:settings",
-    GET_LANGUAGES = "navigator.languages"
+
+    GET_LANGUAGES = "navigator.languages",
+
+    SCREEN_SHARE_PICKER = "screenshare:picker"
 }

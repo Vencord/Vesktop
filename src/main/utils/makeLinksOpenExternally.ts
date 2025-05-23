@@ -50,7 +50,7 @@ export function handleExternalUrl(url: string, protocol?: string): { action: "de
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url, frameName, features }) => {
         try {
-            var { protocol, hostname, pathname } = new URL(url);
+            var { protocol, hostname, pathname, searchParams } = new URL(url);
         } catch {
             return { action: "deny" };
         }
@@ -59,8 +59,10 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
             return createOrFocusPopup(frameName, features);
         }
 
-        if (url === "about:blank" || (frameName === "authorize" && DISCORD_HOSTNAMES.includes(hostname)))
-            return { action: "allow" };
+        if (url === "about:blank") return { action: "allow" };
+
+        // Drop the static temp page Discord web loads for the connections popout
+        if (frameName === "authorize" && searchParams.get("loading") === "true") return { action: "deny" };
 
         return handleExternalUrl(url, protocol);
     });

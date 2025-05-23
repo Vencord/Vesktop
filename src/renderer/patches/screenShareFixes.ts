@@ -59,10 +59,15 @@ if (isLinux) {
                     },
                     autoGainControl: false,
                     echoCancellation: false,
-                    noiseSuppression: false
+                    noiseSuppression: false,
+                    channelCount: 2,
+                    sampleRate: 48000,
+                    sampleSize: 16
                 }
             });
-            audio.getAudioTracks().forEach(t => stream.addTrack(t));
+
+            stream.getAudioTracks().forEach(t => stream.removeTrack(t));
+            stream.addTrack(audio.getAudioTracks()[0]);
         }
 
         return stream;
