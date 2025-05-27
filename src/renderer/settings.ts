@@ -37,6 +37,10 @@ interface TState {
         resolution: string;
         frameRate: string;
     };
+    keybinds?: {
+        action: string;
+        shortcut: string;
+    }[];
 }
 
 const stateKey = "VesktopState";

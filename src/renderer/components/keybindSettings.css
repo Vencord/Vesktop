@@ -1,0 +1,15 @@
+.vcd-keybind-delete-button {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    background: url("/assets/cc9937ea92f932c3.svg") center no-repeat var(--button-danger-background);
+    position: absolute;
+    right: -12px;
+    top: -12px;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.vcd-keybind-card:hover .vcd-keybind-delete-button {
+    opacity: 1;
+}
