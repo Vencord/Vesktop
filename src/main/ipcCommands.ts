@@ -31,6 +31,11 @@ export interface IpcResponse {
  * You must add a handler for the message in the renderer process.
  */
 export function sendRendererCommand<T = any>(message: string, data?: any) {
+    if (mainWin.isDestroyed()) {
+        console.warn("Main window is destroyed, cannot send IPC command:", message);
+        return Promise.reject(new Error("Main window is destroyed"));
+    }
+
     const nonce = randomUUID();
 
     const promise = new Promise<T>((resolve, reject) => {
