@@ -28,18 +28,23 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
 
+export let enableHardwareAcceleration = true;
+
 function init() {
     app.setAsDefaultProtocolClient("discord");
 
-    const { disableSmoothScroll, hardwareAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
 
     const enabledFeatures = new Set(app.commandLine.getSwitchValue("enable-features").split(","));
     const disabledFeatures = new Set(app.commandLine.getSwitchValue("disable-features").split(","));
+    app.commandLine.removeSwitch("enable-features");
+    app.commandLine.removeSwitch("disable-features");
 
-    if (hardwareAcceleration === false) {
+    if (hardwareAcceleration === false || process.argv.includes("--disable-gpu")) {
+        enableHardwareAcceleration = false;
         app.disableHardwareAcceleration();
     } else {
-        if (Settings.store.hardwareVideoAcceleration) {
+        if (hardwareVideoAcceleration) {
             enabledFeatures.add("AcceleratedVideoEncoder");
             enabledFeatures.add("AcceleratedVideoDecoder");
 
@@ -85,8 +90,18 @@ function init() {
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
 
-    app.commandLine.appendSwitch("enable-features", [...enabledFeatures].filter(Boolean).join(","));
-    app.commandLine.appendSwitch("disable-features", [...disabledFeatures].filter(Boolean).join(","));
+    const enabledFeaturesArray = enabledFeatures.values().filter(Boolean).toArray();
+    const disabledFeaturesArray = disabledFeatures.values().filter(Boolean).toArray();
+
+    if (enabledFeaturesArray.length) {
+        app.commandLine.appendSwitch("enable-features", enabledFeaturesArray.join(","));
+        console.log("Enabled Chromium features:", enabledFeaturesArray.join(", "));
+    }
+
+    if (disabledFeaturesArray.length) {
+        app.commandLine.appendSwitch("disable-features", disabledFeaturesArray.join(","));
+        console.log("Disabled Chromium features:", disabledFeaturesArray.join(", "));
+    }
 
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
