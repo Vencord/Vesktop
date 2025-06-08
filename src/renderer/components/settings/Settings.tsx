@@ -46,7 +46,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description:
                 "Enable hardware video acceleration. This can improve performance of screenshare and video playback, but may cause graphical glitches and infinitely loading streams.",
             defaultValue: false,
-            disabled: () => Settings.store.hardwareAcceleration !== false
+            disabled: () => Settings.store.hardwareAcceleration === false
         }
     ],
     "User Interface": [
