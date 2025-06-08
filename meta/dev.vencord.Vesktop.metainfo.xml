@@ -28,6 +28,23 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.5.7" date="2025-06-08" type="stable">
+      <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.7</url>
+      <description>
+        <p>What's Changed</p>
+        <ul>
+          <li>Starting a screenshare on Windows will no longer mute system audio</li>
+          <li>Fixed showing "Invalid URL" errors in some edge cases (spotty network)</li>
+          <li>Now respects your Autogain preference</li>
+          <li>Improved the flow for linking third party accounts</li>
+          <li>Fixed issue that would cause the AppImage to have no icon and be unpinnable</li>
+          <li>Added the ability to screenshare with stereo audio</li>
+          <li>Added Video Hardware Acceleration switch - Used to always be enabled. Now it is opt-in (disabled by default) to fix graphical glitches that were affecting many users</li>
+          <li>Fixed Discord titlebar buttons</li>
+          <li>Fixed "Object has been destroyed" error in some edge cases</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.6" date="2025-04-13" type="stable">
       <url>https://github.com/Vencord/Vesktop/releases/tag/v1.5.6</url>
       <description>
