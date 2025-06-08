@@ -39,12 +39,14 @@ function init() {
     if (hardwareAcceleration === false) {
         app.disableHardwareAcceleration();
     } else {
-        enabledFeatures.add("AcceleratedVideoEncoder");
-        enabledFeatures.add("AcceleratedVideoDecoder");
+        if (Settings.store.hardwareVideoAcceleration) {
+            enabledFeatures.add("AcceleratedVideoEncoder");
+            enabledFeatures.add("AcceleratedVideoDecoder");
 
-        if (isLinux) {
-            enabledFeatures.add("AcceleratedVideoDecodeLinuxGL");
-            enabledFeatures.add("AcceleratedVideoDecodeLinuxZeroCopyGL");
+            if (isLinux) {
+                enabledFeatures.add("AcceleratedVideoDecodeLinuxGL");
+                enabledFeatures.add("AcceleratedVideoDecodeLinuxZeroCopyGL");
+            }
         }
     }
 

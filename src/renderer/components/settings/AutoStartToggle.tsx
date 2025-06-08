@@ -4,15 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Switch, useState } from "@vencord/types/webpack/common";
+import { useState } from "@vencord/types/webpack/common";
 
 import { SettingsComponent } from "./Settings";
+import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 export const AutoStartToggle: SettingsComponent = () => {
     const [autoStartEnabled, setAutoStartEnabled] = useState(VesktopNative.autostart.isEnabled());
 
     return (
-        <Switch
+        <VesktopSettingsSwitch
             value={autoStartEnabled}
             onChange={async v => {
                 await VesktopNative.autostart[v ? "enable" : "disable"]();
@@ -21,6 +22,6 @@ export const AutoStartToggle: SettingsComponent = () => {
             note="Automatically start Vesktop on computer start-up"
         >
             Start With System
-        </Switch>
+        </VesktopSettingsSwitch>
     );
 };
