@@ -20,6 +20,12 @@ ipcRenderer.on(IpcEvents.SPELLCHECK_RESULT, (_, w: string, s: string[]) => {
     spellCheckCallbacks.forEach(cb => cb(w, s));
 });
 
+let onDevtoolsOpen = () => {};
+let onDevtoolsClose = () => {};
+
+ipcRenderer.on(IpcEvents.DEVTOOLS_OPENED, () => onDevtoolsOpen());
+ipcRenderer.on(IpcEvents.DEVTOOLS_CLOSED, () => onDevtoolsClose());
+
 export const VesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
@@ -57,7 +63,11 @@ export const VesktopNative = {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
         minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
-        maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key)
+        maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key),
+        setDevtoolsCallbacks: (onOpen: () => void, onClose: () => void) => {
+            onDevtoolsOpen = onOpen;
+            onDevtoolsClose = onClose;
+        }
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
