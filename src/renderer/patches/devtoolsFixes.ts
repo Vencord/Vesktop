@@ -16,6 +16,11 @@ addPatch({
                 replace: "false"
             }
         },
+
+        // Discord Web uses an incredibly broken devtools detector with false positives.
+        // They "hide" (aka remove from storage) your token if it "detects" open devtools.
+        // Due to the false positives, this leads to random logouts.
+        // Patch their devtools detection to use proper Electron APIs instead to fix the false positives
         {
             find: ".setDevtoolsCallbacks(",
             group: true,
@@ -27,8 +32,8 @@ addPatch({
                 },
                 {
                     // eslint-disable-next-line no-useless-escape
-                    match: /\b\i\.window\b/g,
-                    replace: "VesktopNative.win"
+                    match: /\b\i\.window\.setDevtoolsCallbacks/g,
+                    replace: "VesktopNative.win.setDevtoolsCallbacks"
                 }
             ]
         }
