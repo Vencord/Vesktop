@@ -57,10 +57,9 @@
         "typescript-eslint": "^8.33.1",
         "xml-formatter": "^3.6.6"
     },
-    "packageManager": "pnpm@10.7.1",
+    "packageManager": "pnpm@10.12.1",
     "engines": {
-        "node": ">=18",
-        "pnpm": ">=8"
+        "node": ">=20"
     },
     "build": {
         "appId": "dev.vencord.vesktop",
