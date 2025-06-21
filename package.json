@@ -199,7 +199,7 @@
     },
     "pnpm": {
         "patchedDependencies": {
-            "arrpc@3.5.0": "/home/vee/Coding/Vesktop/patches/arrpc@3.5.0.patch",
+            "arrpc@3.5.0": "patches/arrpc@3.5.0.patch",
             "electron-updater": "patches/electron-updater.patch"
         },
         "onlyBuiltDependencies": [
