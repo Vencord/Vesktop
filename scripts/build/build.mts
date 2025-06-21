@@ -60,6 +60,12 @@ await Promise.all([
     }),
     createContext({
         ...NodeCommonOpts,
+        entryPoints: ["src/main/arrpcWorker.ts"],
+        outfile: "dist/js/arrpcWorker.js",
+        footer: { js: "//# sourceURL=VCDArrpcWorker" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
         outfile: "dist/js/preload.js",
         footer: { js: "//# sourceURL=VCDPreload" }
