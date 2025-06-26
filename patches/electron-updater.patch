@@ -1,0 +1,16 @@
+diff --git a/out/RpmUpdater.js b/out/RpmUpdater.js
+index 563187bb18cb0bd154dff6620cb62b8c8f534cd6..d91594026c2bac9cc78ef3b1183df3241d7d9624 100644
+--- a/out/RpmUpdater.js
++++ b/out/RpmUpdater.js
+@@ -32,7 +32,10 @@ class RpmUpdater extends BaseUpdater_1.BaseUpdater {
+         const sudo = this.wrapSudo();
+         // pkexec doesn't want the command to be wrapped in " quotes
+         const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
+-        const packageManager = this.spawnSyncLog("which zypper");
++        let packageManager;
++        try {
++            packageManager = this.spawnSyncLog("which zypper");
++        } catch {};
+         const installerPath = this.installerPath;
+         if (installerPath == null) {
+             this.dispatchError(new Error("No valid update available, can't quit and install"));

@@ -1,13 +1,14 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
 import vencordDep from "./vencordDep.mjs";
+import { includeDirPlugin } from "./includeDirPlugin.mts";
 
 const isDev = process.argv.includes("--dev");
 
@@ -64,6 +65,11 @@ await Promise.all([
         footer: { js: "//# sourceURL=VCDPreload" }
     }),
     createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/preload/splash.ts"],
+        outfile: "dist/js/splashPreload.js"
+    }),
+    createContext({
         ...CommonOpts,
         globalName: "Vesktop",
         entryPoints: ["src/renderer/index.ts"],
@@ -73,7 +79,7 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
-        plugins: [vencordDep],
+        plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
         footer: { js: "//# sourceURL=VCDRenderer" }
     })
 ]);

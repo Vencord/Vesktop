@@ -3,8 +3,10 @@
 
     <style>
         body {
+            background: none;
             user-select: none;
             -webkit-app-region: drag;
+            overflow: hidden;
         }
 
         .wrapper {
@@ -16,6 +18,15 @@
             align-items: center;
             border-radius: 8px;
             border: 1px solid var(--fg-semi-trans);
+            background: var(--bg);
+        }
+
+        .message {
+            top: 70%;
+            word-break: break-word;
+            padding: 0 16px;
+            position: absolute;
+            font-size: 14px
         }
 
         p {
@@ -39,5 +50,15 @@
             role="presentation"
         />
         <p>Loading Vesktop...</p>
+        <p class="message"></p>
     </div>
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const messageElement = document.querySelector('.message');
+        VesktopSplashNative.onUpdateMessage(message => {
+            messageElement.textContent = message;
+        })
+    });
+</script>

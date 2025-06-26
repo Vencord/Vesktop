@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
@@ -56,7 +56,7 @@ addContextMenuPatch("textarea-context", children => {
     const settings = useSettings();
     const spellCheckLanguages = (settings.spellCheckLanguages ??= [...new Set(navigator.languages)]);
 
-    const pasteSectionIndex = children.findIndex(c => c?.props?.children?.some(c => c?.props?.id === "paste"));
+    const pasteSectionIndex = children.findIndex(c => c?.props?.children?.some?.(c => c?.props?.id === "paste"));
 
     children.splice(
         pasteSectionIndex === -1 ? children.length : pasteSectionIndex,

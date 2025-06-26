@@ -28,7 +28,11 @@ If you don't know the difference, pick the Installer.
 
 ### Mac
 
-[Vesktop.dmg](https://vencord.dev/download/vesktop/universal/dmg)
+Download the latest [Vesktop.dmg](https://vencord.dev/download/vesktop/universal/dmg) or use [Homebrew](https://brew.sh/)
+
+```sh
+brew install vesktop
+```
 
 ### Linux
 
@@ -53,9 +57,15 @@ Below you can find unofficial packages created by the community. They are not of
 
 - Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
 - NixOS: https://wiki.nixos.org/wiki/Discord#Vesktop
+- Slackware: [Vesktop on the SlackBuilds](https://slackbuilds.org/result/?search=vesktop)
 - Windows - Scoop: https://scoop.sh/#/apps?q=Vesktop
 
 ## Building from Source
+
+You need to have the following dependencies installed:
+- [Git](https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/en/download)
+- pnpm: `npm install --global pnpm`
 
 Packaging will create builds in the dist/ folder
 
@@ -69,10 +79,12 @@ pnpm i
 # Either run it without packaging
 pnpm start
 
-# Or package
+# Or package (will build packages for your OS)
 pnpm package
-# Or only build the pacman target
+
+# Or only build the Linux Pacman package
 pnpm package --linux pacman
+
 # Or package to a directory only
 pnpm package:dir
 ```
