@@ -7,7 +7,7 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
 
@@ -16,7 +16,6 @@ let splash: BrowserWindow | undefined;
 export function createSplashWindow(startMinimized = false) {
     splash = new BrowserWindow({
         ...SplashProps,
-        icon: ICON_PATH,
         show: !startMinimized,
         webPreferences: {
             preload: join(__dirname, "splashPreload.js")
