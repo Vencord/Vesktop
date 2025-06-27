@@ -16,7 +16,6 @@ let splash: BrowserWindow | undefined;
 export function createSplashWindow(startMinimized = false) {
     splash = new BrowserWindow({
         ...SplashProps,
-        icon: ICON_PATH,
         show: !startMinimized,
         webPreferences: {
             preload: join(__dirname, "splashPreload.js")
