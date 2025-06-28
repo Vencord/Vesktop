@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import "./traySetting.css";
-
 import { Margins } from "@vencord/types/utils";
 import { Forms, Select, Switch } from "@vencord/types/webpack/common";
 import { setCurrentTrayIcon } from "renderer/patches/tray";
