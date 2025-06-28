@@ -18,6 +18,7 @@ import {
     systemPreferences,
     Tray
 } from "electron";
+import { EventEmitter } from "events";
 import { existsSync } from "fs";
 import { rm } from "fs/promises";
 import { join } from "path";
@@ -42,7 +43,7 @@ import {
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
-import { createSplashWindow } from "./splash";
+import { createSplashWindow, updateSplashMessage } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
@@ -252,7 +253,7 @@ function initMenuBar(win: BrowserWindow) {
         }
     ] satisfies MenuItemList;
 
-    const menu = Menu.buildFromTemplate([
+    const menuItems = [
         {
             label: "Vesktop",
             role: "appMenu",
@@ -261,8 +262,10 @@ function initMenuBar(win: BrowserWindow) {
         { role: "fileMenu" },
         { role: "editMenu" },
         { role: "viewMenu" },
-        { role: "windowMenu" }
-    ]);
+        isDarwin && { role: "windowMenu" }
+    ] satisfies MenuItemList;
+
+    const menu = Menu.buildFromTemplate(menuItems.filter(isTruthy));
 
     Menu.setApplicationMenu(menu);
 }
@@ -392,6 +395,15 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
+function initDevtoolsListeners(win: BrowserWindow) {
+    win.webContents.on("devtools-opened", () => {
+        win.webContents.send(IpcEvents.DEVTOOLS_OPENED);
+    });
+    win.webContents.on("devtools-closed", () => {
+        win.webContents.send(IpcEvents.DEVTOOLS_CLOSED);
+    });
+}
+
 function initStaticTitle(win: BrowserWindow) {
     const listener = (e: { preventDefault: Function }) => e.preventDefault();
 
@@ -477,22 +489,39 @@ function createMainWindow() {
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
+    initDevtoolsListeners(win);
     initStaticTitle(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
+    // win.webContents.session.clearCache().then(() => {
     loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
+    // });
 
     return win;
 }
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
+const loadEvents = new EventEmitter();
+
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
-    mainWin.loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`);
+
+    // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
+    mainWin
+        .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
+        .then(() => loadEvents.emit("app-loaded"))
+        .catch(error => retryUrl(error.url, error.code));
+}
+
+const retryDelay = 1000;
+function retryUrl(url: string, description: string) {
+    console.log(`retrying in ${retryDelay}ms`);
+    updateSplashMessage(`Failed to load Discord: ${description}`);
+    setTimeout(() => loadUrl(url), retryDelay);
 }
 
 export async function createWindows() {
@@ -511,7 +540,7 @@ export async function createWindows() {
 
     mainWin = createMainWindow();
 
-    mainWin.webContents.on("did-finish-load", () => {
+    loadEvents.on("app-loaded", () => {
         splash?.destroy();
 
         if (!startMinimized) {
@@ -534,6 +563,8 @@ export async function createWindows() {
     });
 
     mainWin.webContents.on("did-navigate", (_, url: string, responseCode: number) => {
+        updateSplashMessage(""); // clear the splash message
+
         // check url to ensure app doesn't loop
         if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
             loadUrl(undefined);
