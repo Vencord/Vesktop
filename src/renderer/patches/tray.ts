@@ -21,39 +21,9 @@ export function setCurrentTrayIcon() {
             VesktopNative.tray.setIcon("idle");
         }
     } else {
-        VesktopNative.tray.setIcon("icon");
+        VesktopNative.tray.setIcon("main");
     }
 }
-
-VesktopNative.tray.addBadgeToIcon(async (iconDataURL: string, badgeDataSVG: string) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 128;
-    canvas.height = 128;
-
-    const img = new Image();
-    img.width = 128;
-    img.height = 128;
-
-    img.onload = () => {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-            ctx.drawImage(img, 0, 0);
-
-            const iconImg = new Image();
-            iconImg.width = 64;
-            iconImg.height = 64;
-
-            iconImg.onload = () => {
-                ctx.drawImage(iconImg, 64, 0, 64, 64);
-                VesktopNative.tray.returnIconWithBadge(canvas.toDataURL());
-            };
-
-            iconImg.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(badgeDataSVG)}`;
-        }
-    };
-
-    img.src = iconDataURL;
-});
 
 VesktopNative.tray.setCurrentVoiceIcon(() => {
     setCurrentTrayIcon();
@@ -83,10 +53,13 @@ onceReady.then(() => {
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED" && params.context === "default") {
             isInCall = true;
-            setCurrentTrayIcon();
         } else if (params.state === "RTC_DISCONNECTED" && params.context === "default") {
-            VesktopNative.tray.setIcon("icon");
             isInCall = false;
         }
+        setCurrentTrayIcon();
+    });
+
+    FluxDispatcher.subscribe("MESSAGE_NOTIFICATION_SHOWN", () => {
+        setCurrentTrayIcon();
     });
 });

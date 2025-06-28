@@ -29,10 +29,8 @@ export function setBadgeCount(count: number) {
     lastBadgeCount = count;
     switch (process.platform) {
         case "linux":
-            // commented out lines are temp to be replaced by #686
-            // if (count === -1) count = 0;
-            // app.setBadgeCount(count);
-
+            if (count === -1) count = 0;
+            app.setBadgeCount(count);
             break;
         case "darwin":
             if (count === 0) {
@@ -52,8 +50,7 @@ export function setBadgeCount(count: number) {
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
-
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+    mainWin.webContents.send(IpcEvents.SET_CURRENT_TRAY_ICON);
 }
 
 function getBadgeIndexAndDescription(count: number): [number | null, string] {

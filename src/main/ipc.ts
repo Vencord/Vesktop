@@ -31,7 +31,7 @@ import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
-import { getIconWithBadge, setTrayIcon } from "./tray";
+import { setTrayIcon } from "./tray";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -185,4 +185,3 @@ watch(
 );
 
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
-handle(IpcEvents.GET_ICON_WITH_BADGE, async (_, dataURL) => getIconWithBadge(dataURL));

@@ -566,7 +566,7 @@ export async function createWindows() {
     });
 
     nativeTheme.on("updated", () => {
-        mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+        mainWin.webContents.send(IpcEvents.SET_CURRENT_TRAY_ICON);
     });
 
     initArRPC();
