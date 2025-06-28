@@ -20,11 +20,11 @@ import { EventEmitter } from "events";
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
+import { ICON_PATH } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -46,7 +46,7 @@ import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./u
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
-let tray: Tray;
+export let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -563,6 +563,10 @@ export async function createWindows() {
             loadUrl(undefined);
             console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
         }
+    });
+
+    nativeTheme.on("updated", () => {
+        mainWin.webContents.send(IpcEvents.SET_CURRENT_TRAY_ICON);
     });
 
     initArRPC();

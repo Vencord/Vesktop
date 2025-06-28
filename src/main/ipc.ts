@@ -31,6 +31,7 @@ import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
+import { setTrayIcon } from "./tray";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -182,3 +183,5 @@ watch(
         mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
     })
 );
+
+handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
