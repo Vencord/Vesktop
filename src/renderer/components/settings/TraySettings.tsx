@@ -14,10 +14,7 @@ import { useSettings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
 
-const ColorPicker = findComponentByCodeLazy(
-    "#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}",
-    ".BACKGROUND_PRIMARY)"
-);
+const ColorPicker = findComponentByCodeLazy("#{intl::USER_SETTINGS_PROFILE_COLOR_SELECT_COLOR}", "showEyeDropper");
 
 const presets = [
     "#3DB77F", // discord default ~

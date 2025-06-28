@@ -16,6 +16,9 @@ importers:
 
   .:
     dependencies:
+      '@homebridge/dbus-native':
+        specifier: ^0.7.1
+        version: 0.7.1
       arrpc:
         specifier: github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77
         version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=4313fe844324a52ef0453078a86f5d1ee2d4f406331201211020d9fa243323c4)
@@ -96,9 +99,6 @@ importers:
         specifier: ^3.6.6
         version: 3.6.6
     optionalDependencies:
-      '@homebridge/dbus-native':
-        specifier: 0.6.0
-        version: 0.6.0
       '@vencord/venmic':
         specifier: ^6.1.0
         version: 6.1.0
@@ -357,16 +357,9 @@ packages:
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
 
-  '@homebridge/dbus-native@0.6.0':
-    resolution: {integrity: sha512-xObqQeYHTXmt6wsfj10+krTo4xbzR9BgUfX2aQ+edDC9nc4ojfzLScfXCh3zluAm6UCowKw+AFfXn6WLWUOPkg==}
+  '@homebridge/dbus-native@0.7.1':
+    resolution: {integrity: sha512-ZywUbf0vy+DSN4gCCMERRpSh/nywPjRk/fMq5GGM58Cqm8/dg6/C5aFJPmgVLNUD4Etcamq2d0Jb9qiDSZktcA==}
     hasBin: true
-
-  '@homebridge/long@5.2.1':
-    resolution: {integrity: sha512-i5Df8R63XNPCn+Nj1OgAoRdw9e+jHUQb3CNUbvJneI2iu3j4+OtzQj+5PA1Ce+747NR1SPqZSvyvD483dOT3AA==}
-
-  '@homebridge/put@0.0.8':
-    resolution: {integrity: sha512-mwxLHHqKebOmOSU0tsPEWQSBHGApPhuaqtNpCe7U+AMdsduweANiu64E9SXXUtdpyTjsOpgSMLhD1+kbLHD2gA==}
-    engines: {node: '>=0.3.0'}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2030,6 +2023,9 @@ packages:
   long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
 
+  long@5.3.2:
+    resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
+
   lowercase-keys@2.0.0:
     resolution: {integrity: sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==}
     engines: {node: '>=8'}
@@ -3292,22 +3288,14 @@ snapshots:
 
   '@gar/promisify@1.1.3': {}
 
-  '@homebridge/dbus-native@0.6.0':
+  '@homebridge/dbus-native@0.7.1':
     dependencies:
-      '@homebridge/long': 5.2.1
-      '@homebridge/put': 0.0.8
       event-stream: 4.0.1
       hexy: 0.3.5
+      long: 5.3.2
       minimist: 1.2.8
       safe-buffer: 5.2.1
       xml2js: 0.6.2
-    optional: true
-
-  '@homebridge/long@5.2.1':
-    optional: true
-
-  '@homebridge/put@0.0.8':
-    optional: true
 
   '@humanfs/core@0.19.1': {}
 
@@ -5051,8 +5039,7 @@ snapshots:
 
   hexy@0.2.11: {}
 
-  hexy@0.3.5:
-    optional: true
+  hexy@0.3.5: {}
 
   homedir-polyfill@1.0.3:
     dependencies:
@@ -5417,6 +5404,8 @@ snapshots:
       is-unicode-supported: 0.1.0
 
   long@4.0.0: {}
+
+  long@5.3.2: {}
 
   lowercase-keys@2.0.0: {}
 
@@ -6507,7 +6496,6 @@ snapshots:
     dependencies:
       sax: 1.4.1
       xmlbuilder: 11.0.1
-    optional: true
 
   xmlbuilder@11.0.1: {}
 
