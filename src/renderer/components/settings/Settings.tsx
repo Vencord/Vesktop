@@ -16,13 +16,7 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import {
-    CustomizeTraySwitch,
-    TrayColorTypeSelect,
-    TrayFillColorSwitch,
-    TrayIconPicker,
-    TraySwitch
-} from "./TraySettings";
+import { TrayFillColorSwitch, TraySwitch } from "./TraySettings";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -93,9 +87,6 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     ],
     Tray: [
         TraySwitch,
-        CustomizeTraySwitch,
-        TrayColorTypeSelect,
-        TrayIconPicker,
         TrayFillColorSwitch,
         {
             key: "minimizeToTray",

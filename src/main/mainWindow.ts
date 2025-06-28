@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import dbus from "@homebridge/dbus-native";
 import {
     app,
     BrowserWindow,
@@ -15,15 +14,13 @@ import {
     nativeTheme,
     screen,
     session,
-    systemPreferences,
     Tray
 } from "electron";
 import { EventEmitter } from "events";
-import { existsSync } from "fs";
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
-import { ICON_PATH, ICONS_DIR } from "shared/paths";
+import { ICON_PATH } from "shared/paths";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
@@ -129,11 +126,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    if (Settings.store.trayMainOverride && existsSync(join(ICONS_DIR, "icon_custom.png"))) {
-        tray = new Tray(join(ICONS_DIR, "icon_custom.png"));
-    } else {
-        tray = new Tray(ICON_PATH);
-    }
+    tray = new Tray(ICON_PATH);
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -572,41 +565,9 @@ export async function createWindows() {
         }
     });
 
+    nativeTheme.on("updated", () => {
+        mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);
+    });
+
     initArRPC();
-}
-
-export function getAccentColor(): Promise<string> {
-    if (process.platform === "linux") {
-        return new Promise((resolve, reject) => {
-            const sessionBus = dbus.sessionBus();
-            sessionBus
-                .getService("org.freedesktop.portal.Desktop")
-                .getInterface(
-                    "/org/freedesktop/portal/desktop",
-                    "org.freedesktop.portal.Settings",
-                    function (err, settings) {
-                        if (err) {
-                            resolve("");
-                            return;
-                        }
-                        settings.Read("org.freedesktop.appearance", "accent-color", function (err, result) {
-                            if (err) {
-                                resolve("");
-                                return;
-                            }
-                            const [r, g, b] = result[1][0][1][0];
-                            const r255 = Math.round(r * 255);
-                            const g255 = Math.round(g * 255);
-                            const b255 = Math.round(b * 255);
-
-                            const toHex = (value: number) => value.toString(16).padStart(2, "0");
-                            const hexColor = `#${toHex(r255)}${toHex(g255)}${toHex(b255)}`;
-                            resolve(hexColor);
-                        });
-                    }
-                );
-        });
-    } else {
-        return Promise.resolve(`#${systemPreferences.getAccentColor?.() || ""}`);
-    }
 }
