@@ -60,9 +60,9 @@ await Promise.all([
     }),
     createContext({
         ...NodeCommonOpts,
-        entryPoints: ["src/main/arrpcWorker.ts"],
-        outfile: "dist/js/arrpcWorker.js",
-        footer: { js: "//# sourceURL=VCDArrpcWorker" }
+        entryPoints: ["src/main/arrpc/worker.ts"],
+        outfile: "dist/js/arRpcWorker.js",
+        footer: { js: "//# sourceURL=VCDArRpcWorker" }
     }),
     createContext({
         ...NodeCommonOpts,

@@ -10,7 +10,7 @@ import { MessageChannel, Worker } from "worker_threads";
 
 import { sendRendererCommand } from "../ipcCommands";
 import { Settings } from "../settings";
-import { ArRpcEvent, ArRpcHostEvent } from "./arrpcWorkerTypes";
+import { ArRpcEvent, ArRpcHostEvent } from "./types";
 
 let worker: Worker;
 
@@ -22,7 +22,7 @@ export async function initArRPC() {
     try {
         const { port1: hostPort, port2: workerPort } = new MessageChannel();
 
-        worker = new Worker(resolve(__dirname, "./arrpcWorker.js"), {
+        worker = new Worker(resolve(__dirname, "./arRpcWorker.js"), {
             workerData: {
                 workerPort
             },

@@ -8,7 +8,7 @@ import Server from "arrpc";
 import { randomUUID } from "crypto";
 import { MessagePort, workerData } from "worker_threads";
 
-import { ArRpcEvent, ArRpcHostEvent } from "./arrpcWorkerTypes";
+import { ArRpcEvent, ArRpcHostEvent } from "./types";
 
 let server: any;
 
