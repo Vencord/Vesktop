@@ -9,6 +9,7 @@ export type ArRpcHostEvent = ArRpcHostAckInviteEvent | ArRpcHostAckLinkEvent;
 
 export interface ArRpcActivityEvent {
     type: "activity";
+    nonce: string;
     data: string;
 }
 
@@ -21,7 +22,7 @@ export interface ArRpcInviteEvent {
 export interface ArRpcLinkEvent {
     type: "link";
     nonce: string;
-    data: string;
+    data: any;
 }
 
 export interface ArRpcHostAckInviteEvent {

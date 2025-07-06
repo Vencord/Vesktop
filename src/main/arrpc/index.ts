@@ -29,19 +29,19 @@ export async function initArRPC() {
             transferList: [workerPort]
         });
 
-        hostPort.on("message", async (e: ArRpcEvent) => {
-            switch (e.type) {
+        hostPort.on("message", async ({ type, nonce, data }: ArRpcEvent) => {
+            switch (type) {
                 case "activity": {
-                    sendRendererCommand(IpcCommands.RPC_ACTIVITY, e.data);
+                    sendRendererCommand(IpcCommands.RPC_ACTIVITY, data);
                     break;
                 }
 
                 case "invite": {
-                    const invite = String(e.data);
+                    const invite = String(data);
 
                     const response: ArRpcHostEvent = {
                         type: "ack-invite",
-                        nonce: e.nonce,
+                        nonce,
                         data: false
                     };
 
@@ -56,19 +56,13 @@ export async function initArRPC() {
                 }
 
                 case "link": {
-                    const link = String(e.data);
-
                     const response: ArRpcHostEvent = {
                         type: "ack-link",
-                        nonce: e.nonce,
+                        nonce: nonce,
                         data: false
                     };
 
-                    if (!inviteCodeRegex.test(link)) {
-                        return hostPort.postMessage(response);
-                    }
-
-                    response.data = await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link).catch(() => false);
+                    response.data = await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, data).catch(() => false);
 
                     hostPort.postMessage(response);
                     break;

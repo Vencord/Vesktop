@@ -26,7 +26,8 @@ const linkCallbacks = new Map<string, LinkCallback>();
     server.on("activity", (data: any) => {
         const event: ArRpcEvent = {
             type: "activity",
-            data: JSON.stringify(data)
+            data: JSON.stringify(data),
+            nonce: randomUUID()
         };
         workerPort.postMessage(event);
     });
@@ -38,6 +39,18 @@ const linkCallbacks = new Map<string, LinkCallback>();
         const event: ArRpcEvent = {
             type: "invite",
             data: invite,
+            nonce
+        };
+        workerPort.postMessage(event);
+    });
+
+    server.on("link", async (data: any, callback: LinkCallback) => {
+        const nonce = randomUUID();
+        linkCallbacks.set(nonce, callback);
+
+        const event: ArRpcEvent = {
+            type: "link",
+            data,
             nonce
         };
         workerPort.postMessage(event);
