@@ -39,47 +39,38 @@ export async function initArRPC() {
                 case "invite": {
                     const invite = String(e.data);
 
-                    if (!inviteCodeRegex.test(invite)) {
-                        const hostEvent: ArRpcHostEvent = {
-                            type: "ack-invite",
-                            nonce: e.nonce,
-                            data: false
-                        };
-                        return hostPort.postMessage(hostEvent);
-                    }
-
-                    await sendRendererCommand(IpcCommands.RPC_INVITE, invite);
-
-                    const hostEvent: ArRpcHostEvent = {
+                    const response: ArRpcHostEvent = {
                         type: "ack-invite",
                         nonce: e.nonce,
-                        data: true
+                        data: false
                     };
-                    hostPort.postMessage(hostEvent);
 
+                    if (!inviteCodeRegex.test(invite)) {
+                        return hostPort.postMessage(response);
+                    }
+
+                    response.data = await sendRendererCommand(IpcCommands.RPC_INVITE, invite).catch(() => false);
+
+                    hostPort.postMessage(response);
                     break;
                 }
 
                 case "link": {
                     const link = String(e.data);
-                    if (!inviteCodeRegex.test(link)) {
-                        const hostEvent: ArRpcHostEvent = {
-                            type: "ack-link",
-                            nonce: e.nonce,
-                            data: false
-                        };
-                        return hostPort.postMessage(hostEvent);
-                    }
 
-                    await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link);
-
-                    const hostEvent: ArRpcHostEvent = {
+                    const response: ArRpcHostEvent = {
                         type: "ack-link",
                         nonce: e.nonce,
-                        data: true
+                        data: false
                     };
-                    hostPort.postMessage(hostEvent);
 
+                    if (!inviteCodeRegex.test(link)) {
+                        return hostPort.postMessage(response);
+                    }
+
+                    response.data = await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link).catch(() => false);
+
+                    hostPort.postMessage(response);
                     break;
                 }
             }
