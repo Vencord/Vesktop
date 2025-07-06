@@ -4,25 +4,33 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow } from "electron";
+import { app, BrowserWindow } from "electron";
 import { join } from "path";
 import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
-export function createAboutWindow() {
+export async function createAboutWindow() {
+    const height = 750;
+    const width = height * (4 / 3);
+
     const about = new BrowserWindow({
         center: true,
         autoHideMenuBar: true,
         icon: ICON_PATH,
-        webPreferences: {
-            preload: join(__dirname, "updaterPreload.js")
-        }
+        height,
+        width
     });
 
     makeLinksOpenExternally(about);
 
-    about.loadFile(join(VIEW_DIR, "about.html"));
+    const data = new URLSearchParams({
+        APP_VERSION: app.getVersion()
+    });
+
+    about.loadFile(join(VIEW_DIR, "about.html"), {
+        search: data.toString()
+    });
 
     return about;
 }
