@@ -24,7 +24,7 @@ if (Settings.store.customTitleBar)
             },
             // Visual Refresh
             {
-                find: '"data-windows":',
+                find: ".systemBar,",
                 replacement: [
                     {
                         // TODO: Fix eslint rule

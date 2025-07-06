@@ -5,10 +5,30 @@
     margin-top: 0.5em;
 }
 
-.vcd-settings-section {
-    margin-top: 1.5rem;
+.vcd-settings-title {
+    margin-bottom: 32px;
 }
 
-.vcd-settings-title {
-    margin-bottom: 0.5rem;
+.vcd-settings-category {
+    display: flex;
+    flex-direction: column;
+}
+
+.vcd-settings-category-title {
+    margin-bottom: 16px;
+}
+
+.vcd-settings-category-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.vcd-settings-category-divider {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.vcd-settings-switch {
+    margin-bottom: 0;
 }

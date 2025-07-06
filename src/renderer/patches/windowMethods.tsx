@@ -21,6 +21,10 @@ addPatch({
                     // eslint-disable-next-line no-useless-escape
                     match: /(focus(\(\i\)){).{0,150}?\.focus\(\i,\i\)/,
                     replace: "$1VesktopNative.win.focus$2"
+                },
+                {
+                    match: /,getEnableHardwareAcceleration/,
+                    replace: "$&:VesktopNative.app.getEnableHardwareAcceleration,_oldGetEnableHardwareAcceleration"
                 }
             ]
         }

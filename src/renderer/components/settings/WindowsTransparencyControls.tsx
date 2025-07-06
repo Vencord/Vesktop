@@ -13,8 +13,8 @@ export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => 
     if (!VesktopNative.app.supportsWindowsTransparency()) return null;
 
     return (
-        <>
-            <Forms.FormTitle className={Margins.top16 + " " + Margins.bottom8}>Transparency Options</Forms.FormTitle>
+        <div>
+            <Forms.FormTitle className={Margins.bottom8}>Transparency Options</Forms.FormTitle>
             <Forms.FormText className={Margins.bottom8}>
                 Requires a full restart. You will need a theme that supports transparency for this to work.
             </Forms.FormText>
@@ -42,8 +42,6 @@ export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => 
                 isSelected={v => v === settings.transparencyOption}
                 serialize={s => s}
             />
-
-            <Forms.FormDivider className={Margins.top16 + " " + Margins.bottom16} />
-        </>
+        </div>
     );
 };
