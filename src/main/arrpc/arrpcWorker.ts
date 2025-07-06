@@ -1,14 +1,13 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2023 Vendicated and Vencord contributors
+ * Copyright (c) 2025 Vendicated and Vesktop contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import Server from "arrpc";
-import { IpcEvents } from "shared/IpcEvents";
 import { MessagePort, workerData } from "worker_threads";
 
-import { ArrpcEvent, ArrpcHostEvent } from "./utils/arrpcWorkerTypes";
+import { ArRpcEvent, ArRpcHostEvent } from "./arrpcWorkerTypes";
 
 let server: any;
 
@@ -19,17 +18,20 @@ let inviteCallbacks: Array<InviteCallback> = [];
 let linkCallbacks: Array<LinkCallback> = [];
 
 (async function () {
-    const { workerPort }: { workerPort: MessagePort } = workerData;
+    const { workerPort } = workerData as { workerPort: MessagePort };
+
     server = await new Server();
+
     server.on("activity", (data: any) => {
-        const event: ArrpcEvent = {
-            eventType: IpcEvents.ARRPC_ACTIVITY,
+        const event: ArRpcEvent = {
+            eventType: "activity",
             data: JSON.stringify(data)
         };
         workerPort.postMessage(event);
     });
+
     server.on("invite", (invite: string, callback: InviteCallback) => {
-        const event: ArrpcEvent = {
+        const event: ArRpcEvent = {
             eventType: "invite",
             data: invite,
             inviteId: inviteCallbacks.push(callback) - 1
@@ -37,7 +39,7 @@ let linkCallbacks: Array<LinkCallback> = [];
         workerPort.postMessage(event);
     });
 
-    workerPort.on("message", (e: ArrpcHostEvent) => {
+    workerPort.on("message", (e: ArRpcHostEvent) => {
         switch (e.eventType) {
             case "ack-invite": {
                 inviteCallbacks[e.inviteId](e.data);

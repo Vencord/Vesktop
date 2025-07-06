@@ -5,14 +5,14 @@
  */
 
 import { resolve } from "path";
-import { IpcCommands, IpcEvents } from "shared/IpcEvents";
+import { IpcCommands } from "shared/IpcEvents";
 import { MessageChannel, Worker } from "worker_threads";
 
-import { sendRendererCommand } from "./ipcCommands";
-import { Settings } from "./settings";
-import { ArrpcEvent, ArrpcHostEvent } from "./utils/arrpcWorkerTypes";
+import { sendRendererCommand } from "../ipcCommands";
+import { Settings } from "../settings";
+import { ArRpcEvent, ArRpcHostEvent } from "./arrpcWorkerTypes";
 
-let worker: any;
+let worker: Worker;
 
 const inviteCodeRegex = /^(\w|-)+$/;
 
@@ -21,23 +21,26 @@ export async function initArRPC() {
 
     try {
         const { port1: hostPort, port2: workerPort } = new MessageChannel();
+
         worker = new Worker(resolve(__dirname, "./arrpcWorker.js"), {
             workerData: {
                 workerPort
             },
             transferList: [workerPort]
         });
-        hostPort.on("message", async (e: ArrpcEvent) => {
+
+        hostPort.on("message", async (e: ArRpcEvent) => {
             switch (e.eventType) {
-                case IpcEvents.ARRPC_ACTIVITY: {
+                case "activity": {
                     sendRendererCommand(IpcCommands.RPC_ACTIVITY, e.data);
                     break;
                 }
+
                 case "invite": {
                     const invite = String(e.data);
 
                     if (!inviteCodeRegex.test(invite)) {
-                        const hostEvent: ArrpcHostEvent = {
+                        const hostEvent: ArRpcHostEvent = {
                             eventType: "ack-invite",
                             data: false,
                             inviteId: e.inviteId
@@ -45,21 +48,22 @@ export async function initArRPC() {
                         return hostPort.postMessage(hostEvent);
                     }
 
-                    await sendRendererCommand(IpcCommands.RPC_INVITE, invite).then(() => {
-                        const hostEvent: ArrpcHostEvent = {
-                            eventType: "ack-invite",
-                            data: true,
-                            inviteId: e.inviteId
-                        };
-                        hostPort.postMessage(hostEvent);
-                    });
+                    await sendRendererCommand(IpcCommands.RPC_INVITE, invite);
+
+                    const hostEvent: ArRpcHostEvent = {
+                        eventType: "ack-invite",
+                        data: true,
+                        inviteId: e.inviteId
+                    };
+                    hostPort.postMessage(hostEvent);
 
                     break;
                 }
+
                 case "link": {
                     const link = String(e.data);
                     if (!inviteCodeRegex.test(link)) {
-                        const hostEvent: ArrpcHostEvent = {
+                        const hostEvent: ArRpcHostEvent = {
                             eventType: "ack-link",
                             data: false,
                             linkId: e.linkId
@@ -67,14 +71,14 @@ export async function initArRPC() {
                         return hostPort.postMessage(hostEvent);
                     }
 
-                    await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link).then(() => {
-                        const hostEvent: ArrpcHostEvent = {
-                            eventType: "ack-link",
-                            data: true,
-                            linkId: e.linkId
-                        };
-                        hostPort.postMessage(hostEvent);
-                    });
+                    await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link);
+
+                    const hostEvent: ArRpcHostEvent = {
+                        eventType: "ack-link",
+                        data: true,
+                        linkId: e.linkId
+                    };
+                    hostPort.postMessage(hostEvent);
 
                     break;
                 }

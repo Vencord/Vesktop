@@ -26,7 +26,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
-import { initArRPC } from "./arrpc";
+import { initArRPC } from "./arrpc/arrpc";
 import {
     BrowserUserAgent,
     DATA_DIR,
