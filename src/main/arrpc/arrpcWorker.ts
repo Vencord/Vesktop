@@ -5,6 +5,7 @@
  */
 
 import Server from "arrpc";
+import { randomUUID } from "crypto";
 import { MessagePort, workerData } from "worker_threads";
 
 import { ArRpcEvent, ArRpcHostEvent } from "./arrpcWorkerTypes";
@@ -14,8 +15,8 @@ let server: any;
 type InviteCallback = (valid: boolean) => void;
 type LinkCallback = InviteCallback;
 
-let inviteCallbacks: Array<InviteCallback> = [];
-let linkCallbacks: Array<LinkCallback> = [];
+const inviteCallbacks = new Map<string, InviteCallback>();
+const linkCallbacks = new Map<string, LinkCallback>();
 
 (async function () {
     const { workerPort } = workerData as { workerPort: MessagePort };
@@ -24,31 +25,34 @@ let linkCallbacks: Array<LinkCallback> = [];
 
     server.on("activity", (data: any) => {
         const event: ArRpcEvent = {
-            eventType: "activity",
+            type: "activity",
             data: JSON.stringify(data)
         };
         workerPort.postMessage(event);
     });
 
     server.on("invite", (invite: string, callback: InviteCallback) => {
+        const nonce = randomUUID();
+        inviteCallbacks.set(nonce, callback);
+
         const event: ArRpcEvent = {
-            eventType: "invite",
+            type: "invite",
             data: invite,
-            inviteId: inviteCallbacks.push(callback) - 1
+            nonce
         };
         workerPort.postMessage(event);
     });
 
     workerPort.on("message", (e: ArRpcHostEvent) => {
-        switch (e.eventType) {
+        switch (e.type) {
             case "ack-invite": {
-                inviteCallbacks[e.inviteId](e.data);
-                inviteCallbacks = [...inviteCallbacks.slice(0, e.inviteId), ...inviteCallbacks.slice(e.inviteId + 1)];
+                inviteCallbacks.get(e.nonce)?.(e.data);
+                inviteCallbacks.delete(e.nonce);
                 break;
             }
             case "ack-link": {
-                linkCallbacks[e.linkId](e.data);
-                linkCallbacks = [...inviteCallbacks.slice(0, e.linkId), ...inviteCallbacks.slice(e.linkId + 1)];
+                linkCallbacks.get(e.nonce)?.(e.data);
+                linkCallbacks.delete(e.nonce);
                 break;
             }
         }

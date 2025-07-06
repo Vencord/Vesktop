@@ -30,7 +30,7 @@ export async function initArRPC() {
         });
 
         hostPort.on("message", async (e: ArRpcEvent) => {
-            switch (e.eventType) {
+            switch (e.type) {
                 case "activity": {
                     sendRendererCommand(IpcCommands.RPC_ACTIVITY, e.data);
                     break;
@@ -41,9 +41,9 @@ export async function initArRPC() {
 
                     if (!inviteCodeRegex.test(invite)) {
                         const hostEvent: ArRpcHostEvent = {
-                            eventType: "ack-invite",
-                            data: false,
-                            inviteId: e.inviteId
+                            type: "ack-invite",
+                            nonce: e.nonce,
+                            data: false
                         };
                         return hostPort.postMessage(hostEvent);
                     }
@@ -51,9 +51,9 @@ export async function initArRPC() {
                     await sendRendererCommand(IpcCommands.RPC_INVITE, invite);
 
                     const hostEvent: ArRpcHostEvent = {
-                        eventType: "ack-invite",
-                        data: true,
-                        inviteId: e.inviteId
+                        type: "ack-invite",
+                        nonce: e.nonce,
+                        data: true
                     };
                     hostPort.postMessage(hostEvent);
 
@@ -64,9 +64,9 @@ export async function initArRPC() {
                     const link = String(e.data);
                     if (!inviteCodeRegex.test(link)) {
                         const hostEvent: ArRpcHostEvent = {
-                            eventType: "ack-link",
-                            data: false,
-                            linkId: e.linkId
+                            type: "ack-link",
+                            nonce: e.nonce,
+                            data: false
                         };
                         return hostPort.postMessage(hostEvent);
                     }
@@ -74,9 +74,9 @@ export async function initArRPC() {
                     await sendRendererCommand(IpcCommands.RPC_DEEP_LINK, link);
 
                     const hostEvent: ArRpcHostEvent = {
-                        eventType: "ack-link",
-                        data: true,
-                        linkId: e.linkId
+                        type: "ack-link",
+                        nonce: e.nonce,
+                        data: true
                     };
                     hostPort.postMessage(hostEvent);
 

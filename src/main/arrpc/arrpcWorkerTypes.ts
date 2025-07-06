@@ -8,30 +8,30 @@ export type ArRpcEvent = ArRpcActivityEvent | ArRpcInviteEvent | ArRpcLinkEvent;
 export type ArRpcHostEvent = ArRpcHostAckInviteEvent | ArRpcHostAckLinkEvent;
 
 export interface ArRpcActivityEvent {
-    eventType: "activity";
+    type: "activity";
     data: string;
 }
 
 export interface ArRpcInviteEvent {
-    eventType: "invite";
-    inviteId: number;
+    type: "invite";
+    nonce: string;
     data: string;
 }
 
 export interface ArRpcLinkEvent {
-    eventType: "link";
-    linkId: number;
+    type: "link";
+    nonce: string;
     data: string;
 }
 
 export interface ArRpcHostAckInviteEvent {
-    eventType: "ack-invite";
-    inviteId: number;
+    type: "ack-invite";
+    nonce: string;
     data: boolean;
 }
 
 export interface ArRpcHostAckLinkEvent {
-    eventType: "ack-link";
-    linkId: number;
+    type: "ack-link";
+    nonce: string;
     data: boolean;
 }
