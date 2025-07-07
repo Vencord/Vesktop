@@ -10,7 +10,7 @@ index 563187bb18cb0bd154dff6620cb62b8c8f534cd6..d91594026c2bac9cc78ef3b1183df324
 +        let packageManager;
 +        try {
 +            packageManager = this.spawnSyncLog("which zypper");
-+        } catch {};
++        } catch {}
          const installerPath = this.installerPath;
          if (installerPath == null) {
              this.dispatchError(new Error("No valid update available, can't quit and install"));
