@@ -81,11 +81,6 @@ function init() {
     if (isLinux) {
         // Support TTS on Linux using https://wiki.archlinux.org/title/Speech_dispatcher
         app.commandLine.appendSwitch("enable-speech-dispatcher");
-
-        // Work around Gtk-ERROR: GTK 2/3 symbols detected. Using GTK 2/3 and GTK 4 in the same process is not supported
-        // https://github.com/electron/electron/issues/46538
-        // TODO: Remove this when upstream fixes it
-        app.commandLine.appendSwitch("gtk-version", "3");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
