@@ -4,6 +4,7 @@
     --fg-secondary: #313338;
     --fg-semi-trans: rgb(0 0 0 / 0.2);
     --link: #006ce7;
+    --link-hover: #005bb5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,6 +14,7 @@
         --fg-secondary: #b5bac1;
         --fg-semi-trans: rgb(255 255 255 / 0.2);
         --link: #00a8fc;
+        --link-hover: #0086c3;
     }
 }
 
@@ -27,4 +29,9 @@ body {
 
 a {
     color: var(--link);
+    transition: color 0.2s linear;
+}
+
+a:hover {
+    color: var(--link-hover);
 }

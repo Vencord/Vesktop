@@ -20,6 +20,7 @@ import {
 } from "electron";
 import { mkdirSync, readFileSync, watch } from "fs";
 import { open, readFile } from "fs/promises";
+import { enableHardwareAcceleration } from "main";
 import { release } from "os";
 import { join } from "path";
 import { debounce } from "shared/utils/debounce";
@@ -45,6 +46,7 @@ handleSync(IpcEvents.GET_RENDERER_CSS_FILE, () => join(__dirname, "renderer.css"
 
 handleSync(IpcEvents.GET_SETTINGS, () => Settings.plain);
 handleSync(IpcEvents.GET_VERSION, () => app.getVersion());
+handleSync(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION, () => enableHardwareAcceleration);
 
 handleSync(
     IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY,

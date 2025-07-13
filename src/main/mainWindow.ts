@@ -388,6 +388,15 @@ function initSpellCheck(win: BrowserWindow) {
     initSpellCheckLanguages(win, Settings.store.spellCheckLanguages);
 }
 
+function initDevtoolsListeners(win: BrowserWindow) {
+    win.webContents.on("devtools-opened", () => {
+        win.webContents.send(IpcEvents.DEVTOOLS_OPENED);
+    });
+    win.webContents.on("devtools-closed", () => {
+        win.webContents.send(IpcEvents.DEVTOOLS_CLOSED);
+    });
+}
+
 function initStaticTitle(win: BrowserWindow) {
     const listener = (e: { preventDefault: Function }) => e.preventDefault();
 
@@ -473,6 +482,7 @@ function createMainWindow() {
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
+    initDevtoolsListeners(win);
     initStaticTitle(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);

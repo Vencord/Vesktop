@@ -5,8 +5,13 @@ body:
     - type: markdown
       attributes:
           value: |
-              ![Are you a developer? No? This form is not for you!](https://github.com/Vencord/Vesktop/blob/main/.github/ISSUE_TEMPLATE/developer-banner.png?raw=true)
-              GitHub Issues are for developers, not support. Please use our [support server](https://vencord.dev/discord) if you are not a developer.
+              # This form is reserved for Vesktop Developers. Do not open an issue.
+
+              Instead, use the [#vesktop-support channel](https://discord.com/channels/1015060230222131221/1345457031426871417) on our [Discord server](https://vencord.dev/discord) for help and reporting issues.
+
+              Your issue will be closed immediately with no comment and you will be blocked if you ignore this.
+
+              This is because 99% of issues are not actually bugs, but rather user or system issues and it adds a lot of noise to our development process.
     - type: textarea
       id: content
       attributes:
