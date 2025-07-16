@@ -1,20 +1,22 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import "./settings.css";
 
-import { Forms, Switch, Text } from "@vencord/types/webpack/common";
+import { ErrorBoundary } from "@vencord/types/components";
+import { Forms, Text } from "@vencord/types/webpack/common";
 import { ComponentType } from "react";
 import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
+import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
-import { VencordLocationPicker } from "./VencordLocationPicker";
+import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 import { WindowZoom } from "./WindowZoom";
 
@@ -38,6 +40,14 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Hardware Acceleration",
             description: "Enable hardware acceleration",
             defaultValue: true
+        },
+        {
+            key: "hardwareVideoAcceleration",
+            title: "Video Hardware Acceleration",
+            description:
+                "Enable hardware video acceleration. This can improve performance of screenshare and video playback, but may cause graphical glitches and infinitely loading streams.",
+            defaultValue: false,
+            disabled: () => Settings.store.hardwareAcceleration === false
         }
     ],
     "User Interface": [
@@ -61,10 +71,17 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             disabled: () => Settings.store.customTitleBar ?? isWindows
         },
         {
+            key: "enableSplashScreen",
+            title: "Enable Splash Screen",
+            description:
+                "Shows a small splash screen while Vesktop is loading. Disabling this option will show the main window earlier while it's still loading.",
+            defaultValue: true
+        },
+        {
             key: "splashTheming",
             title: "Splash theming",
             description: "Adapt the splash window colors to your custom theme",
-            defaultValue: false
+            defaultValue: true
         },
         WindowsTransparencyControls,
         WindowZoom
@@ -120,51 +137,61 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    "Vencord Location": [VencordLocationPicker]
+    "Developer Options": [DeveloperOptionsButton]
 };
 
 function SettingsSections() {
     const Settings = useSettings();
 
-    const sections = Object.entries(SettingsOptions).map(([title, settings]) => (
-        <Forms.FormSection
-            title={title}
-            key={title}
-            className="vcd-settings-section"
-            titleClassName="vcd-settings-title"
-        >
-            {settings.map(Setting => {
-                if (typeof Setting === "function") return <Setting settings={Settings} />;
+    const sections = Object.entries(SettingsOptions).map(([title, settings], i, arr) => (
+        <div key={title} className="vcd-settings-category">
+            <Text variant="heading-lg/semibold" color="header-primary" className="vcd-settings-category-title">
+                {title}
+            </Text>
 
-                const { defaultValue, title, description, key, disabled, invisible } = Setting;
-                if (invisible?.()) return null;
+            <div className="vcd-settings-category-content">
+                {settings.map(Setting => {
+                    if (typeof Setting === "function") return <Setting settings={Settings} />;
 
-                return (
-                    <Switch
-                        value={Settings[key as any] ?? defaultValue}
-                        onChange={v => (Settings[key as any] = v)}
-                        note={description}
-                        disabled={disabled?.()}
-                        key={key}
-                    >
-                        {title}
-                    </Switch>
-                );
-            })}
-        </Forms.FormSection>
+                    const { defaultValue, title, description, key, disabled, invisible } = Setting;
+                    if (invisible?.()) return null;
+
+                    return (
+                        <VesktopSettingsSwitch
+                            value={Settings[key as any] ?? defaultValue}
+                            onChange={v => (Settings[key as any] = v)}
+                            note={description}
+                            disabled={disabled?.()}
+                            key={key}
+                        >
+                            {title}
+                        </VesktopSettingsSwitch>
+                    );
+                })}
+            </div>
+
+            {i < arr.length - 1 && <Forms.FormDivider className="vcd-settings-category-divider" />}
+        </div>
     ));
 
     return <>{sections}</>;
 }
 
-export default function SettingsUi() {
-    return (
-        <Forms.FormSection>
-            <Text variant="heading-lg/semibold" style={{ color: "var(--header-primary)" }} tag="h2">
-                Vesktop Settings
-            </Text>
-
-            <SettingsSections />
-        </Forms.FormSection>
-    );
-}
+export default ErrorBoundary.wrap(
+    function SettingsUI() {
+        return (
+            <Forms.FormSection>
+                {/* FIXME: Outdated type */}
+                {/* @ts-expect-error Outdated type */}
+                <Text variant="heading-xl/semibold" color="header-primary" className="vcd-settings-title">
+                    Vesktop Settings
+                </Text>
+                <SettingsSections />
+            </Forms.FormSection>
+        );
+    },
+    {
+        message:
+            "Failed to render the Vesktop Settings tab. If this issue persists, try to right click the Vesktop tray icon, then click 'Repair Vencord'. And make sure your Vesktop is up to date."
+    }
+);

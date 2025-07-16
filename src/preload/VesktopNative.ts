@@ -1,11 +1,12 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron";
+import { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
 
 import { IpcEvents } from "../shared/IpcEvents";
@@ -19,12 +20,19 @@ ipcRenderer.on(IpcEvents.SPELLCHECK_RESULT, (_, w: string, s: string[]) => {
     spellCheckCallbacks.forEach(cb => cb(w, s));
 });
 
+let onDevtoolsOpen = () => {};
+let onDevtoolsClose = () => {};
+
+ipcRenderer.on(IpcEvents.DEVTOOLS_OPENED, () => onDevtoolsOpen());
+ipcRenderer.on(IpcEvents.DEVTOOLS_CLOSED, () => onDevtoolsClose());
+
 export const VesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
-        supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY)
+        supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
+        getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION)
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
@@ -54,9 +62,13 @@ export const VesktopNative = {
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
-        minimize: () => invoke<void>(IpcEvents.MINIMIZE),
-        maximize: () => invoke<void>(IpcEvents.MAXIMIZE),
-        zoom: (zoom: number) => invoke<void>(IpcEvents.SET_ZOOM, zoom)
+        zoom: (zoom: number) => invoke<void>(IpcEvents.SET_ZOOM, zoom),
+        minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
+        maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key),
+        setDevtoolsCallbacks: (onOpen: () => void, onClose: () => void) => {
+            onDevtoolsOpen = onOpen;
+            onDevtoolsClose = onClose;
+        }
     },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
@@ -71,13 +83,18 @@ export const VesktopNative = {
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
-    arrpc: {
-        onActivity(cb: (data: string) => void) {
-            ipcRenderer.on(IpcEvents.ARRPC_ACTIVITY, (_, data: string) => cb(data));
-        }
-    },
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
+    },
+    debug: {
+        launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
+        launchWebrtcInternals: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS)
+    },
+    commands: {
+        onCommand(cb: (message: IpcMessage) => void) {
+            ipcRenderer.on(IpcEvents.IPC_COMMAND, (_, message) => cb(message));
+        },
+        respond: (response: IpcResponse) => ipcRenderer.send(IpcEvents.IPC_COMMAND, response)
     }
 };

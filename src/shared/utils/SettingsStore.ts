@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { LiteralUnion } from "type-fest";
@@ -26,11 +26,11 @@ export class SettingsStore<T extends object> {
     /**
      * The store object. Making changes to this object will trigger the applicable change listeners
      */
-    public declare store: T;
+    declare public store: T;
     /**
      * The plain data. Changes to this object will not trigger any change listeners
      */
-    public declare plain: T;
+    declare public plain: T;
 
     public constructor(plain: T) {
         this.plain = plain;
