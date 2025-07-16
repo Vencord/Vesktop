@@ -499,6 +499,7 @@ function createMainWindow() {
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
 const allowedZoomFactors = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+
 function handleZoomIn() {
     const zoomFactor = Settings.store.zoomFactor ?? 1;
     const currentIndex = allowedZoomFactors.indexOf(zoomFactor);
@@ -525,6 +526,7 @@ function resetZoom() {
     Settings.setData({ zoomFactor: 1 });
     mainWin.webContents.setZoomFactor(1);
     mainWin.webContents.send("zoomChanged", 1);
+}
 
 const loadEvents = new EventEmitter();
 
