@@ -20,6 +20,7 @@ export interface Settings {
     arRPC?: boolean;
     appBadge?: boolean;
     disableMinSize?: boolean;
+    zoomFactor?: number;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
 
