@@ -130,8 +130,6 @@ function initTray(win: BrowserWindow) {
     if (process.platform === "darwin") {
         const icon = nativeImage.createFromPath(ICON_PATH)
             .resize({ width: 16 });
-        icon.setTemplateImage(true);
-
         tray = new Tray(icon);
     } else {
         tray = new Tray(ICON_PATH);
