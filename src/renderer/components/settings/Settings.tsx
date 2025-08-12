@@ -89,7 +89,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "tray",
             title: "Tray Icon",
             description: "Add a tray icon for Vesktop",
-            defaultValue: true
+            defaultValue: !isMac
         },
         {
             key: "minimizeToTray",
