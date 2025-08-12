@@ -44,6 +44,7 @@ import { createSplashWindow, updateSplashMessage } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { nativeImage } from "electron/common";
 
 let isQuitting = false;
 let tray: Tray;
@@ -126,7 +127,16 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(ICON_PATH);
+    if (process.platform === "darwin") {
+        const icon = nativeImage.createFromPath(ICON_PATH)
+            .resize({ width: 16 });
+        icon.setTemplateImage(true);
+
+        tray = new Tray(icon);
+    } else {
+        tray = new Tray(ICON_PATH);
+    }
+
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -477,7 +487,7 @@ function createMainWindow() {
     });
 
     initWindowBoundsListeners(win);
-    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (Settings.store.tray ?? true)) initTray(win);
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
