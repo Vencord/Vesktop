@@ -165,20 +165,28 @@ function readCss() {
 
 open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
     fd.close();
-    watch(
-        VENCORD_QUICKCSS_FILE,
-        { persistent: false },
-        debounce(async () => {
-            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
-        }, 50)
-    );
+    try {
+        watch(
+            VENCORD_QUICKCSS_FILE,
+            { persistent: false },
+            debounce(async () => {
+                mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
+            }, 50)
+        );
+    } catch(e: unknown) {
+        //linux emulation layer on freebsd doesn't implement watch
+    }
 });
 
 mkdirSync(VENCORD_THEMES_DIR, { recursive: true });
-watch(
-    VENCORD_THEMES_DIR,
-    { persistent: false },
-    debounce(() => {
-        mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
-    })
-);
+try {
+    watch(
+        VENCORD_THEMES_DIR,
+        { persistent: false },
+        debounce(() => {
+            mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
+        })
+    );
+} catch(e: unknown) {
+    //linux emulation layer on freebsd doesn't implement watch
+}
