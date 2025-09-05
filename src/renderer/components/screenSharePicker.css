@@ -15,7 +15,6 @@
     flex-grow: 1;
 }
 
-
 /* Screen Grid */
 .vcd-screen-picker-screen-grid {
     display: grid;
@@ -72,7 +71,6 @@
     margin-bottom: 1em;
 }
 
-
 /* Option Radios */
 
 .vcd-screen-picker-option-radios {
@@ -122,7 +120,6 @@
     margin-top: 0.3rem;
 }
 
-
 .vcd-screen-picker-audio {
     margin-bottom: 0;
 }
@@ -132,4 +129,117 @@
     font-size: 14px;
     line-height: 20px;
     font-weight: 400;
+}
+
+.vcd-screen-picker-bitrate-section {
+    margin-top: 20px;
+    padding: 16px;
+    border-top: 1px solid var(--background-modifier-accent, rgba(79, 84, 92, 0.48));
+}
+
+.vcd-screen-picker-bitrate-container {
+    margin-top: 12px;
+}
+
+.vcd-screen-picker-bitrate-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+    background: linear-gradient(
+        to right,
+        var(--brand-experiment) 0%,
+        var(--brand-experiment) var(--progress, 50%),
+        var(--background-secondary) var(--progress, 50%),
+        var(--background-secondary) 100%
+    );
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.vcd-screen-picker-bitrate-slider::-webkit-slider-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--background-secondary, #4f545c);
+}
+
+.vcd-screen-picker-bitrate-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--brand-experiment, #5865f2);
+    cursor: pointer;
+    transition:
+        transform 0.1s,
+        box-shadow 0.1s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: -8px;
+}
+
+.vcd-screen-picker-bitrate-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.vcd-screen-picker-bitrate-slider::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--background-secondary, #4f545c);
+}
+
+.vcd-screen-picker-bitrate-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--brand-experiment, #5865f2);
+    cursor: pointer;
+    border: none;
+    transition:
+        transform 0.1s,
+        box-shadow 0.1s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vcd-screen-picker-bitrate-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.vcd-screen-picker-bitrate-labels {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vcd-screen-picker-bitrate-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--header-primary);
+}
+
+.vcd-screen-picker-bitrate-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.vcd-screen-picker-bitrate-details span {
+    flex: 1;
+    text-align: center;
+}
+
+.vcd-screen-picker-bitrate-details span:first-child {
+    text-align: left;
+}
+
+.vcd-screen-picker-bitrate-details span:last-child {
+    text-align: right;
 }
