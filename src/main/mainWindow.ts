@@ -127,13 +127,8 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    if (process.platform === "darwin") {
-        const icon = nativeImage.createFromPath(ICON_PATH)
-            .resize({ width: 16 });
-        tray = new Tray(icon);
-    } else {
-        tray = new Tray(ICON_PATH);
-    }
+    const icon = nativeImage.createFromPath(ICON_PATH).resize({ width: 16 });
+    tray = new Tray(icon);
 
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
