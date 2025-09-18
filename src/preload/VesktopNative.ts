@@ -62,6 +62,7 @@ export const VesktopNative = {
     win: {
         focus: () => invoke<void>(IpcEvents.FOCUS),
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
+        zoom: (zoom: number) => invoke<void>(IpcEvents.SET_ZOOM, zoom),
         minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
         maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key),
         setDevtoolsCallbacks: (onOpen: () => void, onClose: () => void) => {
