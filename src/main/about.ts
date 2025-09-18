@@ -6,7 +6,7 @@
 
 import { app, BrowserWindow } from "electron";
 import { join } from "path";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
+import { VIEW_DIR } from "shared/paths";
 
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
