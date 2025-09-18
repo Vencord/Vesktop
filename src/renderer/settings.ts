@@ -37,6 +37,7 @@ interface TState {
         resolution: string;
         frameRate: string;
     };
+    streamBitrate?: number;
 }
 
 const stateKey = "VesktopState";
