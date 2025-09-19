@@ -16,6 +16,7 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { TrayFillColorSwitch, TraySwitch } from "./TraySettings";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -84,28 +85,25 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         WindowsTransparencyControls
     ],
-    Behaviour: [
-        {
-            key: "tray",
-            title: "Tray Icon",
-            description: "Add a tray icon for Vesktop",
-            defaultValue: true,
-            invisible: () => isMac
-        },
+    Tray: [
+        TraySwitch,
+        TrayFillColorSwitch,
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
             description: "Hitting X will make Vesktop minimize to the tray instead of closing",
             defaultValue: true,
-            invisible: () => isMac,
-            disabled: () => Settings.store.tray === false
+            invisible: () => isMac || Settings.store.tray === false
         },
         {
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
             description: "Left clicking tray icon will toggle the vesktop window visibility.",
-            defaultValue: false
-        },
+            defaultValue: false,
+            invisible: () => Settings.store.tray === false
+        }
+    ],
+    Behaviour: [
         {
             key: "disableMinSize",
             title: "Disable minimum window size",
