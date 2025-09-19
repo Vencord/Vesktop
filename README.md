@@ -17,48 +17,7 @@ Vesktop is a custom Discord desktop app
 
 ## Installing
 
-### Windows
-
-If you don't know the difference, pick the Installer.
-
-- [Installer](https://vencord.dev/download/vesktop/universal/windows)
-- Portable:
-  - [x64 / amd64](https://vencord.dev/download/vesktop/amd64/windows-portable)
-  - [Arm® 64](https://vencord.dev/download/vesktop/arm64/windows-portable)
-
-### Mac
-
-Download the latest [Vesktop.dmg](https://vencord.dev/download/vesktop/universal/dmg) or use [Homebrew](https://brew.sh/)
-
-```sh
-brew install vesktop
-```
-
-### Linux
-
-[![Download on Flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/dev.vencord.Vesktop)
-
-If you don't know the difference, pick amd64.
-
-- amd64 / x86_64
-  - [AppImage](https://vencord.dev/download/vesktop/amd64/appimage)
-  - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/amd64/deb)
-  - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/amd64/rpm)
-  - [tarball](https://vencord.dev/download/vesktop/amd64/tar)
-- Arm® 64 / aarch64
-  - [AppImage](https://vencord.dev/download/vesktop/arm64/appimage)
-  - [Ubuntu/Debian (.deb)](https://vencord.dev/download/vesktop/arm64/deb)
-  - [Fedora/RHEL (.rpm)](https://vencord.dev/download/vesktop/arm64/rpm)
-  - [tarball](https://vencord.dev/download/vesktop/arm64/tar)
-
-#### Community packages
-
-Below you can find unofficial packages created by the community. They are not officially supported by us, so before reporting issues, please first confirm the issue also happens on official builds. When in doubt, consult with their packager first. The flatpak and AppImage should work on any distro that [supports them](https://flatpak.org/setup/), so I recommend you just use those instead!
-
-- Arch Linux: [Vesktop on the Arch user repository](https://aur.archlinux.org/packages?K=vesktop)
-- NixOS: https://wiki.nixos.org/wiki/Discord#Vesktop
-- Slackware: [Vesktop on the SlackBuilds](https://slackbuilds.org/result/?search=vesktop)
-- Windows - Scoop: https://scoop.sh/#/apps?q=Vesktop
+Visit https://vesktop.vencord.dev/install
 
 ## Building from Source
 

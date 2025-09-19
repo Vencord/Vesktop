@@ -40,6 +40,7 @@ function makeAutoStartLinux(): AutoStart {
                 Exec=${commandLine}
                 StartupNotify=false
                 Terminal=false
+                Icon=vesktop
             `;
 
             mkdirSync(dir, { recursive: true });

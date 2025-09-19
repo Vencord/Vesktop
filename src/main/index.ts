@@ -15,6 +15,7 @@ import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
+import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 
 if (!IS_DEV) {
@@ -31,7 +32,7 @@ const isLinux = process.platform === "linux";
 export let enableHardwareAcceleration = true;
 
 function init() {
-    app.setAsDefaultProtocolClient("discord");
+    setAsDefaultProtocolClient("discord");
 
     const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
 
@@ -81,11 +82,6 @@ function init() {
     if (isLinux) {
         // Support TTS on Linux using https://wiki.archlinux.org/title/Speech_dispatcher
         app.commandLine.appendSwitch("enable-speech-dispatcher");
-
-        // Work around Gtk-ERROR: GTK 2/3 symbols detected. Using GTK 2/3 and GTK 4 in the same process is not supported
-        // https://github.com/electron/electron/issues/46538
-        // TODO: Remove this when upstream fixes it
-        app.commandLine.appendSwitch("gtk-version", "3");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
