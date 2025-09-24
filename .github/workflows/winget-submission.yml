@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Submit package to Winget Community Repo
-        uses: vedantmgoyal2009/winget-releaser@4614300d5812e5df91cb02ef0edbece623d5dea8
+        uses: vedantmgoyal2009/winget-releaser@0db4f0a478166abd0fa438c631849f0b8dcfb99f
         with:
           identifier: Vencord.Vesktop
           token: ${{ secrets.WINGET_PAT }}

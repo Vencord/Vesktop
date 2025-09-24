@@ -1,15 +1,59 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2023 Vendicated and Vencord contributors
+ * Copyright (c) 2025 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useForceUpdater } from "@vencord/types/utils";
-import { Button, Forms, Toasts } from "@vencord/types/webpack/common";
+import {
+    Margins,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalRoot,
+    ModalSize,
+    openModal,
+    useForceUpdater
+} from "@vencord/types/utils";
+import { Button, Forms, Text, Toasts } from "@vencord/types/webpack/common";
+import { Settings } from "shared/settings";
 
 import { SettingsComponent } from "./Settings";
 
-export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
+export const DeveloperOptionsButton: SettingsComponent = ({ settings }) => {
+    return <Button onClick={() => openDeveloperOptionsModal(settings)}>Open Developer Settings</Button>;
+};
+
+function openDeveloperOptionsModal(settings: Settings) {
+    openModal(props => (
+        <ModalRoot {...props} size={ModalSize.MEDIUM}>
+            <ModalHeader>
+                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>
+                    Vesktop Developer Options
+                </Text>
+                <ModalCloseButton onClick={props.onClose} />
+            </ModalHeader>
+
+            <ModalContent>
+                <div style={{ padding: "1em 0" }}>
+                    <Forms.FormTitle tag="h5">Vencord Location</Forms.FormTitle>
+                    <VencordLocationPicker settings={settings} />
+
+                    <Forms.FormTitle tag="h5" className={Margins.top16}>
+                        Debugging
+                    </Forms.FormTitle>
+                    <div className="vcd-settings-button-grid">
+                        <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
+                        <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
+                            Open chrome://webrtc-internals
+                        </Button>
+                    </div>
+                </div>
+            </ModalContent>
+        </ModalRoot>
+    ));
+}
+
+const VencordLocationPicker: SettingsComponent = ({ settings }) => {
     const forceUpdate = useForceUpdater();
     const vencordDir = VesktopNative.fileManager.getVencordDir();
 
@@ -31,7 +75,7 @@ export const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                     "the default location"
                 )}
             </Forms.FormText>
-            <div className="vcd-location-btns">
+            <div className="vcd-settings-button-grid">
                 <Button
                     size={Button.Sizes.SMALL}
                     onClick={async () => {

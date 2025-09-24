@@ -1,12 +1,13 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { app } from "electron";
 import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
+import { stripIndent } from "shared/utils/text";
 
 interface AutoStart {
     isEnabled(): boolean;
@@ -31,15 +32,16 @@ function makeAutoStartLinux(): AutoStart {
     return {
         isEnabled: () => existsSync(file),
         enable() {
-            const desktopFile = `
-[Desktop Entry]
-Type=Application
-Name=Vesktop
-Comment=Vesktop autostart script
-Exec=${commandLine}
-StartupNotify=false
-Terminal=false
-`.trim();
+            const desktopFile = stripIndent`
+                [Desktop Entry]
+                Type=Application
+                Name=Vesktop
+                Comment=Vesktop autostart script
+                Exec=${commandLine}
+                StartupNotify=false
+                Terminal=false
+                Icon=vesktop
+            `;
 
             mkdirSync(dir, { recursive: true });
             writeFileSync(file, desktopFile);
