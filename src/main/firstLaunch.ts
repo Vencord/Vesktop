@@ -1,7 +1,7 @@
 /*
- * SPDX-License-Identifier: GPL-3.0
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { app } from "electron";
@@ -28,6 +28,7 @@ interface Data {
 export function createFirstLaunchTour() {
     const win = new BrowserWindow({
         ...SplashProps,
+        transparent: false,
         frame: true,
         autoHideMenuBar: true,
         height: 470,

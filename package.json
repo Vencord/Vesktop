@@ -1,11 +1,11 @@
 {
     "name": "vesktop",
-    "version": "1.5.3",
+    "version": "1.5.8",
     "private": true,
     "description": "Vesktop is a custom Discord desktop app",
     "keywords": [],
     "homepage": "https://vencord.dev/",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
     "scripts": {
@@ -13,7 +13,7 @@
         "build:dev": "pnpm build --dev",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mts,.mjs",
+        "lint": "eslint",
         "lint:fix": "pnpm lint --fix",
         "start": "pnpm build && electron .",
         "start:dev": "pnpm build:dev && electron .",
@@ -21,44 +21,45 @@
         "test": "pnpm lint && pnpm testTypes",
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch",
-        "updateMeta": "tsx scripts/utils/updateMeta.mts"
+        "updateMeta": "tsx scripts/utils/updateMeta.mts",
+        "updateArrpcDB": "node ./node_modules/arrpc/update_db.js",
+        "postinstall": "pnpm updateArrpcDB"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#c62ec6a04c8d870530aa6944257fe745f6c59a24",
-        "electron-updater": "^6.2.1"
+        "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
+        "electron-updater": "^6.6.2"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@types/node": "^20.14.11",
-        "@types/react": "^18.3.3",
-        "@typescript-eslint/eslint-plugin": "^7.17.0",
-        "@typescript-eslint/parser": "^7.17.0",
-        "@vencord/types": "^1.8.4",
-        "dotenv": "^16.4.5",
-        "electron": "^31.2.1",
-        "electron-builder": "^25.0.1",
-        "esbuild": "^0.20.2",
-        "eslint": "^8.57.0",
-        "eslint-config-prettier": "^9.1.0",
+        "@stylistic/eslint-plugin": "^5.3.1",
+        "@types/node": "^24.3.1",
+        "@types/react": "18.3.1",
+        "@vencord/types": "^1.11.5",
+        "dotenv": "^17.2.2",
+        "electron": "^38.0.0",
+        "electron-builder": "^26.0.12",
+        "esbuild": "^0.25.9",
+        "eslint": "^9.34.0",
         "eslint-import-resolver-alias": "^1.1.2",
-        "eslint-plugin-license-header": "^0.6.1",
-        "eslint-plugin-path-alias": "^1.1.0",
-        "eslint-plugin-prettier": "^5.2.1",
+        "eslint-plugin-path-alias": "^2.1.0",
+        "eslint-plugin-prettier": "^5.5.4",
+        "eslint-plugin-simple-header": "^1.2.2",
         "eslint-plugin-simple-import-sort": "^12.1.1",
-        "eslint-plugin-unused-imports": "^3.2.0",
-        "prettier": "^3.3.3",
+        "eslint-plugin-unused-imports": "^4.2.0",
+        "prettier": "^3.6.2",
         "sharp": "^0.33.0",
         "sharp-ico": "^0.1.5",
         "source-map-support": "^0.5.21",
-        "tsx": "^4.16.2",
-        "type-fest": "^4.23.0",
-        "typescript": "^5.5.4",
-        "xml-formatter": "^3.6.3"
+        "tsx": "^4.20.5",
+        "type-fest": "^4.41.0",
+        "typescript": "^5.9.2",
+        "typescript-eslint": "^8.42.0",
+        "xml-formatter": "^3.6.6"
     },
-    "packageManager": "pnpm@9.1.0",
+    "packageManager": "pnpm@10.7.1",
     "engines": {
         "node": ">=18",
         "pnpm": ">=8"
@@ -74,6 +75,12 @@
             "package.json",
             "LICENSE"
         ],
+        "protocols": {
+            "name": "Discord",
+            "schemes": [
+                "discord"
+            ]
+        },
         "beforePack": "scripts/build/sandboxFix.js",
         "linux": {
             "icon": "build/icon.icns",
@@ -110,11 +117,15 @@
                 }
             ],
             "desktop": {
-                "Name": "Vesktop",
-                "GenericName": "Internet Messenger",
-                "Type": "Application",
-                "Categories": "Network;InstantMessaging;Chat;",
-                "Keywords": "discord;vencord;electron;chat;"
+                "entry": {
+                    "Name": "Vesktop",
+                    "GenericName": "Internet Messenger",
+                    "Type": "Application",
+                    "Categories": "Network;InstantMessaging;Chat;",
+                    "Keywords": "discord;vencord;electron;chat;",
+                    "MimeType": "x-scheme-handler/discord",
+                    "StartupWMClass": "vesktop"
+                }
             }
         },
         "mac": {
@@ -181,11 +192,22 @@
         },
         "publish": {
             "provider": "github"
+        },
+        "rpm": {
+            "fpm": [
+                "--rpm-rpmbuild-define=_build_id_links none"
+            ]
         }
     },
     "pnpm": {
         "patchedDependencies": {
-            "arrpc@3.4.0": "patches/arrpc@3.4.0.patch"
-        }
+            "arrpc@3.5.0": "patches/arrpc@3.5.0.patch",
+            "electron-updater": "patches/electron-updater.patch"
+        },
+        "onlyBuiltDependencies": [
+            "@vencord/venmic",
+            "electron",
+            "esbuild"
+        ]
     }
 }

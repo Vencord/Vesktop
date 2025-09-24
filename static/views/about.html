@@ -1,4 +1,6 @@
 <head>
+    <title>About Vesktop</title>
+
     <link rel="stylesheet" href="./style.css" type="text/css" />
 
     <style>
@@ -9,19 +11,25 @@
         h1 {
             text-align: center;
         }
+
+        ul {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
     </style>
 </head>
 
 <body>
-    <h1 id="title">Vesktop</h1>
-    <p>
-        Vesktop is a free/libre cross platform desktop app aiming to give you a snappier Discord experience with Vencord
-        pre-installed
-    </p>
+    <h1 id="title">Vesktop v{{APP_VERSION}}</h1>
+    <p>Vesktop is a cross platform Discord Desktop client, aiming to give you a better Discord experience</p>
 
     <section>
         <h2>Links</h2>
         <ul>
+            <li>
+                <a href="https://vesktop.vencord.dev/wiki" target="_blank">Vesktop Wiki</a>
+            </li>
             <li>
                 <a href="https://vencord.dev" target="_blank">Vencord Website</a>
             </li>
@@ -32,6 +40,17 @@
                 <a href="https://github.com/Vencord/Vesktop/issues" target="_blank">Report bugs / Request features</a>
             </li>
         </ul>
+    </section>
+
+    <section>
+        <h2>License</h2>
+        <p>
+            Vesktop is licensed under the
+            <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank">GNU General Public License v3.0</a>.
+            <br />
+            This is free software, and you are welcome to redistribute it under certain conditions; see the license for
+            details.
+        </p>
     </section>
 
     <section>
@@ -53,23 +72,36 @@
             </li>
             <li>
                 <a href="https://github.com/Soundux/rohrkabel" target="_blank">rohrkabel</a>
-                - A C++ RAII Pipewire-API Wrapper 
+                - A C++ RAII Pipewire-API Wrapper
             </li>
             <li>
                 And many
                 <a href="https://github.com/Vencord/Vesktop/blob/main/pnpm-lock.yaml" target="_blank"
-                    >more awesome open source libraries</a
+                    >more open source libraries</a
                 >
             </li>
         </ul>
     </section>
 </body>
 
-<script type="module">
-    const data = await Updater.getData();
-    if (data.currentVersion) {
-        const title = document.getElementById("title");
+<script>
+    const data = new URLSearchParams(location.search);
 
-        title.textContent += ` v${data.currentVersion}`;
+    // replace all {{FOO}} placeholders in the document with the values from the URL
+
+    /** @param {Node} [node] */
+    function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            node.textContent = node.textContent.replace(/{{(\w+)}}/g, (match, key) => data.get(key) || match);
+            return;
+        }
+
+        if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== "SCRIPT") {
+            for (const child of node.childNodes) {
+                walk(child);
+            }
+        }
     }
+
+    walk(document.body);
 </script>
