@@ -6,6 +6,7 @@
 
 if (process.platform === "linux") import("./venmic");
 
+// eslint-disable-next-line simple-import-sort/imports
 import { execFile } from "child_process";
 import {
     app,
@@ -26,11 +27,11 @@ import { join } from "path";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
-import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { VENCORD_FILES_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
+import { setBadgeCount } from "./appBadge";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";

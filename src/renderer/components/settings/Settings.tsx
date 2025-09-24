@@ -16,6 +16,7 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { TrayNotificationBadgeToggle } from "./TrayNotificationBadgeToggle";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -119,7 +120,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    Notifications: [NotificationBadgeToggle],
+    Notifications: [NotificationBadgeToggle, TrayNotificationBadgeToggle],
     Miscellaneous: [
         {
             key: "arRPC",

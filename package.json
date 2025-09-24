@@ -50,6 +50,8 @@
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unused-imports": "^4.2.0",
         "prettier": "^3.6.2",
+        "sharp": "^0.33.0",
+        "sharp-ico": "^0.1.5",
         "source-map-support": "^0.5.21",
         "tsx": "^4.20.5",
         "type-fest": "^4.41.0",
