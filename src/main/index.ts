@@ -5,6 +5,7 @@
  */
 
 import "./ipc";
+import "./userAssets";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
