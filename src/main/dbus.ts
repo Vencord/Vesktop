@@ -6,7 +6,7 @@
 
 let libVesktop: typeof import("libvesktop") | null = null;
 
-function loadLibvesktop() {
+function loadLibVesktop() {
     if (!libVesktop) {
         libVesktop = require(require("libvesktop"));
     }
@@ -14,13 +14,13 @@ function loadLibvesktop() {
 }
 
 export function getAccentColor() {
-    return loadLibvesktop().getAccentColor();
+    return loadLibVesktop().getAccentColor();
 }
 
 export function setUnityLauncherEntry(count: number) {
-    return loadLibvesktop()!.updateUnityLauncherEntry(count);
+    return loadLibVesktop().updateUnityLauncherEntry(count);
 }
 
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
-    return loadLibvesktop()!.requestBackground(autoStart, commandLine);
+    return loadLibVesktop().requestBackground(autoStart, commandLine);
 }
