@@ -25,6 +25,9 @@ const NodeCommonOpts: BuildOptions = {
     platform: "node",
     external: ["electron"],
     target: ["esnext"],
+    loader: {
+        ".node": "file"
+    },
     define: {
         IS_DEV: JSON.stringify(isDev)
     }
