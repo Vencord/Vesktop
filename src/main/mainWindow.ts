@@ -47,16 +47,11 @@ import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader"
 
 let isQuitting = false;
 let tray: Tray;
-// FIXME: include if darwin "monochromeTemplate.png" when tray on macos is restored
-const trayPath = () => join(TRAY_ICON_PATH, `${nativeTheme.shouldUseDarkColors ? "light" : "dark"}.png`);
 
 applyDeckKeyboardFix();
 
 app.on("before-quit", () => {
     isQuitting = true;
-});
-nativeTheme.on("updated", () => {
-    tray?.setImage(trayPath());
 });
 
 export let mainWin: BrowserWindow;
@@ -131,7 +126,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(trayPath());
+    tray = new Tray(join(TRAY_ICON_PATH, `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`));
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
