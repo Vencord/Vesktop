@@ -5,7 +5,6 @@
  */
 
 import { app, dialog, net, protocol } from "electron";
-import EventEmitter from "events";
 import { copyFile, mkdir, rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -13,6 +12,7 @@ import { STATIC_DIR } from "shared/paths";
 import { pathToFileURL } from "url";
 
 import { DATA_DIR } from "./constants";
+import { AppEvents } from "./events";
 import { mainWin } from "./mainWindow";
 import { fileExistsAsync } from "./utils/fileExists";
 import { handle } from "./utils/ipcWrappers";
@@ -65,10 +65,6 @@ app.whenReady().then(() => {
     });
 });
 
-export const AssetEvents = new EventEmitter<{
-    assetChanged: [UserAssetType];
-}>();
-
 handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?: null) => {
     if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
         throw `Invalid asset: ${asset}`;
@@ -79,7 +75,7 @@ handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?:
     if (value === null) {
         try {
             await rm(assetPath, { force: true });
-            AssetEvents.emit("assetChanged", asset);
+            AppEvents.emit("userAssetChanged", asset);
             return "ok";
         } catch (e) {
             console.error(`Failed to remove user asset ${asset}:`, e);
@@ -104,7 +100,7 @@ handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?:
     try {
         await mkdir(UserAssetFolder, { recursive: true });
         await copyFile(res.filePaths[0], assetPath);
-        AssetEvents.emit("assetChanged", asset);
+        AppEvents.emit("userAssetChanged", asset);
         return "ok";
     } catch (e) {
         console.error(`Failed to copy user asset ${asset}:`, e);

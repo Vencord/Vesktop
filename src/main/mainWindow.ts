@@ -16,7 +16,6 @@ import {
     session,
     Tray
 } from "electron";
-import { EventEmitter } from "events";
 import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
@@ -37,11 +36,12 @@ import {
     MIN_WIDTH,
     VENCORD_FILES_DIR
 } from "./constants";
+import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
-import { AssetEvents, resolveAssetPath } from "./userAssets";
+import { resolveAssetPath } from "./userAssets";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
@@ -78,7 +78,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-AssetEvents.on("assetChanged", async asset => {
+AppEvents.on("userAssetChanged", async asset => {
     if (asset === "tray" && tray) {
         tray.setImage(await resolveAssetPath("tray"));
     }
@@ -504,10 +504,6 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
-const loadEvents = new EventEmitter<{
-    "app-loaded": [];
-}>();
-
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
@@ -515,7 +511,7 @@ export function loadUrl(uri: string | undefined) {
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
         .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
-        .then(() => loadEvents.emit("app-loaded"))
+        .then(() => AppEvents.emit("appLoaded"))
         .catch(error => retryUrl(error.url, error.code));
 }
 
@@ -542,7 +538,7 @@ export async function createWindows() {
 
     mainWin = createMainWindow();
 
-    loadEvents.on("app-loaded", () => {
+    AppEvents.on("appLoaded", () => {
         splash?.destroy();
 
         if (!startMinimized) {
