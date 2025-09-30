@@ -20,7 +20,7 @@ import { UserAssetType } from "main/userAssets";
 
 import { SettingsComponent } from "./Settings";
 
-const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash"];
+const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash", "tray"];
 
 export const UserAssetsButton: SettingsComponent = () => {
     return <Button onClick={() => openAssetsModal()}>Customize App Assets</Button>;

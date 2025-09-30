@@ -41,6 +41,7 @@ import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
+import { AssetEvents, resolveAssetPath } from "./userAssets";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
@@ -77,7 +78,13 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-function initTray(win: BrowserWindow) {
+AssetEvents.on("assetChanged", async asset => {
+    if (asset === "tray" && tray) {
+        tray.setImage(await resolveAssetPath("tray"));
+    }
+});
+
+async function initTray(win: BrowserWindow) {
     const onTrayClick = () => {
         if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
         else win.show();
@@ -126,7 +133,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(ICON_PATH);
+    tray = new Tray(await resolveAssetPath("tray"));
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -497,7 +504,9 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
-const loadEvents = new EventEmitter();
+const loadEvents = new EventEmitter<{
+    "app-loaded": [];
+}>();
 
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;

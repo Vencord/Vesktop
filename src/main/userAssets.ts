@@ -5,6 +5,7 @@
  */
 
 import { app, dialog, net, protocol } from "electron";
+import EventEmitter from "events";
 import { copyFile, mkdir, rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -13,12 +14,31 @@ import { pathToFileURL } from "url";
 
 import { DATA_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
+import { fileExistsAsync } from "./utils/fileExists";
 import { handle } from "./utils/ipcWrappers";
 
-const CUSTOMIZABLE_ASSETS = ["splash"] as const;
+const CUSTOMIZABLE_ASSETS = ["splash", "tray"] as const;
 export type UserAssetType = (typeof CUSTOMIZABLE_ASSETS)[number];
 
+const DEFAULT_ASSETS: Record<UserAssetType, string> = {
+    splash: "splash.webp",
+    tray: "tray.png"
+};
+
 const UserAssetFolder = join(DATA_DIR, "userAssets");
+
+export async function resolveAssetPath(asset: UserAssetType) {
+    if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
+        throw new Error(`Invalid asset: ${asset}`);
+    }
+
+    const assetPath = join(UserAssetFolder, asset);
+    if (await fileExistsAsync(assetPath)) {
+        return assetPath;
+    }
+
+    return join(STATIC_DIR, DEFAULT_ASSETS[asset]);
+}
 
 app.whenReady().then(() => {
     protocol.handle("vesktop", async req => {
@@ -41,9 +61,13 @@ app.whenReady().then(() => {
             if (res.ok) return res;
         } catch {}
 
-        return net.fetch(pathToFileURL(join(STATIC_DIR, `${asset}.webp`)).href);
+        return net.fetch(pathToFileURL(join(STATIC_DIR, DEFAULT_ASSETS[asset])).href);
     });
 });
+
+export const AssetEvents = new EventEmitter<{
+    assetChanged: [UserAssetType];
+}>();
 
 handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?: null) => {
     if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
@@ -55,6 +79,7 @@ handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?:
     if (value === null) {
         try {
             await rm(assetPath, { force: true });
+            AssetEvents.emit("assetChanged", asset);
             return "ok";
         } catch (e) {
             console.error(`Failed to remove user asset ${asset}:`, e);
@@ -79,6 +104,7 @@ handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?:
     try {
         await mkdir(UserAssetFolder, { recursive: true });
         await copyFile(res.filePaths[0], assetPath);
+        AssetEvents.emit("assetChanged", asset);
         return "ok";
     } catch (e) {
         console.error(`Failed to copy user asset ${asset}:`, e);
