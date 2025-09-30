@@ -8,6 +8,8 @@ import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
+import { setUnityLauncherEntry } from "./dbus";
+
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
     const cached = imgCache.get(index);
@@ -25,7 +27,7 @@ export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            setUnityLauncherEntry(count);
             break;
         case "darwin":
             if (count === 0) {

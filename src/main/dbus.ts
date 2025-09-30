@@ -10,15 +10,17 @@ function loadLibvesktop() {
     if (!libVesktop) {
         libVesktop = require(require("libvesktop"));
     }
-    return libVesktop;
+    return libVesktop!;
 }
 
 export function getAccentColor() {
-    return loadLibvesktop()?.getAccentColor();
+    return loadLibvesktop().getAccentColor();
 }
 
-setInterval(() => {
-    const x = Math.floor(Math.random() * 100);
-    console.log("Setting count to", x);
-    loadLibvesktop()?.updateUnityLauncherEntry(x);
-}, 1000);
+export function setUnityLauncherEntry(count: number) {
+    return loadLibvesktop()!.updateUnityLauncherEntry(count);
+}
+
+export function requestBackground(autoStart: boolean, commandLine: string[]) {
+    return loadLibvesktop()!.requestBackground(autoStart, commandLine);
+}

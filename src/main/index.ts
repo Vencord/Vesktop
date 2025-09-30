@@ -5,7 +5,6 @@
  */
 
 import "./ipc";
-import "./dbus";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
