@@ -66,15 +66,13 @@ bool update_launcher_count(int count)
     g_variant_builder_add(&builder, "{sv}", "count", g_variant_new_int64(count));
     g_variant_builder_add(&builder, "{sv}", "count-visible", g_variant_new_boolean(count != 0));
 
-    GVariantPtr parameters(g_variant_new("(sa{sv})", desktop_id, &builder));
-
     gboolean result = g_dbus_connection_emit_signal(
         bus.get(),
         nullptr,
         "/",
         "com.canonical.Unity.LauncherEntry",
         "Update",
-        parameters.release(),
+        g_variant_new("(sa{sv})", desktop_id, &builder),
         &error);
 
     if (!result || error)
@@ -101,15 +99,13 @@ std::optional<int32_t> get_accent_color()
         return std::nullopt;
     }
 
-    GVariantPtr params(g_variant_new("(ss)", "org.freedesktop.appearance", "accent-color"));
-
     GVariantPtr reply(g_dbus_connection_call_sync(
         bus.get(),
         "org.freedesktop.portal.Desktop",
         "/org/freedesktop/portal/desktop",
         "org.freedesktop.portal.Settings",
         "Read",
-        params.release(),
+        g_variant_new("(ss)", "org.freedesktop.appearance", "accent-color"),
         nullptr,
         G_DBUS_CALL_FLAGS_NONE,
         5000,
@@ -183,15 +179,13 @@ bool request_background(bool autostart, const std::vector<std::string> &commandl
         g_variant_builder_add(&cmd_builder, "s", s.c_str());
     g_variant_builder_add(&builder, "{sv}", "commandline", g_variant_builder_end(&cmd_builder));
 
-    GVariantPtr parameters(g_variant_new("(sa{sv})", "", &builder));
-
     GVariantPtr reply(g_dbus_connection_call_sync(
         bus.get(),
         "org.freedesktop.portal.Desktop",
         "/org/freedesktop/portal/desktop",
         "org.freedesktop.portal.Background",
         "RequestBackground",
-        parameters.release(),
+        g_variant_new("(sa{sv})", "", &builder),
         nullptr,
         G_DBUS_CALL_FLAGS_NONE,
         5000,
