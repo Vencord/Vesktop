@@ -147,12 +147,22 @@ std::optional<int32_t> get_accent_color()
     double r = 0.0, g = 0.0, b = 0.0;
     g_variant_get(inner.get(), "(ddd)", &r, &g, &b);
 
-    auto toInt = [](double v) -> int
+    bool discard = false;
+    auto toInt = [&discard](double v) -> int
     {
-        return std::clamp(static_cast<int>(std::round(v * 255.0)), 0, 255);
+        if (v < 0.0 || v > 1.0 || std::isnan(v) || std::isinf(v))
+        {
+            discard = true;
+            return 0;
+        }
+
+        return static_cast<int>(std::round(v * 255.0));
     };
 
     int32_t rgb = (toInt(r) << 16) | (toInt(g) << 8) | toInt(b);
+    if (discard)
+        return std::nullopt;
+
     return rgb;
 }
 
