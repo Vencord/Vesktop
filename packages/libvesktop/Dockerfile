@@ -1,7 +1,6 @@
-# Dockerfile for building libvesktop on both x64 and arm64 with an old
-# enough glibc version to support all popular Linux distros.
+# Dockerfile for building both x64 and arm64 on an old distro for maximum compatibility.
 
-# glibc 2.31 -- ubuntu20 is dead but debian11 is still supported for now
+#  ubuntu20 is dead but debian11 is still supported for now
 FROM debian:11
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -13,8 +12,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 18.x (works on glibc 2.31)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
  && apt-get update && apt-get install -y nodejs \
  && rm -rf /var/lib/apt/lists/*
 
