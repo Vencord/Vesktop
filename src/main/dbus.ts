@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "path";
+import { STATIC_DIR } from "shared/paths";
+
 let libVesktop: typeof import("libvesktop") | null = null;
 
 function loadLibVesktop() {
     if (!libVesktop) {
-        libVesktop = require(require("libvesktop"));
+        libVesktop = require(join(STATIC_DIR, `dist/libvesktop-${process.arch}.node`));
     }
     return libVesktop!;
 }

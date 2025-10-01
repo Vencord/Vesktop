@@ -53,8 +53,17 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyLibVesktop() {
+    if (process.platform !== "linux") return;
+
+    return copyFile("./packages/libvesktop/build/Release/vesktop.node", "./static/dist/libvesktop-x64.node").catch(() =>
+        console.warn("Failed to copy libvesktop. Building without libvesktop support")
+    );
+}
+
 await Promise.all([
     copyVenmic(),
+    copyLibVesktop(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

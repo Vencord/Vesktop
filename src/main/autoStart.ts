@@ -6,9 +6,10 @@
 
 import { app } from "electron";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
-import { requestBackground } from "libvesktop";
 import { join } from "path";
 import { stripIndent } from "shared/utils/text";
+
+import { requestBackground } from "./dbus";
 
 interface AutoStart {
     isEnabled(): boolean;
