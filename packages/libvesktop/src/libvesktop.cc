@@ -43,7 +43,7 @@ struct GErrorDeleter
 
 using GErrorPtr = std::unique_ptr<GError, GErrorDeleter>;
 
-bool update_launcher_entry(int count)
+bool update_launcher_count(int count)
 {
     GError *error = nullptr;
 
@@ -56,7 +56,7 @@ bool update_launcher_entry(int count)
     if (!bus)
     {
         GErrorPtr error_ptr(error);
-        std::cerr << "[libvesktop::update_launcher_entry] Failed to connect to session bus: "
+        std::cerr << "[libvesktop::update_launcher_count] Failed to connect to session bus: "
                   << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
         return false;
     }
@@ -80,7 +80,7 @@ bool update_launcher_entry(int count)
     if (!result || error)
     {
         GErrorPtr error_ptr(error);
-        std::cerr << "[libvesktop::update_launcher_entry] Failed to emit Update signal: "
+        std::cerr << "[libvesktop::update_launcher_count] Failed to emit Update signal: "
                   << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
         return false;
     }
@@ -209,7 +209,7 @@ bool request_background(bool autostart, const std::vector<std::string> &commandl
     return true;
 }
 
-Napi::Value updateUnityLauncherEntry(Napi::CallbackInfo const &info)
+Napi::Value updateUnityLauncherCount(Napi::CallbackInfo const &info)
 {
     if (info.Length() < 1 || !info[0].IsNumber())
     {
@@ -218,7 +218,7 @@ Napi::Value updateUnityLauncherEntry(Napi::CallbackInfo const &info)
     }
 
     int count = info[0].As<Napi::Number>().Int32Value();
-    bool success = update_launcher_entry(count);
+    bool success = update_launcher_count(count);
     return Napi::Boolean::New(info.Env(), success);
 }
 
@@ -256,7 +256,7 @@ Napi::Value RequestBackground(const Napi::CallbackInfo &info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set("updateUnityLauncherEntry", Napi::Function::New(env, updateUnityLauncherEntry));
+    exports.Set("updateUnityLauncherCount", Napi::Function::New(env, updateUnityLauncherCount));
     exports.Set("getAccentColor", Napi::Function::New(env, getAccentColor));
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
     return exports;

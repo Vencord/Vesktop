@@ -54,6 +54,7 @@ export interface State {
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+    linuxAutoStartEnabled?: boolean;
 
     vencordDir?: string;
 }

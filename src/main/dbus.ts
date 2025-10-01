@@ -17,8 +17,8 @@ export function getAccentColor() {
     return loadLibVesktop().getAccentColor();
 }
 
-export function setUnityLauncherEntry(count: number) {
-    return loadLibVesktop().updateUnityLauncherEntry(count);
+export function updateUnityLauncherCount(count: number) {
+    return loadLibVesktop().updateUnityLauncherCount(count);
 }
 
 export function requestBackground(autoStart: boolean, commandLine: string[]) {

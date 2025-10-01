@@ -5,7 +5,8 @@
  */
 
 import { app } from "electron";
-import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
+import { requestBackground } from "libvesktop";
 import { join } from "path";
 import { stripIndent } from "shared/utils/text";
 
@@ -15,14 +16,10 @@ interface AutoStart {
     disable(): void;
 }
 
-function makeAutoStartLinux(): AutoStart {
+function makeAutoStartLinuxDesktop(): AutoStart {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
     const file = join(dir, "vesktop.desktop");
-
-    // IM STUPID
-    const legacyName = join(dir, "vencord.desktop");
-    if (existsSync(legacyName)) renameSync(legacyName, file);
 
     // "Quoting must be done by enclosing the argument between double quotes and escaping the double quote character,
     // backtick character ("`"), dollar sign ("$") and backslash character ("\") by preceding it with an additional backslash character"
@@ -47,6 +44,51 @@ function makeAutoStartLinux(): AutoStart {
             writeFileSync(file, desktopFile);
         },
         disable: () => rmSync(file, { force: true })
+    };
+}
+
+// TODO: fix circular dependency hell
+const getState = () => (require("./settings") as typeof import("./settings")).State;
+
+function makeAutoStartLinuxPortal() {
+    return {
+        isEnabled: () => getState().store.linuxAutoStartEnabled === true,
+        enable() {
+            if (requestBackground(true, process.argv)) {
+                getState().store.linuxAutoStartEnabled = true;
+                return true;
+            }
+            return false;
+        },
+        disable() {
+            if (requestBackground(false, process.argv)) {
+                getState().store.linuxAutoStartEnabled = false;
+                return true;
+            }
+            return false;
+        }
+    };
+}
+
+function makeAutoStartLinux(): AutoStart {
+    // Not all DEs support the Background portal, so have a .desktop file fallback. https://wiki.archlinux.org/title/XDG_Desktop_Portal#List_of_backends_and_interfaces
+    const portal = makeAutoStartLinuxPortal();
+    const desktop = makeAutoStartLinuxDesktop();
+    const isFlatpak = process.env.FLATPAK_ID !== undefined;
+
+    return {
+        isEnabled: () => portal.isEnabled() || desktop.isEnabled(),
+        enable() {
+            if (portal.enable()) {
+                desktop.disable(); // disable fallback to ensure only one is used
+            } else if (!isFlatpak) {
+                desktop.enable();
+            }
+        },
+        disable() {
+            portal.disable();
+            desktop.disable();
+        }
     };
 }
 
