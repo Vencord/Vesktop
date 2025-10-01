@@ -2,10 +2,21 @@
  * @type {typeof import(".")}
  */
 const libVesktop = require(".");
+const test = require("node:test");
+const assert = require("node:assert/strict");
 
-console.log(libVesktop.getAccentColor().toString(16));
-console.log(libVesktop.updateUnityLauncherCount(5));
-console.log(libVesktop.updateUnityLauncherCount(0));
-console.log(libVesktop.updateUnityLauncherCount(10));
-console.log(libVesktop.requestBackground(true, ["bash"]));
-console.log(libVesktop.requestBackground(false, ["bash"]));
+test("getAccentColor should return a number", () => {
+    const color = libVesktop.getAccentColor();
+    assert.strictEqual(typeof color, "number");
+});
+
+test("updateUnityLauncherCount should return true (success)", () => {
+    assert.strictEqual(libVesktop.updateUnityLauncherCount(5), true);
+    assert.strictEqual(libVesktop.updateUnityLauncherCount(0), true);
+    assert.strictEqual(libVesktop.updateUnityLauncherCount(10), true);
+});
+
+test("requestBackground should return true (success)", () => {
+    assert.strictEqual(libVesktop.requestBackground(true, ["bash"]), true);
+    assert.strictEqual(libVesktop.requestBackground(false, ["bash"]), true);
+});
