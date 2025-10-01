@@ -1,0 +1,18 @@
+# glibc 2.31 -- ubuntu20 is dead but debian11 is still supported for now
+FROM debian:11
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN dpkg --add-architecture arm64
+
+RUN apt-get update && apt-get install -y \
+    build-essential python3 curl pkg-config \
+    g++-aarch64-linux-gnu libglib2.0-dev:amd64 libglib2.0-dev:arm64 \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 18.x (works on glibc 2.31)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+ && apt-get update && apt-get install -y nodejs \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
