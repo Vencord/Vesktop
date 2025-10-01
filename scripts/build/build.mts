@@ -56,9 +56,21 @@ async function copyVenmic() {
 async function copyLibVesktop() {
     if (process.platform !== "linux") return;
 
-    return copyFile("./packages/libvesktop/build/Release/vesktop.node", "./static/dist/libvesktop-x64.node").catch(() =>
-        console.warn("Failed to copy libvesktop. Building without libvesktop support")
-    );
+    try {
+        await copyFile(
+            "./packages/libvesktop/build/Release/vesktop.node",
+            `./static/dist/libvesktop-${process.arch}.node`
+        );
+        console.log("Using local libvesktop build");
+    } catch {
+        console.log(
+            "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
+        );
+        return Promise.all([
+            copyFile("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
+            copyFile("./packages/libvesktop/prebuilds/vesktop-arm64.node", "./static/dist/libvesktop-arm64.node")
+        ]).catch(() => console.warn("Failed to copy libvesktop. Building without libvesktop support"));
+    }
 }
 
 await Promise.all([

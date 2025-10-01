@@ -11,6 +11,7 @@
     "scripts": {
         "build": "tsx scripts/build/build.mts",
         "build:dev": "pnpm build --dev",
+        "buildLibVesktop": "pnpm -C packages/libvesktop install && pnpm -C packages/libvesktop run build",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "lint": "eslint",

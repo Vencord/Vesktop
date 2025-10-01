@@ -1,3 +1,6 @@
+# Dockerfile for building libvesktop on both x64 and arm64 with an old
+# enough glibc version to support all popular Linux distros.
+
 # glibc 2.31 -- ubuntu20 is dead but debian11 is still supported for now
 FROM debian:11
 ENV DEBIAN_FRONTEND=noninteractive

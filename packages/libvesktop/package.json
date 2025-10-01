@@ -10,6 +10,5 @@
         "build": "node-gyp configure build",
         "clean": "node-gyp clean",
         "test": "npm run build && node test.js"
-    },
-    "packageManager": "npm"
+    }
 }
