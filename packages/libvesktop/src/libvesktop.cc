@@ -150,7 +150,7 @@ std::optional<int32_t> get_accent_color()
     bool discard = false;
     auto toInt = [&discard](double v) -> int
     {
-        if (v < 0.0 || v > 1.0 || std::isnan(v) || std::isinf(v))
+        if (!std::isfinite(v) || v < 0.0 || v > 1.0)
         {
             discard = true;
             return 0;
