@@ -79,9 +79,10 @@
                 "discord"
             ]
         },
-        "beforePack": "scripts/build/sandboxFix.js",
+        "beforePack": "scripts/build/beforePack.mjs",
+        "afterPack": "scripts/build/afterPack.mjs",
         "linux": {
-            "icon": "build/icon.icns",
+            "icon": "build/icon.svg",
             "category": "Network",
             "maintainer": "vendicated+vesktop@riseup.net",
             "target": [
@@ -141,7 +142,8 @@
                 "NSMicrophoneUsageDescription": "This app needs access to the microphone",
                 "NSCameraUsageDescription": "This app needs access to the camera",
                 "com.apple.security.device.audio-input": true,
-                "com.apple.security.device.camera": true
+                "com.apple.security.device.camera": true,
+                "CFBundleIconName": "Icon"
             },
             "notarize": true
         },
@@ -171,6 +173,7 @@
             "oneClick": false
         },
         "win": {
+            "icon": "build/icon.ico",
             "target": [
                 {
                     "target": "nsis",
