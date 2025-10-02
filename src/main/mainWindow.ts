@@ -24,7 +24,7 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { ICON_PATH } from "../shared/paths";
+import { TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -126,7 +126,7 @@ function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(ICON_PATH);
+    tray = new Tray(join(TRAY_ICON_PATH, `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`));
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
@@ -439,7 +439,6 @@ function createMainWindow() {
             // disable renderer backgrounding to prevent the app from unloading when in the background
             backgroundThrottling: false
         },
-        icon: ICON_PATH,
         frame: !noFrame,
         ...(transparent && {
             transparent: true,
