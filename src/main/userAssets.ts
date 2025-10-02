@@ -17,12 +17,13 @@ import { mainWin } from "./mainWindow";
 import { fileExistsAsync } from "./utils/fileExists";
 import { handle } from "./utils/ipcWrappers";
 
-const CUSTOMIZABLE_ASSETS = ["splash", "tray"] as const;
+const CUSTOMIZABLE_ASSETS = ["splash", "tray", "trayUnread"] as const;
 export type UserAssetType = (typeof CUSTOMIZABLE_ASSETS)[number];
 
 const DEFAULT_ASSETS: Record<UserAssetType, string> = {
     splash: "splash.webp",
-    tray: join("tray", `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`)
+    tray: `tray/${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`,
+    trayUnread: "tray/trayUnread.png"
 };
 
 const UserAssetFolder = join(DATA_DIR, "userAssets");

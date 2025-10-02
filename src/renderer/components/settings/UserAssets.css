@@ -1,5 +1,6 @@
 .vcd-user-assets {
     display: flex;
+    margin-block: 1em 2em;
     flex-direction: column;
     gap: 1em;
 }

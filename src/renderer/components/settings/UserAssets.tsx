@@ -13,6 +13,7 @@ import {
     ModalRoot,
     ModalSize,
     openModal,
+    wordsFromCamel,
     wordsToTitle
 } from "@vencord/types/utils";
 import { Button, showToast, Text, useState } from "@vencord/types/webpack/common";
@@ -20,7 +21,7 @@ import { UserAssetType } from "main/userAssets";
 
 import { SettingsComponent } from "./Settings";
 
-const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash", "tray"];
+const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash", "tray", "trayUnread"];
 
 export const UserAssetsButton: SettingsComponent = () => {
     return <Button onClick={() => openAssetsModal()}>Customize App Assets</Button>;
@@ -63,7 +64,7 @@ function Asset({ asset }: { asset: UserAssetType }) {
     return (
         <section>
             <Text tag="h3" variant="text-md/semibold">
-                {wordsToTitle([asset])}
+                {wordsToTitle(wordsFromCamel(asset))}
             </Text>
             <div className="vcd-user-assets-asset">
                 <img className="vcd-user-assets-image" src={`vesktop://assets/${asset}?v=${version}`} alt="" />
