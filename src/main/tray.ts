@@ -17,7 +17,7 @@ let tray: Tray;
 let trayVariant: "tray" | "trayUnread" = "tray";
 
 AppEvents.on("userAssetChanged", async asset => {
-    if (asset === "tray" && tray) {
+    if (tray && (asset === "tray" || asset === "trayUnread")) {
         tray.setImage(await resolveAssetPath(trayVariant));
     }
 });
