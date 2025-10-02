@@ -22,7 +22,7 @@ export type UserAssetType = (typeof CUSTOMIZABLE_ASSETS)[number];
 
 const DEFAULT_ASSETS: Record<UserAssetType, string> = {
     splash: "splash.webp",
-    tray: "tray.png"
+    tray: join("tray", `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`)
 };
 
 const UserAssetFolder = join(DATA_DIR, "userAssets");

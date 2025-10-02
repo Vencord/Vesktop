@@ -23,7 +23,6 @@ import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -133,7 +132,7 @@ async function initTray(win: BrowserWindow) {
         }
     ]);
 
-    tray = new Tray(join(TRAY_ICON_PATH, `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`));
+    tray = new Tray(await resolveAssetPath("tray"));
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
