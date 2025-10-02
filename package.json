@@ -79,7 +79,8 @@
                 "discord"
             ]
         },
-        "beforePack": "scripts/build/sandboxFix.js",
+        "beforePack": "scripts/build/beforePack.mjs",
+        "afterPack": "scripts/build/afterPack.mjs",
         "linux": {
             "icon": "build/icon.svg",
             "category": "Network",
@@ -141,7 +142,8 @@
                 "NSMicrophoneUsageDescription": "This app needs access to the microphone",
                 "NSCameraUsageDescription": "This app needs access to the camera",
                 "com.apple.security.device.audio-input": true,
-                "com.apple.security.device.camera": true
+                "com.apple.security.device.camera": true,
+                "CFBundleIconName": "AppIcon"
             },
             "notarize": true
         },
