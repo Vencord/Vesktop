@@ -6,18 +6,21 @@
 
 // Based on https://github.com/gergof/electron-builder-sandbox-fix/blob/master/lib/index.js
 
-const fs = require("fs/promises");
-const path = require("path");
+import fs from "fs/promises";
+import path from "path";
+import AppImageTarget from "app-builder-lib/out/targets/AppImageTarget.js";
+
 let isApplied = false;
 
-const hook = async () => {
-    if (isApplied) return;
-    isApplied = true;
+export async function applyAppImageSandboxFix() {
     if (process.platform !== "linux") {
         // this fix is only required on linux
         return;
     }
-    const AppImageTarget = require("app-builder-lib/out/targets/AppImageTarget");
+
+    if (isApplied) return;
+    isApplied = true;
+
     const oldBuildMethod = AppImageTarget.default.prototype.build;
     AppImageTarget.default.prototype.build = async function (...args) {
         console.log("Running AppImage builder hook", args);
@@ -69,6 +72,4 @@ exec "$SCRIPT_DIR/${this.packager.executableName}.bin" "$([ "$IS_STEAMOS" == 1 ]
 
         return ret;
     };
-};
-
-module.exports = hook;
+}
