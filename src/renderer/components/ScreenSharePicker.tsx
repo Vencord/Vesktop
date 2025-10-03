@@ -16,6 +16,7 @@ import {
     Select,
     Switch,
     Text,
+    useEffect,
     UserStore,
     useState
 } from "@vencord/types/webpack/common";
@@ -26,7 +27,7 @@ import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { classNameFactory, isLinux, isWindows } from "renderer/utils";
 
-const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440"] as const;
 const StreamFps = ["15", "30", "60"] as const;
 
 const cl = classNameFactory("vcd-screen-picker-");
@@ -49,6 +50,7 @@ interface StreamSettings {
     contentHint?: string;
     includeSources?: AudioSources;
     excludeSources?: AudioSources;
+    bitrate?: number;
 }
 
 export interface StreamPick extends StreamSettings {
@@ -63,6 +65,14 @@ interface Source {
 
 export let currentSettings: StreamSettings | null = null;
 
+// Export current quality settings for the showStreamQuality patch
+export const currentQualitySettings = {
+    resolution: 1080,
+    frameRate: 30,
+    maxResolution: 2160,
+    maxFrameRate: 60
+};
+
 const logger = new Logger("VesktopScreenShare");
 
 addPatch({
@@ -76,32 +86,119 @@ addPatch({
         }
     ],
     patchStreamQuality(opts: any) {
-        const { screenshareQuality } = State.store;
-        if (!screenshareQuality) return;
+        try {
+            const { screenshareQuality } = State.store;
+            if (!screenshareQuality) return;
 
-        const framerate = Number(screenshareQuality.frameRate);
-        const height = Number(screenshareQuality.resolution);
-        const width = Math.round(height * (16 / 9));
+            const bitrateTarget = State.store.streamBitrate || 800000;
 
-        Object.assign(opts, {
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
-        });
-        if (opts?.encode) {
-            Object.assign(opts.encode, {
-                framerate,
-                width,
-                height,
-                pixelCount: height * width
-            });
+            if (!bitrateTarget || isNaN(bitrateTarget) || bitrateTarget <= 0) {
+                logger.warn("Invalid bitrate value, skipping bitrate patch");
+                return;
+            }
+
+            const maxDiscordBitrate = 8000000;
+            const effectiveBitrate = Math.min(bitrateTarget, maxDiscordBitrate);
+
+            const bitrateSettings = {
+                bitrateMin: Math.max(Math.round(effectiveBitrate * 0.8), 100000),
+                bitrateMax: effectiveBitrate,
+                bitrateTarget: effectiveBitrate
+            };
+
+            Object.assign(opts, bitrateSettings);
+
+            if (opts.encode) Object.assign(opts.encode, bitrateSettings);
+            if (opts.capture) Object.assign(opts.capture, bitrateSettings);
+
+            logger.info(`Applied bitrate: ${effectiveBitrate}`);
+        } catch (error) {
+            logger.error("Error in patchStreamQuality:", error);
         }
-        Object.assign(opts.capture, {
-            framerate,
-            width,
-            height,
-            pixelCount: height * width
-        });
+    },
+
+    enforceOnMediaEngine(targetBitrate: number) {
+        try {
+            const connections = [...(MediaEngineStore.getMediaEngine()?.connections || [])];
+            connections.forEach((conn: any) => {
+                if (conn?.connection?.getSenders) {
+                    conn.connection.getSenders().forEach((sender: RTCRtpSender) => {
+                        if (sender.track?.kind === "video") {
+                            const params = sender.getParameters();
+                            if (params.encodings && params.encodings.length > 0) {
+                                let changed = false;
+                                params.encodings.forEach((encoding: any) => {
+                                    if (encoding.maxBitrate !== targetBitrate) {
+                                        encoding.maxBitrate = targetBitrate;
+                                        encoding.minBitrate = Math.round(targetBitrate * 0.95);
+                                        changed = true;
+                                    }
+                                });
+                                if (changed) {
+                                    sender.setParameters(params).catch(() => {});
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            // Silently continue
+        }
+    },
+
+    enforceOnWebRTCConnections(targetBitrate: number) {
+        try {
+            // Find all RTCPeerConnection instances
+            const rtcConnections = document.querySelectorAll("*");
+            rtcConnections.forEach((element: any) => {
+                if (element._rtcConnection || element.connection) {
+                    const conn = element._rtcConnection || element.connection;
+                    if (conn.getSenders) {
+                        conn.getSenders().forEach((sender: RTCRtpSender) => {
+                            if (sender.track?.kind === "video") {
+                                const params = sender.getParameters();
+                                if (params.encodings) {
+                                    params.encodings.forEach((encoding: any) => {
+                                        encoding.maxBitrate = targetBitrate;
+                                        encoding.minBitrate = Math.round(targetBitrate * 0.95);
+                                    });
+                                    sender.setParameters(params).catch(() => {});
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        } catch (error) {
+            // Silently continue
+        }
+    },
+
+    enforceOnRTCPeerConnections(targetBitrate: number) {
+        try {
+            // Hook into global RTCPeerConnection if available
+            if (window.RTCPeerConnection) {
+                const connections = (window as any).__rtcConnections || [];
+                connections.forEach((conn: RTCPeerConnection) => {
+                    if (conn.getSenders) {
+                        conn.getSenders().forEach((sender: RTCRtpSender) => {
+                            if (sender.track?.kind === "video") {
+                                const params = sender.getParameters();
+                                if (params.encodings) {
+                                    params.encodings.forEach((encoding: any) => {
+                                        encoding.maxBitrate = targetBitrate;
+                                    });
+                                    sender.setParameters(params).catch(() => {});
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (error) {
+            // Silently continue
+        }
     }
 });
 
@@ -355,14 +452,28 @@ function StreamSettingsUi({
 }) {
     const Settings = useSettings();
     const qualitySettings = State.store.screenshareQuality!;
+    const [thumb, setThumb] = useState(source.url);
+    const [bitrate, setBitrate] = useState(State.store.streamBitrate || 800000);
 
-    const [thumb] = useAwaiter(
-        () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
-        {
-            fallbackValue: source.url,
-            deps: [source.id]
+    useEffect(() => {
+        if (skipPicker) {
+            setThumb(source.url);
+            return;
         }
-    );
+
+        const fetchThumbnail = async () => {
+            try {
+                const newThumb = await VesktopNative.capturer.getLargeThumbnail(source.id);
+                setThumb(newThumb);
+            } catch (error) {
+                console.error("Failed to fetch thumbnail:", error);
+                setThumb(source.url);
+            }
+        };
+
+        // Fetch once when component mounts or source changes
+        fetchThumbnail();
+    }, [skipPicker, source.id, source.url]);
 
     const openSettings = () => {
         const key = openModal(props => (
@@ -450,6 +561,43 @@ function StreamSettingsUi({
                         setExcludeSources={sources => setSettings(s => ({ ...s, excludeSources: sources }))}
                     />
                 )}
+
+                <div className={cl("bitrate-section")}>
+                    <Forms.FormTitle>Bitrate</Forms.FormTitle>
+                    <div className={cl("bitrate-container")}>
+                        <input
+                            type="range"
+                            min="100000"
+                            max="8000000"
+                            step="100000"
+                            value={bitrate}
+                            onChange={e => {
+                                const value = parseInt(e.target.value);
+                                setBitrate(value);
+                                State.store.streamBitrate = value;
+                                setSettings(s => ({ ...s, bitrate: value }));
+                            }}
+                            className={cl("bitrate-slider")}
+                            style={
+                                {
+                                    width: "100%",
+                                    height: "8px",
+                                    borderRadius: "4px",
+                                    background: `linear-gradient(to right, #5865f2 0%, #5865f2 ${((bitrate - 100000) / 7900000) * 100}%, #4f545c ${((bitrate - 100000) / 7900000) * 100}%, #4f545c 100%)`,
+                                    WebkitAppearance: "none",
+                                    appearance: "none",
+                                    outline: "none",
+                                    cursor: "pointer"
+                                } as React.CSSProperties
+                            }
+                        />
+                        <div className={cl("bitrate-labels")}>
+                            <span className={cl("bitrate-value")} style={{ fontSize: "16px", fontWeight: 600 }}>
+                                {(bitrate / 800000).toFixed(1)} Mbps
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </Card>
         </div>
     );
@@ -585,9 +733,19 @@ function AudioSourcePickerLinux({
     setIncludeSources: (s: AudioSources) => void;
     setExcludeSources: (s: AudioSources) => void;
 }) {
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
-        fallbackValue: { ok: true, targets: [], hasPipewirePulse: true }
+        fallbackValue: { ok: true, targets: [], hasPipewirePulse: true },
+        deps: [refreshTrigger]
     });
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRefreshTrigger(prev => prev + 1);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
     const [ignorePulseWarning, setIgnorePulseWarning] = useState(false);
@@ -697,11 +855,11 @@ function ModalComponent({
     const [settings, setSettings] = useState<StreamSettings>({
         contentHint: "motion",
         audio: true,
-        includeSources: "None"
+        includeSources: "Entire System"
     });
     const qualitySettings = (useVesktopState().screenshareQuality ??= {
-        resolution: "720",
-        frameRate: "30"
+        resolution: "1080",
+        frameRate: "60"
     });
 
     return (
@@ -732,6 +890,10 @@ function ModalComponent({
                             const height = Number(qualitySettings.resolution);
                             const width = Math.round(height * (16 / 9));
 
+                            // Update exported quality settings for the showStreamQuality patch
+                            currentQualitySettings.resolution = height;
+                            currentQualitySettings.frameRate = frameRate;
+
                             const conn = [...MediaEngineStore.getMediaEngine().connections].find(
                                 connection => connection.streamUserId === UserStore.getCurrentUser().id
                             );
@@ -758,8 +920,8 @@ function ModalComponent({
                                 const constraints = {
                                     ...track.getConstraints(),
                                     frameRate: { min: frameRate, ideal: frameRate },
-                                    width: { min: 640, ideal: width, max: width },
-                                    height: { min: 480, ideal: height, max: height },
+                                    width: { min: width, ideal: width, max: width },
+                                    height: { min: height, ideal: height, max: height },
                                     advanced: [{ width: width, height: height }],
                                     resizeMode: "none"
                                 };
