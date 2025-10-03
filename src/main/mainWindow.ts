@@ -34,8 +34,7 @@ import {
     DEFAULT_WIDTH,
     MessageBoxChoice,
     MIN_HEIGHT,
-    MIN_WIDTH,
-    VENCORD_FILES_DIR
+    MIN_WIDTH
 } from "./constants";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
@@ -44,6 +43,7 @@ import { createSplashWindow, updateSplashMessage } from "./splash";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 let isQuitting = false;
 let tray: Tray;
