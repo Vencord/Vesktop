@@ -65,6 +65,7 @@
     "build": {
         "appId": "dev.vencord.vesktop",
         "productName": "Vesktop",
+        "executableName": "vesktop",
         "files": [
             "!*",
             "!node_modules",
