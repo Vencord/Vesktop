@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
 import { stripIndent } from "shared/utils/text";
 
+import { IS_FLATPAK } from "./constants";
 import { requestBackground } from "./dbus";
 import { Settings, State } from "./settings";
 import { escapeDesktopFileArgument } from "./utils/desktopFileEscape";
@@ -55,40 +56,18 @@ function makeAutoStartLinuxPortal() {
     return {
         isEnabled: () => State.store.linuxAutoStartEnabled === true,
         enable() {
-            if (requestBackground(true, getEscapedCommandLine())) {
+            const success = requestBackground(true, getEscapedCommandLine());
+            if (success) {
                 State.store.linuxAutoStartEnabled = true;
-                return true;
             }
-            return false;
+            return success;
         },
         disable() {
-            if (requestBackground(false, [])) {
+            const success = requestBackground(false, []);
+            if (success) {
                 State.store.linuxAutoStartEnabled = false;
-                return true;
             }
-            return false;
-        }
-    };
-}
-
-function makeAutoStartLinux(): AutoStart {
-    // Not all DEs support the Background portal, so have a .desktop file fallback. https://wiki.archlinux.org/title/XDG_Desktop_Portal#List_of_backends_and_interfaces
-    const portal = makeAutoStartLinuxPortal();
-    const desktop = makeAutoStartLinuxDesktop();
-    const isFlatpak = process.env.FLATPAK_ID !== undefined;
-
-    return {
-        isEnabled: () => portal.isEnabled() || desktop.isEnabled(),
-        enable() {
-            desktop.disable(); // disable fallback to ensure only one is used
-
-            if (!portal.enable() && !isFlatpak) {
-                desktop.enable();
-            }
-        },
-        disable() {
-            portal.disable();
-            desktop.disable();
+            return success;
         }
     };
 }
@@ -103,7 +82,16 @@ const autoStartWindowsMac: AutoStart = {
     disable: () => app.setLoginItemSettings({ openAtLogin: false })
 };
 
-export const autoStart = process.platform === "linux" ? makeAutoStartLinux() : autoStartWindowsMac;
+// The portal call uses the app id by default, which is org.chromium.Chromium, even in packaged Vesktop.
+// This leads to an autostart entry named "Chromium" instead of "Vesktop".
+// Thus, only use the portal inside Flatpak, where the app is actually correct.
+// Maybe there is a way to fix it outside of flatpak, but I couldn't figure it out.
+export const autoStart =
+    process.platform !== "linux"
+        ? autoStartWindowsMac
+        : IS_FLATPAK
+          ? makeAutoStartLinuxPortal()
+          : makeAutoStartLinuxDesktop();
 
 Settings.addChangeListener("autoStartMinimized", () => {
     if (!autoStart.isEnabled()) return;

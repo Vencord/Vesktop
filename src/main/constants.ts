@@ -51,3 +51,5 @@ export const enum MessageBoxChoice {
     Default,
     Cancel
 }
+
+export const IS_FLATPAK = process.env.FLATPAK_ID !== undefined;
