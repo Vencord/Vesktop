@@ -95,5 +95,16 @@ export const VesktopNative = {
             ipcRenderer.on(IpcEvents.IPC_COMMAND, (_, message) => cb(message));
         },
         respond: (response: IpcResponse) => ipcRenderer.send(IpcEvents.IPC_COMMAND, response)
+    },
+    keybind: {
+        setKeybinds: (
+            keybinds: {
+                id: string;
+                shortcut?: string;
+                name?: string;
+            }[]
+        ) => invoke<void>(IpcEvents.KEYBIND_SET_KEYBINDS, keybinds),
+        getCurrentShortcut: () => sendSync<string>(IpcEvents.KEYBIND_GET_CURRENT_SHORTCUT),
+        needsXdp: () => sendSync<boolean>(IpcEvents.KEYBIND_NEEDS_XDP)
     }
 };
