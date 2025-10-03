@@ -5,7 +5,6 @@
 #include <napi.h>
 #include <optional>
 #include <cmath>
-#include <algorithm>
 #include <memory>
 
 template <typename T>
