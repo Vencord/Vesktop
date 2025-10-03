@@ -10,6 +10,7 @@ import { join } from "path";
 import { stripIndent } from "shared/utils/text";
 
 import { requestBackground } from "./dbus";
+import { escapeDesktopFileArgument } from "./utils/desktopFileEscape";
 
 interface AutoStart {
     isEnabled(): boolean;
@@ -22,10 +23,7 @@ function makeAutoStartLinuxDesktop(): AutoStart {
     const dir = join(configDir, "autostart");
     const file = join(dir, "vesktop.desktop");
 
-    // "Quoting must be done by enclosing the argument between double quotes and escaping the double quote character,
-    // backtick character ("`"), dollar sign ("$") and backslash character ("\") by preceding it with an additional backslash character"
-    // https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
-    const commandLine = process.argv.map(arg => '"' + arg.replace(/["$`\\]/g, "\\$&") + '"').join(" ");
+    const commandLine = process.argv.map(escapeDesktopFileArgument).join(" ");
 
     return {
         isEnabled: () => existsSync(file),
@@ -55,14 +53,14 @@ function makeAutoStartLinuxPortal() {
     return {
         isEnabled: () => getState().store.linuxAutoStartEnabled === true,
         enable() {
-            if (requestBackground(true, process.argv)) {
+            if (requestBackground(true, process.argv.map(escapeDesktopFileArgument))) {
                 getState().store.linuxAutoStartEnabled = true;
                 return true;
             }
             return false;
         },
         disable() {
-            if (requestBackground(false, process.argv)) {
+            if (requestBackground(false, [])) {
                 getState().store.linuxAutoStartEnabled = false;
                 return true;
             }
@@ -80,9 +78,9 @@ function makeAutoStartLinux(): AutoStart {
     return {
         isEnabled: () => portal.isEnabled() || desktop.isEnabled(),
         enable() {
-            if (portal.enable()) {
-                desktop.disable(); // disable fallback to ensure only one is used
-            } else if (!isFlatpak) {
+            desktop.disable(); // disable fallback to ensure only one is used
+
+            if (!portal.enable() && !isFlatpak) {
                 desktop.enable();
             }
         },

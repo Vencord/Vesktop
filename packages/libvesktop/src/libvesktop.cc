@@ -183,11 +183,14 @@ bool request_background(bool autostart, const std::vector<std::string> &commandl
     g_variant_builder_init(&builder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_add(&builder, "{sv}", "autostart", g_variant_new_boolean(autostart));
 
-    GVariantBuilder cmd_builder;
-    g_variant_builder_init(&cmd_builder, G_VARIANT_TYPE("as"));
-    for (const auto &s : commandline)
-        g_variant_builder_add(&cmd_builder, "s", s.c_str());
-    g_variant_builder_add(&builder, "{sv}", "commandline", g_variant_builder_end(&cmd_builder));
+    if (!commandline.empty())
+    {
+        GVariantBuilder cmd_builder;
+        g_variant_builder_init(&cmd_builder, G_VARIANT_TYPE("as"));
+        for (const auto &s : commandline)
+            g_variant_builder_add(&cmd_builder, "s", s.c_str());
+        g_variant_builder_add(&builder, "{sv}", "commandline", g_variant_builder_end(&cmd_builder));
+    }
 
     GVariantPtr reply(g_dbus_connection_call_sync(
         bus.get(),
