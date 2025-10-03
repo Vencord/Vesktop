@@ -35,6 +35,13 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     "System Startup & Performance": [
         AutoStartToggle,
         {
+            key: "autoStartMinimized",
+            title: "Auto Start Minimized",
+            description: "Start Vesktop minimized when starting with system",
+            defaultValue: false,
+            invisible: () => !VesktopNative.autostart.isEnabled()
+        },
+        {
             key: "hardwareAcceleration",
             title: "Hardware Acceleration",
             description: "Enable hardware acceleration",

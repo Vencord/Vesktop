@@ -40,7 +40,7 @@ export function escapeDesktopFileArgument(arg: string) {
             // "and escaping the double quote character, backtick character ("`"), dollar sign ("$")
             // and backslash character ("\") by preceding it with an additional backslash character"
             if (c === '"' || c === "`" || c === "$" || c === "\\") {
-                out += "\\"; // escape
+                out += "\\";
             }
         }
 

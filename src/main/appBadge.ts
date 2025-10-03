@@ -9,6 +9,7 @@ import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
 import { updateUnityLauncherCount } from "./dbus";
+import { mainWin } from "./mainWindow";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -42,8 +43,6 @@ export function setBadgeCount(count: number) {
 
             lastIndex = index;
 
-            // circular import shenanigans
-            const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }

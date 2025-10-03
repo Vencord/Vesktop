@@ -10,6 +10,7 @@ import { join } from "path";
 import { stripIndent } from "shared/utils/text";
 
 import { requestBackground } from "./dbus";
+import { Settings, State } from "./settings";
 import { escapeDesktopFileArgument } from "./utils/desktopFileEscape";
 
 interface AutoStart {
@@ -18,12 +19,16 @@ interface AutoStart {
     disable(): void;
 }
 
+function getEscapedCommandLine() {
+    const args = process.argv.map(escapeDesktopFileArgument);
+    if (Settings.store.autoStartMinimized) args.push("--start-minimized");
+    return args;
+}
+
 function makeAutoStartLinuxDesktop(): AutoStart {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
     const file = join(dir, "vesktop.desktop");
-
-    const commandLine = process.argv.map(escapeDesktopFileArgument).join(" ");
 
     return {
         isEnabled: () => existsSync(file),
@@ -33,7 +38,7 @@ function makeAutoStartLinuxDesktop(): AutoStart {
                 Type=Application
                 Name=Vesktop
                 Comment=Vesktop autostart script
-                Exec=${commandLine}
+                Exec=${getEscapedCommandLine().join(" ")}
                 StartupNotify=false
                 Terminal=false
                 Icon=vesktop
@@ -46,22 +51,19 @@ function makeAutoStartLinuxDesktop(): AutoStart {
     };
 }
 
-// TODO: fix circular dependency hell
-const getState = () => (require("./settings") as typeof import("./settings")).State;
-
 function makeAutoStartLinuxPortal() {
     return {
-        isEnabled: () => getState().store.linuxAutoStartEnabled === true,
+        isEnabled: () => State.store.linuxAutoStartEnabled === true,
         enable() {
-            if (requestBackground(true, process.argv.map(escapeDesktopFileArgument))) {
-                getState().store.linuxAutoStartEnabled = true;
+            if (requestBackground(true, getEscapedCommandLine())) {
+                State.store.linuxAutoStartEnabled = true;
                 return true;
             }
             return false;
         },
         disable() {
             if (requestBackground(false, [])) {
-                getState().store.linuxAutoStartEnabled = false;
+                State.store.linuxAutoStartEnabled = false;
                 return true;
             }
             return false;
@@ -93,8 +95,18 @@ function makeAutoStartLinux(): AutoStart {
 
 const autoStartWindowsMac: AutoStart = {
     isEnabled: () => app.getLoginItemSettings().openAtLogin,
-    enable: () => app.setLoginItemSettings({ openAtLogin: true }),
+    enable: () =>
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            args: Settings.store.autoStartMinimized ? ["--start-minimized"] : []
+        }),
     disable: () => app.setLoginItemSettings({ openAtLogin: false })
 };
 
 export const autoStart = process.platform === "linux" ? makeAutoStartLinux() : autoStartWindowsMac;
+
+Settings.addChangeListener("autoStartMinimized", () => {
+    if (!autoStart.isEnabled()) return;
+
+    autoStart.enable();
+});
