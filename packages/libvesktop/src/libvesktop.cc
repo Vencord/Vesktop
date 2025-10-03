@@ -47,10 +47,8 @@ bool update_launcher_count(int count)
 {
     GError *error = nullptr;
 
-    const char *container = std::getenv("container");
-    const char *desktop_id = (container && std::string(container) == "1")
-                                 ? "application://dev.vencord.Vesktop.desktop"
-                                 : "application://vesktop.desktop";
+    const char *chromeDesktop = std::getenv("CHROME_DESKTOP");
+    std::string desktop_id = std::string("application://") + (chromeDesktop ? chromeDesktop : "vesktop.desktop");
 
     GObjectPtr<GDBusConnection> bus(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
     if (!bus)
@@ -72,7 +70,7 @@ bool update_launcher_count(int count)
         "/",
         "com.canonical.Unity.LauncherEntry",
         "Update",
-        g_variant_new("(sa{sv})", desktop_id, &builder),
+        g_variant_new("(sa{sv})", desktop_id.c_str(), &builder),
         &error);
 
     if (!result || error)
