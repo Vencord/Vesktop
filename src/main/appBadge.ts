@@ -8,6 +8,8 @@ import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
+import { AppEvents } from "./events";
+
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
     const cached = imgCache.get(index);
@@ -21,7 +23,13 @@ function loadBadge(index: number) {
 
 let lastIndex: null | number = -1;
 
+/**
+ * -1 = show unread indicator
+ * 0 = clear
+ */
 export function setBadgeCount(count: number) {
+    AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;

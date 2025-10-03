@@ -1,0 +1,25 @@
+.vcd-user-assets {
+    display: flex;
+    margin-block: 1em 2em;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.vcd-user-assets-asset {
+    display: flex;
+    margin-top: 0.5em;
+    align-items: center;
+    gap: 1em;
+}
+
+.vcd-user-assets-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.vcd-user-assets-image {
+    height: 7.5em;
+    width: 7.5em;
+    object-fit: contain;
+}
