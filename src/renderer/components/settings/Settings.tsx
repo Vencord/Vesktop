@@ -18,6 +18,7 @@ import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
+import { WindowZoom } from "./WindowZoom";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
@@ -82,7 +83,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Adapt the splash window colors to your custom theme",
             defaultValue: true
         },
-        WindowsTransparencyControls
+        WindowsTransparencyControls,
+        WindowZoom
     ],
     Behaviour: [
         {
