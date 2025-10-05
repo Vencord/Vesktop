@@ -8,23 +8,18 @@ import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
-    dialog,
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
     screen,
-    session,
-    Tray
+    session
 } from "electron";
-import { EventEmitter } from "events";
-import { rm } from "fs/promises";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { TRAY_ICON_PATH } from "../shared/paths";
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import {
@@ -34,19 +29,21 @@ import {
     DEFAULT_WIDTH,
     MessageBoxChoice,
     MIN_HEIGHT,
-    MIN_WIDTH
+    MIN_WIDTH,
 } from "./constants";
+import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
+import { destroyTray, initTray } from "./tray";
+import { clearData } from "./utils/clearData";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 let isQuitting = false;
-let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -76,84 +73,6 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
-
-function initTray(win: BrowserWindow) {
-    const onTrayClick = () => {
-        if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
-        else win.show();
-    };
-    const trayMenu = Menu.buildFromTemplate([
-        {
-            label: "Open",
-            click() {
-                win.show();
-            }
-        },
-        {
-            label: "About",
-            click: createAboutWindow
-        },
-        {
-            label: "Repair Vencord",
-            async click() {
-                await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
-            }
-        },
-        {
-            label: "Reset Vesktop",
-            async click() {
-                await clearData(win);
-            }
-        },
-        {
-            type: "separator"
-        },
-        {
-            label: "Restart",
-            click() {
-                app.relaunch();
-                app.quit();
-            }
-        },
-        {
-            label: "Quit",
-            click() {
-                isQuitting = true;
-                app.quit();
-            }
-        }
-    ]);
-
-    tray = new Tray(join(TRAY_ICON_PATH, `${process.platform === "darwin" ? "trayTemplate" : "tray"}.png`));
-    tray.setToolTip("Vesktop");
-    tray.setContextMenu(trayMenu);
-    tray.on("click", onTrayClick);
-}
-
-async function clearData(win: BrowserWindow) {
-    const { response } = await dialog.showMessageBox(win, {
-        message: "Are you sure you want to reset Vesktop?",
-        detail: "This will log you out, clear caches and reset all your settings!\n\nVesktop will automatically restart after this operation.",
-        buttons: ["Yes", "No"],
-        cancelId: MessageBoxChoice.Cancel,
-        defaultId: MessageBoxChoice.Default,
-        type: "warning"
-    });
-
-    if (response === MessageBoxChoice.Cancel) return;
-
-    win.close();
-
-    await win.webContents.session.clearStorageData();
-    await win.webContents.session.clearCache();
-    await win.webContents.session.clearCodeCaches({});
-    await rm(DATA_DIR, { force: true, recursive: true });
-
-    app.relaunch();
-    app.quit();
-}
 
 type MenuItemList = Array<MenuItemConstructorOptions | false>;
 
@@ -333,8 +252,8 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
 function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
-        if (enable) initTray(win);
-        else tray?.destroy();
+        if (enable) initTray(win, q => (isQuitting = q));
+        else destroyTray();
     });
 
     addSettingsListener("disableMinSize", disable => {
@@ -476,7 +395,9 @@ function createMainWindow() {
     });
 
     initWindowBoundsListeners(win);
-    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")
+        initTray(win, q => (isQuitting = q));
+
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
@@ -496,8 +417,6 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
-const loadEvents = new EventEmitter();
-
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
@@ -505,7 +424,7 @@ export function loadUrl(uri: string | undefined) {
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
         .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
-        .then(() => loadEvents.emit("app-loaded"))
+        .then(() => AppEvents.emit("appLoaded"))
         .catch(error => retryUrl(error.url, error.code));
 }
 
@@ -532,7 +451,7 @@ export async function createWindows() {
 
     mainWin = createMainWindow();
 
-    loadEvents.on("app-loaded", () => {
+    AppEvents.on("appLoaded", () => {
         splash?.destroy();
 
         if (!startMinimized) {

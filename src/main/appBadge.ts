@@ -10,6 +10,7 @@ import { BADGE_DIR } from "shared/paths";
 
 import { updateUnityLauncherCount } from "./dbus";
 import { mainWin } from "./mainWindow";
+import { AppEvents } from "./events";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -24,7 +25,13 @@ function loadBadge(index: number) {
 
 let lastIndex: null | number = -1;
 
+/**
+ * -1 = show unread indicator
+ * 0 = clear
+ */
 export function setBadgeCount(count: number) {
+    AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
