@@ -22,15 +22,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
-import {
-    BrowserUserAgent,
-    DATA_DIR,
-    DEFAULT_HEIGHT,
-    DEFAULT_WIDTH,
-    MessageBoxChoice,
-    MIN_HEIGHT,
-    MIN_WIDTH,
-} from "./constants";
+import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";

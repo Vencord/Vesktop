@@ -9,8 +9,8 @@ import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
 import { updateUnityLauncherCount } from "./dbus";
-import { mainWin } from "./mainWindow";
 import { AppEvents } from "./events";
+import { mainWin } from "./mainWindow";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
