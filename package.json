@@ -1,5 +1,5 @@
 {
-    "name": "vesktop",
+    "name": "@vencord/vesktop",
     "version": "1.5.8",
     "private": true,
     "description": "Vesktop is a custom Discord desktop app",
@@ -67,7 +67,7 @@
     "build": {
         "appId": "dev.vencord.vesktop",
         "productName": "Vesktop",
-        "executableName": "vesktop",
+        "executableName": "@vencord/vesktop",
         "files": [
             "!*",
             "!node_modules",

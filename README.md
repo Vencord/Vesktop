@@ -17,7 +17,7 @@ Vesktop is a custom Discord desktop app
 
 ## Installing
 
-Visit https://vesktop.vencord.dev/install
+Visit https://vesktop.dev/install
 
 ## Building from Source
 
