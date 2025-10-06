@@ -14,14 +14,13 @@ export const AutoStartToggle: SettingsComponent = () => {
 
     return (
         <VesktopSettingsSwitch
+            title="Start With System"
+            description="Automatically start Vesktop on computer start-up"
             value={autoStartEnabled}
             onChange={async v => {
                 await VesktopNative.autostart[v ? "enable" : "disable"]();
                 setAutoStartEnabled(v);
             }}
-            note="Automatically start Vesktop on computer start-up"
-        >
-            Start With System
-        </VesktopSettingsSwitch>
+        />
     );
 };
