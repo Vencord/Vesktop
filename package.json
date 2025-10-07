@@ -1,5 +1,5 @@
 {
-    "name": "@vencord/vesktop",
+    "name": "vesktop",
     "version": "1.5.8",
     "private": true,
     "description": "Vesktop is a custom Discord desktop app",
