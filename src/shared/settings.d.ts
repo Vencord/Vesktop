@@ -50,7 +50,7 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
-    displayId: int;
+    displayId: number;
 
     firstLaunch?: boolean;
 

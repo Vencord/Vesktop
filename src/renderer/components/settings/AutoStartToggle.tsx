@@ -15,24 +15,22 @@ export const AutoStartToggle: SettingsComponent = ({ settings }) => {
     return (
         <>
             <VesktopSettingsSwitch
+                title="Start With System"
+                description="Automatically start Vesktop on computer start-up"
                 value={autoStartEnabled}
                 onChange={async v => {
                     await VesktopNative.autostart[v ? "enable" : "disable"]();
                     setAutoStartEnabled(v);
                 }}
-                note="Automatically start Vesktop on computer start-up"
-            >
-                Start With System
-            </VesktopSettingsSwitch>
+            />
 
             <VesktopSettingsSwitch
+                title="Auto Start Minimized"
+                description={"Start Vesktop minimized when starting with system"}
                 value={settings.autoStartMinimized ?? false}
                 onChange={v => (settings.autoStartMinimized = v)}
-                note={"Start Vesktop minimized when starting with system"}
                 disabled={!autoStartEnabled}
-            >
-                Auto Start Minimized
-            </VesktopSettingsSwitch>
+            />
         </>
     );
 };
