@@ -11,6 +11,7 @@ export interface Settings {
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     minimizeToTray?: boolean;
+    autoStartMinimized?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
@@ -54,6 +55,7 @@ export interface State {
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+    linuxAutoStartEnabled?: boolean;
 
     vencordDir?: string;
 }
