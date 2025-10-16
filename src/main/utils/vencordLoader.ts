@@ -6,9 +6,10 @@
 
 import { mkdirSync } from "fs";
 import { access, constants as FsConstants, writeFile } from "fs/promises";
+import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
 
-import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
+import { USER_AGENT } from "../constants";
 import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";

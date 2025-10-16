@@ -8,7 +8,9 @@ import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
+import { updateUnityLauncherCount } from "./dbus";
 import { AppEvents } from "./events";
+import { mainWin } from "./mainWindow";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -33,7 +35,7 @@ export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
-            app.setBadgeCount(count);
+            updateUnityLauncherCount(count);
             break;
         case "darwin":
             if (count === 0) {
@@ -48,8 +50,6 @@ export function setBadgeCount(count: number) {
 
             lastIndex = index;
 
-            // circular import shenanigans
-            const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
