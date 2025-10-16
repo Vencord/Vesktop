@@ -179,12 +179,12 @@ function SettingsSections() {
 export default ErrorBoundary.wrap(
     function SettingsUI() {
         return (
-            <Forms.FormSection>
+            <section>
                 <Text variant="heading-xl/semibold" color="header-primary" className="vcd-settings-title">
                     Vesktop Settings
                 </Text>
                 <SettingsSections />
-            </Forms.FormSection>
+            </section>
         );
     },
     {
