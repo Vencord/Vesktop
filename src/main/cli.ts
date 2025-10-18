@@ -8,6 +8,13 @@ import { app } from "electron";
 import { stripIndent } from "shared/utils/text";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
+type Option = ParseArgsOptionDescriptor & {
+    description: string;
+    hidden?: boolean;
+    options?: string[];
+    argumentName?: string;
+};
+
 const options = {
     "start-minimized": {
         default: false,
@@ -35,10 +42,27 @@ const options = {
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
     }
-} satisfies Record<
-    string,
-    ParseArgsOptionDescriptor & { description: string; options?: string[]; argumentName?: string }
->;
+} satisfies Record<string, Option>;
+
+// only for help display
+const extraOptions = {
+    "enable-features": {
+        type: "string",
+        description: "Enable specific Chromium features",
+        argumentName: "feature1,feature2,…"
+    },
+    "disable-features": {
+        type: "string",
+        description: "Disable specific Chromium features",
+        argumentName: "feature1,feature2,…"
+    },
+    "ozone-platform": {
+        hidden: process.platform !== "linux",
+        type: "string",
+        description: "Whether to run Vesktop in Wayland or X11 (XWayland)",
+        options: ["x11", "wayland"]
+    }
+} satisfies Record<string, Option>;
 
 export const CommandLine = parseArgs({
     options,
@@ -60,11 +84,19 @@ export function checkCommandLineForHelpOrVersion() {
 
             Usage: ${process.execPath} [options] [url]
 
-            Options:
+            Electron Options:
+              See <https://www.electronjs.org/docs/latest/api/command-line-switches#electron-cli-flags>
+
+            Chromium Options:
+              See <https://peter.sh/experiments/chromium-command-line-switches> - only some of them work
+
+            Vesktop Options:
         `;
 
         const optionLines = Object.entries(options)
             .sort(([a], [b]) => a.localeCompare(b))
+            .concat(Object.entries(extraOptions))
+            .filter(([, opt]) => !("hidden" in opt && opt.hidden))
             .map(([name, opt]) => {
                 const flags = [
                     "short" in opt && `-${opt.short}`,
