@@ -42,7 +42,7 @@ const options = {
 
 export const CommandLine = parseArgs({
     options,
-    strict: true,
+    strict: false as true, // we manually check later, so cast to true to get better types
     allowPositionals: true
 });
 
@@ -50,7 +50,7 @@ export function checkCommandLineForHelpOrVersion() {
     const { help, version } = CommandLine.values;
 
     if (version) {
-        console.error(`Vesktop v${app.getVersion()}`);
+        console.log(`Vesktop v${app.getVersion()}`);
         app.exit(0);
     }
 
@@ -84,15 +84,20 @@ export function checkCommandLineForHelpOrVersion() {
             .map(([flags, description]) => `  ${flags.padEnd(padding, " ")}${description}`)
             .join("\n");
 
-        console.error(base + "\n" + optionsHelp);
+        console.log(base + "\n" + optionsHelp);
         app.exit(0);
     }
 
     for (const [name, def] of Object.entries(options)) {
         const value = CommandLine.values[name];
-        if (!value) continue;
+        if (value == null) continue;
 
-        if ("options" in def && !def.options?.includes(value)) {
+        if (typeof value !== def.type) {
+            console.error(`Invalid options. Expected ${def.type === "boolean" ? "no" : "an"} argument for --${name}`);
+            app.exit(1);
+        }
+
+        if ("options" in def && !def.options?.includes(value as string)) {
             console.error(`Invalid value for --${name}: ${value}\nExpected one of: ${def.options.join(", ")}`);
             app.exit(1);
         }
