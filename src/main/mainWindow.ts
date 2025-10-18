@@ -22,6 +22,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
+import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
@@ -428,7 +429,7 @@ function retryUrl(url: string, description: string) {
 }
 
 export async function createWindows() {
-    const startMinimized = process.argv.includes("--start-minimized");
+    const startMinimized = CommandLine.values["start-minimized"];
 
     let splash: BrowserWindow | undefined;
     if (Settings.store.enableSplashScreen !== false) {

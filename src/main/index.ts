@@ -10,6 +10,7 @@ import "./userAssets";
 import { app, BrowserWindow, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
 
+import { checkCommandLineForHelpOrVersion } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
@@ -18,6 +19,8 @@ import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
+
+checkCommandLineForHelpOrVersion();
 
 if (!IS_DEV) {
     autoUpdater.checkForUpdatesAndNotify();

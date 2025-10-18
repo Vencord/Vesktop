@@ -8,6 +8,8 @@ import { app } from "electron";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 
+import { CommandLine } from "./cli";
+
 const vesktopDir = dirname(process.execPath);
 
 export const PORTABLE =
@@ -45,7 +47,10 @@ const BrowserUserAgents = {
     windows: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) ${VersionString}`
 };
 
-export const BrowserUserAgent = BrowserUserAgents[process.platform] || BrowserUserAgents.windows;
+export const BrowserUserAgent =
+    CommandLine.values["user-agent"] ||
+    BrowserUserAgents[CommandLine.values["user-agent-os"] || process.platform] ||
+    BrowserUserAgents.windows;
 
 export const enum MessageBoxChoice {
     Default,
