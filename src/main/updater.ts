@@ -77,5 +77,5 @@ function openUpdater(update: UpdateInfo) {
         updaterWindow = null;
     });
 
-    loadView(updaterWindow, "updater.html");
+    loadView(updaterWindow, "updater/index.html");
 }
