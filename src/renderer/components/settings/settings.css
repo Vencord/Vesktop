@@ -32,3 +32,16 @@
 .vcd-settings-switch {
     margin-bottom: 0;
 }
+
+.vcd-settings-updater-card {
+    padding: 1em;
+    margin-bottom: 1em;
+    display: grid;
+    gap: 0.5em;
+
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+    background: var(--background-feedback-warning);
+    border: 1px solid var(--info-warning-foreground);
+    color: var(--text-feedback-warning);
+}

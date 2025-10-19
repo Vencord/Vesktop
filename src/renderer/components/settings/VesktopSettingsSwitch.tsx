@@ -7,6 +7,8 @@
 import { FormSwitch } from "@vencord/types/components";
 import { ComponentProps } from "react";
 
+import { cl } from "./Settings";
+
 export function VesktopSettingsSwitch(props: ComponentProps<typeof FormSwitch>) {
-    return <FormSwitch {...props} hideBorder className="vcd-settings-switch" />;
+    return <FormSwitch {...props} hideBorder className={cl("switch")} />;
 }

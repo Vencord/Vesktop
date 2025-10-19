@@ -5,9 +5,9 @@
  */
 
 import { app, BrowserWindow, ipcMain } from "electron";
-import { autoUpdater } from "electron-updater";
+import { autoUpdater, UpdateInfo } from "electron-updater";
 import { join } from "path";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
 import { VIEW_DIR } from "shared/paths";
 import { Millis } from "shared/utils/millis";
 
@@ -21,6 +21,28 @@ autoUpdater.on("update-available", update => {
     if (State.store.updater?.ignoredVersion === update.version) return;
     if ((State.store.updater?.snoozeUntil ?? 0) > Date.now()) return;
 
+    openUpdater(update);
+});
+
+autoUpdater.on("update-downloaded", () => setTimeout(() => autoUpdater.quitAndInstall(), 100));
+autoUpdater.on("download-progress", p =>
+    updaterWindow?.webContents.send(UpdaterIpcEvents.DOWNLOAD_PROGRESS, p.percent)
+);
+autoUpdater.on("error", err => updaterWindow?.webContents.send(UpdaterIpcEvents.ERROR, err.message));
+
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
+autoUpdater.fullChangelog = true;
+
+const isOutdated = autoUpdater.checkForUpdates().then(res => Boolean(res?.isUpdateAvailable));
+
+handle(IpcEvents.UPDATER_IS_OUTDATED, () => isOutdated);
+handle(IpcEvents.UPDATER_OPEN, async () => {
+    const res = await autoUpdater.checkForUpdates();
+    if (res?.isUpdateAvailable && res.updateInfo) openUpdater(res.updateInfo);
+});
+
+function openUpdater(update: UpdateInfo) {
     updaterWindow = new BrowserWindow({
         title: "Vesktop Updater",
         autoHideMenuBar: true,
@@ -32,40 +54,28 @@ autoUpdater.on("update-available", update => {
     });
     makeLinksOpenExternally(updaterWindow);
 
-    handle(IpcEvents.UPDATER_GET_DATA, () => ({ update, version: app.getVersion() }));
-    handle(IpcEvents.UPDATER_INSTALL, async () => {
+    handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion() }));
+    handle(UpdaterIpcEvents.INSTALL, async () => {
         await autoUpdater.downloadUpdate();
     });
-    handle(IpcEvents.UPDATER_SNOOZE_UPDATE, () => {
+    handle(UpdaterIpcEvents.SNOOZE_UPDATE, () => {
         State.store.updater ??= {};
         State.store.updater.snoozeUntil = Date.now() + 1 * Millis.DAY;
         updaterWindow?.close();
     });
-    handle(IpcEvents.UPDATER_IGNORE_UPDATE, () => {
+    handle(UpdaterIpcEvents.IGNORE_UPDATE, () => {
         State.store.updater ??= {};
         State.store.updater.ignoredVersion = update.version;
         updaterWindow?.close();
     });
 
     updaterWindow.on("closed", () => {
-        ipcMain.removeHandler(IpcEvents.UPDATER_GET_DATA);
-        ipcMain.removeHandler(IpcEvents.UPDATER_INSTALL);
-        ipcMain.removeHandler(IpcEvents.UPDATER_SNOOZE_UPDATE);
-        ipcMain.removeHandler(IpcEvents.UPDATER_IGNORE_UPDATE);
+        ipcMain.removeHandler(UpdaterIpcEvents.GET_DATA);
+        ipcMain.removeHandler(UpdaterIpcEvents.INSTALL);
+        ipcMain.removeHandler(UpdaterIpcEvents.SNOOZE_UPDATE);
+        ipcMain.removeHandler(UpdaterIpcEvents.IGNORE_UPDATE);
         updaterWindow = null;
     });
 
     updaterWindow.loadFile(join(VIEW_DIR, "updater.html"));
-});
-
-autoUpdater.on("update-downloaded", () => setTimeout(() => autoUpdater.quitAndInstall(), 100));
-autoUpdater.on("download-progress", p =>
-    updaterWindow?.webContents.send(IpcEvents.UPDATER_DOWNLOAD_PROGRESS, p.percent)
-);
-autoUpdater.on("error", err => updaterWindow?.webContents.send(IpcEvents.UPDATER_ERROR, err.message));
-
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = false;
-autoUpdater.fullChangelog = true;
-
-autoUpdater.checkForUpdates();
+}

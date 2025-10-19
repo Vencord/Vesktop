@@ -6,19 +6,19 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import type { UpdateInfo } from "electron-updater";
-import { IpcEvents } from "shared/IpcEvents";
+import { UpdaterIpcEvents } from "shared/IpcEvents";
 
 import { invoke } from "./typedIpc";
 
 contextBridge.exposeInMainWorld("VesktopUpdaterNative", {
-    getData: () => invoke<UpdateInfo>(IpcEvents.UPDATER_GET_DATA),
-    installUpdate: () => invoke(IpcEvents.UPDATER_INSTALL),
+    getData: () => invoke<UpdateInfo>(UpdaterIpcEvents.GET_DATA),
+    installUpdate: () => invoke(UpdaterIpcEvents.INSTALL),
     onProgress: (cb: (percent: number) => void) => {
-        ipcRenderer.on(IpcEvents.UPDATER_DOWNLOAD_PROGRESS, (_, percent: number) => cb(percent));
+        ipcRenderer.on(UpdaterIpcEvents.DOWNLOAD_PROGRESS, (_, percent: number) => cb(percent));
     },
     onError: (cb: (message: string) => void) => {
-        ipcRenderer.on(IpcEvents.UPDATER_ERROR, (_, message: string) => cb(message));
+        ipcRenderer.on(UpdaterIpcEvents.ERROR, (_, message: string) => cb(message));
     },
-    snoozeUpdate: () => invoke(IpcEvents.UPDATER_SNOOZE_UPDATE),
-    ignoreUpdate: () => invoke(IpcEvents.UPDATER_IGNORE_UPDATE)
+    snoozeUpdate: () => invoke(UpdaterIpcEvents.SNOOZE_UPDATE),
+    ignoreUpdate: () => invoke(UpdaterIpcEvents.IGNORE_UPDATE)
 });
