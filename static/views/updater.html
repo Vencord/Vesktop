@@ -116,11 +116,36 @@
         progress {
             width: 100%;
             height: 1.5em;
+            margin-top: 1em;
         }
 
         #error {
             color: red;
             font-weight: bold;
+        }
+
+        .spinner-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2em;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--fg);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -143,7 +168,8 @@
     <footer>
         <section id="buttons">
             <button id="update-button" class="green">Install Update & Restart</button>
-            <button id="later-button" class="grey">Remind Me Later</button>
+            <button id="later-button" class="grey">Remind me Later</button>
+            <button id="ignore-button" class="grey">Ignore this Update</button>
         </section>
     </footer>
 
@@ -160,6 +186,15 @@
         <progress id="download-progress" value="0" max="100"></progress>
 
         <p id="error"></p>
+    </dialog>
+
+    <dialog id="installing-dialog" closedby="none">
+        <h2>Installing Update</h2>
+        <p>Please wait while the update is being installed. Vesktop will restart shortly.</p>
+
+        <div class="spinner-wrapper">
+            <div class="spinner"></div>
+        </div>
     </dialog>
 </body>
 
@@ -189,32 +224,41 @@
     });
 
     /** @type {HTMLDialogElement} */
-    const dialog = document.getElementById("update-dialog");
+    const updateDialog = document.getElementById("update-dialog");
+    /** @type {HTMLDialogElement} */
+    const installingDialog = document.getElementById("installing-dialog");
     /** @type {HTMLProgressElement} */
-    const progress = document.getElementById("download-progress");
+    const downloadProgress = document.getElementById("download-progress");
+    /** @type {HTMLElement} */
+    const errorText = document.getElementById("error");
 
     document.getElementById("update-button").addEventListener("click", () => {
-        progress.value = 0;
+        downloadProgress.value = 0;
+        errorText.textContent = "";
 
         if (navigator.platform.startsWith("Linux")) {
             document.getElementById("linux-note").style.display = "initial";
         }
 
-        dialog.showModal();
+        updateDialog.showModal();
 
         VesktopUpdaterNative.installUpdate().then(() => {
-            progress.value = 100
-            dialog.closedBy = "any";
+            downloadProgress.value = 100
+            updateDialog.closedBy = "any";
+
+            installingDialog.showModal();
+            updateDialog.style.visibility = "hidden";
         });
     });
 
-    document.getElementById("later-button").addEventListener("click", () => window.close());
+    document.getElementById("later-button").addEventListener("click", () => VesktopUpdaterNative.snoozeUpdate());
+    document.getElementById("ignore-button").addEventListener("click", () => VesktopUpdaterNative.ignoreUpdate());
 
-    VesktopUpdaterNative.onProgress(percent => progress.value = percent);
+    VesktopUpdaterNative.onProgress(percent => downloadProgress.value = percent);
     VesktopUpdaterNative.onError(message => {
-        dialog.closedBy = "any";
-
-        const errorElem = document.getElementById("error");
-        errorElem.textContent = `An error occurred while downloading the update: ${message}`;
+        updateDialog.closedBy = "any";
+        errorText.textContent = `An error occurred while downloading the update: ${message}`;
+        installingDialog.close();
+        updateDialog.style.visibility = "initial";
     });
 </script>

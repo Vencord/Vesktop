@@ -9,18 +9,26 @@ import { autoUpdater } from "electron-updater";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { VIEW_DIR } from "shared/paths";
+import { Millis } from "shared/utils/millis";
 
+import { State } from "./settings";
 import { handle } from "./utils/ipcWrappers";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 
 let updaterWindow: BrowserWindow | null = null;
 
 autoUpdater.on("update-available", update => {
+    if (State.store.updater?.ignoredVersion === update.version) return;
+    if ((State.store.updater?.snoozeUntil ?? 0) > Date.now()) return;
+
     updaterWindow = new BrowserWindow({
+        title: "Vesktop Updater",
         autoHideMenuBar: true,
         webPreferences: {
             preload: join(__dirname, "updaterPreload.js")
-        }
+        },
+        minHeight: 400,
+        minWidth: 750
     });
     makeLinksOpenExternally(updaterWindow);
 
@@ -28,10 +36,22 @@ autoUpdater.on("update-available", update => {
     handle(IpcEvents.UPDATER_INSTALL, async () => {
         await autoUpdater.downloadUpdate();
     });
+    handle(IpcEvents.UPDATER_SNOOZE_UPDATE, () => {
+        State.store.updater ??= {};
+        State.store.updater.snoozeUntil = Date.now() + 1 * Millis.DAY;
+        updaterWindow?.close();
+    });
+    handle(IpcEvents.UPDATER_IGNORE_UPDATE, () => {
+        State.store.updater ??= {};
+        State.store.updater.ignoredVersion = update.version;
+        updaterWindow?.close();
+    });
 
     updaterWindow.on("closed", () => {
         ipcMain.removeHandler(IpcEvents.UPDATER_GET_DATA);
         ipcMain.removeHandler(IpcEvents.UPDATER_INSTALL);
+        ipcMain.removeHandler(IpcEvents.UPDATER_SNOOZE_UPDATE);
+        ipcMain.removeHandler(IpcEvents.UPDATER_IGNORE_UPDATE);
         updaterWindow = null;
     });
 

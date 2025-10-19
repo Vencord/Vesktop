@@ -18,5 +18,7 @@ contextBridge.exposeInMainWorld("VesktopUpdaterNative", {
     },
     onError: (cb: (message: string) => void) => {
         ipcRenderer.on(IpcEvents.UPDATER_ERROR, (_, message: string) => cb(message));
-    }
+    },
+    snoozeUpdate: () => invoke(IpcEvents.UPDATER_SNOOZE_UPDATE),
+    ignoreUpdate: () => invoke(IpcEvents.UPDATER_IGNORE_UPDATE)
 });
