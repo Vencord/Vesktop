@@ -28,6 +28,7 @@ export interface Settings {
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
+    splashPixelated?: boolean;
 
     spellCheckLanguages?: string[];
 

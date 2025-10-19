@@ -24,7 +24,7 @@ export function createSplashWindow(startMinimized = false) {
 
     loadView(splash, "splash.html");
 
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
     if (splashTheming !== false) {
         if (splashColor) {
@@ -37,6 +37,10 @@ export function createSplashWindow(startMinimized = false) {
         if (splashBackground) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
+    }
+
+    if (splashPixelated) {
+        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
     }
 
     return splash;
