@@ -22,7 +22,7 @@
         "test": "pnpm lint && pnpm testTypes",
         "testTypes": "tsc --noEmit",
         "watch": "pnpm build --watch",
-        "updateMeta": "tsx scripts/utils/updateMeta.mts",
+        "generateMeta": "tsx scripts/utils/generateMeta.mts",
         "updateArrpcDB": "node ./node_modules/arrpc/update_db.js",
         "postinstall": "pnpm updateArrpcDB"
     },

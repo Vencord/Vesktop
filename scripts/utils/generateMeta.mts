@@ -5,7 +5,7 @@
  */
 
 import { promises as fs } from "node:fs";
-
+import { mkdir } from "node:fs/promises";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import xmlFormat from "xml-formatter";
 
@@ -50,7 +50,9 @@ const latestReleaseInformation = await fetch("https://api.github.com/repos/Venco
     }
 }).then(res => res.json());
 
-const metaInfo = await fs.readFile("./meta/dev.vencord.Vesktop.metainfo.xml", "utf-8");
+const metaInfo = await fetch(
+    "https://github.com/Vencord/Vesktop/releases/latest/download/dev.vencord.Vesktop.metainfo.xml"
+).then(res => res.text());
 
 const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
@@ -90,4 +92,7 @@ const output = xmlFormat(new XMLSerializer().serializeToString(parser), {
     indentation: "  "
 });
 
-await fs.writeFile("./meta/dev.vencord.Vesktop.metainfo.xml", output, "utf-8");
+await mkdir("./dist", { recursive: true });
+await fs.writeFile("./dist/dev.vencord.Vesktop.metainfo.xml", output, "utf-8");
+
+console.log("Updated meta information written to ./dist/dev.vencord.Vesktop.metainfo.xml");
