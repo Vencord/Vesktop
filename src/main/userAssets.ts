@@ -42,7 +42,7 @@ export async function resolveAssetPath(asset: UserAssetType) {
 }
 
 export async function handleVesktopAssetsProtocol(path: string, req: Request) {
-    const asset = path.replace(/\?v=\d+$/, "").replace(/\/+$/, "");
+    const asset = path.slice(1);
 
     // @ts-expect-error dumb types
     if (!CUSTOMIZABLE_ASSETS.includes(asset)) {

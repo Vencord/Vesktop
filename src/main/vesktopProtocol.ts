@@ -11,17 +11,15 @@ import { handleVesktopStaticProtocol } from "./vesktopStatic";
 
 app.whenReady().then(() => {
     protocol.handle("vesktop", async req => {
-        const url = decodeURI(req.url).slice("vesktop://".length);
-        const [channel, ...pathParts] = url.split("/");
-        const path = pathParts.join("/");
+        const url = new URL(req.url);
 
-        if (channel === "assets") {
-            return handleVesktopAssetsProtocol(path, req);
+        switch (url.hostname) {
+            case "assets":
+                return handleVesktopAssetsProtocol(url.pathname, req);
+            case "static":
+                return handleVesktopStaticProtocol(url.pathname, req);
+            default:
+                return new Response(null, { status: 404 });
         }
-        if (channel === "static") {
-            return handleVesktopStaticProtocol(path, req);
-        }
-
-        return new Response(null, { status: 404 });
     });
 });

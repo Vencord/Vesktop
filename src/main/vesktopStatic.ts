@@ -13,9 +13,7 @@ import { isPathInDirectory } from "./utils/isPathInDirectory";
 const STATIC_DIR = join(__dirname, "..", "..", "static");
 
 export async function handleVesktopStaticProtocol(path: string, req: Request) {
-    const staticPath = new URL(path, "vesktop://").pathname;
-
-    const fullPath = join(STATIC_DIR, staticPath);
+    const fullPath = join(STATIC_DIR, path);
     if (!isPathInDirectory(fullPath, STATIC_DIR)) {
         return new Response(null, { status: 404 });
     }
