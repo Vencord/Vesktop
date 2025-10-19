@@ -80,24 +80,31 @@ await Promise.all([
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/js/main.js",
-        footer: { js: "//# sourceURL=VCDMain" }
+        footer: { js: "//# sourceURL=VesktopMain" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/arrpc/worker.ts"],
         outfile: "dist/js/arRpcWorker.js",
-        footer: { js: "//# sourceURL=VCDArRpcWorker" }
+        footer: { js: "//# sourceURL=VesktopArRpcWorker" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
         outfile: "dist/js/preload.js",
-        footer: { js: "//# sourceURL=VCDPreload" }
+        footer: { js: "//# sourceURL=VesktopPreload" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/splash.ts"],
-        outfile: "dist/js/splashPreload.js"
+        outfile: "dist/js/splashPreload.js",
+        footer: { js: "//# sourceURL=VesktopSplashPreload" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/preload/updater.ts"],
+        outfile: "dist/js/updaterPreload.js",
+        footer: { js: "//# sourceURL=VesktopUpdaterPreload" }
     }),
     createContext({
         ...CommonOpts,
@@ -110,7 +117,7 @@ await Promise.all([
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
         plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
-        footer: { js: "//# sourceURL=VCDRenderer" }
+        footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);
 

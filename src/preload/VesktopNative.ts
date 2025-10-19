@@ -32,7 +32,9 @@ export const VesktopNative = {
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
-        getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION)
+        getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION),
+        isOutdated: () => invoke<boolean>(IpcEvents.UPDATER_IS_OUTDATED),
+        openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN)
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),

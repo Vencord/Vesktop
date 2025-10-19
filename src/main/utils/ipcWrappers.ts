@@ -6,7 +6,7 @@
 
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebFrameMain } from "electron";
 import { DISCORD_HOSTNAMES } from "main/constants";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
 
 export function validateSender(frame: WebFrameMain | null, event: string) {
     if (!frame) throw new Error(`ipc[${event}]: No sender frame`);
@@ -25,14 +25,14 @@ export function validateSender(frame: WebFrameMain | null, event: string) {
     }
 }
 
-export function handleSync(event: IpcEvents, cb: (e: IpcMainEvent, ...args: any[]) => any) {
+export function handleSync(event: IpcEvents | UpdaterIpcEvents, cb: (e: IpcMainEvent, ...args: any[]) => any) {
     ipcMain.on(event, (e, ...args) => {
         validateSender(e.senderFrame, event);
         e.returnValue = cb(e, ...args);
     });
 }
 
-export function handle(event: IpcEvents, cb: (e: IpcMainInvokeEvent, ...args: any[]) => any) {
+export function handle(event: IpcEvents | UpdaterIpcEvents, cb: (e: IpcMainInvokeEvent, ...args: any[]) => any) {
     ipcMain.handle(event, (e, ...args) => {
         validateSender(e.senderFrame, event);
         return cb(e, ...args);

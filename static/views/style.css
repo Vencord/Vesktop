@@ -1,21 +1,12 @@
 :root {
-    --bg: white;
-    --fg: black;
-    --fg-secondary: #313338;
-    --fg-semi-trans: rgb(0 0 0 / 0.2);
-    --link: #006ce7;
-    --link-hover: #005bb5;
-}
+    color-scheme: light dark;
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: hsl(223 6.7% 20.6%);
-        --fg: white;
-        --fg-secondary: #b5bac1;
-        --fg-semi-trans: rgb(255 255 255 / 0.2);
-        --link: #00a8fc;
-        --link-hover: #0086c3;
-    }
+    --bg: light-dark(white, hsl(223 6.7% 20.6%));
+    --fg: light-dark(black, white);
+    --fg-secondary: light-dark(#313338, #b5bac1);
+    --fg-semi-trans: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.2));
+    --link: light-dark(#006ce7, #00a8fc);
+    --link-hover: light-dark(#005bb5, #0086c3);
 }
 
 body {

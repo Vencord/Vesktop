@@ -5,12 +5,12 @@
  */
 
 import { ipcRenderer } from "electron";
-import { IpcEvents } from "shared/IpcEvents";
+import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
 
-export function invoke<T = any>(event: IpcEvents, ...args: any[]) {
+export function invoke<T = any>(event: IpcEvents | UpdaterIpcEvents, ...args: any[]) {
     return ipcRenderer.invoke(event, ...args) as Promise<T>;
 }
 
-export function sendSync<T = any>(event: IpcEvents, ...args: any[]) {
+export function sendSync<T = any>(event: IpcEvents | UpdaterIpcEvents, ...args: any[]) {
     return ipcRenderer.sendSync(event, ...args) as T;
 }

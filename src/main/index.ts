@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./updater";
 import "./ipc";
 import "./userAssets";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
-import { autoUpdater } from "electron-updater";
 
 import { checkCommandLineForHelpOrVersion } from "./cli";
 import { DATA_DIR } from "./constants";
@@ -21,10 +21,6 @@ import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 
 checkCommandLineForHelpOrVersion();
-
-if (!IS_DEV) {
-    autoUpdater.checkForUpdatesAndNotify();
-}
 
 console.log("Vesktop v" + app.getVersion());
 
