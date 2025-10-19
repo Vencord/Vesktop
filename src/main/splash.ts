@@ -7,9 +7,9 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
+import { loadView } from "./vesktopStatic";
 
 let splash: BrowserWindow | undefined;
 
@@ -22,7 +22,7 @@ export function createSplashWindow(startMinimized = false) {
         }
     });
 
-    splash.loadFile(join(VIEW_DIR, "splash.html"));
+    loadView(splash, "splash.html");
 
     const { splashBackground, splashColor, splashTheming } = Settings.store;
 

@@ -18,7 +18,7 @@ export function validateSender(frame: WebFrameMain | null, event: string) {
         throw new Error(`ipc[${event}]: Invalid URL ${frame.url}`);
     }
 
-    if (protocol === "file:") return;
+    if (protocol === "file:" || protocol === "vesktop:") return;
 
     if (!DISCORD_HOSTNAMES.includes(hostname)) {
         throw new Error(`ipc[${event}]: Disallowed hostname ${hostname}`);

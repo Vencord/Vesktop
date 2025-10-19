@@ -7,6 +7,7 @@
 import "./updater";
 import "./ipc";
 import "./userAssets";
+import "./vesktopProtocol";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
 

@@ -8,12 +8,12 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import { join } from "path";
 import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
-import { VIEW_DIR } from "shared/paths";
 import { Millis } from "shared/utils/millis";
 
 import { State } from "./settings";
 import { handle } from "./utils/ipcWrappers";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { loadView } from "./vesktopStatic";
 
 let updaterWindow: BrowserWindow | null = null;
 
@@ -77,5 +77,5 @@ function openUpdater(update: UpdateInfo) {
         updaterWindow = null;
     });
 
-    updaterWindow.loadFile(join(VIEW_DIR, "updater.html"));
+    loadView(updaterWindow, "updater.html");
 }

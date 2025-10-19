@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app, dialog, net, protocol } from "electron";
+import { app, dialog, net } from "electron";
 import { copyFile, mkdir, rm } from "fs/promises";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
@@ -41,30 +41,21 @@ export async function resolveAssetPath(asset: UserAssetType) {
     return join(STATIC_DIR, DEFAULT_ASSETS[asset]);
 }
 
-app.whenReady().then(() => {
-    protocol.handle("vesktop", async req => {
-        if (!req.url.startsWith("vesktop://assets/")) {
-            return new Response(null, { status: 404 });
-        }
+export async function handleVesktopAssetsProtocol(path: string, req: Request) {
+    const asset = path.replace(/\?v=\d+$/, "").replace(/\/+$/, "");
 
-        const asset = decodeURI(req.url)
-            .slice("vesktop://assets/".length)
-            .replace(/\?v=\d+$/, "")
-            .replace(/\/+$/, "");
+    // @ts-expect-error dumb types
+    if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
+        return new Response(null, { status: 404 });
+    }
 
-        // @ts-expect-error dumb types
-        if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
-            return new Response(null, { status: 404 });
-        }
+    try {
+        const res = await net.fetch(pathToFileURL(join(UserAssetFolder, asset)).href);
+        if (res.ok) return res;
+    } catch {}
 
-        try {
-            const res = await net.fetch(pathToFileURL(join(UserAssetFolder, asset)).href);
-            if (res.ok) return res;
-        } catch {}
-
-        return net.fetch(pathToFileURL(join(STATIC_DIR, DEFAULT_ASSETS[asset])).href);
-    });
-});
+    return net.fetch(pathToFileURL(join(STATIC_DIR, DEFAULT_ASSETS[asset])).href);
+}
 
 handle(IpcEvents.CHOOSE_USER_ASSET, async (_event, asset: UserAssetType, value?: null) => {
     if (!CUSTOMIZABLE_ASSETS.includes(asset)) {
