@@ -5,6 +5,7 @@
  */
 
 import { app } from "electron";
+import { basename } from "path";
 import { stripIndent } from "shared/utils/text";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
@@ -64,7 +65,10 @@ const extraOptions = {
     }
 } satisfies Record<string, Option>;
 
+const args = basename(process.argv[0]) === "electron" ? process.argv.slice(2) : process.argv.slice(1);
+
 export const CommandLine = parseArgs({
+    args,
     options,
     strict: false as true, // we manually check later, so cast to true to get better types
     allowPositionals: true
@@ -82,7 +86,7 @@ export function checkCommandLineForHelpOrVersion() {
         const base = stripIndent`
             Vesktop v${app.getVersion()}
 
-            Usage: ${process.execPath} [options] [url]
+            Usage: ${basename(process.execPath)} [options] [url]
 
             Electron Options:
               See <https://www.electronjs.org/docs/latest/api/command-line-switches#electron-cli-flags>
