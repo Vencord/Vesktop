@@ -139,3 +139,5 @@ export function checkCommandLineForHelpOrVersion() {
         }
     }
 }
+
+checkCommandLineForHelpOrVersion();
