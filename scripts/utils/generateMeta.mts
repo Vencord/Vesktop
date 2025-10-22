@@ -43,16 +43,25 @@ function generateDescription(description: string, descriptionNode: Element) {
     }
 }
 
-const latestReleaseInformation = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases/latest", {
+const releases = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases", {
     headers: {
         Accept: "application/vnd.github+json",
         "X-Github-Api-Version": "2022-11-28"
     }
 }).then(res => res.json());
 
-const metaInfo = await fetch(
-    "https://github.com/Vencord/Vesktop/releases/latest/download/dev.vencord.Vesktop.metainfo.xml"
-).then(res => res.text());
+const latestReleaseInformation = releases[0];
+
+const metaInfo = await (async () => {
+    for (const release of releases) {
+        const metaAsset = release.assets.find((a: any) => a.name === "dev.vencord.Vesktop.metainfo.xml");
+        if (metaAsset) return fetch(metaAsset.browser_download_url).then(res => res.text());
+    }
+})();
+
+if (!metaInfo) {
+    throw new Error("Could not find existing meta information from any release");
+}
 
 const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
