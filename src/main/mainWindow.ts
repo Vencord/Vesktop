@@ -11,7 +11,6 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
-    Point,
     Rectangle,
     screen,
     session
@@ -280,24 +279,21 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     // We want the default window behaviour to apply in game mode since it expects everything to be fullscreen and maximized.
     if (isDeckGameMode) return {};
 
-    const { x, y, width, height } = State.store.windowBounds ?? {};
+    const { x, y, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = State.store.windowBounds ?? {};
 
-    const options = {
-        width: width ?? DEFAULT_WIDTH,
-        height: height ?? DEFAULT_HEIGHT
-    } as BrowserWindowConstructorOptions;
+    const options = { width, height } as BrowserWindowConstructorOptions;
 
     if (x != null && y != null) {
-        function isInBounds(point: Point, rect: Rectangle) {
-            return (
-                point.x >= rect.x &&
-                point.x <= rect.x + rect.width &&
-                point.y >= rect.y &&
-                point.y <= rect.y + rect.height
+        function isInBounds(rect: Rectangle, display: Rectangle) {
+            return !(
+                rect.x + rect.width < display.x ||
+                rect.x > display.x + display.width ||
+                rect.y + rect.height < display.y ||
+                rect.y > display.y + display.height
             );
         }
 
-        const inBounds = screen.getAllDisplays().some(d => isInBounds({ x, y }, d.bounds));
+        const inBounds = screen.getAllDisplays().some(d => isInBounds({ x, y, width, height }, d.bounds));
         if (inBounds) {
             options.x = x;
             options.y = y;
