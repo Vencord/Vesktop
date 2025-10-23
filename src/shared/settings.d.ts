@@ -51,7 +51,6 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
-    displayId: number;
 
     firstLaunch?: boolean;
 

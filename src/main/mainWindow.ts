@@ -11,6 +11,8 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
+    Point,
+    Rectangle,
     screen,
     session
 } from "electron";
@@ -186,11 +188,21 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayId);
+    if (x != null && y != null) {
+        function isInBounds(point: Point, rect: Rectangle) {
+            return (
+                point.x >= rect.x &&
+                point.x <= rect.x + rect.width &&
+                point.y >= rect.y &&
+                point.y <= rect.y + rect.height
+            );
+        }
 
-    if (x != null && y != null && storedDisplay) {
-        options.x = x;
-        options.y = y;
+        const inBounds = screen.getAllDisplays().some(d => isInBounds({ x, y }, d.bounds));
+        if (inBounds) {
+            options.x = x;
+            options.y = y;
+        }
     }
 
     if (!Settings.store.disableMinSize) {
@@ -236,7 +248,6 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
-        State.store.displayId = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);
