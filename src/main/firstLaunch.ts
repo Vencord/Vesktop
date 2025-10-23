@@ -65,10 +65,9 @@ export function createFirstLaunchTour() {
             } catch (e) {
                 if (e instanceof Error && "code" in e && e.code === "ENOENT") {
                     console.log("No Vencord settings found to import.");
-                    return;
+                } else {
+                    console.error("Failed to import Vencord settings:", e);
                 }
-
-                console.error("Failed to import Vencord settings:", e);
             }
         }
 
