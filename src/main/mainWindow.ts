@@ -11,6 +11,7 @@ import {
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
+    Rectangle,
     screen,
     session
 } from "electron";
@@ -186,9 +187,22 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
         height: height ?? DEFAULT_HEIGHT
     } as BrowserWindowConstructorOptions;
 
-    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayId);
+    const overlaps = (a : Rectangle, b : Rectangle) => {
+        return !(
+               (a.x + a.width) < b.x 
+            || a.x > (b.x + b.width) 
+            || (a.y + a.height) < b.y 
+            || a.y > (b.y + b.height) 
+        )
+    }
 
-    if (x != null && y != null && storedDisplay) {
+    let isOnScreen = false;
+    const margin = 10;
+    screen.getAllDisplays().forEach(display => {
+        isOnScreen ||= (overlaps({x: x+margin, y: y+margin, width: width-(2*margin), height: height-(2*margin)}, display.workArea))
+    });
+
+    if (x != null && y != null && isOnScreen) {
         options.x = x;
         options.y = y;
     }
