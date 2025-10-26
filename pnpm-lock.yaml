@@ -20,8 +20,8 @@ importers:
         specifier: github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77
         version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=4313fe844324a52ef0453078a86f5d1ee2d4f406331201211020d9fa243323c4)
       electron-updater:
-        specifier: ^6.6.2
-        version: 6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)
+        specifier: ^6.7.0
+        version: 6.7.0(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)
     devDependencies:
       '@fal-works/esbuild-plugin-global-externals':
         specifier: ^2.1.2
@@ -799,6 +799,10 @@ packages:
     resolution: {integrity: sha512-2/egrNDDnRaxVwK3A+cJq6UOlqOdedGA7JPqCeJjN2Zjk1/QB/6QUi3b714ScIGS7HafFXTyzJEOr5b44I3kvQ==}
     engines: {node: '>=12.0.0'}
 
+  builder-util-runtime@9.5.0:
+    resolution: {integrity: sha512-7qmRMH8X/IzDM+1TysKNFo5cNWBbfacdLX4EqkuE5aiRTECAlYiKHSqEc6cc3c4Lrmpgk0utbxOPkj0iYaWAWQ==}
+    engines: {node: '>=12.0.0'}
+
   builder-util@25.1.7:
     resolution: {integrity: sha512-7jPjzBwEGRbwNcep0gGNpLXG9P94VA3CPAZQCzxkFXiV2GMQKlziMbY//rXPI7WKfhsvGgFXjTcXdBEwgXw9ww==}
 
@@ -1116,8 +1120,8 @@ packages:
   electron-publish@26.0.11:
     resolution: {integrity: sha512-a8QRH0rAPIWH9WyyS5LbNvW9Ark6qe63/LqDB7vu2JXYpi0Gma5Q60Dh4tmTqhOBQt0xsrzD8qE7C+D7j+B24A==}
 
-  electron-updater@6.6.2:
-    resolution: {integrity: sha512-Cr4GDOkbAUqRHP5/oeOmH/L2Bn6+FQPxVLZtPbcmKZC63a1F3uu5EefYOssgZXG3u/zBlubbJ5PJdITdMVggbw==}
+  electron-updater@6.7.0:
+    resolution: {integrity: sha512-j8ejBZCkp5kvv1MxJNoQaSjNvEbr/ZHSeQdwm0jbZGgVm+Z6ExqRpqE8oRxDsDacxQfk7l8hlBAnlq4qAk2wfw==}
 
   electron@38.0.0:
     resolution: {integrity: sha512-egljptiPJqbL/oamFCEY+g3RNeONWTVxZSGeyLqzK8xq106JhzuxnhJZ3sxt4DzJFaofbGyGJA37Oe9d+gVzYw==}
@@ -1422,10 +1426,6 @@ packages:
   fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
     engines: {node: '>=12'}
-
-  fs-extra@11.3.0:
-    resolution: {integrity: sha512-Z4XaCL6dUDHfP/jT25jJKMmtxvuwbkrD1vNSMFlo9lNLY2c5FHYSQgHPRZUjAB26TpDEoW9HCOgplrdbaPV/ew==}
-    engines: {node: '>=14.14'}
 
   fs-extra@11.3.2:
     resolution: {integrity: sha512-Xr9F6z6up6Ws+NjzMCZc6WXg2YFRlrLP9NQDO3VQrWrfiojdhS56TzueT88ze0uBdCTwEIhQ3ptnmKeWGFAe0A==}
@@ -2490,11 +2490,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.7.1:
-    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.7.2:
@@ -3802,6 +3797,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  builder-util-runtime@9.5.0:
+    dependencies:
+      debug: 4.4.3
+      sax: 1.4.1
+    transitivePeerDependencies:
+      - supports-color
+
   builder-util@25.1.7:
     dependencies:
       7zip-bin: 5.2.0
@@ -3959,13 +3961,13 @@ snapshots:
     dependencies:
       axios: 1.7.9(debug@4.4.0)
       debug: 4.4.0
-      fs-extra: 11.3.0
+      fs-extra: 11.3.2
       lodash.isplainobject: 4.0.6
       memory-stream: 1.0.0
       node-api-headers: 1.5.0
       npmlog: 6.0.2
       rc: 1.2.8
-      semver: 7.7.1
+      semver: 7.7.2
       tar: 6.2.1
       url-join: 4.0.1
       which: 2.0.2
@@ -4235,15 +4237,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-updater@6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887):
+  electron-updater@6.7.0(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887):
     dependencies:
-      builder-util-runtime: 9.3.1
+      builder-util-runtime: 9.5.0
       fs-extra: 10.1.0
       js-yaml: 4.1.0
       lazy-val: 1.0.5
       lodash.escaperegexp: 4.1.2
       lodash.isequal: 4.5.0
-      semver: 7.7.1
+      semver: 7.7.2
       tiny-typed-emitter: 2.1.0
     transitivePeerDependencies:
       - supports-color
@@ -4666,13 +4668,6 @@ snapshots:
       graceful-fs: 4.2.11
       jsonfile: 6.2.0
       universalify: 2.0.1
-
-  fs-extra@11.3.0:
-    dependencies:
-      graceful-fs: 4.2.11
-      jsonfile: 6.2.0
-      universalify: 2.0.1
-    optional: true
 
   fs-extra@11.3.2:
     dependencies:
@@ -5798,8 +5793,6 @@ snapshots:
   semver@5.7.2: {}
 
   semver@6.3.1: {}
-
-  semver@7.7.1: {}
 
   semver@7.7.2: {}
 
