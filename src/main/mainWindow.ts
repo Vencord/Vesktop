@@ -26,6 +26,7 @@ import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
+import { initNativeIdle } from "./idle";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
@@ -399,6 +400,7 @@ function createMainWindow() {
     initSpellCheck(win);
     initDevtoolsListeners(win);
     initStaticTitle(win);
+    initNativeIdle(win);
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
