@@ -44,7 +44,6 @@ export function createFirstLaunchTour() {
         if (!msg.startsWith("form:")) return;
         const data = JSON.parse(msg.slice(5)) as Data;
 
-        console.log(data);
         State.store.firstLaunch = false;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.minimizeToTray = !!data.minimizeToTray;
