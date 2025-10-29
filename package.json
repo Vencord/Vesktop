@@ -28,7 +28,8 @@
     },
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
-        "electron-updater": "^6.6.2"
+        "electron-updater": "^6.6.2",
+        "vesktop-wayland-protocols": "^0.1.2"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"

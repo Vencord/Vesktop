@@ -22,6 +22,9 @@ importers:
       electron-updater:
         specifier: ^6.6.2
         version: 6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)
+      vesktop-wayland-protocols:
+        specifier: ^0.1.2
+        version: 0.1.2
     devDependencies:
       '@fal-works/esbuild-plugin-global-externals':
         specifier: ^2.1.2
@@ -2845,6 +2848,10 @@ packages:
   verror@1.10.1:
     resolution: {integrity: sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==}
     engines: {node: '>=0.6.0'}
+
+  vesktop-wayland-protocols@0.1.2:
+    resolution: {integrity: sha512-YppYC5x1SYcr+ETzT3g1GK/AD+Tr+a997HNn5yUFd9EW4AkAHW/wgvQzDFjWwxrw1zbXk7CxQRvnx2ncUxsgjA==}
+    engines: {node: '>= 12.22.0 < 13 || >= 14.17.0 < 15 || >= 15.12.0 < 16 || >= 16.0.0'}
 
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
@@ -6222,6 +6229,8 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.4.1
     optional: true
+
+  vesktop-wayland-protocols@0.1.2: {}
 
   wcwidth@1.0.1:
     dependencies:
