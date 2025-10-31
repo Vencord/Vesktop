@@ -11,6 +11,7 @@ import { STATIC_DIR } from "shared/paths";
 import { Millis } from "shared/utils/millis";
 
 import { isWayland } from "./constants";
+import { VencordSettings } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 
 let suspended = false;
@@ -25,7 +26,7 @@ function getWaylandIdleCallback(win: BrowserWindow): () => boolean {
         ) as typeof import("vesktop-wayland-protocols");
 
         const idleNotifier = new waylandProtocols.IdleNotifier({
-            timeoutMs: 10 * Millis.MINUTE,
+            timeoutMs: (VencordSettings.store.plugins?.CustomIdle?.idleTimeout ?? 10) * Millis.MINUTE,
             onIdled: () => win.webContents.send(IpcEvents.IDLE_POWER_EVENT),
             onResumed: () => win.webContents.send(IpcEvents.NO_IDLE_POWER_EVENT)
         });
