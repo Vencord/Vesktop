@@ -22,8 +22,8 @@ function getWaylandIdleCallback(win: BrowserWindow): () => boolean {
 
     try {
         const waylandProtocols = require(
-            join(STATIC_DIR, `dist/vesktop-wayland-protocols.linux-${process.arch}-gnu.node`)
-        ) as typeof import("vesktop-wayland-protocols");
+            join(STATIC_DIR, `dist/wayland-protocols-${process.arch}.node`)
+        ) as typeof import("wayland-protocols");
 
         const idleNotifier = new waylandProtocols.IdleNotifier({
             timeoutMs: (VencordSettings.store.plugins?.CustomIdle?.idleTimeout ?? 10) * Millis.MINUTE,
@@ -68,6 +68,4 @@ export function initNativeIdle(win: BrowserWindow) {
     // see https://issues.chromium.org/issues/380125108
     handleSync(IpcEvents.IS_WAYLAND_IDLE, getWaylandIdleCallback(win));
     handle(IpcEvents.GET_IDLE_TIME_MS, () => powerMonitor.getSystemIdleTime() * Millis.SECOND);
-
-    console.log(VencordSettings.store);
 }

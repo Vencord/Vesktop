@@ -73,25 +73,34 @@ async function copyLibVesktop() {
     }
 }
 
-async function copyVesktopWaylandProtocols() {
+async function copyWaylandProtocols() {
     if (process.platform !== "linux") return;
 
-    return Promise.all([
-        copyFile(
-            "./node_modules/vesktop-wayland-protocols/prebuilds/x86_64/vesktop-wayland-protocols.linux-x64-gnu.node",
-            "./static/dist/vesktop-wayland-protocols.linux-x64-gnu.node"
-        ),
-        copyFile(
-            "./node_modules/vesktop-wayland-protocols/prebuilds/aarch64/vesktop-wayland-protocols.linux-arm64-gnu.node",
-            "./static/dist/vesktop-wayland-protocols.linux-arm64-gnu.node"
-        ),
-    ]).catch(() => console.warn("Failed to copy vesktop-wayland-protocols. Building without wayland native idle support"));
+    try {
+        await copyFile(
+            "./packages/wayland-protocols/target/release/wayland-protocols.node",
+            `./static/dist/wayaldn-protocols-${process.arch}.node`
+        );
+        console.log('using local wayland-protocols build');
+    } catch {
+        console.log("Using prebuilt wayland-protocols binaries. Run `pnpm buildWaylandProtocols` and build again to build from source")
+        return Promise.all([
+            copyFile(
+                "./packages/wayland-protocols/prebuilds/wayland-protocols-x64.node",
+                "./static/dist/wayland-protocols-x64.node"
+            ),
+            copyFile(
+                "./packages/wayland-protocols/prebuilds/wayland-protocols-arm64.node",
+                "./static/dist/wayland-protocols-arm64.node"
+            ),
+        ]).catch(() => console.warn("Failed to copy wayland-protocols. Building without native wayland idle support"));
+    }
 }
 
 await Promise.all([
     copyVenmic(),
     copyLibVesktop(),
-    copyVesktopWaylandProtocols(),
+    copyWaylandProtocols(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],

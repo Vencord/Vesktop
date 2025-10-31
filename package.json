@@ -12,6 +12,7 @@
         "build": "tsx scripts/build/build.mts",
         "build:dev": "pnpm build --dev",
         "buildLibVesktop": "pnpm -C packages/libvesktop install && pnpm -C packages/libvesktop run build",
+        "buildWaylandProtocols": "pnpm -C packages/wayland-protocols install && pnpm -C packages/wayland-protocols run build",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "lint": "eslint",
@@ -31,8 +32,7 @@
         "electron-updater": "^6.6.2"
     },
     "optionalDependencies": {
-        "@vencord/venmic": "^6.1.0",
-        "vesktop-wayland-protocols": "^0.1.3"
+        "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
@@ -58,6 +58,7 @@
         "type-fest": "^5.0.1",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.46.0",
+        "wayland-protocols": "link:packages/wayland-protocols",
         "xml-formatter": "^3.6.7"
     },
     "packageManager": "pnpm@10.7.1",
