@@ -18,7 +18,7 @@ let suspended = false;
 let locked = false;
 
 function getWaylandIdleCallback(win: BrowserWindow): () => boolean {
-    if (!isWayland) return () => false;
+    if (!isWayland || VencordSettings.store.plugins?.CustomIdle?.idleTimeout === 0) return () => false;
 
     try {
         const waylandProtocols = require(
@@ -68,4 +68,6 @@ export function initNativeIdle(win: BrowserWindow) {
     // see https://issues.chromium.org/issues/380125108
     handleSync(IpcEvents.IS_WAYLAND_IDLE, getWaylandIdleCallback(win));
     handle(IpcEvents.GET_IDLE_TIME_MS, () => powerMonitor.getSystemIdleTime() * Millis.SECOND);
+
+    console.log(VencordSettings.store);
 }
