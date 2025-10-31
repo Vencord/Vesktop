@@ -73,9 +73,34 @@ async function copyLibVesktop() {
     }
 }
 
+async function copyWaylandProtocols() {
+    if (process.platform !== "linux") return;
+
+    try {
+        await copyFile(
+            "./packages/wayland-protocols/target/release/wayland-protocols.node",
+            `./static/dist/wayaldn-protocols-${process.arch}.node`
+        );
+        console.log('using local wayland-protocols build');
+    } catch {
+        console.log("Using prebuilt wayland-protocols binaries. Run `pnpm buildWaylandProtocols` and build again to build from source")
+        return Promise.all([
+            copyFile(
+                "./packages/wayland-protocols/prebuilds/wayland-protocols-x64.node",
+                "./static/dist/wayland-protocols-x64.node"
+            ),
+            copyFile(
+                "./packages/wayland-protocols/prebuilds/wayland-protocols-arm64.node",
+                "./static/dist/wayland-protocols-arm64.node"
+            ),
+        ]).catch(() => console.warn("Failed to copy wayland-protocols. Building without native wayland idle support"));
+    }
+}
+
 await Promise.all([
     copyVenmic(),
     copyLibVesktop(),
+    copyWaylandProtocols(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
