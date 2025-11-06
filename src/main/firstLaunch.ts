@@ -31,8 +31,8 @@ export function createFirstLaunchTour() {
         transparent: false,
         frame: true,
         autoHideMenuBar: true,
-        height: 470,
-        width: 550
+        height: 550,
+        width: 600
     });
 
     makeLinksOpenExternally(win);
