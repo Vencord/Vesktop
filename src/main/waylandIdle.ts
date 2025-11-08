@@ -31,7 +31,7 @@ function initWaylandIdleWatcher(): () => boolean {
         ) as typeof import("wayland-protocols");
 
         const idleNotifier = new waylandProtocols.IdleNotifier({
-            timeoutMs: (VencordSettings.store.plugins?.CustomIdle?.idleTimeout ?? 10) * Millis.SECOND
+            timeoutMs: (VencordSettings.store.plugins?.CustomIdle?.idleTimeout ?? 10) * Millis.MINUTE
         });
 
         return () => idleNotifier.isIdle();
