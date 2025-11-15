@@ -65,7 +65,9 @@ const extraOptions = {
     }
 } satisfies Record<string, Option>;
 
-const args = basename(process.argv[0]) === "electron" ? process.argv.slice(2) : process.argv.slice(1);
+const args = basename(process.argv[0]).toLowerCase().startsWith("electron")
+    ? process.argv.slice(2)
+    : process.argv.slice(1);
 
 export const CommandLine = parseArgs({
     args,
