@@ -92,6 +92,9 @@ importers:
       typescript-eslint:
         specifier: ^8.46.2
         version: 8.46.2(eslint@9.38.0)(typescript@5.9.3)
+      wayland-protocols:
+        specifier: link:packages/wayland-protocols
+        version: link:packages/wayland-protocols
       xml-formatter:
         specifier: ^3.6.7
         version: 3.6.7

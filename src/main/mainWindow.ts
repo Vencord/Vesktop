@@ -36,6 +36,7 @@ import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
+import { initWaylandIdleHandler } from "./waylandIdle";
 
 let isQuitting = false;
 
@@ -440,6 +441,8 @@ export async function createWindows() {
         // SteamOS letterboxes and scales it terribly, so just full screen it
         if (isDeckGameMode) splash.setFullScreen(true);
     }
+
+    initWaylandIdleHandler();
 
     await ensureVencordFiles();
     runVencordMain();

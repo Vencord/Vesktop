@@ -36,6 +36,9 @@ export const VesktopNative = {
         isOutdated: () => invoke<boolean>(IpcEvents.UPDATER_IS_OUTDATED),
         openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN)
     },
+    powerMonitor: {
+        isWaylandIdle: () => sendSync<boolean>(IpcEvents.IS_WAYLAND_IDLE)
+    },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
         enable: () => invoke<void>(IpcEvents.ENABLE_AUTOSTART),

@@ -58,3 +58,12 @@ If you want to build it from source:
     - Fedora: `dnf install @c-development @development-tools python3 curl pkgconf-pkg-config glib2-devel`
 2. Run `pnpm buildLibVesktop`
 3. From now on, building Vesktop will use your own build
+
+## Building wayland-protocols from Source
+
+A small Wayland client for Linux written in Rust. Prebuilt binaries targeting x86_64-unknown-linux-gnu and aarch64-uknown-linux-gnu (x64 and arm64) are provided and used by default.
+
+If you want to build it from source:
+1. Install rust and your desired toolchains (see [rustup](https://rustup.rs/))
+2. Run `pnpm buildWaylandProtocols`
+3. From now on, building Vesktop will use your own build
