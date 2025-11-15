@@ -39,7 +39,8 @@ if (isLinux) {
         const constraints = {
             ...track.getConstraints(),
             ...getContentResolutionSettings(contentHint, { width, height }),
-            frameRate: getContentFrameSettings(contentHint, frameRate)
+            frameRate: getContentFrameSettings(contentHint, frameRate),
+            resizeMode: "none"
         };
 
         track
