@@ -319,7 +319,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const options: BrowserWindowConstructorOptions = {
-        show: Settings.store.enableSplashScreen === false,
+        show: Settings.store.enableSplashScreen === false && !CommandLine.values["start-minimized"],
         backgroundColor,
         webPreferences: {
             nodeIntegration: false,
