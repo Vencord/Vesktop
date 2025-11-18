@@ -6,8 +6,8 @@
 
 import { Logger } from "@vencord/types/utils";
 import { currentSettings } from "renderer/components/ScreenSharePicker";
+import { isLinux } from "renderer/constants";
 import { State } from "renderer/settings";
-import { isLinux } from "renderer/utils";
 
 const logger = new Logger("VesktopStreamFixes");
 

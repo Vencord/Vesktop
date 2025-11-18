@@ -14,9 +14,9 @@ import { Button, Card, FluxDispatcher, Forms, Select, Text, UserStore, useState 
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { MediaEngineStore } from "renderer/common";
+import { isLinux, isWindows } from "renderer/constants";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
-import { isLinux, isWindows } from "renderer/utils";
 
 const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
 const StreamFps = ["15", "30", "60"] as const;

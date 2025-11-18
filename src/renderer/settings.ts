@@ -7,8 +7,8 @@
 import { useEffect, useReducer } from "@vencord/types/webpack/common";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
+import { localStorage } from "./constants";
 import { VesktopLogger } from "./logger";
-import { localStorage } from "./utils";
 
 export const Settings = new SettingsStore(VesktopNative.settings.get());
 Settings.addGlobalChangeListener((o, p) => VesktopNative.settings.set(o, p));

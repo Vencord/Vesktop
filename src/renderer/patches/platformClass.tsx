@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { isMac } from "renderer/constants";
 import { Settings } from "renderer/settings";
-import { isMac } from "renderer/utils";
 
 import { addPatch } from "./shared";
 

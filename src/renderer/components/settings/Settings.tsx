@@ -10,8 +10,8 @@ import { classNameFactory } from "@vencord/types/api/Styles";
 import { ErrorBoundary } from "@vencord/types/components";
 import { Forms, Text } from "@vencord/types/webpack/common";
 import { ComponentType } from "react";
+import { isMac, isWindows } from "renderer/constants";
 import { Settings, useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";

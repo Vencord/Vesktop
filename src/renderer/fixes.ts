@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { localStorage } from "./utils";
+import { localStorage } from "./constants";
 
 // Make clicking Notifications focus the window
 const originalSetOnClick = Object.getOwnPropertyDescriptor(Notification.prototype, "onclick")!.set!;
