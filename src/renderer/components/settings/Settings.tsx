@@ -7,8 +7,8 @@
 import "./settings.css";
 
 import { classNameFactory } from "@vencord/types/api/Styles";
-import { ErrorBoundary } from "@vencord/types/components";
-import { Forms, Text } from "@vencord/types/webpack/common";
+import { Divider, ErrorBoundary } from "@vencord/types/components";
+import { Text } from "@vencord/types/webpack/common";
 import { ComponentType } from "react";
 import { isMac, isWindows } from "renderer/constants";
 import { Settings, useSettings } from "renderer/settings";
@@ -173,7 +173,7 @@ function SettingsSections() {
                 })}
             </div>
 
-            {i < arr.length - 1 && <Forms.FormDivider className={cl("category-divider")} />}
+            {i < arr.length - 1 && <Divider className={cl("category-divider")} />}
         </div>
     ));
 

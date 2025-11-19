@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Paragraph } from "@vencord/types/components";
 import { useAwaiter } from "@vencord/types/utils";
-import { Button, Text } from "@vencord/types/webpack/common";
+import { Button } from "@vencord/types/webpack/common";
 
 import { cl } from "./Settings";
 
@@ -16,8 +17,12 @@ export function Updater() {
 
     return (
         <div className={cl("updater-card")}>
-            <Text variant="text-md/semibold">Your Vesktop is outdated!</Text>
-            <Text variant="text-sm/normal">Staying up to date is important for security and stability.</Text>
+            <Paragraph size="md" weight="semibold">
+                Your Vesktop is outdated!
+            </Paragraph>
+            <Paragraph size="sm" weight="normal">
+                Staying up to date is important for security and stability.
+            </Paragraph>
 
             <Button
                 onClick={() => VesktopNative.app.openUpdater()}

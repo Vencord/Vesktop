@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Heading, Paragraph } from "@vencord/types/components";
 import {
     Margins,
     ModalCloseButton,
@@ -14,7 +15,7 @@ import {
     openModal,
     useForceUpdater
 } from "@vencord/types/utils";
-import { Button, Forms, Text, Toasts } from "@vencord/types/webpack/common";
+import { Button, Text, Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "shared/settings";
 
 import { cl, SettingsComponent } from "./Settings";
@@ -35,12 +36,12 @@ function openDeveloperOptionsModal(settings: Settings) {
 
             <ModalContent>
                 <div style={{ padding: "1em 0" }}>
-                    <Forms.FormTitle tag="h5">Vencord Location</Forms.FormTitle>
+                    <Heading tag="h5">Vencord Location</Heading>
                     <VencordLocationPicker settings={settings} />
 
-                    <Forms.FormTitle tag="h5" className={Margins.top16}>
+                    <Heading tag="h5" className={Margins.top16}>
                         Debugging
-                    </Forms.FormTitle>
+                    </Heading>
                     <div className={cl("button-grid")}>
                         <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
                         <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
@@ -59,7 +60,7 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
 
     return (
         <>
-            <Forms.FormText>
+            <Paragraph>
                 Vencord files are loaded from{" "}
                 {vencordDir ? (
                     <a
@@ -74,7 +75,7 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                 ) : (
                     "the default location"
                 )}
-            </Forms.FormText>
+            </Paragraph>
             <div className={cl("button-grid")}>
                 <Button
                     size={Button.Sizes.SMALL}

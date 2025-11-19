@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ErrorBoundary } from "@vencord/types/components";
+import { ErrorBoundary, Heading, Paragraph } from "@vencord/types/components";
 import { Margins } from "@vencord/types/utils";
-import { Forms, Select } from "@vencord/types/webpack/common";
+import { Select } from "@vencord/types/webpack/common";
 
 import { SettingsComponent } from "./Settings";
 
@@ -16,10 +16,10 @@ export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => 
     return (
         <ErrorBoundary noop>
             <div>
-                <Forms.FormTitle className={Margins.bottom8}>Transparency Options</Forms.FormTitle>
-                <Forms.FormText className={Margins.bottom8}>
+                <Heading>Transparency Options</Heading>
+                <Paragraph className={Margins.bottom8}>
                     Requires a full restart. You will need a theme that supports transparency for this to work.
-                </Forms.FormText>
+                </Paragraph>
 
                 <Select
                     placeholder="None"

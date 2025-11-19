@@ -18,8 +18,9 @@
 
 .vcd-screen-picker-card {
     flex-grow: 1;
+    padding: 0.5em;
+    box-sizing: border-box;
 }
-
 
 /* Screen Grid */
 .vcd-screen-picker-screen-grid {
@@ -52,11 +53,6 @@
     text-align: center;
     font-weight: 600;
     margin-inline: 0.5em;
-}
-
-.vcd-screen-picker-card {
-    padding: 0.5em;
-    box-sizing: border-box;
 }
 
 .vcd-screen-picker-preview-img-linux {

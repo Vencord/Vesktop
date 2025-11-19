@@ -7,10 +7,10 @@
 import "./screenSharePicker.css";
 
 import { classNameFactory } from "@vencord/types/api/Styles";
-import { CogWheel, FormSwitch, RestartIcon } from "@vencord/types/components";
+import { Button, Card, CogWheel, FormSwitch, Heading, Paragraph, RestartIcon } from "@vencord/types/components";
 import { closeModal, Logger, Modals, ModalSize, openModal, useAwaiter, useForceUpdater } from "@vencord/types/utils";
 import { onceReady } from "@vencord/types/webpack";
-import { Button, Card, FluxDispatcher, Forms, Select, Text, UserStore, useState } from "@vencord/types/webpack/common";
+import { FluxDispatcher, Select, UserStore, useState } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { MediaEngineStore } from "renderer/common";
@@ -165,9 +165,9 @@ function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScre
                     />
 
                     <img src={url} alt="" />
-                    <Text className={cl("screen-name")} variant="text-sm/normal">
+                    <Paragraph className={cl("screen-name")} size="sm">
                         {name}
-                    </Text>
+                    </Paragraph>
                 </label>
             ))}
         </div>
@@ -188,7 +188,9 @@ function AudioSettingsModal({
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
             <Modals.ModalHeader className={cl("header")}>
-                <Forms.FormTitle tag="h2">Venmic Settings</Forms.FormTitle>
+                <Heading tag="h2" className={cl("header-title")}>
+                    Venmic Settings
+                </Heading>
                 <Modals.ModalCloseButton onClick={close} className={cl("header-close-button")} />
             </Modals.ModalHeader>
 
@@ -289,7 +291,7 @@ function AudioSettingsModal({
                 />
             </Modals.ModalContent>
             <Modals.ModalFooter className={cl("footer")}>
-                <Button color={Button.Colors.TRANSPARENT} onClick={close}>
+                <Button variant="secondary" onClick={close}>
                     Back
                 </Button>
             </Modals.ModalFooter>
@@ -310,7 +312,9 @@ function OptionRadio<Settings extends object, Key extends keyof Settings>(props:
         <div className={cl("option-radios")}>
             {(options as string[]).map((option, idx) => (
                 <label className={cl("option-radio")} data-checked={settings[settingsKey] === option} key={option}>
-                    <Text variant="text-sm/bold">{labels?.[idx] ?? option}</Text>
+                    <Paragraph size="sm" weight="bold">
+                        {labels?.[idx] ?? option}
+                    </Paragraph>
                     <input
                         className={cl("option-input")}
                         type="radio"
@@ -361,18 +365,18 @@ function StreamSettingsUi({
 
     return (
         <div>
-            <Forms.FormTitle>What you're streaming</Forms.FormTitle>
+            <Heading>What you're streaming</Heading>
             <Card className={cl("card", "preview")}>
                 <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
-                <Text variant="text-sm/normal">{source.name}</Text>
+                <Paragraph size="sm">{source.name}</Paragraph>
             </Card>
 
-            <Forms.FormTitle>Stream Settings</Forms.FormTitle>
+            <Heading>Stream Settings</Heading>
 
             <Card className={cl("card")}>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Forms.FormTitle>Resolution</Forms.FormTitle>
+                        <Heading>Resolution</Heading>
                         <OptionRadio
                             options={StreamResolutions}
                             settings={qualitySettings}
@@ -382,7 +386,7 @@ function StreamSettingsUi({
                     </section>
 
                     <section className={cl("quality-section")}>
-                        <Forms.FormTitle>Frame Rate</Forms.FormTitle>
+                        <Heading>Frame Rate</Heading>
                         <OptionRadio
                             options={StreamFps}
                             settings={qualitySettings}
@@ -393,7 +397,7 @@ function StreamSettingsUi({
                 </div>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Forms.FormTitle>Content Type</Forms.FormTitle>
+                        <Heading>Content Type</Heading>
                         <div>
                             <OptionRadio
                                 options={["motion", "detail"]}
@@ -578,7 +582,7 @@ function AudioSourcePickerLinux({
 
     if (!sources.ok && sources.isGlibCxxOutdated) {
         return (
-            <Forms.FormText>
+            <Paragraph>
                 Failed to retrieve Audio Sources because your C++ library is too old to run
                 <a href="https://github.com/Vencord/venmic" target="_blank">
                     venmic
@@ -588,13 +592,13 @@ function AudioSourcePickerLinux({
                     this guide
                 </a>{" "}
                 for possible solutions.
-            </Forms.FormText>
+            </Paragraph>
         );
     }
 
     if (!hasPipewirePulse && !ignorePulseWarning) {
         return (
-            <Text variant="text-sm/normal">
+            <Paragraph size="sm">
                 Could not find pipewire-pulse. See{" "}
                 <a href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install" target="_blank">
                     this guide
@@ -603,7 +607,7 @@ function AudioSourcePickerLinux({
                 You can still continue, however, please{" "}
                 <b>beware that you can only share audio of apps that are running under pipewire</b>.{" "}
                 <a onClick={() => setIgnorePulseWarning(true)}>I know what I'm doing!</a>
-            </Text>
+            </Paragraph>
         );
     }
 
@@ -623,7 +627,7 @@ function AudioSourcePickerLinux({
         <>
             <div className={cl("audio-sources")}>
                 <section>
-                    <Forms.FormTitle>{loading ? "Loading Sources..." : "Audio Sources"}</Forms.FormTitle>
+                    <Heading>{loading ? "Loading Sources..." : "Audio Sources"}</Heading>
                     <Select
                         options={allSources.map(({ name, value }) => ({
                             label: name,
@@ -639,7 +643,7 @@ function AudioSourcePickerLinux({
                 </section>
                 {includeSources === "Entire System" && (
                     <section>
-                        <Forms.FormTitle>Exclude Sources</Forms.FormTitle>
+                        <Heading>Exclude Sources</Heading>
                         <Select
                             options={allSources
                                 .filter(x => x.name !== "Entire System")
@@ -658,15 +662,11 @@ function AudioSourcePickerLinux({
                 )}
             </div>
             <div className={cl("settings-buttons")}>
-                <Button
-                    color={Button.Colors.TRANSPARENT}
-                    onClick={refreshAudioSources}
-                    className={cl("settings-button")}
-                >
+                <Button variant="secondary" onClick={refreshAudioSources} className={cl("settings-button")}>
                     <RestartIcon className={cl("settings-button-icon")} />
                     Refresh Audio Sources
                 </Button>
-                <Button color={Button.Colors.TRANSPARENT} onClick={openSettings} className={cl("settings-button")}>
+                <Button variant="secondary" onClick={openSettings} className={cl("settings-button")}>
                     <CogWheel className={cl("settings-button-icon")} />
                     Open Audio Settings
                 </Button>
@@ -702,9 +702,12 @@ function ModalComponent({
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
             <Modals.ModalHeader className={cl("header")}>
-                <Forms.FormTitle tag="h2">ScreenShare</Forms.FormTitle>
-                <Modals.ModalCloseButton onClick={close} />
+                <Heading tag="h2" className={cl("header-title")}>
+                    ScreenShare
+                </Heading>
+                <Modals.ModalCloseButton onClick={close} className={cl("header-close-button")} />
             </Modals.ModalHeader>
+
             <Modals.ModalContent className={cl("modal")}>
                 {!selected ? (
                     <ScreenPicker screens={screens} chooseScreen={setSelected} />
@@ -781,11 +784,11 @@ function ModalComponent({
                 </Button>
 
                 {selected && !skipPicker ? (
-                    <Button color={Button.Colors.TRANSPARENT} onClick={() => setSelected(void 0)}>
+                    <Button variant="secondary" onClick={() => setSelected(void 0)}>
                         Back
                     </Button>
                 ) : (
-                    <Button color={Button.Colors.TRANSPARENT} onClick={close}>
+                    <Button variant="secondary" onClick={close}>
                         Cancel
                     </Button>
                 )}

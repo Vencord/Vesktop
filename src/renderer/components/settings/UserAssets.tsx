@@ -6,7 +6,7 @@
 
 import "./UserAssets.css";
 
-import { FormSwitch } from "@vencord/types/components";
+import { FormSwitch, Heading } from "@vencord/types/components";
 import {
     Margins,
     ModalCloseButton,
@@ -73,9 +73,7 @@ function Asset({ asset }: { asset: UserAssetType }) {
 
     return (
         <section>
-            <Text tag="h3" variant="text-md/semibold">
-                {wordsToTitle(wordsFromCamel(asset))}
-            </Text>
+            <Heading tag="h3">{wordsToTitle(wordsFromCamel(asset))}</Heading>
             <div className="vcd-user-assets-asset">
                 <img
                     className="vcd-user-assets-image"
