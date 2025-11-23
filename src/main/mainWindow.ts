@@ -323,7 +323,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         backgroundColor,
         webPreferences: {
             nodeIntegration: false,
-            sandbox: false, // TODO
+            sandbox: true,
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
