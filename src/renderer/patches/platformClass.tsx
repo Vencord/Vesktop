@@ -14,7 +14,6 @@ addPatch({
         {
             find: "platform-web",
             replacement: {
-                // eslint-disable-next-line no-useless-escape
                 match: /(?<=" platform-overlay"\):)\i/,
                 replace: "$self.getPlatformClass()"
             }

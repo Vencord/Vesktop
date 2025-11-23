@@ -66,6 +66,7 @@ addContextMenuPatch("textarea-context", children => {
                 <>
                     {corrections.map(c => (
                         <Menu.MenuItem
+                            key={c}
                             id={"vcd-spellcheck-suggestion-" + c}
                             label={c}
                             action={() => VesktopNative.spellcheck.replaceMisspelling(c)}
@@ -95,6 +96,7 @@ addContextMenuPatch("textarea-context", children => {
                         const isEnabled = spellCheckLanguages.includes(lang);
                         return (
                             <Menu.MenuCheckboxItem
+                                key={lang}
                                 id={"vcd-spellcheck-lang-" + lang}
                                 label={lang}
                                 checked={isEnabled}

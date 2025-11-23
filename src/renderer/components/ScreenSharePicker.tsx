@@ -580,11 +580,15 @@ function AudioSourcePickerLinux({
         return (
             <Forms.FormText>
                 Failed to retrieve Audio Sources because your C++ library is too old to run
-                <a href="https://github.com/Vencord/venmic" target="_blank">
+                <a href="https://github.com/Vencord/venmic" target="_blank" rel="noreferrer">
                     venmic
                 </a>
                 . See{" "}
-                <a href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a" target="_blank">
+                <a
+                    href="https://gist.github.com/Vendicated/b655044ffbb16b2716095a448c6d827a"
+                    target="_blank"
+                    rel="noreferrer"
+                >
                     this guide
                 </a>{" "}
                 for possible solutions.
@@ -596,7 +600,11 @@ function AudioSourcePickerLinux({
         return (
             <Text variant="text-sm/normal">
                 Could not find pipewire-pulse. See{" "}
-                <a href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install" target="_blank">
+                <a
+                    href="https://gist.github.com/the-spyke/2de98b22ff4f978ebf0650c90e82027e#install"
+                    target="_blank"
+                    rel="noreferrer"
+                >
                     this guide
                 </a>{" "}
                 on how to switch to pipewire. <br />

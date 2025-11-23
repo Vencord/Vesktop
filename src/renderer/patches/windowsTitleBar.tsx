@@ -15,8 +15,6 @@ if (Settings.store.customTitleBar)
                 find: ".wordmarkWindows",
                 replacement: [
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /case \i\.\i\.WINDOWS:/,
                         replace: 'case "WEB":'
                     }
@@ -27,14 +25,10 @@ if (Settings.store.customTitleBar)
                 find: ".systemBar,",
                 replacement: [
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /\i===\i\.PlatformTypes\.WINDOWS/g,
                         replace: "true"
                     },
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /\i===\i\.PlatformTypes\.WEB/g,
                         replace: "false"
                     }

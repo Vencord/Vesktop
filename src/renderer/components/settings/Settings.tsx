@@ -154,8 +154,8 @@ function SettingsSections() {
             </Text>
 
             <div className={cl("category-content")}>
-                {settings.map(Setting => {
-                    if (typeof Setting === "function") return <Setting settings={Settings} />;
+                {settings.map((Setting, i) => {
+                    if (typeof Setting === "function") return <Setting key={`Custom-${i}`} settings={Settings} />;
 
                     const { defaultValue, title, description, key, disabled, invisible } = Setting;
                     if (invisible?.()) return null;
