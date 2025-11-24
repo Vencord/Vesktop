@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron/renderer";
 
 contextBridge.exposeInMainWorld("VesktopSplashNative", {
     onUpdateMessage(callback: (message: string) => void) {

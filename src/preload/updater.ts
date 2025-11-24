@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron/renderer";
 import type { UpdateInfo } from "electron-updater";
 import { UpdaterIpcEvents } from "shared/IpcEvents";
 

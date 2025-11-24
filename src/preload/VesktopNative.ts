@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Node } from "@vencord/venmic";
-import { ipcRenderer } from "electron";
-import { IpcMessage, IpcResponse } from "main/ipcCommands";
+import type { Node } from "@vencord/venmic";
+import { ipcRenderer } from "electron/renderer";
+import type { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
 
 import { IpcEvents } from "../shared/IpcEvents";
