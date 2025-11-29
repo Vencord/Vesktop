@@ -20,6 +20,7 @@ export interface Settings {
     hardwareVideoAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
+    enableTaskbarFlashing?: boolean;
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;

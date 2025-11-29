@@ -389,6 +389,10 @@ function createMainWindow() {
         return false;
     });
 
+    win.on("focus", () => {
+        win.flashFrame(false);
+    });
+
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")
         initTray(win, q => (isQuitting = q));
