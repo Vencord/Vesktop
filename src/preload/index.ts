@@ -7,7 +7,6 @@
 import { contextBridge, ipcRenderer, webFrame } from "electron/renderer";
 
 import { IpcEvents } from "../shared/IpcEvents";
-import { invoke } from "./typedIpc";
 import { VesktopNative } from "./VesktopNative";
 
 contextBridge.exposeInMainWorld("VesktopNative", VesktopNative);
@@ -25,23 +24,3 @@ Function(
 
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT));
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VESKTOP_RENDERER_SCRIPT));
-
-invoke<string>(IpcEvents.GET_VESKTOP_RENDERER_CSS).then(css => {
-    const style = document.createElement("style");
-    style.id = "vcd-css-core";
-    style.textContent = css;
-
-    if (document.readyState === "complete") {
-        document.documentElement.appendChild(style);
-    } else {
-        document.addEventListener("DOMContentLoaded", () => document.documentElement.appendChild(style), {
-            once: true
-        });
-    }
-
-    if (IS_DEV) {
-        ipcRenderer.on(IpcEvents.VESKTOP_RENDERER_CSS_UPDATE, (e, newCss: string) => {
-            style.textContent = newCss;
-        });
-    }
-});

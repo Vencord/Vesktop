@@ -34,7 +34,14 @@ export const VesktopNative = {
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
         getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION),
         isOutdated: () => invoke<boolean>(IpcEvents.UPDATER_IS_OUTDATED),
-        openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN)
+        openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN),
+        // used by vencord
+        getRendererCss: () => invoke<string>(IpcEvents.GET_VESKTOP_RENDERER_CSS),
+        onRendererCssUpdate: (cb: (newCss: string) => void) => {
+            if (!IS_DEV) return;
+
+            ipcRenderer.on(IpcEvents.VESKTOP_RENDERER_CSS_UPDATE, (_e, newCss: string) => cb(newCss));
+        }
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
