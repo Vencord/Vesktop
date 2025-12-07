@@ -35,6 +35,9 @@ import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
+handleSync(IpcEvents.DEPRECATED_GET_VENCORD_PRELOAD_SCRIPT_PATH, () =>
+    join(VENCORD_FILES_DIR, "vencordDesktopPreload.js")
+);
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_SCRIPT, () =>
     readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"), "utf-8")
 );
@@ -49,7 +52,7 @@ handle(IpcEvents.GET_VESKTOP_RENDERER_CSS, () => readFile(VESKTOP_RENDERER_CSS_P
 
 if (IS_DEV) {
     watch(VESKTOP_RENDERER_CSS_PATH, { persistent: false }, async () => {
-        mainWin.webContents.postMessage(
+        mainWin?.webContents.postMessage(
             IpcEvents.VESKTOP_RENDERER_CSS_UPDATE,
             await readFile(VESKTOP_RENDERER_CSS_PATH, "utf-8")
         );
