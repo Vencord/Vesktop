@@ -4,15 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { ipcMain } from "electron";
 import { resolve } from "path";
 import { IpcCommands } from "shared/IpcEvents";
-import { MessageChannel, Worker } from "worker_threads";
+import { MessageChannel, MessagePort, Worker } from "worker_threads";
 
 import { sendRendererCommand } from "../ipcCommands";
 import { Settings } from "../settings";
-import { ArRpcEvent, ArRpcHostEvent } from "./types";
+import { ArRpcHostEvent } from "./types";
 
 let worker: Worker;
+let hostPortRef: MessagePort | null = null;
+let voiceIpcRegistered = false;
 
 const inviteCodeRegex = /^(\w|-)+$/;
 
@@ -21,6 +24,7 @@ export async function initArRPC() {
 
     try {
         const { port1: hostPort, port2: workerPort } = new MessageChannel();
+        hostPortRef = hostPort;
 
         worker = new Worker(resolve(__dirname, "./arRpcWorker.js"), {
             workerData: {
@@ -29,7 +33,8 @@ export async function initArRPC() {
             transferList: [workerPort]
         });
 
-        hostPort.on("message", async ({ type, nonce, data }: ArRpcEvent) => {
+        hostPort.on("message", async message => {
+            const { type, nonce, data } = message as any;
             switch (type) {
                 case "activity": {
                     sendRendererCommand(IpcCommands.RPC_ACTIVITY, data);
@@ -67,8 +72,69 @@ export async function initArRPC() {
                     hostPort.postMessage(response);
                     break;
                 }
+
+                case "voice-set": {
+                    const response: ArRpcHostEvent = {
+                        type: "ack-voice-set",
+                        nonce,
+                        data: undefined as any
+                    } as any;
+
+                    try {
+                        response.data = await sendRendererCommand(IpcCommands.RPC_SET_VOICE_SETTINGS, data);
+                    } catch (err: any) {
+                        response.data = { error: String(err) } as any;
+                    }
+
+                    hostPort.postMessage(response);
+                    break;
+                }
+
+                case "voice-get": {
+                    const response: ArRpcHostEvent = {
+                        type: "ack-voice-get",
+                        nonce,
+                        data: undefined as any
+                    } as any;
+
+                    try {
+                        response.data = await sendRendererCommand(IpcCommands.RPC_GET_VOICE_SETTINGS, data);
+                    } catch (err: any) {
+                        response.data = { error: String(err) } as any;
+                    }
+
+                    hostPort.postMessage(response);
+                    break;
+                }
+
+                case "voice-channel-get": {
+                    const response: ArRpcHostEvent = {
+                        type: "ack-voice-channel",
+                        nonce,
+                        data: undefined as any
+                    } as any;
+
+                    try {
+                        response.data = await sendRendererCommand(IpcCommands.RPC_GET_SELECTED_VOICE_CHANNEL, data);
+                    } catch (err: any) {
+                        response.data = { error: String(err) } as any;
+                    }
+
+                    hostPort.postMessage(response);
+                    break;
+                }
             }
         });
+
+        if (!voiceIpcRegistered) {
+            voiceIpcRegistered = true;
+            ipcMain.on(IpcCommands.RPC_VOICE_STATE_UPDATE, (_event, state) => {
+                hostPortRef?.postMessage({
+                    type: "voice-settings-update",
+                    data: state
+                });
+            });
+        }
     } catch (e) {
         console.error("Failed to start arRPC server", e);
     }

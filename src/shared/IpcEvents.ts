@@ -74,6 +74,10 @@ export const enum IpcCommands {
     RPC_ACTIVITY = "rpc:activity",
     RPC_INVITE = "rpc:invite",
     RPC_DEEP_LINK = "rpc:link",
+    RPC_SET_VOICE_SETTINGS = "rpc:voice:set",
+    RPC_GET_VOICE_SETTINGS = "rpc:voice:get",
+    RPC_GET_SELECTED_VOICE_CHANNEL = "rpc:voice:getSelectedChannel",
+    RPC_VOICE_STATE_UPDATE = "rpc:voice:update",
 
     NAVIGATE_SETTINGS = "navigate:settings",
 

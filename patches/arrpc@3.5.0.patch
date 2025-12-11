@@ -1,5 +1,5 @@
 diff --git a/src/process/index.js b/src/process/index.js
-index 389b0845256a34b4536d6da99edb00d17f13a6b4..f17a0ac687e9110ebfd33cb91fd2f6250d318643 100644
+index f445024f14ecfe5ee0eb70fe42535591c76838dc..4f089d035202a611ad5f18a74925e8d273a095b4 100644
 --- a/src/process/index.js
 +++ b/src/process/index.js
 @@ -5,8 +5,20 @@ import fs from 'node:fs';
@@ -25,3 +25,247 @@ index 389b0845256a34b4536d6da99edb00d17f13a6b4..f17a0ac687e9110ebfd33cb91fd2f625
  
  import * as Natives from './native/index.js';
  const Native = Natives[process.platform];
+diff --git a/src/server.js b/src/server.js
+index e016f9694e7fad2686daab5716d635f48b0af810..cc0e69dcd3a7c0941ba9f58d34a079b2cea59af3 100644
+--- a/src/server.js
++++ b/src/server.js
+@@ -8,6 +8,17 @@ import WSServer from './transports/websocket.js';
+ import ProcessServer from './process/index.js';
+ 
+ let socketId = 0;
++const mockUser = {
++  id: '1045800378228281345',
++  username: 'arrpc',
++  discriminator: '0',
++  global_name: 'arRPC',
++  avatar: 'cfefa4d9839fb4bdf030f91c2a13e95c',
++  avatar_decoration_data: null,
++  bot: false,
++  flags: 0,
++  premium_type: 0,
++};
+ export default class RPCServer extends EventEmitter {
+   constructor() { super(); return (async () => {
+     this.onConnection = this.onConnection.bind(this);
+@@ -25,6 +36,9 @@ export default class RPCServer extends EventEmitter {
+ 
+     if (!process.argv.includes('--no-process-scanning') && !process.env.ARRPC_NO_PROCESS_SCANNING) this.process = await new ProcessServer(handlers);
+ 
++    this.voiceSettingsSubscribers = new Set();
++    this.voiceStateSubscribers = new Set();
++
+     return this;
+   })(); }
+ 
+@@ -38,17 +52,7 @@ export default class RPCServer extends EventEmitter {
+           api_endpoint: '//discord.com/api',
+           environment: 'production'
+         },
+-        user: { // mock user data using arRPC app/bot
+-          id: '1045800378228281345',
+-          username: 'arrpc',
+-          discriminator: '0',
+-          global_name: 'arRPC',
+-          avatar: 'cfefa4d9839fb4bdf030f91c2a13e95c',
+-          avatar_decoration_data: null,
+-          bot: false,
+-          flags: 0,
+-          premium_type: 0,
+-        }
++        user: mockUser // mock user data using arRPC app/bot
+       },
+       evt: 'READY',
+       nonce: null
+@@ -66,10 +70,13 @@ export default class RPCServer extends EventEmitter {
+       socketId: socket.socketId.toString()
+     });
+ 
++    this.voiceSettingsSubscribers?.delete(socket);
++    this.voiceStateSubscribers?.delete(socket);
++
+     this.emit('close', socket);
+   }
+ 
+-  async onMessage(socket, { cmd, args, nonce }) {
++  async onMessage(socket, { cmd, args, nonce, evt }) {
+     this.emit('message', { socket, cmd, args, nonce });
+ 
+     switch (cmd) {
+@@ -173,6 +180,177 @@ export default class RPCServer extends EventEmitter {
+         }
+         this.emit('link', args, deep_callback);
+         break;
++
++      case 'AUTHORIZE': {
++        socket.send?.({
++          cmd,
++          data: { code: 'arrpc-ok' },
++          evt: null,
++          nonce
++        });
++        break;
++      }
++
++      case 'AUTHENTICATE': {
++        socket.send?.({
++          cmd,
++          data: { access_token: args?.access_token ?? null, user: mockUser },
++          evt: null,
++          nonce
++        });
++        break;
++      }
++
++      case 'SET_VOICE_SETTINGS': {
++        const callback = (err, data = {}) => {
++          socket.send?.({
++            cmd,
++            data: err ? { message: String(err) } : data,
++            evt: err ? 'ERROR' : null,
++            nonce
++          });
++
++          if (!err && data) this.dispatchVoiceSettings(data);
++        };
++
++        return this.emit('voice-settings-set', args ?? {}, callback);
++      }
++
++      case 'GET_VOICE_SETTINGS': {
++        const callback = (err, data = {}) => socket.send?.({
++          cmd,
++          data: err ? { message: String(err) } : data,
++          evt: err ? 'ERROR' : null,
++          nonce
++        });
++
++        return this.emit('voice-settings-get', callback);
++      }
++
++      case 'GET_SELECTED_VOICE_CHANNEL': {
++        const callback = (err, data = {}) => socket.send?.({
++          cmd,
++          data: err ? { message: String(err) } : data,
++          evt: err ? 'ERROR' : null,
++          nonce
++        });
++
++        return this.emit('voice-channel-get', callback);
++      }
++
++      case 'SUBSCRIBE': {
++        const eventName = evt ?? args?.evt ?? args?.event;
++
++        if (eventName === 'VOICE_SETTINGS_UPDATE') {
++          this.voiceSettingsSubscribers.add(socket);
++
++          socket.send?.({ cmd, data: null, evt: null, nonce });
++
++          this.emit('voice-settings-get', (err, data) => {
++            if (!err && data) this.dispatchVoiceSettings(data, socket);
++          });
++          break;
++        }
++
++        if (eventName === 'VOICE_STATE_UPDATE') {
++          this.voiceStateSubscribers.add(socket);
++
++          socket.send?.({ cmd, data: null, evt: null, nonce });
++
++          this.emit('voice-settings-get', (err, data) => {
++            if (!err && data) {
++              const state = this.toVoiceState(data);
++              this.dispatchVoiceState(state, socket);
++            }
++          });
++          break;
++        }
++
++        socket.send?.({ cmd, data: null, evt: null, nonce });
++        break;
++      }
++
++      case 'UNSUBSCRIBE': {
++        const eventName = evt ?? args?.evt ?? args?.event;
++        if (eventName === 'VOICE_SETTINGS_UPDATE') this.voiceSettingsSubscribers.delete(socket);
++        if (eventName === 'VOICE_STATE_UPDATE') this.voiceStateSubscribers.delete(socket);
++        socket.send?.({ cmd, data: null, evt: null, nonce });
++        break;
++      }
++    }
++  }
++
++  dispatchVoiceSettings(data, target) {
++    const payload = {
++      cmd: 'DISPATCH',
++      data,
++      evt: 'VOICE_SETTINGS_UPDATE',
++      nonce: null
++    };
++
++    if (target) target.send?.(payload);
++
++    for (const sock of this.voiceSettingsSubscribers) {
++      sock.send?.(payload);
++    }
++
++    this.dispatchVoiceState(data);
++  }
++
++  toVoiceState(data) {
++    const source = data.voice_state ?? data;
++    return {
++      mute: source.self_mute ?? source.mute ?? false,
++      deaf: source.self_deaf ?? source.deaf ?? false,
++      self_mute: source.self_mute ?? source.mute ?? false,
++      self_deaf: source.self_deaf ?? source.deaf ?? false,
++      channel_id: source.channel_id ?? null,
++      guild_id: source.guild_id ?? null,
++      user_id: source.user_id ?? null,
++      session_id: source.session_id ?? 'arrpc-session',
++      suppress: source.suppress ?? false,
++      self_stream: source.self_stream ?? false,
++      self_video: source.self_video ?? false,
++      request_to_speak_timestamp: source.request_to_speak_timestamp ?? null,
++      voice_state: {
++        channel_id: source.channel_id ?? null,
++        guild_id: source.guild_id ?? null,
++        user_id: source.user_id ?? null,
++        mute: source.self_mute ?? source.mute ?? false,
++        deaf: source.self_deaf ?? source.deaf ?? false,
++        self_mute: source.self_mute ?? source.mute ?? false,
++        self_deaf: source.self_deaf ?? source.deaf ?? false,
++        session_id: source.session_id ?? 'arrpc-session',
++        suppress: source.suppress ?? false,
++        self_stream: source.self_stream ?? false,
++        self_video: source.self_video ?? false,
++        request_to_speak_timestamp: source.request_to_speak_timestamp ?? null
++      }
++    };
++  }
++
++  dispatchVoiceState(data, target) {
++    const state = this.toVoiceState(data);
++    const payload = {
++      cmd: 'DISPATCH',
++      data: state,
++      evt: 'VOICE_STATE_UPDATE',
++      nonce: null
++    };
++
++    if (target) target.send?.(payload);
++    for (const sock of this.voiceStateSubscribers) {
++      sock.send?.(payload);
++    }
++    if (this.ipc?.server?.connections) {
++      for (const sock of this.ipc.server.connections ?? []) {
++        sock.send?.(payload);
++      }
++    }
++    if (this.ws?.wss?.clients) {
++      for (const sock of this.ws.wss.clients) {
++        sock.send?.(payload);
++      }
+     }
+   }
+ }

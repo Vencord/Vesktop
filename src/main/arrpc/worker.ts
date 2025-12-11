@@ -8,7 +8,7 @@ import Server from "arrpc";
 import { randomUUID } from "crypto";
 import { MessagePort, workerData } from "worker_threads";
 
-import { ArRpcEvent, ArRpcHostEvent } from "./types";
+import { ArRpcEvent, ArRpcHostEvent, VoiceSettingsState } from "./types";
 
 let server: any;
 
@@ -17,6 +17,11 @@ type LinkCallback = InviteCallback;
 
 const inviteCallbacks = new Map<string, InviteCallback>();
 const linkCallbacks = new Map<string, LinkCallback>();
+const voiceCallbacks = new Map<string, (err: string | null, data?: VoiceSettingsState) => void>();
+const voiceChannelCallbacks = new Map<
+    string,
+    (err: string | null, data?: { channel_id: string | null; guild_id?: string | null }) => void
+>();
 
 (async function () {
     const { workerPort } = workerData as { workerPort: MessagePort };
@@ -56,6 +61,43 @@ const linkCallbacks = new Map<string, LinkCallback>();
         workerPort.postMessage(event);
     });
 
+    server.on("voice-settings-set", (data: Partial<VoiceSettingsState>, callback) => {
+        const nonce = randomUUID();
+        voiceCallbacks.set(nonce, callback);
+
+        const event: ArRpcEvent = {
+            type: "voice-set",
+            nonce,
+            data
+        };
+
+        workerPort.postMessage(event);
+    });
+
+    server.on("voice-settings-get", callback => {
+        const nonce = randomUUID();
+        voiceCallbacks.set(nonce, callback);
+
+        const event: ArRpcEvent = {
+            type: "voice-get",
+            nonce
+        };
+
+        workerPort.postMessage(event);
+    });
+
+    server.on("voice-channel-get", callback => {
+        const nonce = randomUUID();
+        voiceChannelCallbacks.set(nonce, callback);
+
+        const event: ArRpcEvent = {
+            type: "voice-channel-get",
+            nonce
+        };
+
+        workerPort.postMessage(event);
+    });
+
     workerPort.on("message", (e: ArRpcHostEvent) => {
         switch (e.type) {
             case "ack-invite": {
@@ -66,6 +108,37 @@ const linkCallbacks = new Map<string, LinkCallback>();
             case "ack-link": {
                 linkCallbacks.get(e.nonce)?.(e.data);
                 linkCallbacks.delete(e.nonce);
+                break;
+            }
+
+            case "ack-voice-set":
+            case "ack-voice-get": {
+                const cb = voiceCallbacks.get(e.nonce);
+                if (cb) {
+                    if ("error" in e.data) cb(String(e.data.error));
+                    else cb(null, e.data as VoiceSettingsState);
+                }
+                voiceCallbacks.delete(e.nonce);
+
+                if (e.type === "ack-voice-set" && !("error" in e.data)) {
+                    server.dispatchVoiceSettings?.(e.data as VoiceSettingsState);
+                }
+                break;
+            }
+
+            case "ack-voice-channel": {
+                const cb = voiceChannelCallbacks.get(e.nonce);
+                if (cb) {
+                    if ("error" in e.data) cb(String(e.data.error));
+                    else cb(null, e.data as { channel_id: string | null; guild_id?: string | null });
+                }
+                voiceChannelCallbacks.delete(e.nonce);
+                break;
+            }
+
+            case "voice-settings-update": {
+                server.dispatchVoiceSettings?.(e.data);
+                server.dispatchVoiceState?.(e.data);
                 break;
             }
         }

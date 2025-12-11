@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   arrpc@3.5.0:
-    hash: 4313fe844324a52ef0453078a86f5d1ee2d4f406331201211020d9fa243323c4
+    hash: 71731f23c3ebace6210db342b7e98da49bfab7115cff16858267749a9ffb6175
     path: patches/arrpc@3.5.0.patch
   electron-updater:
     hash: 080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887
@@ -18,7 +18,7 @@ importers:
     dependencies:
       arrpc:
         specifier: github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77
-        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=4313fe844324a52ef0453078a86f5d1ee2d4f406331201211020d9fa243323c4)
+        version: https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=71731f23c3ebace6210db342b7e98da49bfab7115cff16858267749a9ffb6175)
       electron-updater:
         specifier: ^6.6.2
         version: 6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)
@@ -4042,7 +4042,7 @@ snapshots:
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
 
-  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=4313fe844324a52ef0453078a86f5d1ee2d4f406331201211020d9fa243323c4):
+  arrpc@https://codeload.github.com/OpenAsar/arrpc/tar.gz/2234e9c9111f4c42ebcc3aa6a2215bfd979eef77(patch_hash=71731f23c3ebace6210db342b7e98da49bfab7115cff16858267749a9ffb6175):
     dependencies:
       ws: 8.18.0
     transitivePeerDependencies:

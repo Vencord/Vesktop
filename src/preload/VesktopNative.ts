@@ -9,7 +9,7 @@ import { ipcRenderer } from "electron";
 import { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
 
-import { IpcEvents } from "../shared/IpcEvents";
+import { IpcCommands, IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpc";
 
 type SpellCheckerResultCallback = (word: string, suggestions: string[]) => void;
@@ -93,6 +93,10 @@ export const VesktopNative = {
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
         launchWebrtcInternals: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS)
+    },
+    rpcVoice: {
+        notifyState: (state: { mute: boolean; deaf: boolean }) =>
+            ipcRenderer.send(IpcCommands.RPC_VOICE_STATE_UPDATE, state)
     },
     commands: {
         onCommand(cb: (message: IpcMessage) => void) {
