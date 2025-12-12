@@ -27,8 +27,12 @@ function loadSettings<T extends object = any>(file: string, name: string) {
 
     const store = new SettingsStore(settings);
     store.addGlobalChangeListener(o => {
-        mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, JSON.stringify(o, null, 4));
+        try {
+            mkdirSync(dirname(file), { recursive: true });
+            writeFileSync(file, JSON.stringify(o, null, 4));
+        } catch (err) {
+            console.error(`Failed to save settings to ${name}.json:`, err);
+        }
     });
 
     return store;
