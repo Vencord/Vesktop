@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import type arRpcPlugin from "@vencord/types/plugins/arRPC.web";
 import { Logger } from "@vencord/types/utils";
 import { findLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
@@ -15,9 +16,7 @@ import { Settings } from "./settings";
 const logger = new Logger("VesktopRPC", "#5865f2");
 const StreamerModeStore = findStoreLazy("StreamerModeStore");
 
-const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as any as {
-    handleEvent(e: MessageEvent): void;
-};
+const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as typeof arRpcPlugin;
 
 onIpcCommand(IpcCommands.RPC_ACTIVITY, async jsonData => {
     if (!Settings.store.arRPC) return;
