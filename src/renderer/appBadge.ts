@@ -5,65 +5,44 @@
  */
 
 import { filters, waitFor } from "@vencord/types/webpack";
-import { GenericStore, RelationshipStore } from "@vencord/types/webpack/common";
+import { RelationshipStore } from "@vencord/types/webpack/common";
 
 import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
 
-let GuildReadStateStore: GenericStore;
-let NotificationSettingsStore: GenericStore;
-let SelfPresenceStore: GenericStore;
-
-let lastCount = 0;
+let GuildReadStateStore: any;
+let NotificationSettingsStore: any;
 
 export function setBadge() {
-    const { appBadge, enableTaskbarFlashing } = Settings.store;
-    const enableAppBadge = appBadge !== false;
-    if (!enableAppBadge && !enableTaskbarFlashing) return;
+    if (Settings.store.appBadge === false) return;
 
     try {
         const mentionCount = GuildReadStateStore.getTotalMentionCount();
         const pendingRequests = RelationshipStore.getPendingCount();
-        const totalCount = mentionCount + pendingRequests;
+        const hasUnread = GuildReadStateStore.hasAnyUnread();
+        const disableUnreadBadge = NotificationSettingsStore.getDisableUnreadBadge();
 
-        if (enableAppBadge) {
-            const hasUnread = GuildReadStateStore.hasAnyUnread();
-            const disableUnreadBadge = NotificationSettingsStore.getDisableUnreadBadge();
-            const badgeValue = !totalCount && hasUnread && !disableUnreadBadge ? -1 : totalCount;
-            VesktopNative.app.setBadgeCount(badgeValue);
-        }
+        let totalCount = mentionCount + pendingRequests;
+        if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
-        if (enableTaskbarFlashing) {
-            const canDisturb = SelfPresenceStore.getStatus() !== "dnd";
-            if (totalCount > lastCount && canDisturb) {
-                VesktopNative.win.flashFrame(true);
-            } else if (totalCount === 0 && lastCount !== totalCount) {
-                VesktopNative.win.flashFrame(false);
-            }
-            lastCount = totalCount;
-        }
+        VesktopNative.app.setBadgeCount(totalCount);
     } catch (e) {
-        VesktopLogger.error("Failed to update badge/taskbar state", e);
+        VesktopLogger.error("Failed to update badge count", e);
     }
 }
 
-function waitForStore(name: string, cb?: (store: GenericStore) => void) {
-    return new Promise<GenericStore>(resolve => {
-        waitFor(filters.byStoreName(name), store => {
-            cb?.(store);
-            resolve(store);
-        });
+let toFind = 3;
+
+function waitForAndSubscribeToStore(name: string, cb?: (m: any) => void) {
+    waitFor(filters.byStoreName(name), store => {
+        cb?.(store);
+        store.addChangeListener(setBadge);
+
+        toFind--;
+        if (toFind === 0) setBadge();
     });
 }
 
-Promise.all([
-    waitForStore("GuildReadStateStore", store => (GuildReadStateStore = store)),
-    waitForStore("NotificationSettingsStore", store => (NotificationSettingsStore = store)),
-    waitForStore("SelfPresenceStore", store => (SelfPresenceStore = store)),
-    waitForStore("RelationshipStore")
-]).then(stores => {
-    stores.forEach(store => {
-        store.addChangeListener(setBadge);
-    });
-    setBadge();
-});
+waitForAndSubscribeToStore("GuildReadStateStore", store => (GuildReadStateStore = store));
+waitForAndSubscribeToStore("NotificationSettingsStore", store => (NotificationSettingsStore = store));
+waitForAndSubscribeToStore("RelationshipStore");
