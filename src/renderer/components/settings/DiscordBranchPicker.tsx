@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ErrorBoundary } from "@vencord/types/components";
 import { Select } from "@vencord/types/webpack/common";
 
+import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
 import { SettingsComponent } from "./Settings";
 
 export const DiscordBranchPicker: SettingsComponent = ({ settings }) => {
     return (
-        <ErrorBoundary noop>
+        <SimpleErrorBoundary>
             <Select
                 placeholder="Stable"
                 options={[
@@ -24,6 +24,6 @@ export const DiscordBranchPicker: SettingsComponent = ({ settings }) => {
                 isSelected={v => v === settings.discordBranch}
                 serialize={s => s}
             />
-        </ErrorBoundary>
+        </SimpleErrorBoundary>
     );
 };

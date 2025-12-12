@@ -4,23 +4,24 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ErrorBoundary } from "@vencord/types/components";
+import { Heading, Paragraph } from "@vencord/types/components";
 import { Margins } from "@vencord/types/utils";
-import { Forms, Select } from "@vencord/types/webpack/common";
+import { Select } from "@vencord/types/webpack/common";
 
+import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
 import { SettingsComponent } from "./Settings";
 
 export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => {
     if (!VesktopNative.app.supportsWindowsTransparency()) return null;
 
     return (
-        <ErrorBoundary noop>
-            <div>
-                <Forms.FormTitle className={Margins.bottom8}>Transparency Options</Forms.FormTitle>
-                <Forms.FormText className={Margins.bottom8}>
-                    Requires a full restart. You will need a theme that supports transparency for this to work.
-                </Forms.FormText>
+        <div>
+            <Heading tag="h5">Transparency Options</Heading>
+            <Paragraph className={Margins.bottom8}>
+                Requires a full restart. You will need a theme that supports transparency for this to work.
+            </Paragraph>
 
+            <SimpleErrorBoundary>
                 <Select
                     placeholder="None"
                     options={[
@@ -44,7 +45,7 @@ export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => 
                     isSelected={v => v === settings.transparencyOption}
                     serialize={s => s}
                 />
-            </div>
-        </ErrorBoundary>
+            </SimpleErrorBoundary>
+        </div>
     );
 };

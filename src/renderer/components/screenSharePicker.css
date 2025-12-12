@@ -81,13 +81,13 @@
 /* Option Radios */
 
 .vcd-screen-picker-option-radios {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     width: 100%;
     border-radius: 3px;
 }
 
 .vcd-screen-picker-option-radio {
-    flex: 1 1 auto;
     text-align: center;
     background-color: var(--background-secondary);
     border: 1px solid var(--primary-800);
@@ -151,11 +151,4 @@
     >section {
         flex: 1;
     }
-}
-
-.vcd-screen-picker-hint-description {
-    color: var(--header-secondary);
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 400;
 }
