@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText, Button, Heading, Paragraph, TextButton } from "@vencord/types/components";
 import {
     Margins,
     ModalCloseButton,
@@ -14,7 +15,7 @@ import {
     openModal,
     useForceUpdater
 } from "@vencord/types/utils";
-import { Button, Forms, Text, Toasts } from "@vencord/types/webpack/common";
+import { Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "shared/settings";
 
 import { cl, SettingsComponent } from "./Settings";
@@ -27,20 +28,20 @@ function openDeveloperOptionsModal(settings: Settings) {
     openModal(props => (
         <ModalRoot {...props} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>
+                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
                     Vesktop Developer Options
-                </Text>
+                </BaseText>
                 <ModalCloseButton onClick={props.onClose} />
             </ModalHeader>
 
             <ModalContent>
                 <div style={{ padding: "1em 0" }}>
-                    <Forms.FormTitle tag="h5">Vencord Location</Forms.FormTitle>
+                    <Heading tag="h5">Vencord Location</Heading>
                     <VencordLocationPicker settings={settings} />
 
-                    <Forms.FormTitle tag="h5" className={Margins.top16}>
+                    <Heading tag="h5" className={Margins.top16}>
                         Debugging
-                    </Forms.FormTitle>
+                    </Heading>
                     <div className={cl("button-grid")}>
                         <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
                         <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
@@ -59,25 +60,24 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
 
     return (
         <>
-            <Forms.FormText>
+            <Paragraph>
                 Vencord files are loaded from{" "}
                 {vencordDir ? (
-                    <a
-                        href="about:blank"
+                    <TextButton
+                        variant="link"
                         onClick={e => {
                             e.preventDefault();
                             VesktopNative.fileManager.showItemInFolder(vencordDir!);
                         }}
                     >
                         {vencordDir}
-                    </a>
+                    </TextButton>
                 ) : (
                     "the default location"
                 )}
-            </Forms.FormText>
+            </Paragraph>
             <div className={cl("button-grid")}>
                 <Button
-                    size={Button.Sizes.SMALL}
                     onClick={async () => {
                         const choice = await VesktopNative.fileManager.selectVencordDir();
                         switch (choice) {
@@ -105,8 +105,7 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                     Change
                 </Button>
                 <Button
-                    size={Button.Sizes.SMALL}
-                    color={Button.Colors.RED}
+                    variant="dangerPrimary"
                     onClick={async () => {
                         await VesktopNative.fileManager.selectVencordDir(null);
                         forceUpdate();

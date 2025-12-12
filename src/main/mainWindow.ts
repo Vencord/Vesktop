@@ -312,7 +312,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
         Settings.store;
 
-    const { frameless, transparent, macosTranslucency } = VencordSettings.store;
+    const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
     const backgroundColor =
@@ -358,9 +358,9 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         options.titleBarStyle = "hidden";
         options.trafficLightPosition = { x: 10, y: 10 };
 
-        if (macosTranslucency) {
-            options.vibrancy = "sidebar";
-            options.backgroundColor = "#ffffff00";
+        if (macosVibrancyStyle) {
+            options.vibrancy = macosVibrancyStyle;
+            options.backgroundColor = "#00000000";
         }
     }
 
