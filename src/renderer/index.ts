@@ -24,7 +24,7 @@ VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
 // TODO
-const customSettingsSections = (Vencord.Plugins.plugins.Settings as any as typeof SettingsPlugin).customSections;
+const customSettingsSections = (Vencord.Plugins.plugins.Settings as typeof SettingsPlugin).customSections;
 
 customSettingsSections.push(() => ({
     section: "Vesktop",
