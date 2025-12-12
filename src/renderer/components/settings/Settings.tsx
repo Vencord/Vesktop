@@ -124,7 +124,15 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
-    Notifications: [NotificationBadgeToggle],
+    Notifications: [
+        NotificationBadgeToggle,
+        {
+            key: "enableTaskbarFlashing",
+            title: "Enable Taskbar Flashing",
+            description: "Flashes the app in your taskbar when you have new notifications.",
+            defaultValue: false
+        }
+    ],
     Miscellaneous: [
         {
             key: "arRPC",
