@@ -17,7 +17,8 @@ let SelfPresenceStore: GenericStore;
 let lastCount = 0;
 
 export function setBadge() {
-    const { appBadge: enableAppBadge, enableTaskbarFlashing } = Settings.store;
+    const { appBadge, enableTaskbarFlashing } = Settings.store;
+    const enableAppBadge = appBadge !== false;
     if (!enableAppBadge && !enableTaskbarFlashing) return;
 
     try {
