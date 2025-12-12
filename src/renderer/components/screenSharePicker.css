@@ -152,10 +152,3 @@
         flex: 1;
     }
 }
-
-.vcd-screen-picker-hint-description {
-    color: var(--header-secondary);
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 400;
-}
