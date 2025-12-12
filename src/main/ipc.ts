@@ -144,7 +144,6 @@ handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
 
 handle(IpcEvents.FLASH_FRAME, (_, flag: boolean) => {
     if (!mainWin || mainWin.isDestroyed() || (flag && mainWin.isFocused())) return;
-    console.log("FLASH_FRAME", flag);
     mainWin.flashFrame(flag);
 });
 
