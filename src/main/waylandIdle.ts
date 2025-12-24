@@ -26,11 +26,11 @@ function initWaylandIdleWatcher(): () => boolean {
     if (!isWayland || VencordSettings.store.plugins?.CustomIdle?.idleTimeout === 0) return () => false;
 
     try {
-        const waylandProtocols = require(
-            join(STATIC_DIR, `dist/wayland-protocols-${process.arch}.node`)
-        ) as typeof import("wayland-protocols");
+        const libVesktop = require(
+            join(STATIC_DIR, `dist/libvesktop-${process.arch}.node`)
+        ) as typeof import("libvesktop");
 
-        const idleNotifier = new waylandProtocols.IdleNotifier({
+        const idleNotifier = new libVesktop.IdleNotifier({
             timeoutMs: (VencordSettings.store.plugins?.CustomIdle?.idleTimeout ?? 10) * Millis.MINUTE
         });
 
