@@ -61,30 +61,6 @@ body {
     justify-content: end;
 }
 
-button {
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    font-size: 1.2em;
-    color: var(--fg);
-    border: none;
-    border-radius: 3px;
-    font-weight: bold;
-    transition: filter 0.2 ease-in-out;
-}
-
-button:hover,
-button:active {
-    filter: brightness(0.9);
-}
-
-.green {
-    background-color: #248046;
-}
-
-.grey {
-    background-color: rgba(151, 151, 159, 0.12);
-}
-
 .hidden {
     display: none;
 }
@@ -118,7 +94,7 @@ progress {
 }
 
 #error {
-    color: red;
+    color: var(--red);
     font-weight: bold;
 }
 

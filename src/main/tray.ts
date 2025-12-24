@@ -8,10 +8,10 @@ import { app, BrowserWindow, Menu, Tray } from "electron";
 
 import { createAboutWindow } from "./about";
 import { AppEvents } from "./events";
+import { createRecoveryModeWindow } from "./recoveryMode";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
 import { clearData } from "./utils/clearData";
-import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
 let trayVariant: "tray" | "trayUnread" = "tray";
@@ -53,12 +53,8 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
             click: createAboutWindow
         },
         {
-            label: "Repair Vencord",
-            async click() {
-                await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
-            }
+            label: "Recovery Mode",
+            click: createRecoveryModeWindow
         },
         {
             label: "Reset Vesktop",

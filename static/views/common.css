@@ -7,6 +7,9 @@
     --fg-semi-trans: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.2));
     --link: light-dark(#006ce7, #00a8fc);
     --link-hover: light-dark(#005bb5, #0086c3);
+
+    --green: oklab(0.525938 -0.120357 0.0608586);
+    --red: #d22d39;
 }
 
 html,
@@ -29,4 +32,32 @@ a {
 
 a:hover {
     color: var(--link-hover);
+}
+
+.button {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 1.2em;
+    color: var(--fg);
+    border: none;
+    border-radius: 3px;
+    font-weight: bold;
+    transition: filter 0.2 ease-in-out;
+
+    &:hover,
+    &:active {
+        filter: brightness(0.9);
+    }
+
+    &.green {
+        background-color: var(--green);
+    }
+
+    &.grey {
+        background-color: #97979f1f;
+    }
+
+    &.red {
+        background-color: var(--red);
+    }
 }
