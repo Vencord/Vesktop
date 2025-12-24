@@ -42,6 +42,10 @@ const options = {
         type: "string",
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
+    },
+    "recovery-mode": {
+        type: "boolean",
+        description: "Open Recovery Mode to help fix issues with Vesktop"
     }
 } satisfies Record<string, Option>;
 
@@ -77,10 +81,16 @@ export const CommandLine = parseArgs({
 });
 
 export function checkCommandLineForHelpOrVersion() {
-    const { help, version } = CommandLine.values;
+    const { help, version, "recovery-mode": recoveryMode } = CommandLine.values;
 
     if (version) {
         console.log(`Vesktop v${app.getVersion()}`);
+        app.exit(0);
+    }
+
+    if (recoveryMode) {
+        // TODO
+        console.log("Starting Vesktop in Recovery Mode...");
         app.exit(0);
     }
 
