@@ -59,7 +59,7 @@ MediaStreamTrack.prototype.applyConstraints = function (constraints) {
                 fixVideoTrackConstraints(constraints);
             }
         } catch (e) {
-            logger.error("Failed to fix applyConstraints", e);
+            logger.error("Failed to fix constraints", e);
         }
     }
     return originalApplyConstraints.call(this, constraints);
