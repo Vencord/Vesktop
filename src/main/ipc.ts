@@ -18,17 +18,15 @@ import {
     session,
     shell
 } from "electron";
-import { mkdirSync, readFileSync, watch } from "fs";
-import { open, readFile } from "fs/promises";
+import { readFileSync, watch } from "fs";
+import { readFile } from "fs/promises";
 import { enableHardwareAcceleration } from "main";
 import { release } from "os";
 import { join } from "path";
-import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
-import { VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
@@ -37,13 +35,29 @@ import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
-handleSync(IpcEvents.GET_VENCORD_PRELOAD_FILE, () => join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"));
+handleSync(IpcEvents.DEPRECATED_GET_VENCORD_PRELOAD_SCRIPT_PATH, () =>
+    join(VENCORD_FILES_DIR, "vencordDesktopPreload.js")
+);
+handleSync(IpcEvents.GET_VENCORD_PRELOAD_SCRIPT, () =>
+    readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"), "utf-8")
+);
 handleSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT, () =>
     readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopRenderer.js"), "utf-8")
 );
 
-handleSync(IpcEvents.GET_RENDERER_SCRIPT, () => readFileSync(join(__dirname, "renderer.js"), "utf-8"));
-handleSync(IpcEvents.GET_RENDERER_CSS_FILE, () => join(__dirname, "renderer.css"));
+const VESKTOP_RENDERER_JS_PATH = join(__dirname, "renderer.js");
+const VESKTOP_RENDERER_CSS_PATH = join(__dirname, "renderer.css");
+handleSync(IpcEvents.GET_VESKTOP_RENDERER_SCRIPT, () => readFileSync(VESKTOP_RENDERER_JS_PATH, "utf-8"));
+handle(IpcEvents.GET_VESKTOP_RENDERER_CSS, () => readFile(VESKTOP_RENDERER_CSS_PATH, "utf-8"));
+
+if (IS_DEV) {
+    watch(VESKTOP_RENDERER_CSS_PATH, { persistent: false }, async () => {
+        mainWin?.webContents.postMessage(
+            IpcEvents.VESKTOP_RENDERER_CSS_UPDATE,
+            await readFile(VESKTOP_RENDERER_CSS_PATH, "utf-8")
+        );
+    });
+}
 
 handleSync(IpcEvents.GET_SETTINGS, () => Settings.plain);
 handleSync(IpcEvents.GET_VERSION, () => app.getVersion());
@@ -164,27 +178,3 @@ function openDebugPage(page: string) {
 
 handle(IpcEvents.DEBUG_LAUNCH_GPU, () => openDebugPage("chrome://gpu"));
 handle(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS, () => openDebugPage("chrome://webrtc-internals"));
-
-function readCss() {
-    return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
-}
-
-open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
-    fd.close();
-    watch(
-        VENCORD_QUICKCSS_FILE,
-        { persistent: false },
-        debounce(async () => {
-            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
-        }, 50)
-    );
-});
-
-mkdirSync(VENCORD_THEMES_DIR, { recursive: true });
-watch(
-    VENCORD_THEMES_DIR,
-    { persistent: false },
-    debounce(() => {
-        mainWin?.webContents.postMessage("VencordThemeUpdate", void 0);
-    })
-);
