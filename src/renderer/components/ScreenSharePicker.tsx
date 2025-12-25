@@ -35,6 +35,7 @@ import { FluxDispatcher, Select, UserStore, useState } from "@vencord/types/webp
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { MediaEngineStore } from "renderer/common";
+import { patchOverrideDevices } from "renderer/patches/screenShareFixes";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
@@ -61,6 +62,8 @@ interface AudioItem {
 
 interface StreamSettings {
     audio: boolean;
+    overrideAudioDevice?: string;
+    overrideVideoDevice?: string;
     contentHint?: string;
     includeSources?: AudioSources;
     excludeSources?: AudioSources;
@@ -155,6 +158,11 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                                 await VesktopNative.virtmic.start(v.includeSources);
                             }
                         }
+
+                        patchOverrideDevices({
+                            audio: v.overrideAudioDevice,
+                            video: v.overrideVideoDevice
+                        });
 
                         resolve(v);
                     }}
@@ -363,6 +371,16 @@ function StreamSettingsUi({
         }
     );
 
+    const [audioDevices, , audioDevicesPending] = useAwaiter(
+        () => navigator.mediaDevices.enumerateDevices().then(g => g.filter(d => d.kind === "audioinput")),
+        { fallbackValue: [] }
+    );
+
+    const [videoDevices, , videoDevicesPending] = useAwaiter(
+        () => navigator.mediaDevices.enumerateDevices().then(g => g.filter(d => d.kind === "videoinput")),
+        { fallbackValue: [] }
+    );
+
     const openSettings = () => {
         openModal(props => (
             <AudioSettingsModal
@@ -424,6 +442,47 @@ function StreamSettingsUi({
                                 a much sharper and clearer image.
                             </Paragraph>
                         </div>
+
+                        <div>
+                            <Forms.FormTitle>
+                                {audioDevicesPending ? "Loading audio devices..." : "Audio devices"}
+                            </Forms.FormTitle>
+                            <Select
+                                options={audioDevices.map(({ label, deviceId }) => ({
+                                    label,
+                                    value: deviceId
+                                }))}
+                                isSelected={d => settings.overrideAudioDevice === d}
+                                select={d => {
+                                    setSettings(v => ({ ...v, overrideAudioDevice: d }));
+                                }}
+                                serialize={String}
+                                popoutPosition="top"
+                                closeOnSelect={true}
+                                isDisabled={audioDevicesPending}
+                            />
+                        </div>
+
+                        <div>
+                            <Forms.FormTitle>
+                                {videoDevicesPending ? "Loading video devices..." : "Video devices"}
+                            </Forms.FormTitle>
+                            <Select
+                                options={videoDevices.map(({ label, deviceId }) => ({
+                                    label,
+                                    value: deviceId
+                                }))}
+                                isSelected={d => settings.overrideVideoDevice === d}
+                                select={d => {
+                                    setSettings(v => ({ ...v, overrideVideoDevice: d }));
+                                }}
+                                serialize={String}
+                                popoutPosition="top"
+                                closeOnSelect={true}
+                                isDisabled={videoDevicesPending}
+                            />
+                        </div>
+
                         {isWindows && (
                             <FormSwitch
                                 title="Stream With Audio"
