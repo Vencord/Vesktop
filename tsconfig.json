@@ -10,7 +10,7 @@
         "target": "ESNEXT",
         "jsx": "preserve",
 
-        // we have duplicate electron types but it's w/e
+        // @vencord/types has some errors for now
         "skipLibCheck": true,
 
         "baseUrl": "./src/",

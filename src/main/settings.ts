@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { type Settings as TVencordSettings } from "@vencord/types/Vencord";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import type { Settings as TSettings, State as TState } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
@@ -27,26 +28,17 @@ function loadSettings<T extends object = any>(file: string, name: string) {
 
     const store = new SettingsStore(settings);
     store.addGlobalChangeListener(o => {
-        mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, JSON.stringify(o, null, 4));
+        try {
+            mkdirSync(dirname(file), { recursive: true });
+            writeFileSync(file, JSON.stringify(o, null, 4));
+        } catch (err) {
+            console.error(`Failed to save settings to ${name}.json:`, err);
+        }
     });
 
     return store;
 }
 
 export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
-
-export const VencordSettings = loadSettings<any>(VENCORD_SETTINGS_FILE, "Vencord settings");
-
-if (Object.hasOwn(Settings.plain, "firstLaunch") && !existsSync(STATE_FILE)) {
-    console.warn("legacy state in settings.json detected. migrating to state.json");
-    const state = {} as TState;
-    for (const prop of ["firstLaunch", "maximized", "minimized", "steamOSLayoutVersion", "windowBounds"] as const) {
-        state[prop] = Settings.plain[prop];
-        delete Settings.plain[prop];
-    }
-    Settings.markAsChanged();
-    writeFileSync(STATE_FILE, JSON.stringify(state, null, 4));
-}
-
+export const VencordSettings = loadSettings<TVencordSettings>(VENCORD_SETTINGS_FILE, "Vencord settings");
 export const State = loadSettings<TState>(STATE_FILE, "Vesktop state");

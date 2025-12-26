@@ -11,14 +11,13 @@ addPatch({
         {
             find: "lastOutputSystemDevice.justChanged",
             replacement: {
-                // eslint-disable-next-line no-useless-escape
                 match: /(\i)\.\i\.getState\(\).neverShowModal/,
-                replace: "$& || $self.shouldIgnore($1)"
+                replace: "$& || $self.shouldIgnoreDevice($1)"
             }
         }
     ],
 
-    shouldIgnore(state: any) {
+    shouldIgnoreDevice(state: any) {
         return Object.keys(state?.default?.lastDeviceConnected ?? {})?.[0] === "vencord-screen-share";
     }
 });

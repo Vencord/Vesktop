@@ -1,0 +1,14 @@
+{
+    "name": "libvesktop",
+    "main": "build/Release/vesktop.node",
+    "types": "index.d.ts",
+    "devDependencies": {
+        "node-addon-api": "^8.5.0",
+        "node-gyp": "^11.4.2"
+    },
+    "scripts": {
+        "build": "node-gyp configure build",
+        "clean": "node-gyp clean",
+        "test": "npm run build && node test.js"
+    }
+}

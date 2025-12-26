@@ -8,6 +8,7 @@ import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
 import vencordDep from "./vencordDep.mjs";
+import { includeDirPlugin } from "./includeDirPlugin.mts";
 
 const isDev = process.argv.includes("--dev");
 
@@ -24,6 +25,9 @@ const NodeCommonOpts: BuildOptions = {
     platform: "node",
     external: ["electron"],
     target: ["esnext"],
+    loader: {
+        ".node": "file"
+    },
     define: {
         IS_DEV: JSON.stringify(isDev)
     }
@@ -49,19 +53,58 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyLibVesktop() {
+    if (process.platform !== "linux") return;
+
+    try {
+        await copyFile(
+            "./packages/libvesktop/build/Release/vesktop.node",
+            `./static/dist/libvesktop-${process.arch}.node`
+        );
+        console.log("Using local libvesktop build");
+    } catch {
+        console.log(
+            "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
+        );
+        return Promise.all([
+            copyFile("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
+            copyFile("./packages/libvesktop/prebuilds/vesktop-arm64.node", "./static/dist/libvesktop-arm64.node")
+        ]).catch(() => console.warn("Failed to copy libvesktop. Building without libvesktop support"));
+    }
+}
+
 await Promise.all([
     copyVenmic(),
+    copyLibVesktop(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/js/main.js",
-        footer: { js: "//# sourceURL=VCDMain" }
+        footer: { js: "//# sourceURL=VesktopMain" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/main/arrpc/worker.ts"],
+        outfile: "dist/js/arRpcWorker.js",
+        footer: { js: "//# sourceURL=VesktopArRpcWorker" }
     }),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
         outfile: "dist/js/preload.js",
-        footer: { js: "//# sourceURL=VCDPreload" }
+        footer: { js: "//# sourceURL=VesktopPreload" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/preload/splash.ts"],
+        outfile: "dist/js/splashPreload.js",
+        footer: { js: "//# sourceURL=VesktopSplashPreload" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
+        entryPoints: ["src/preload/updater.ts"],
+        outfile: "dist/js/updaterPreload.js",
+        footer: { js: "//# sourceURL=VesktopUpdaterPreload" }
     }),
     createContext({
         ...CommonOpts,
@@ -73,8 +116,8 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
-        plugins: [vencordDep],
-        footer: { js: "//# sourceURL=VCDRenderer" }
+        plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
+        footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);
 

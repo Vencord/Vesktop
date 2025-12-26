@@ -59,8 +59,8 @@ function resolveColor(color: string) {
 const updateSplashColors = () => {
     const bodyStyles = document.body.computedStyleMap();
 
-    const color = bodyStyles.get("--text-normal");
-    const backgroundColor = bodyStyles.get("--background-primary");
+    const color = bodyStyles.get("--text-default");
+    const backgroundColor = bodyStyles.get("--background-base-lowest");
 
     if (isValidColor(color)) {
         Settings.store.splashColor = resolveColor(color[0]);

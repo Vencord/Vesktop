@@ -9,13 +9,13 @@ import { BrowserWindow } from "electron/main";
 import { copyFileSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { autoStart } from "./autoStart";
 import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { loadView } from "./vesktopStatic";
 
 interface Data {
     discordBranch: "stable" | "canary" | "ptb";
@@ -31,21 +31,19 @@ export function createFirstLaunchTour() {
         transparent: false,
         frame: true,
         autoHideMenuBar: true,
-        height: 470,
-        width: 550,
-        icon: ICON_PATH
+        height: 550,
+        width: 600
     });
 
     makeLinksOpenExternally(win);
 
-    win.loadFile(join(VIEW_DIR, "first-launch.html"));
+    loadView(win, "first-launch.html");
     win.webContents.addListener("console-message", (_e, _l, msg) => {
         if (msg === "cancel") return app.exit();
 
         if (!msg.startsWith("form:")) return;
         const data = JSON.parse(msg.slice(5)) as Data;
 
-        console.log(data);
         State.store.firstLaunch = false;
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.minimizeToTray = !!data.minimizeToTray;
@@ -64,7 +62,11 @@ export function createFirstLaunchTour() {
                     copyFileSync(join(from, file), join(to, file));
                 }
             } catch (e) {
-                console.error("Failed to import settings:", e);
+                if (e instanceof Error && "code" in e && e.code === "ENOENT") {
+                    console.log("No Vencord settings found to import.");
+                } else {
+                    console.error("Failed to import Vencord settings:", e);
+                }
             }
         }
 

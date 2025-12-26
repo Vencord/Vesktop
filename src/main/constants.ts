@@ -5,8 +5,10 @@
  */
 
 import { app } from "electron";
-import { existsSync, mkdirSync, readdirSync, renameSync, rmdirSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
+
+import { CommandLine } from "./cli";
 
 const vesktopDir = dirname(process.execPath);
 
@@ -15,41 +17,19 @@ export const PORTABLE =
     !process.execPath.toLowerCase().endsWith("electron.exe") &&
     !existsSync(join(vesktopDir, "Uninstall Vesktop.exe"));
 
-const LEGACY_DATA_DIR = join(app.getPath("appData"), "VencordDesktop", "VencordDesktop");
 export const DATA_DIR =
     process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
 
 mkdirSync(DATA_DIR, { recursive: true });
 
-// TODO: remove eventually
-if (existsSync(LEGACY_DATA_DIR)) {
-    try {
-        console.warn("Detected legacy settings dir", LEGACY_DATA_DIR + ".", "migrating to", DATA_DIR);
-        for (const file of readdirSync(LEGACY_DATA_DIR)) {
-            renameSync(join(LEGACY_DATA_DIR, file), join(DATA_DIR, file));
-        }
-        rmdirSync(LEGACY_DATA_DIR);
-        renameSync(
-            join(app.getPath("appData"), "VencordDesktop", "IndexedDB"),
-            join(DATA_DIR, "sessionData", "IndexedDB")
-        );
-    } catch (e) {
-        console.error("Migration failed", e);
-    }
-}
-const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
+export const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
 app.setPath("sessionData", SESSION_DATA_DIR);
 
 export const VENCORD_SETTINGS_DIR = join(DATA_DIR, "settings");
+mkdirSync(VENCORD_SETTINGS_DIR, { recursive: true });
 export const VENCORD_QUICKCSS_FILE = join(VENCORD_SETTINGS_DIR, "quickCss.css");
 export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json");
 export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
-
-// needs to be inline require because of circular dependency
-// as otherwise "DATA_DIR" (which is used by ./settings) will be uninitialised
-export const VENCORD_FILES_DIR =
-    (require("./settings") as typeof import("./settings")).State.store.vencordDir ||
-    join(SESSION_DATA_DIR, "vencordFiles");
 
 export const USER_AGENT = `Vesktop/${app.getVersion()} (https://github.com/Vencord/Vesktop)`;
 
@@ -68,12 +48,17 @@ const BrowserUserAgents = {
     windows: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) ${VersionString}`
 };
 
-export const BrowserUserAgent = BrowserUserAgents[process.platform] || BrowserUserAgents.windows;
+export const BrowserUserAgent =
+    CommandLine.values["user-agent"] ||
+    BrowserUserAgents[CommandLine.values["user-agent-os"] || process.platform] ||
+    BrowserUserAgents.windows;
 
 export const enum MessageBoxChoice {
     Default,
     Cancel
 }
+
+export const IS_FLATPAK = process.env.FLATPAK_ID !== undefined;
 
 export const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
