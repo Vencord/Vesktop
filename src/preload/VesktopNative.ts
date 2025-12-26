@@ -102,6 +102,12 @@ export const VesktopNative = {
         onToggleSelfMute: (listener: (...args: any[]) => void) => {
             ipcRenderer.on(IpcEvents.TOGGLE_SELF_MUTE, listener);
         },
+        onSelfMute: (listener: (...args: any[]) => void) => {
+            ipcRenderer.on(IpcEvents.SELF_MUTE, listener);
+        },
+        onSelfUnmute: (listener: (...args: any[]) => void) => {
+            ipcRenderer.on(IpcEvents.SELF_UNMUTE, listener);
+        },
         onToggleSelfDeaf: (listener: (...args: any[]) => void) => {
             ipcRenderer.on(IpcEvents.TOGGLE_SELF_DEAF, listener);
         }

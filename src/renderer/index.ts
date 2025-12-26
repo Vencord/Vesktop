@@ -49,4 +49,6 @@ if (!Vencord.Api.Styles.vencordRootNode) {
 const VoiceActions = findByPropsLazy("toggleSelfMute");
 
 VesktopNative.voice.onToggleSelfMute(() => VoiceActions.toggleSelfMute());
+VesktopNative.voice.onSelfMute(() => VoiceActions.setSelfMute("default", true));
+VesktopNative.voice.onSelfUnmute(() => VoiceActions.setSelfMute("default", false));
 VesktopNative.voice.onToggleSelfDeaf(() => VoiceActions.toggleSelfDeaf());
