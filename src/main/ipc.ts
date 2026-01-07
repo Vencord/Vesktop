@@ -19,7 +19,7 @@ import {
     shell
 } from "electron";
 import { readFileSync, watch } from "fs";
-import { readFile } from "fs/promises";
+import { readFile, stat } from "fs/promises";
 import { enableHardwareAcceleration } from "main";
 import { release } from "os";
 import { join } from "path";
@@ -91,8 +91,15 @@ handle(IpcEvents.RELAUNCH, async () => {
     app.exit();
 });
 
-handle(IpcEvents.SHOW_ITEM_IN_FOLDER, (_, path) => {
-    shell.showItemInFolder(path);
+handleSync(IpcEvents.IS_USING_CUSTOM_VENCORD_DIR, () => !!State.store.vencordDir);
+handle(IpcEvents.SHOW_CUSTOM_VENCORD_DIR, async () => {
+    const { vencordDir } = State.store;
+    if (!vencordDir) return;
+
+    const stats = await stat(vencordDir);
+    if (!stats.isDirectory()) return;
+
+    shell.openPath(vencordDir);
 });
 
 function getWindow(e: IpcMainInvokeEvent, key?: string) {
@@ -132,8 +139,6 @@ handle(IpcEvents.SPELLCHECK_REPLACE_MISSPELLING, (e, word: string) => {
 handle(IpcEvents.SPELLCHECK_ADD_TO_DICTIONARY, (e, word: string) => {
     e.sender.session.addWordToSpellCheckerDictionary(word);
 });
-
-handleSync(IpcEvents.GET_VENCORD_DIR, e => (e.returnValue = State.store.vencordDir));
 
 handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
     if (value === null) {
