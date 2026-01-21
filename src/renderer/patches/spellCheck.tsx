@@ -10,6 +10,7 @@ import { FluxDispatcher, Menu, useMemo, useStateFromStores } from "@vencord/type
 import { useSettings } from "renderer/settings";
 
 import { addPatch } from "./shared";
+import "./spellCheck.css";
 
 let word: string;
 let corrections: string[];

@@ -1,0 +1,3 @@
+[class*="submenu"]:has([id*="vcd-spellcheck-lang-"]) [class*="scroller"] {
+    max-height: 50vh !important;
+}
