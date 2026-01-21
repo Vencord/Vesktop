@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./spellCheck.css";
+
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
 import { findStoreLazy } from "@vencord/types/webpack";
 import { FluxDispatcher, Menu, useMemo, useStateFromStores } from "@vencord/types/webpack/common";
 import { useSettings } from "renderer/settings";
 
 import { addPatch } from "./shared";
-import "./spellCheck.css";
 
 let word: string;
 let corrections: string[];
