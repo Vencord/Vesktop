@@ -34,7 +34,6 @@ customSettingsSections.push(() => ({
 }));
 
 // TODO: remove this legacy workaround once some time has passed
-// @ts-expect-error
 if (!Vencord.Api.Styles.vencordRootNode) {
     const style = document.createElement("style");
     style.id = "vesktop-css-core";
