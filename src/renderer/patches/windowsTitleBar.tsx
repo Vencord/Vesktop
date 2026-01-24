@@ -12,7 +12,7 @@ if (Settings.store.customTitleBar)
     addPatch({
         patches: [
             {
-                find: ".wordmarkWindows",
+                find: ".USE_OSX_NATIVE_TRAFFIC_LIGHTS",
                 replacement: [
                     {
                         match: /case \i\.\i\.WINDOWS:/,
@@ -22,7 +22,7 @@ if (Settings.store.customTitleBar)
             },
             // Visual Refresh
             {
-                find: ".systemBar,",
+                find: '"refresh-title-bar-small"',
                 replacement: [
                     {
                         match: /\i===\i\.PlatformTypes\.WINDOWS/g,

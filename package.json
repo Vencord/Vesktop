@@ -38,7 +38,7 @@
         "@stylistic/eslint-plugin": "^5.6.1",
         "@types/node": "^25.0.3",
         "@types/react": "19.2.1",
-        "@vencord/types": "^1.13.7",
+        "@vencord/types": "^1.14.1",
         "dotenv": "^17.2.3",
         "electron": "^39.2.7",
         "electron-builder": "^26.0.12",

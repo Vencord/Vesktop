@@ -31,10 +31,9 @@ import {
     useForceUpdater
 } from "@vencord/types/utils";
 import { onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, Select, UserStore, useState } from "@vencord/types/webpack/common";
+import { FluxDispatcher, MediaEngineStore, Select, UserStore, useState } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
-import { MediaEngineStore } from "renderer/common";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";

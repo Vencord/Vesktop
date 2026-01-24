@@ -36,8 +36,8 @@ importers:
         specifier: 19.2.1
         version: 19.2.1
       '@vencord/types':
-        specifier: ^1.13.7
-        version: 1.13.7(@types/react-dom@18.3.1)(@types/react@19.2.1)
+        specifier: ^1.14.1
+        version: 1.14.1(@types/react-dom@18.3.1)(@types/react@19.2.1)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -461,6 +461,9 @@ packages:
   '@types/node@22.19.3':
     resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
 
+  '@types/node@22.19.7':
+    resolution: {integrity: sha512-MciR4AKGHWl7xwxkBa6xUGxQJ4VBOmPTF7sL+iGzuahOFaO0jHCsuEfS80pan1ef4gWId1oWOweIhrDEYLuaOw==}
+
   '@types/node@25.0.3':
     resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
 
@@ -550,8 +553,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.0.10
 
-  '@vencord/types@1.13.7':
-    resolution: {integrity: sha512-MThrBwMEJ0CvKMrVgJC4cvJuDwwFXEhgSOJnmDZxmJeKOByVWLo7xxjn1suHkE1/euw9J5lGTfz1QTiYVXbLqA==}
+  '@vencord/types@1.14.1':
+    resolution: {integrity: sha512-P4eYl3IJKXLjAWH2Ejs2/z8eOS0LsuTNFqL9OHXQRXtOWoAEYNG6z9MXH25Thr/dIUH839IZCW872XjOSVIauQ==}
     peerDependencies:
       '@types/react': 18.3.1
       '@types/react-dom': 18.3.1
@@ -2157,8 +2160,8 @@ packages:
     resolution: {integrity: sha512-E2wEyrgX/CqvicaQYU3Ze1PFGjc4QYPGsjUrlYkqAE0WjHEZwgOsGMPMzkMse4LjJbDmaEuDX3CM036j5K2DSQ==}
     engines: {node: '>=10'}
 
-  node-abi@3.85.0:
-    resolution: {integrity: sha512-zsFhmbkAzwhTft6nd3VxcG0cvJsT70rL+BIGHWVq5fi6MwGrHwzqKaxXE+Hl2GmnGItnDKPPkO5/LQqjVkIdFg==}
+  node-abi@3.87.0:
+    resolution: {integrity: sha512-+CGM1L1CgmtheLcBuleyYOn7NWPVu0s0EJH2C4puxgEZb9h8QpR9G2dBfZJOAUhi7VQxuBPMd0hiISWcTyiYyQ==}
     engines: {node: '>=10'}
 
   node-addon-api@1.7.2:
@@ -2512,8 +2515,9 @@ packages:
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
 
-  sax@1.4.3:
-    resolution: {integrity: sha512-yqYn1JhPczigF94DMS+shiDMjDowYO6y9+wB/4WgO0Y19jWYk0lQ4tuG5KI7kj4FTp1wxPj5IFfcrz/s1c3jjQ==}
+  sax@1.4.4:
+    resolution: {integrity: sha512-1n3r/tGXO6b6VXMdFT54SHzT9ytu9yr7TaELowdYpMqY/Ao7EnlQGmAQ1+RatX7Tkkdm6hONI2owqNx2aZj5Sw==}
+    engines: {node: '>=11.0.0'}
 
   semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
@@ -2911,6 +2915,10 @@ packages:
     resolution: {integrity: sha512-rEvr90Bck4WZt9HHFC4DJMsjvu7x+r6bImz0/BrbWb7A2djJ8hnZMrWnHo9F8ssv0OMErasDhftrfROTyqSDrw==}
     engines: {node: '>= 0.4'}
 
+  which-typed-array@1.1.20:
+    resolution: {integrity: sha512-LYfpUkmqwl0h9A2HL09Mms427Q1RZWuOHsukfVcKRq9q95iQxdw0ix1JQrqbcDR9PH1QDwf5Qo8OZb5lksZ8Xg==}
+    engines: {node: '>= 0.4'}
+
   which@1.3.1:
     resolution: {integrity: sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ==}
     hasBin: true
@@ -3066,7 +3074,7 @@ snapshots:
       detect-libc: 2.1.2
       fs-extra: 10.1.0
       got: 11.8.6
-      node-abi: 3.85.0
+      node-abi: 3.87.0
       node-api-version: 0.2.1
       node-gyp: 9.4.1
       ora: 5.4.1
@@ -3347,6 +3355,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@22.19.7':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/node@25.0.3':
     dependencies:
       undici-types: 7.16.0
@@ -3476,10 +3488,10 @@ snapshots:
       moment: 2.30.1
       type-fest: 4.41.0
 
-  '@vencord/types@1.13.7(@types/react-dom@18.3.1)(@types/react@19.2.1)':
+  '@vencord/types@1.14.1(@types/react-dom@18.3.1)(@types/react@19.2.1)':
     dependencies:
       '@types/lodash': 4.17.15
-      '@types/node': 22.19.3
+      '@types/node': 22.19.7
       '@types/react': 19.2.1
       '@types/react-dom': 18.3.1
       '@vencord/discord-types': 1.0.0(@types/react@19.2.1)
@@ -3838,7 +3850,7 @@ snapshots:
   builder-util-runtime@9.2.10:
     dependencies:
       debug: 4.4.3
-      sax: 1.4.3
+      sax: 1.4.4
     transitivePeerDependencies:
       - supports-color
 
@@ -4432,7 +4444,7 @@ snapshots:
       typed-array-byte-offset: 1.0.4
       typed-array-length: 1.0.7
       unbox-primitive: 1.1.0
-      which-typed-array: 1.1.19
+      which-typed-array: 1.1.20
 
   es-define-property@1.0.1: {}
 
@@ -5575,7 +5587,7 @@ snapshots:
     dependencies:
       semver: 7.7.2
 
-  node-abi@3.85.0:
+  node-abi@3.87.0:
     dependencies:
       semver: 7.7.3
 
@@ -5966,7 +5978,7 @@ snapshots:
 
   sax@1.4.1: {}
 
-  sax@1.4.3: {}
+  sax@1.4.4: {}
 
   semver-compare@1.0.0:
     optional: true
@@ -6459,6 +6471,16 @@ snapshots:
       is-weakset: 2.0.4
 
   which-typed-array@1.1.19:
+    dependencies:
+      available-typed-arrays: 1.0.7
+      call-bind: 1.0.8
+      call-bound: 1.0.4
+      for-each: 0.3.5
+      get-proto: 1.0.1
+      gopd: 1.2.0
+      has-tostringtag: 1.0.2
+
+  which-typed-array@1.1.20:
     dependencies:
       available-typed-arrays: 1.0.7
       call-bind: 1.0.8
