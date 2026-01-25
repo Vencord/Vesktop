@@ -5,16 +5,13 @@
  */
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
-import { findStoreLazy } from "@vencord/types/webpack";
-import { FluxDispatcher, Menu, useMemo, useStateFromStores } from "@vencord/types/webpack/common";
+import { FluxDispatcher, Menu, SpellCheckStore, useMemo, useStateFromStores } from "@vencord/types/webpack/common";
 import { useSettings } from "renderer/settings";
 
 import { addPatch } from "./shared";
 
 let word: string;
 let corrections: string[];
-
-const SpellCheckStore = findStoreLazy("SpellcheckStore");
 
 // Make spellcheck suggestions work
 addPatch({

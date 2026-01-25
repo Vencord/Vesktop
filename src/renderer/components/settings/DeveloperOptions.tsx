@@ -56,21 +56,21 @@ function openDeveloperOptionsModal(settings: Settings) {
 
 const VencordLocationPicker: SettingsComponent = ({ settings }) => {
     const forceUpdate = useForceUpdater();
-    const vencordDir = VesktopNative.fileManager.getVencordDir();
+    const usingCustomVencordDir = VesktopNative.fileManager.isUsingCustomVencordDir();
 
     return (
         <>
             <Paragraph>
                 Vencord files are loaded from{" "}
-                {vencordDir ? (
+                {usingCustomVencordDir ? (
                     <TextButton
                         variant="link"
                         onClick={e => {
                             e.preventDefault();
-                            VesktopNative.fileManager.showItemInFolder(vencordDir!);
+                            VesktopNative.fileManager.showCustomVencordDir();
                         }}
                     >
-                        {vencordDir}
+                        a custom location
                     </TextButton>
                 ) : (
                     "the default location"

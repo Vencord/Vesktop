@@ -6,15 +6,14 @@
 
 import type arRpcPlugin from "@vencord/types/plugins/arRPC.web";
 import { Logger } from "@vencord/types/utils";
-import { findLazy, findStoreLazy, onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
+import { findLazy, onceReady } from "@vencord/types/webpack";
+import { FluxDispatcher, InviteActions, StreamerModeStore } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { onIpcCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 
 const logger = new Logger("VesktopRPC", "#5865f2");
-const StreamerModeStore = findStoreLazy("StreamerModeStore");
 
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as typeof arRpcPlugin;
 

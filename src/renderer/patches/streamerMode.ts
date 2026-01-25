@@ -9,11 +9,11 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".STREAMER_MODE_ENABLE,",
+            find: ".STREAMING_AUTO_STREAMER_MODE,",
             replacement: {
                 // remove if (platformEmbedded) check from streamer mode toggle
-                match: /if\(\i\.\i\)(?=return.{0,200}?"autoToggle")/g,
-                replace: ""
+                match: /(?<=usePredicate.{0,20}?return )\i\.\i/g,
+                replace: "true"
             }
         }
     ]
