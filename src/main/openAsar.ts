@@ -68,7 +68,7 @@ export function applyOpenAsarPulseLatency(): void {
 
 export function setupOpenAsarWebRequestBlocking(): void {
     if (!isOpenAsarEnabled()) return;
-    const { openAsar } = Settings.store;
+    const openAsar = Settings.store.openAsar ?? {};
 
     const urls: string[] = [];
 
