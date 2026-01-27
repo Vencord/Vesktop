@@ -15,7 +15,6 @@ import { DATA_DIR } from "./constants";
 import { createWindows } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
-import { downloadOpenAsar } from "./utils/openAsarLoader";
 import { loadView } from "./vesktopStatic";
 
 interface Data {
@@ -24,7 +23,6 @@ interface Data {
     autoStart?: "on";
     importSettings?: "on";
     richPresence?: "on";
-    useOpenAsar?: "on";
 }
 
 export function createFirstLaunchTour() {
@@ -52,11 +50,6 @@ export function createFirstLaunchTour() {
         Settings.store.arRPC = !!data.richPresence;
 
         if (data.autoStart) autoStart.enable();
-
-        if (data.useOpenAsar) {
-            Settings.store.useOpenAsar = true;
-            downloadOpenAsar().catch(e => console.error("Failed to download OpenAsar:", e));
-        }
 
         if (data.importSettings) {
             const from = join(app.getPath("userData"), "..", "Vencord", "settings");
