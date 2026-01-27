@@ -11,6 +11,7 @@ export interface Settings {
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
     tray?: boolean;
     minimizeToTray?: boolean;
+    useOpenAsar?: boolean;
     autoStartMinimized?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;

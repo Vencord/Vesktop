@@ -102,6 +102,10 @@ export const VesktopNative = {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
         launchWebrtcInternals: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS)
     },
+    openasar: {
+        exists: () => invoke<boolean>(IpcEvents.OPENASAR_EXISTS),
+        download: () => invoke<void>(IpcEvents.DOWNLOAD_OPENASAR)
+    },
     commands: {
         onCommand(cb: (message: IpcMessage) => void) {
             ipcRenderer.on(IpcEvents.IPC_COMMAND, (_, message) => cb(message));

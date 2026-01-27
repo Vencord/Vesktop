@@ -16,6 +16,7 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+import { OpenAsarToggle } from "./OpenAsarToggle";
 import { OutdatedVesktopWarning } from "./OutdatedVesktopWarning";
 import { UserAssetsButton } from "./UserAssets";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
@@ -38,6 +39,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     "Discord Branch": [DiscordBranchPicker],
     "System Startup & Performance": [
         AutoStartToggle,
+        OpenAsarToggle,
         {
             key: "hardwareAcceleration",
             title: "Hardware Acceleration",
