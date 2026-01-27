@@ -23,6 +23,7 @@ interface Data {
     autoStart?: "on";
     importSettings?: "on";
     richPresence?: "on";
+    openAsar?: "on";
 }
 
 export function createFirstLaunchTour() {
@@ -48,6 +49,7 @@ export function createFirstLaunchTour() {
         Settings.store.discordBranch = data.discordBranch;
         Settings.store.minimizeToTray = !!data.minimizeToTray;
         Settings.store.arRPC = !!data.richPresence;
+        Settings.store.openAsarEnabled = !!data.openAsar;
 
         if (data.autoStart) autoStart.enable();
 

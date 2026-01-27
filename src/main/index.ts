@@ -16,12 +16,21 @@ import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
+import {
+    applyOpenAsarCmdSwitches,
+    applyOpenAsarPulseLatency,
+    injectModuleGlobalPaths,
+    shouldAllowMultiInstance
+} from "./openAsar";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 
 console.log("Vesktop v" + app.getVersion());
+
+injectModuleGlobalPaths();
+applyOpenAsarPulseLatency();
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
@@ -32,6 +41,8 @@ export let enableHardwareAcceleration = true;
 
 function init() {
     setAsDefaultProtocolClient("discord");
+
+    applyOpenAsarCmdSwitches();
 
     const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
 
@@ -124,7 +135,7 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV })) {
+if (!app.requestSingleInstanceLock({ IS_DEV }) && !shouldAllowMultiInstance()) {
     if (IS_DEV) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();

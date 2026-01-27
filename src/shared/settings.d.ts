@@ -33,6 +33,18 @@ export interface Settings {
 
     spellCheckLanguages?: string[];
 
+    openAsarEnabled?: boolean;
+    openAsar?: {
+        performanceMode?: boolean;
+        batteryMode?: boolean;
+        noTrack?: boolean;
+        noTyping?: boolean;
+        quickstart?: boolean;
+        multiInstance?: boolean;
+        domOptimizer?: boolean;
+        customFlags?: string;
+    };
+
     audio?: {
         workaround?: boolean;
 

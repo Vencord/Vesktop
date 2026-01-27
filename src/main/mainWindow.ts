@@ -28,6 +28,12 @@ import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH 
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
+import {
+    getOpenAsarDomOptimizerScript,
+    getOpenAsarNoTrackScript,
+    isQuickstartEnabled,
+    setupOpenAsarWebRequestBlocking
+} from "./openAsar";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
@@ -368,14 +374,24 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
 }
 
 function createMainWindow() {
-    // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
+
+    setupOpenAsarWebRequestBlocking();
 
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
 
     win.setMenuBarVisibility(false);
     if (process.platform === "darwin" && Settings.store.customTitleBar) win.setWindowButtonVisibility(false);
+
+    win.webContents.on("dom-ready", () => {
+        const noTrackScript = getOpenAsarNoTrackScript();
+        const domOptimizerScript = getOpenAsarDomOptimizerScript();
+        const combinedScript = noTrackScript + domOptimizerScript;
+        if (combinedScript) {
+            win.webContents.executeJavaScript(combinedScript).catch(() => {});
+        }
+    });
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
@@ -436,12 +452,12 @@ function retryUrl(url: string, description: string) {
 
 export async function createWindows() {
     const startMinimized = CommandLine.values["start-minimized"];
+    const quickstart = isQuickstartEnabled();
 
     let splash: BrowserWindow | undefined;
-    if (Settings.store.enableSplashScreen !== false) {
+    if (Settings.store.enableSplashScreen !== false && !quickstart) {
         splash = createSplashWindow(startMinimized);
 
-        // SteamOS letterboxes and scales it terribly, so just full screen it
         if (isDeckGameMode) splash.setFullScreen(true);
     }
 
@@ -449,6 +465,10 @@ export async function createWindows() {
     runVencordMain();
 
     mainWin = createMainWindow();
+
+    if (quickstart && !startMinimized) {
+        mainWin.show();
+    }
 
     AppEvents.on("appLoaded", () => {
         splash?.destroy();
