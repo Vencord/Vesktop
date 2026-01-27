@@ -28,6 +28,8 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
 
+const isWayland = isLinux && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
 export let enableHardwareAcceleration = true;
 
 function init() {
@@ -81,6 +83,10 @@ function init() {
     if (isLinux) {
         // Support TTS on Linux using https://wiki.archlinux.org/title/Speech_dispatcher
         app.commandLine.appendSwitch("enable-speech-dispatcher");
+    }
+
+    if (isWayland) {
+        disabledFeatures.add("WaylandWpColorManagerV1");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
