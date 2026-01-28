@@ -148,14 +148,3 @@ export function injectModuleGlobalPaths(): void {
         return originalResolveLookupPaths(request, parent);
     };
 }
-
-export function shouldAllowMultiInstance(): boolean {
-    const { openAsar } = Settings.store;
-    return process.argv?.includes?.("--multi-instance") || openAsar?.multiInstance === true;
-}
-
-export function isQuickstartEnabled(): boolean {
-    if (!isOpenAsarEnabled()) return false;
-    const { openAsar } = Settings.store;
-    return process.env.VESKTOP_QUICKSTART === "true" || openAsar?.quickstart === true;
-}

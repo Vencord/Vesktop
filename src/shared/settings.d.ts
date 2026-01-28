@@ -39,8 +39,6 @@ export interface Settings {
         batteryMode?: boolean;
         noTrack?: boolean;
         noTyping?: boolean;
-        quickstart?: boolean;
-        multiInstance?: boolean;
         domOptimizer?: boolean;
         customFlags?: string;
     };

@@ -28,12 +28,7 @@ import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH 
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
-import {
-    getOpenAsarDomOptimizerScript,
-    getOpenAsarNoTrackScript,
-    isQuickstartEnabled,
-    setupOpenAsarWebRequestBlocking
-} from "./openAsar";
+import { getOpenAsarDomOptimizerScript, getOpenAsarNoTrackScript, setupOpenAsarWebRequestBlocking } from "./openAsar";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
@@ -452,10 +447,9 @@ function retryUrl(url: string, description: string) {
 
 export async function createWindows() {
     const startMinimized = CommandLine.values["start-minimized"];
-    const quickstart = isQuickstartEnabled();
 
     let splash: BrowserWindow | undefined;
-    if (Settings.store.enableSplashScreen !== false && !quickstart) {
+    if (Settings.store.enableSplashScreen !== false) {
         splash = createSplashWindow(startMinimized);
 
         if (isDeckGameMode) splash.setFullScreen(true);
@@ -465,10 +459,6 @@ export async function createWindows() {
     runVencordMain();
 
     mainWin = createMainWindow();
-
-    if (quickstart && !startMinimized) {
-        mainWin.show();
-    }
 
     AppEvents.on("appLoaded", () => {
         splash?.destroy();

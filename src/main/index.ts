@@ -16,12 +16,7 @@ import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
-import {
-    applyOpenAsarCmdSwitches,
-    applyOpenAsarPulseLatency,
-    injectModuleGlobalPaths,
-    shouldAllowMultiInstance
-} from "./openAsar";
+import { applyOpenAsarCmdSwitches, applyOpenAsarPulseLatency, injectModuleGlobalPaths } from "./openAsar";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
@@ -135,7 +130,7 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV }) && !shouldAllowMultiInstance()) {
+if (!app.requestSingleInstanceLock({ IS_DEV }) && !process.argv.includes("--multi-instance")) {
     if (IS_DEV) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
