@@ -17,12 +17,11 @@ let corrections: string[];
 addPatch({
     patches: [
         {
-            find: ".enableSpellCheck)",
+            find: ".enableSpellCheck",
             replacement: {
-                // if (isDesktop) { DiscordNative.onSpellcheck(openMenu(props)) } else { e.preventDefault(); openMenu(props) }
-                match: /else (\i)\.preventDefault\(\),(\i\(\i\))(?<=:(\i)\.enableSpellCheck\).+?)/,
-                // ... else { $self.onSlateContext(() => openMenu(props)) }
-                replace: "else {$self.onSlateContext($1, $3?.enableSpellCheck, () => $2)}"
+                // if (settings?.enableSpellCheck && isDesktop) { DiscordNative.onSpellcheck(openMenu(props)) } else { e.preventDefault(); openMenu(props) }
+                match: /else (\i)\.preventDefault\(\),(\i\(\i\))(?<=(\i)\??\.enableSpellCheck.+?)/,
+                replace: "else $self.onSlateContext($1, $3?.enableSpellCheck, () => $2)"
             }
         }
     ],
