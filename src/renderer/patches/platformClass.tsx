@@ -14,7 +14,7 @@ addPatch({
         {
             find: "platform-web",
             replacement: {
-                match: /(?<=" platform-overlay"\):)\i/,
+                match: '"platform-web"',
                 replace: "$self.getPlatformClass()"
             }
         }
