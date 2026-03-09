@@ -12,11 +12,9 @@ if (Settings.store.customTitleBar)
     addPatch({
         patches: [
             {
-                find: ".wordmarkWindows",
+                find: ".USE_OSX_NATIVE_TRAFFIC_LIGHTS",
                 replacement: [
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /case \i\.\i\.WINDOWS:/,
                         replace: 'case "WEB":'
                     }
@@ -24,17 +22,13 @@ if (Settings.store.customTitleBar)
             },
             // Visual Refresh
             {
-                find: ".systemBar,",
+                find: '"refresh-title-bar-small"',
                 replacement: [
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /\i===\i\.PlatformTypes\.WINDOWS/g,
                         replace: "true"
                     },
                     {
-                        // TODO: Fix eslint rule
-                        // eslint-disable-next-line no-useless-escape
                         match: /\i===\i\.PlatformTypes\.WEB/g,
                         replace: "false"
                     }

@@ -1,7 +1,16 @@
+<!doctype html>
+<meta charset="utf-8" />
+
 <head>
-    <link rel="stylesheet" href="./style.css" type="text/css" />
+    <link rel="stylesheet" href="./common.css" type="text/css" />
 
     <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             background: none;
             user-select: none;
@@ -10,8 +19,9 @@
         }
 
         .wrapper {
-            box-sizing: border-box;
+            width: 100%;
             height: 100%;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -36,19 +46,14 @@
         img {
             width: 128px;
             height: 128px;
-            image-rendering: pixelated;
+            object-fit: contain;
         }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <img
-            draggable="false"
-            src="../shiggy.gif"
-            alt="shiggy"
-            role="presentation"
-        />
+        <img draggable="false" src="vesktop://assets/splash" alt="" role="presentation" />
         <p>Loading Vesktop...</p>
         <p class="message"></p>
     </div>

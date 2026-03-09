@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Switch } from "@vencord/types/webpack/common";
-import { ComponentProps } from "react";
+import { FormSwitch } from "@vencord/types/components";
+import type { ComponentProps } from "react";
 
-export function VesktopSettingsSwitch(props: ComponentProps<typeof Switch>) {
-    return (
-        <Switch {...props} hideBorder className="vcd-settings-switch">
-            {props.children}
-        </Switch>
-    );
+import { cl } from "./Settings";
+
+export function VesktopSettingsSwitch(props: ComponentProps<typeof FormSwitch>) {
+    return <FormSwitch {...props} hideBorder className={cl("switch")} />;
 }

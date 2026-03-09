@@ -7,25 +7,24 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
+import { loadView } from "./vesktopStatic";
 
 let splash: BrowserWindow | undefined;
 
 export function createSplashWindow(startMinimized = false) {
     splash = new BrowserWindow({
         ...SplashProps,
-        icon: ICON_PATH,
         show: !startMinimized,
         webPreferences: {
             preload: join(__dirname, "splashPreload.js")
         }
     });
 
-    splash.loadFile(join(VIEW_DIR, "splash.html"));
+    loadView(splash, "splash.html");
 
-    const { splashBackground, splashColor, splashTheming } = Settings.store;
+    const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
     if (splashTheming !== false) {
         if (splashColor) {
@@ -38,6 +37,10 @@ export function createSplashWindow(startMinimized = false) {
         if (splashBackground) {
             splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
         }
+    }
+
+    if (splashPixelated) {
+        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
     }
 
     return splash;

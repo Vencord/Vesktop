@@ -4,40 +4,89 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { nativeImage, nativeTheme } from "electron";
-import { join } from "path";
-import { ICONS_DIR } from "shared/paths";
+import { app, BrowserWindow, Menu, Tray } from "electron";
 
-import { lastBadgeCount } from "./appBadge";
-import { tray } from "./mainWindow";
+import { createAboutWindow } from "./about";
+import { AppEvents } from "./events";
 import { Settings } from "./settings";
+import { resolveAssetPath } from "./userAssets";
+import { clearData } from "./utils/clearData";
+import { downloadVencordFiles } from "./utils/vencordLoader";
 
-export async function setTrayIcon(iconName: string) {
-    if (!tray || tray.isDestroyed()) return;
-    const Icons = new Set(["speaking", "muted", "deafened", "idle", "main"]);
-    if (!Icons.has(iconName)) return;
+let tray: Tray;
+let trayVariant: "tray" | "trayUnread" = "tray";
 
-    if (iconName === "main" && ![-1, 0].includes(lastBadgeCount)) {
-        var trayImage = nativeImage.createFromPath(join(ICONS_DIR, "main_badge.png"));
-        tray.setImage(trayImage);
-        return;
+AppEvents.on("userAssetChanged", async asset => {
+    if (tray && (asset === "tray" || asset === "trayUnread")) {
+        tray.setImage(await resolveAssetPath(trayVariant));
     }
+});
 
-    if (
-        (Settings.store.trayAutoFill === "auto" && !nativeTheme.shouldUseDarkColors) ||
-        (Settings.store.trayAutoFill === "black" && ["idle", "main"].includes(iconName))
-    ) {
-        iconName += "_black";
-    }
+AppEvents.on("setTrayVariant", async variant => {
+    if (trayVariant === variant) return;
 
-    var trayImage = nativeImage.createFromPath(join(ICONS_DIR, iconName + ".png"));
-    if (trayImage.isEmpty()) {
-        return;
-    }
-    if (process.platform === "darwin") {
-        trayImage = trayImage.resize({ width: 16, height: 16 });
-    }
-    tray.setImage(trayImage);
+    trayVariant = variant;
+    if (!tray) return;
 
-    return;
+    tray.setImage(await resolveAssetPath(trayVariant));
+});
+
+export function destroyTray() {
+    tray?.destroy();
+}
+
+export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
+    const onTrayClick = () => {
+        if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
+        else win.show();
+    };
+
+    const trayMenu = Menu.buildFromTemplate([
+        {
+            label: "Open",
+            click() {
+                win.show();
+            }
+        },
+        {
+            label: "About",
+            click: createAboutWindow
+        },
+        {
+            label: "Repair Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            label: "Restart",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
+            label: "Quit",
+            click() {
+                setIsQuitting(true);
+                app.quit();
+            }
+        }
+    ]);
+
+    tray = new Tray(await resolveAssetPath(trayVariant));
+    tray.setToolTip("Vesktop");
+    tray.setContextMenu(trayMenu);
+    tray.on("click", onTrayClick);
 }

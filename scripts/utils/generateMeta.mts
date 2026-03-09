@@ -5,7 +5,7 @@
  */
 
 import { promises as fs } from "node:fs";
-
+import { mkdir } from "node:fs/promises";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import xmlFormat from "xml-formatter";
 
@@ -43,14 +43,25 @@ function generateDescription(description: string, descriptionNode: Element) {
     }
 }
 
-const latestReleaseInformation = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases/latest", {
+const releases = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases", {
     headers: {
         Accept: "application/vnd.github+json",
         "X-Github-Api-Version": "2022-11-28"
     }
 }).then(res => res.json());
 
-const metaInfo = await fs.readFile("./meta/dev.vencord.Vesktop.metainfo.xml", "utf-8");
+const latestReleaseInformation = releases[0];
+
+const metaInfo = await (async () => {
+    for (const release of releases) {
+        const metaAsset = release.assets.find((a: any) => a.name === "dev.vencord.Vesktop.metainfo.xml");
+        if (metaAsset) return fetch(metaAsset.browser_download_url).then(res => res.text());
+    }
+})();
+
+if (!metaInfo) {
+    throw new Error("Could not find existing meta information from any release");
+}
 
 const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
@@ -90,4 +101,7 @@ const output = xmlFormat(new XMLSerializer().serializeToString(parser), {
     indentation: "  "
 });
 
-await fs.writeFile("./meta/dev.vencord.Vesktop.metainfo.xml", output, "utf-8");
+await mkdir("./dist", { recursive: true });
+await fs.writeFile("./dist/dev.vencord.Vesktop.metainfo.xml", output, "utf-8");
+
+console.log("Updated meta information written to ./dist/dev.vencord.Vesktop.metainfo.xml");

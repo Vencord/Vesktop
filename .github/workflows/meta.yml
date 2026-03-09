@@ -7,7 +7,7 @@ on:
     workflow_dispatch:
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
     update:
@@ -26,17 +26,13 @@ jobs:
               run: pnpm i
 
             - name: Update metainfo
-              run: pnpm updateMeta
+              run: pnpm generateMeta
 
             - name: Commit and merge in changes
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-                  gh release upload "${{ github.event.release.tag_name }}" meta/dev.vencord.Vesktop.metainfo.xml
-
-                  git add meta/dev.vencord.Vesktop.metainfo.xml
-                  git commit -m "metainfo: add entry for ${{ github.event.release.tag_name }}"
-                  git push origin HEAD:main
+                  gh release upload "${{ github.event.release.tag_name }}" dist/dev.vencord.Vesktop.metainfo.xml
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

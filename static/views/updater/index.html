@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8" />
+
+<head>
+    <title>Vesktop Updater</title>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none';
+        script-src vesktop:;
+        style-src vesktop:;
+      ">
+
+    <link rel="stylesheet" href="../common.css" type="text/css" />
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+
+<body>
+    <header>
+        <h1>An update is available!</h1>
+    </header>
+
+    <main>
+        <p id="versions">
+            <span class="label">Current version:</span> <span id="current-version" class="value"></span>
+            <span class="label">New version:</span> <span id="new-version" class="value"></span>
+        </p>
+        <h2>Release Notes</h2>
+
+        <div id="release-notes"></div>
+    </main>
+
+    <footer>
+        <section id="buttons">
+            <button id="update-button" class="green">Install update & restart</button>
+            <button id="later-button" class="grey">Remind me later</button>
+            <button id="ignore-button" class="grey">Ignore this update</button>
+        </section>
+    </footer>
+
+    <dialog id="update-dialog" closedby="none">
+        <h2>Downloading Update</h2>
+        <p>
+            Please wait while the update is being downloaded. Once the update finished downloading, it will
+            automatically install and Vesktop will restart.
+        </p>
+
+        <p id="linux-note" class="hidden">You will likely be prompted to enter your password. Do so to finish the
+            update.</p>
+
+        <progress id="download-progress" value="0" max="100"></progress>
+
+        <p id="error"></p>
+    </dialog>
+
+    <dialog id="installing-dialog" closedby="none">
+        <h2>Installing Update</h2>
+        <p>Please wait while the update is being installed. Vesktop will restart shortly.</p>
+
+        <div class="spinner-wrapper">
+            <div class="spinner"></div>
+        </div>
+    </dialog>
+</body>
+
+<script type="module" src="./script.js"></script>

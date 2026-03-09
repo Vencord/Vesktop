@@ -12,6 +12,7 @@ export interface Settings {
     tray?: boolean;
     trayAutoFill?: "auto" | "white" | "black";
     minimizeToTray?: boolean;
+    autoStartMinimized?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
@@ -20,6 +21,7 @@ export interface Settings {
     hardwareVideoAcceleration?: boolean;
     arRPC?: boolean;
     appBadge?: boolean;
+    enableTaskbarFlashing?: boolean;
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
@@ -28,6 +30,7 @@ export interface Settings {
     splashTheming?: boolean;
     splashColor?: string;
     splashBackground?: string;
+    splashPixelated?: boolean;
 
     spellCheckLanguages?: string[];
 
@@ -50,11 +53,16 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
-    displayId: int;
 
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+    linuxAutoStartEnabled?: boolean;
 
     vencordDir?: string;
+
+    updater?: {
+        ignoredVersion?: string;
+        snoozeUntil?: number;
+    };
 }

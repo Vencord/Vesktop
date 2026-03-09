@@ -6,17 +6,34 @@
 
 //@ts-check
 
+import { defineConfig } from "eslint/config";
 import stylistic from "@stylistic/eslint-plugin";
 import pathAlias from "eslint-plugin-path-alias";
+import react from "eslint-plugin-react";
 import simpleHeader from "eslint-plugin-simple-header";
 import importSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
 import prettier from "eslint-plugin-prettier";
 
-export default tseslint.config(
+export default defineConfig(
     { ignores: ["dist"] },
-
+    {
+        files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}"],
+        settings: {
+            react: {
+                version: "19"
+            }
+        },
+        ...react.configs.flat.recommended,
+        rules: {
+            ...react.configs.flat.recommended.rules,
+            "react/react-in-jsx-scope": "off",
+            "react/prop-types": "off",
+            "react/display-name": "off",
+            "react/no-unescaped-entities": "off"
+        }
+    },
     {
         files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}"],
         plugins: {
@@ -24,8 +41,10 @@ export default tseslint.config(
             stylistic,
             importSort,
             unusedImports,
+            // @ts-expect-error Missing types
             pathAlias,
-            prettier
+            prettier,
+            "@typescript-eslint": tseslint.plugin
         },
         settings: {
             "import/resolver": {
@@ -51,7 +70,6 @@ export default tseslint.config(
             ],
 
             // ESLint Rules
-
             yoda: "error",
             eqeqeq: ["error", "always", { null: "ignore" }],
             "prefer-destructuring": [
@@ -67,8 +85,19 @@ export default tseslint.config(
             "no-invalid-regexp": "error",
             "no-constant-condition": ["error", { checkLoops: false }],
             "no-duplicate-imports": "error",
-            "dot-notation": "error",
-            "no-useless-escape": "error",
+            "@typescript-eslint/dot-notation": [
+                "error",
+                {
+                    allowPrivateClassPropertyAccess: true,
+                    allowProtectedClassPropertyAccess: true
+                }
+            ],
+            "no-useless-escape": [
+                "error",
+                {
+                    allowRegexCharacters: ["i"]
+                }
+            ],
             "no-fallthrough": "error",
             "for-direction": "error",
             "no-async-promise-executor": "error",
@@ -85,7 +114,7 @@ export default tseslint.config(
             "no-unsafe-optional-chaining": "error",
             "no-useless-backreference": "error",
             "use-isnan": "error",
-            "prefer-const": "error",
+            "prefer-const": ["error", { destructuring: "all" }],
             "prefer-spread": "error",
 
             // Styling Rules

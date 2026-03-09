@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { mkdirSync } from "fs";
+import { mkdirSync, readFileSync } from "fs";
 import { access, constants as FsConstants, writeFile } from "fs/promises";
+import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
 
-import { USER_AGENT, VENCORD_FILES_DIR } from "../constants";
+import { USER_AGENT } from "../constants";
 import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";
@@ -73,4 +74,17 @@ export async function ensureVencordFiles() {
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
     await Promise.all([downloadVencordFiles(), writeFile(join(VENCORD_FILES_DIR, "package.json"), "{}")]);
+}
+
+// TODO: remove this once enough time has passed
+export function vencordSupportsSandboxing() {
+    const supports = readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopMain.js"), "utf-8").includes(
+        "VencordGetRendererCss"
+    );
+    if (!supports) {
+        console.warn(
+            "⚠️  [VencordLoader] Vencord version is outdated and does not support sandboxing. Please update Vencord to the latest version."
+        );
+    }
+    return supports;
 }

@@ -26,12 +26,10 @@ addPatch({
             group: true,
             replacement: [
                 {
-                    // eslint-disable-next-line no-useless-escape
                     match: /if\(null!=(\i)\)(?=.{0,50}\1\.window\.setDevtoolsCallbacks)/,
                     replace: "if(true)"
                 },
                 {
-                    // eslint-disable-next-line no-useless-escape
                     match: /\b\i\.window\.setDevtoolsCallbacks/g,
                     replace: "VesktopNative.win.setDevtoolsCallbacks"
                 }

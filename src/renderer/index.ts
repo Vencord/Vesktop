@@ -23,7 +23,8 @@ import type SettingsPlugin from "@vencord/types/plugins/_core/settings";
 VesktopLogger.log("read if cute :3");
 VesktopLogger.log("Vesktop v" + VesktopNative.app.getVersion());
 
-const customSettingsSections = (Vencord.Plugins.plugins.Settings as any as typeof SettingsPlugin).customSections;
+// TODO
+const customSettingsSections = (Vencord.Plugins.plugins.Settings as typeof SettingsPlugin).customSections;
 
 customSettingsSections.push(() => ({
     section: "Vesktop",
@@ -31,3 +32,13 @@ customSettingsSections.push(() => ({
     element: SettingsUi,
     className: "vc-vesktop-settings"
 }));
+
+// TODO: remove this legacy workaround once some time has passed
+if (!Vencord.Api.Styles.vencordRootNode) {
+    const style = document.createElement("style");
+    style.id = "vesktop-css-core";
+
+    VesktopNative.app.getRendererCss().then(css => (style.textContent = css));
+
+    document.addEventListener("DOMContentLoaded", () => document.documentElement.append(style), { once: true });
+}

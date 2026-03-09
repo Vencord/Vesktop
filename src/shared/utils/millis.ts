@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findStoreLazy } from "@vencord/types/webpack";
-
-export const MediaEngineStore = findStoreLazy("MediaEngineStore");
+export const enum Millis {
+    SECOND = 1000,
+    MINUTE = 60 * SECOND,
+    HOUR = 60 * MINUTE,
+    DAY = 24 * HOUR
+}
