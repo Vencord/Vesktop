@@ -29,7 +29,7 @@ import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
-import { setTrayIcon } from "./tray";
+import { setInCall, setTrayIcon } from "./tray";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
@@ -185,4 +185,5 @@ function openDebugPage(page: string) {
 handle(IpcEvents.DEBUG_LAUNCH_GPU, () => openDebugPage("chrome://gpu"));
 handle(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS, () => openDebugPage("chrome://webrtc-internals"));
 
-handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
+handle(IpcEvents.SET_TRAY_ICON, (_, asset) => setTrayIcon(asset));
+handle(IpcEvents.SET_IN_CALL, (_, inCall) => setInCall(inCall));

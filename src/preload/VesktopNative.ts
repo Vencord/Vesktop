@@ -99,10 +99,9 @@ export const VesktopNative = {
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
     },
     tray: {
-        setIcon: (iconURI: string) => invoke<void>(IpcEvents.SET_TRAY_ICON, iconURI),
-        setCurrentVoiceIcon: (listener: (...args: any[]) => void) => {
-            ipcRenderer.on(IpcEvents.SET_CURRENT_TRAY_ICON, listener);
-        }
+        setIcon: (variant: "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened") =>
+            invoke<void>(IpcEvents.SET_TRAY_ICON, variant),
+        setIsInCall: (inCall: Boolean) => invoke<void>(IpcEvents.SET_IN_CALL, inCall)
     },
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),

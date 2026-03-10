@@ -14,10 +14,19 @@ import { clearData } from "./utils/clearData";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
-let trayVariant: "tray" | "trayUnread" = "tray";
+let trayVariant: "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened" = "tray";
+export let isInCall: Boolean;
 
 AppEvents.on("userAssetChanged", async asset => {
-    if (tray && (asset === "tray" || asset === "trayUnread")) {
+    if (
+        tray &&
+        (asset === "tray" ||
+            asset === "trayUnread" ||
+            asset === "traySpeaking" ||
+            asset === "trayIdle" ||
+            asset === "trayMuted" ||
+            asset === "trayDeafened")
+    ) {
         tray.setImage(await resolveAssetPath(trayVariant));
     }
 });
@@ -89,4 +98,12 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
+}
+
+export async function setTrayIcon(asset: typeof trayVariant) {
+    AppEvents.emit("setTrayVariant", asset);
+}
+
+export async function setInCall(inCall: Boolean) {
+    isInCall = inCall;
 }

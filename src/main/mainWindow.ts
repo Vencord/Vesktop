@@ -13,8 +13,7 @@ import {
     nativeTheme,
     Rectangle,
     screen,
-    session,
-    Tray
+    session
 } from "electron";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
@@ -39,7 +38,6 @@ import { downloadVencordFiles, ensureVencordFiles, vencordSupportsSandboxing } f
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 let isQuitting = false;
-export let tray: Tray;
 
 applyDeckKeyboardFix();
 
@@ -482,10 +480,6 @@ export async function createWindows() {
             loadUrl(undefined);
             console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
         }
-    });
-
-    nativeTheme.on("updated", () => {
-        mainWin.webContents.send(IpcEvents.SET_CURRENT_TRAY_ICON);
     });
 
     initArRPC();

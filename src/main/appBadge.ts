@@ -6,12 +6,12 @@
 
 import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
-import { IpcEvents } from "shared/IpcEvents";
 import { BADGE_DIR } from "shared/paths";
 
 import { updateUnityLauncherCount } from "./dbus";
 import { AppEvents } from "./events";
 import { mainWin } from "./mainWindow";
+import { isInCall } from "./tray";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -32,7 +32,10 @@ export var lastBadgeCount: number = -1;
  * 0 = clear
  */
 export function setBadgeCount(count: number) {
-    AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+    lastBadgeCount = count;
+    if (!isInCall) {
+        AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+    }
 
     switch (process.platform) {
         case "linux":
@@ -55,7 +58,6 @@ export function setBadgeCount(count: number) {
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
     }
-    mainWin.webContents.send(IpcEvents.SET_CURRENT_TRAY_ICON);
 }
 
 function getBadgeIndexAndDescription(count: number): [number | null, string] {

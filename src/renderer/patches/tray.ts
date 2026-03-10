@@ -9,25 +9,21 @@ import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
 
 const voiceActions = findByPropsLazy("isSelfMute");
 
-var isInCall = false;
+let isInCall = false;
 
 export function setCurrentTrayIcon() {
     if (isInCall) {
         if (voiceActions.isSelfDeaf()) {
-            VesktopNative.tray.setIcon("deafened");
+            VesktopNative.tray.setIcon("trayDeafened");
         } else if (voiceActions.isSelfMute()) {
-            VesktopNative.tray.setIcon("muted");
+            VesktopNative.tray.setIcon("trayMuted");
         } else {
-            VesktopNative.tray.setIcon("idle");
+            VesktopNative.tray.setIcon("trayIdle");
         }
     } else {
-        VesktopNative.tray.setIcon("main");
+        VesktopNative.tray.setIcon("tray");
     }
 }
-
-VesktopNative.tray.setCurrentVoiceIcon(() => {
-    setCurrentTrayIcon();
-});
 
 onceReady.then(() => {
     const userID = UserStore.getCurrentUser().id;
@@ -35,7 +31,7 @@ onceReady.then(() => {
     FluxDispatcher.subscribe("SPEAKING", params => {
         if (params.userId === userID && params.context === "default") {
             if (params.speakingFlags) {
-                VesktopNative.tray.setIcon("speaking");
+                VesktopNative.tray.setIcon("traySpeaking");
             } else {
                 setCurrentTrayIcon();
             }
@@ -53,8 +49,10 @@ onceReady.then(() => {
     FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
         if (params.state === "RTC_CONNECTED" && params.context === "default") {
             isInCall = true;
+            VesktopNative.tray.setIsInCall(true);
         } else if (params.state === "RTC_DISCONNECTED" && params.context === "default") {
             isInCall = false;
+            VesktopNative.tray.setIsInCall(false);
         }
         setCurrentTrayIcon();
     });
