@@ -25,7 +25,7 @@ function loadBadge(index: number) {
 }
 
 let lastBadgeIndex: null | number = -1;
-export var lastBadgeCount: number = -1;
+export let lastBadgeCount: number = -1;
 
 /**
  * -1 = show unread indicator
