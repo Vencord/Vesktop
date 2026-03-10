@@ -7,6 +7,7 @@
 import { app, BrowserWindow, Menu, Tray } from "electron";
 
 import { createAboutWindow } from "./about";
+import { lastBadgeCount } from "./appBadge";
 import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
@@ -15,7 +16,7 @@ import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
 let trayVariant: "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened" = "tray";
-export let isInCall: Boolean;
+export let isInCall: Boolean = false;
 
 AppEvents.on("userAssetChanged", async asset => {
     if (
@@ -34,7 +35,8 @@ AppEvents.on("userAssetChanged", async asset => {
 AppEvents.on("setTrayVariant", async variant => {
     if (trayVariant === variant) return;
 
-    trayVariant = variant;
+    if (variant === "tray" && lastBadgeCount > 0) trayVariant = "trayUnread";
+    else trayVariant = variant;
     if (!tray) return;
 
     tray.setImage(await resolveAssetPath(trayVariant));
