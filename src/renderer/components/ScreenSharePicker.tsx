@@ -477,9 +477,10 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelec
     }
 
     const name = node["application.name"];
+    const description = node["node.description"];
 
     if (name) {
-        rtn.push({ name: name, value: { "application.name": name } });
+        rtn.push({ name: description || name, value: { "application.name": name } });
     }
 
     if (!granularSelect) {
@@ -489,7 +490,7 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelec
     const rawName = node["node.name"];
 
     if (!name) {
-        rtn.push({ name: rawName, value: { "node.name": rawName } });
+        rtn.push({ name: description || rawName, value: { "node.name": rawName } });
     }
 
     const binary = node["application.process.binary"];

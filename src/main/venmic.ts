@@ -72,7 +72,7 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const { granularSelect } = Settings.store.audio ?? {};
 
     const targets = obtainVenmic()
-        ?.list(granularSelect ? ["node.name"] : undefined)
+        ?.list(granularSelect ? ["node.name", "node.description"] : ["node.description"])
         .filter(s => s["application.process.id"] !== audioPid);
 
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
