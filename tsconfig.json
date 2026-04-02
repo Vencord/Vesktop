@@ -3,8 +3,8 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "lib": ["DOM", "DOM.Iterable", "esnext", "esnext.array", "esnext.asynciterable", "esnext.symbol"],
-        "module": "commonjs",
-        "moduleResolution": "node",
+        "module": "preserve",
+        "moduleResolution": "bundler",
         "strict": true,
         "noImplicitAny": false,
         "target": "ESNEXT",
@@ -13,9 +13,11 @@
         // @vencord/types has some errors for now
         "skipLibCheck": true,
 
-        "baseUrl": "./src/",
+        "paths": {
+            "*": ["./src/*"],
+        },
 
-        "typeRoots": ["./node_modules/@types", "./node_modules/@vencord"]
+        "types": ["node", "@vencord/types"]
     },
     "include": ["src/**/*"]
 }
