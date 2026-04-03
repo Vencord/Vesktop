@@ -28,7 +28,10 @@ export function validateSender(frame: WebFrameMain | null, event: string) {
 export function handleSync(event: IpcEvents | UpdaterIpcEvents, cb: (e: IpcMainEvent, ...args: any[]) => any) {
     ipcMain.on(event, (e, ...args) => {
         validateSender(e.senderFrame, event);
-        e.returnValue = cb(e, ...args);
+        const result = cb(e, ...args);
+        if (e.returnValue === undefined) {
+            e.returnValue = result;
+        }
     });
 }
 
