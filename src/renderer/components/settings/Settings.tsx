@@ -9,6 +9,7 @@ import "./settings.css";
 import { classNameFactory } from "@vencord/types/api/Styles";
 import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
 import { ComponentType } from "react";
+import { KeyBindSettings } from "renderer/globalShortcuts/ShortcutSettings";
 import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
@@ -148,6 +149,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             defaultValue: false
         }
     ],
+    KeyBinds: [KeyBindSettings],
     "Developer Options": [DeveloperOptionsButton]
 };
 

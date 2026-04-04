@@ -14,6 +14,7 @@ import { app, BrowserWindow, nativeTheme } from "electron";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { registerKeyBinds } from "./keyBinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
@@ -58,6 +59,9 @@ function init() {
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
+
+    // Enable Wayland Portal for global shortcuts
+    enabledFeatures.add("GlobalShortcutsPortal");
 
     // disable renderer backgrounding to prevent the app from unloading when in the background
     // https://github.com/electron/electron/issues/2822
@@ -115,6 +119,7 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        registerKeyBinds();
 
         bootstrap();
 

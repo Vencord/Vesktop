@@ -1,0 +1,47 @@
+.vcd-shortcuts-group {
+    display: grid;
+    gap: 0.25em 1em;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+    align-items: center;
+}
+
+.vcd-shortcuts-label:first-child {
+    grid-column: 1 / 2;
+}
+
+.vcd-shortcuts-label:nth-child(2) {
+    grid-column: 2 / 5;
+}
+
+.vcd-shortcuts-recorder {
+    display: flex;
+    background-color: var(--input-background-default);
+    border: 1px solid;
+    border-color: var(--input-border-default);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    min-height: calc(var(--select-option-height) - 2px);
+    padding: 0.25em;
+}
+
+.vcd-shortcuts-record-input {
+    background-color: transparent;
+    border: none;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-strong);
+    font-weight: 600;
+
+    &:disabled {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+}
+
+.vcd-shortcuts-record-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-width: max-content;
+}
