@@ -11,9 +11,13 @@ import "./userAssets";
 import "./vesktopProtocol";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { IpcCommands } from "shared/IpcEvents";
 
+// eslint-disable-next-line no-duplicate-imports
+import { CommandLine } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { sendRendererCommand } from "./ipcCommands";
 import { registerKeyBinds } from "./keyBinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
@@ -129,7 +133,7 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV })) {
+if (!app.requestSingleInstanceLock({ IS_DEV, args: CommandLine })) {
     if (IS_DEV) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
@@ -157,4 +161,11 @@ app.on("open-url", (_, url) => {
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
+});
+
+app.on("second-instance", (_e, _argv, _cwd, data) => {
+    const { args } = data as { args: typeof CommandLine; IS_DEV: boolean };
+    const { "run-shortcut": shortcut } = args.values;
+
+    if (shortcut) sendRendererCommand(IpcCommands.HANDLE_KEY_BIND, shortcut);
 });

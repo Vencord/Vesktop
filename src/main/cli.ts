@@ -6,6 +6,7 @@
 
 import { app } from "electron";
 import { basename } from "path";
+import { ShortcutAction } from "renderer/globalShortcuts/ShortcutSettings";
 import { stripIndent } from "shared/utils/text";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
@@ -42,6 +43,19 @@ const options = {
         type: "string",
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
+    },
+    "run-shortcut": {
+        type: "string",
+        description:
+            "Run a predefined shortcut action (for custom key binds). Vesktop has to be open for this to have any effect",
+        options: [
+            "toggleMute",
+            "toggleDeafen",
+            "toggleStreamerMode",
+            "toggleCamera",
+            "toggleScreenShare",
+            "disconnectFromVoiceChannel"
+        ] satisfies Array<ShortcutAction>
     }
 } satisfies Record<string, Option>;
 
@@ -135,7 +149,7 @@ export function checkCommandLineForHelpOrVersion() {
             app.exit(1);
         }
 
-        if ("options" in def && !def.options?.includes(value as string)) {
+        if ("options" in def && !def.options?.includes(value as any)) {
             console.error(`Invalid value for --${name}: ${value}\nExpected one of: ${def.options.join(", ")}`);
             app.exit(1);
         }

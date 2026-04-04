@@ -11,6 +11,8 @@ import { sendRendererCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 
 function unregisterKeyBinds() {
+    if (!app.isReady()) return;
+
     globalShortcut.unregisterAll();
 }
 
