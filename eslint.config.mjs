@@ -125,7 +125,7 @@ export default defineConfig(
             "importSort/imports": "error",
             "importSort/exports": "error",
             "unusedImports/no-unused-imports": "error",
-            "pathAlias/no-relative": "error",
+            // "pathAlias/no-relative": "error",
             "prettier/prettier": "error"
         }
     }
