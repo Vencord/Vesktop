@@ -52,8 +52,6 @@ const options = {
             "toggleMute",
             "toggleDeafen",
             "toggleStreamerMode",
-            "toggleCamera",
-            "toggleScreenShare",
             "disconnectFromVoiceChannel"
         ] satisfies Array<ShortcutAction>
     }

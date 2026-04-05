@@ -18,6 +18,7 @@ import { CommandLine } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { sendRendererCommand } from "./ipcCommands";
+import { initSocket } from "./ipcSocket";
 import { registerKeyBinds } from "./keyBinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
@@ -124,6 +125,7 @@ function init() {
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
         registerKeyBinds();
+        initSocket();
 
         bootstrap();
 
