@@ -90,7 +90,7 @@ export async function recordKeybind(signal?: AbortSignal): Promise<string> {
         }
 
         function cleanup() {
-            document.removeEventListener("keydown", onKeyDown);
+            document.removeEventListener("keydown", onKeyDown, { capture: true });
             signal?.removeEventListener("abort", onAbort);
         }
 
@@ -101,6 +101,7 @@ export async function recordKeybind(signal?: AbortSignal): Promise<string> {
 
         function onKeyDown(event: KeyboardEvent) {
             event.preventDefault();
+            event.stopImmediatePropagation();
 
             if (MODIFIER_KEYS.has(event.key)) return;
 
@@ -120,6 +121,6 @@ export async function recordKeybind(signal?: AbortSignal): Promise<string> {
         }
 
         signal?.addEventListener("abort", onAbort, { once: true });
-        document.addEventListener("keydown", onKeyDown);
+        document.addEventListener("keydown", onKeyDown, { capture: true });
     });
 }

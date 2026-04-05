@@ -12,7 +12,6 @@ import { Settings } from "./settings";
 
 function unregisterKeyBinds() {
     if (!app.isReady()) return;
-
     globalShortcut.unregisterAll();
 }
 
@@ -21,15 +20,18 @@ export async function registerKeyBinds() {
 
     unregisterKeyBinds();
 
+    let success = true;
+
     for (const { action, enabled, key } of Settings.store.keyBinds || []) {
         if (!enabled || !key || action === "unassigned") continue;
 
-        console.log(
-            key,
-            "SUCCESS",
-            globalShortcut.register(key, () => sendRendererCommand(IpcCommands.HANDLE_KEY_BIND, action))
+        const registeredSuccessfully = globalShortcut.register(key, () =>
+            sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, action)
         );
+        success &&= registeredSuccessfully;
     }
+
+    sendRendererCommand(IpcCommands.KEY_BINDS_SET_STATUS, success);
 }
 
 Settings.addChangeListener("keyBinds", registerKeyBinds);

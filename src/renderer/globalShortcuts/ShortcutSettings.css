@@ -1,6 +1,13 @@
+.vcd-shortcuts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding-block: 1em;
+}
+
 .vcd-shortcuts-group {
     display: grid;
-    gap: 0.25em 1em;
+    gap: 0.25em 0.5em;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
     align-items: center;
 }
@@ -21,7 +28,8 @@
     border-radius: var(--radius-sm);
     width: 100%;
     min-height: calc(var(--select-option-height) - 2px);
-    padding: 0.25em;
+    padding: 3px 4px 3px 12px;
+    box-sizing: border-box;
 }
 
 .vcd-shortcuts-record-input {

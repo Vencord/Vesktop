@@ -6,10 +6,23 @@
 
 import "./ShortcutSettings.css";
 
-import { BaseText, Button, DeleteIcon, Switch } from "@vencord/types/components";
-import { classNameFactory, identity } from "@vencord/types/utils";
+import { BaseText, Button, Card, DeleteIcon, Switch } from "@vencord/types/components";
+import {
+    classNameFactory,
+    identity,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalRoot,
+    ModalSize,
+    openModal
+} from "@vencord/types/utils";
 import { React, Select, useState } from "@vencord/types/webpack/common";
+import { SettingsComponent } from "renderer/components/settings/Settings";
+import { onIpcCommand } from "renderer/ipcCommands";
+import { reactiveValue } from "renderer/reactiveState";
 import { Settings } from "renderer/settings";
+import { IpcCommands } from "shared/IpcEvents";
 
 import { recordKeybind } from "./recordKeybind";
 
@@ -20,12 +33,13 @@ const ShortcutActions = {
     toggleMute: "Toggle Mute",
     toggleDeafen: "Toggle Deafen",
     toggleStreamerMode: "Toggle Streamer Mode",
-    toggleCamera: "Toggle Camera",
-    toggleScreenShare: "Toggle Screen Share",
-    disconnectFromVoiceChannel: "Disconnect from Voice Channel"
+    disconnectFromVoiceChannel: "Disconnect from VC"
 } as const;
 
 export type ShortcutAction = keyof typeof ShortcutActions;
+
+const shortcutStatus = reactiveValue(true);
+onIpcCommand(IpcCommands.KEY_BINDS_SET_STATUS, status => (shortcutStatus.value = status));
 
 export interface KeyBind {
     id: string;
@@ -109,9 +123,18 @@ function KeyBindGroup({
 
 export function KeyBindSettings() {
     const [keyBinds, setKeyBinds] = useState<KeyBind[]>(Settings.store.keyBinds ?? []);
+    const shortcutsStatus = shortcutStatus.use();
 
     return (
-        <div>
+        <div className={cl("container")}>
+            {shortcutsStatus === false && (
+                <Card variant="danger">
+                    <BaseText size="md" weight="medium">
+                        Some of your keybinds failed to register.
+                    </BaseText>
+                </Card>
+            )}
+
             {keyBinds.map((keyBind, index) => (
                 <KeyBindGroup
                     key={keyBind.id}
@@ -147,3 +170,24 @@ export function KeyBindSettings() {
         </div>
     );
 }
+
+export function openKeybindsModal() {
+    openModal(props => (
+        <ModalRoot {...props} size={ModalSize.MEDIUM}>
+            <ModalHeader>
+                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
+                    Keybinds
+                </BaseText>
+                <ModalCloseButton onClick={props.onClose} />
+            </ModalHeader>
+
+            <ModalContent>
+                <KeyBindSettings />
+            </ModalContent>
+        </ModalRoot>
+    ));
+}
+
+export const KeybindsButton: SettingsComponent = () => {
+    return <Button onClick={() => openKeybindsModal()}>Configure Keybinds</Button>;
+};

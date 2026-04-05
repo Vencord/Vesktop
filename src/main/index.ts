@@ -167,5 +167,5 @@ app.on("second-instance", (_e, _argv, _cwd, data) => {
     const { args } = data as { args: typeof CommandLine; IS_DEV: boolean };
     const { "run-shortcut": shortcut } = args.values;
 
-    if (shortcut) sendRendererCommand(IpcCommands.HANDLE_KEY_BIND, shortcut);
+    if (shortcut) sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, shortcut);
 });

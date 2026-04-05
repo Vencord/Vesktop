@@ -85,5 +85,6 @@ export const enum IpcCommands {
 
     SCREEN_SHARE_PICKER = "screenshare:picker",
 
-    HANDLE_KEY_BIND = "keyBinds:handle"
+    KEY_BINDS_HANDLE = "keyBinds:handle",
+    KEY_BINDS_SET_STATUS = "keyBinds:setStatus"
 }

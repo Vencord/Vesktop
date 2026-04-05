@@ -8,6 +8,7 @@ import { randomUUID } from "crypto";
 import { ipcMain } from "electron";
 import { IpcEvents } from "shared/IpcEvents";
 
+import { appReady } from "./events";
 import { mainWin } from "./mainWindow";
 
 const resolvers = new Map<string, Record<"resolve" | "reject", (data: any) => void>>();
@@ -30,7 +31,9 @@ export interface IpcResponse {
  *
  * You must add a handler for the message in the renderer process.
  */
-export function sendRendererCommand<T = any>(message: string, data?: any) {
+export async function sendRendererCommand<T = any>(message: string, data?: any) {
+    await appReady;
+
     if (mainWin.isDestroyed()) {
         console.warn("Main window is destroyed, cannot send IPC command:", message);
         return Promise.reject(new Error("Main window is destroyed"));
