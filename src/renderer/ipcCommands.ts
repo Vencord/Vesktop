@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByPropsLazy } from "@vencord/types/webpack";
+import { SettingsRouter } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { openScreenSharePicker } from "./components/ScreenSharePicker";
@@ -12,7 +12,6 @@ import { openScreenSharePicker } from "./components/ScreenSharePicker";
 type IpcCommandHandler = (data: any) => any;
 
 const handlers = new Map<string, IpcCommandHandler>();
-const OpenSettingsModule = findByPropsLazy("openUserSettings");
 
 function respond(nonce: string, ok: boolean, data: any) {
     VesktopNative.commands.respond({ nonce, ok, data });
@@ -47,7 +46,7 @@ export function offIpcCommand(channel: string) {
 /* Generic Handlers */
 
 onIpcCommand(IpcCommands.NAVIGATE_SETTINGS, () => {
-    OpenSettingsModule.openUserSettings();
+    SettingsRouter.openUserSettings("my_account_panel");
 });
 
 onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
