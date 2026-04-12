@@ -42,6 +42,14 @@ import { SimpleErrorBoundary } from "./SimpleErrorBoundary";
 
 const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
 const StreamFps = ["15", "30", "60"] as const;
+export const screenShareBitrateMin = 500000;
+export const screenShareBitrateMaxFloor = 8000000;
+export const screenShareBitrateTarget = 600000;
+const screenSharePixelCountGuardKey = "__vesktopScreenSharePixelCountGuard";
+const screenShareVideoStreamParametersGuardKey = "__vesktopScreenShareVideoStreamParametersGuard";
+const screenShareMaxResolutionGuardKey = "__vesktopScreenShareMaxResolutionGuard";
+const screenShareVideoStreamParameterListGuardKey = "__vesktopScreenShareVideoStreamParameterListGuard";
+const screenShareSyncDelaysMs = [0, 10, 50, 100, 250, 500, 1000];
 
 const cl = classNameFactory("vcd-screen-picker-");
 
@@ -75,9 +83,436 @@ interface Source {
     url: string;
 }
 
+interface ScreenShareProfile {
+    frameRate: number;
+    height: number;
+    width: number;
+    pixelCount: number;
+}
+
+interface ScreenShareBitrateProfile {
+    min: number;
+    target: number;
+    max: number;
+}
+
+export interface ScreenShareVideoStreamParameters {
+    maxBitrate?: number;
+    maxFrameRate?: number;
+    maxPixelCount?: number;
+    minBitrate?: number;
+    targetBitrate?: number;
+    maxResolution?: {
+        type?: string;
+        width?: number;
+        height?: number;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
+interface MediaEngineConnectionLike {
+    streamUserId?: string;
+    input?: {
+        desktop?: {
+            stream?: {
+                getVideoTracks?: () => MediaStreamTrack[];
+            };
+        };
+    };
+    videoStreamParameters?: Array<ScreenShareVideoStreamParameters | undefined>;
+}
+
 export let currentSettings: StreamSettings | null = null;
 
 const logger = new Logger("VesktopScreenShare");
+let screenShareParameterSyncSequence = 0;
+
+function getCurrentUserMediaEngineConnections() {
+    try {
+        const currentUserId = UserStore.getCurrentUser()?.id;
+        if (!currentUserId) {
+            return [] as MediaEngineConnectionLike[];
+        }
+
+        return [...MediaEngineStore.getMediaEngine().connections].filter(
+            candidate => candidate.streamUserId === currentUserId
+        ) as MediaEngineConnectionLike[];
+    } catch (error) {
+        logger.error("Failed to enumerate media engine connections for screenshare sync.", error);
+        return [];
+    }
+}
+
+function hasDesktopVideoTrack(connection: MediaEngineConnectionLike) {
+    return Boolean(connection.input?.desktop?.stream?.getVideoTracks?.().some(track => track.kind === "video"));
+}
+
+function getCurrentUserScreenShareVideoStreamParameterTargets() {
+    const connections = getCurrentUserMediaEngineConnections();
+    if (!connections.length) {
+        return [];
+    }
+
+    const preferredConnections = connections.filter(hasDesktopVideoTrack);
+    return preferredConnections.length ? preferredConnections : connections.slice(0, 1);
+}
+
+export function getSelectedScreenShareProfile(): ScreenShareProfile {
+    const { screenshareQuality } = State.store;
+    const frameRate = Number(screenshareQuality?.frameRate ?? 30);
+    const height = Number(screenshareQuality?.resolution ?? 720);
+    const width = Math.round(height * (16 / 9));
+
+    return {
+        frameRate,
+        height,
+        width,
+        pixelCount: height * width
+    };
+}
+
+function normalizeScreenShareBitrate(value: unknown) {
+    const bitrate = Number(value);
+    return Number.isFinite(bitrate) && bitrate > 0 ? Math.round(bitrate) : void 0;
+}
+
+function applyScreenShareBitrateFloor(value: number) {
+    return Math.max(screenShareBitrateMin, Math.round(value));
+}
+
+export function getSelectedScreenShareBitrateProfile(
+    profile: ScreenShareProfile = getSelectedScreenShareProfile()
+): ScreenShareBitrateProfile {
+    let min = screenShareBitrateMin;
+    let target = screenShareBitrateTarget;
+
+    if (profile.height >= 2160) {
+        min = 4000000;
+        target = 6000000;
+    } else if (profile.height >= 1440) {
+        min = 3000000;
+        target = 5000000;
+    } else if (profile.height >= 1080) {
+        min = 2000000;
+        target = 3500000;
+    } else if (profile.height >= 720) {
+        min = 1200000;
+        target = 2000000;
+    } else {
+        min = 700000;
+        target = 1000000;
+    }
+
+    if (profile.frameRate >= 60) {
+        min = Math.round(min * 1.25);
+        target = Math.round(target * 1.25);
+    } else if (profile.frameRate <= 15) {
+        min = Math.round(min * 0.9);
+        target = Math.round(target * 0.9);
+    }
+
+    min = applyScreenShareBitrateFloor(min);
+    target = applyScreenShareBitrateFloor(Math.max(target, min));
+
+    return {
+        min,
+        target,
+        max: screenShareBitrateMaxFloor
+    };
+}
+
+function getScreenShareBitrateValueAtLeast(value: unknown, floor: number) {
+    return normalizeScreenShareBitrate(value) ?? applyScreenShareBitrateFloor(floor);
+}
+
+function installScreenSharePixelCountGuard(videoStreamParameters: ScreenShareVideoStreamParameters) {
+    const guardedStreamParameters = videoStreamParameters as Record<string, unknown>;
+    if (guardedStreamParameters[screenSharePixelCountGuardKey]) {
+        return;
+    }
+
+    Object.defineProperty(videoStreamParameters, "maxPixelCount", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getSelectedScreenShareProfile().pixelCount;
+        },
+        set() {
+            // Always reflect the currently selected profile on reads.
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, screenSharePixelCountGuardKey, {
+        configurable: false,
+        enumerable: false,
+        value: true,
+        writable: false
+    });
+}
+
+function installScreenShareMaxResolutionGuard(
+    maxResolution: ScreenShareVideoStreamParameters["maxResolution"]
+): NonNullable<ScreenShareVideoStreamParameters["maxResolution"]> {
+    const guardedMaxResolution = (
+        typeof maxResolution === "object" && maxResolution !== null ? maxResolution : {}
+    ) as NonNullable<ScreenShareVideoStreamParameters["maxResolution"]> & Record<string, unknown>;
+
+    if (guardedMaxResolution[screenShareMaxResolutionGuardKey]) {
+        return guardedMaxResolution;
+    }
+
+    Object.defineProperty(guardedMaxResolution, "type", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return "fixed";
+        },
+        set() {
+            // Always reflect a fixed resolution profile on reads.
+        }
+    });
+
+    Object.defineProperty(guardedMaxResolution, "width", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getSelectedScreenShareProfile().width;
+        },
+        set() {
+            // Always reflect the currently selected profile on reads.
+        }
+    });
+
+    Object.defineProperty(guardedMaxResolution, "height", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getSelectedScreenShareProfile().height;
+        },
+        set() {
+            // Always reflect the currently selected profile on reads.
+        }
+    });
+
+    Object.defineProperty(guardedMaxResolution, screenShareMaxResolutionGuardKey, {
+        configurable: false,
+        enumerable: false,
+        value: true,
+        writable: false
+    });
+
+    return guardedMaxResolution;
+}
+
+function installScreenShareVideoStreamParameterGuards(videoStreamParameters: ScreenShareVideoStreamParameters) {
+    const guardedStreamParameters = videoStreamParameters as Record<string, unknown>;
+    if (guardedStreamParameters[screenShareVideoStreamParametersGuardKey]) {
+        return;
+    }
+
+    let maxResolution = installScreenShareMaxResolutionGuard(videoStreamParameters.maxResolution);
+    let maxBitrate = normalizeScreenShareBitrate(videoStreamParameters.maxBitrate);
+    let minBitrate = normalizeScreenShareBitrate(videoStreamParameters.minBitrate);
+    let targetBitrate = normalizeScreenShareBitrate(videoStreamParameters.targetBitrate);
+
+    installScreenSharePixelCountGuard(videoStreamParameters);
+
+    Object.defineProperty(videoStreamParameters, "maxBitrate", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getScreenShareBitrateValueAtLeast(maxBitrate, getSelectedScreenShareBitrateProfile().max);
+        },
+        set(value) {
+            maxBitrate = normalizeScreenShareBitrate(value);
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, "minBitrate", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getScreenShareBitrateValueAtLeast(minBitrate, getSelectedScreenShareBitrateProfile().min);
+        },
+        set(value) {
+            minBitrate = normalizeScreenShareBitrate(value);
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, "targetBitrate", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getScreenShareBitrateValueAtLeast(targetBitrate, getSelectedScreenShareBitrateProfile().target);
+        },
+        set(value) {
+            targetBitrate = normalizeScreenShareBitrate(value);
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, "maxFrameRate", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getSelectedScreenShareProfile().frameRate;
+        },
+        set() {
+            // Always reflect the currently selected profile on reads.
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, "maxResolution", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return maxResolution;
+        },
+        set(value) {
+            maxResolution = installScreenShareMaxResolutionGuard(value);
+            maxResolution.type = "fixed";
+            maxResolution.width = getSelectedScreenShareProfile().width;
+            maxResolution.height = getSelectedScreenShareProfile().height;
+        }
+    });
+
+    Object.defineProperty(videoStreamParameters, screenShareVideoStreamParametersGuardKey, {
+        configurable: false,
+        enumerable: false,
+        value: true,
+        writable: false
+    });
+}
+
+function installScreenShareVideoStreamParameterListGuard(
+    videoStreamParameters: Array<ScreenShareVideoStreamParameters | undefined> | undefined
+) {
+    if (!Array.isArray(videoStreamParameters)) {
+        return videoStreamParameters;
+    }
+
+    const guardedParameterList = videoStreamParameters as Array<ScreenShareVideoStreamParameters | undefined> &
+        Record<string, unknown>;
+
+    if (guardedParameterList[screenShareVideoStreamParameterListGuardKey]) {
+        const currentPrimaryParameters = guardedParameterList[0];
+        if (currentPrimaryParameters) {
+            installScreenShareVideoStreamParameterGuards(currentPrimaryParameters);
+        }
+
+        return videoStreamParameters;
+    }
+
+    let primaryParameters = guardedParameterList[0];
+    if (primaryParameters) {
+        installScreenShareVideoStreamParameterGuards(primaryParameters);
+    }
+
+    Object.defineProperty(guardedParameterList, "0", {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return primaryParameters;
+        },
+        set(value: ScreenShareVideoStreamParameters | undefined) {
+            if (value) {
+                installScreenShareVideoStreamParameterGuards(value);
+            }
+
+            primaryParameters = value;
+        }
+    });
+
+    Object.defineProperty(guardedParameterList, screenShareVideoStreamParameterListGuardKey, {
+        configurable: false,
+        enumerable: false,
+        value: true,
+        writable: false
+    });
+
+    return videoStreamParameters;
+}
+
+export function getScreenShareConnectionVideoStreamParameters(
+    connection:
+        | {
+              videoStreamParameters?: Array<ScreenShareVideoStreamParameters | undefined>;
+          }
+        | null
+        | undefined
+) {
+    const guardedParameterList = installScreenShareVideoStreamParameterListGuard(connection?.videoStreamParameters);
+    const currentPrimaryParameters = guardedParameterList?.[0];
+
+    if (currentPrimaryParameters) {
+        installScreenShareVideoStreamParameterGuards(currentPrimaryParameters);
+    }
+
+    return currentPrimaryParameters;
+}
+
+export function syncSelectedScreenShareVideoStreamParameters(
+    videoStreamParameters: ScreenShareVideoStreamParameters | null | undefined
+) {
+    if (!videoStreamParameters) {
+        return;
+    }
+
+    installScreenShareVideoStreamParameterGuards(videoStreamParameters);
+
+    const profile = getSelectedScreenShareProfile();
+    const bitrateProfile = getSelectedScreenShareBitrateProfile(profile);
+
+    videoStreamParameters.maxBitrate = getScreenShareBitrateValueAtLeast(
+        videoStreamParameters.maxBitrate,
+        bitrateProfile.max
+    );
+    videoStreamParameters.maxFrameRate = profile.frameRate;
+    videoStreamParameters.maxPixelCount = profile.pixelCount;
+    videoStreamParameters.minBitrate = getScreenShareBitrateValueAtLeast(
+        videoStreamParameters.minBitrate,
+        bitrateProfile.min
+    );
+    videoStreamParameters.targetBitrate = getScreenShareBitrateValueAtLeast(
+        videoStreamParameters.targetBitrate,
+        bitrateProfile.target
+    );
+
+    const maxResolution = videoStreamParameters.maxResolution ?? (videoStreamParameters.maxResolution = {});
+    maxResolution.type = "fixed";
+    maxResolution.height = profile.height;
+    maxResolution.width = profile.width;
+}
+
+export function syncCurrentUserScreenShareVideoStreamParameters() {
+    if (!isLinux) {
+        return;
+    }
+
+    for (const connection of getCurrentUserScreenShareVideoStreamParameterTargets()) {
+        syncSelectedScreenShareVideoStreamParameters(getScreenShareConnectionVideoStreamParameters(connection));
+    }
+}
+
+export function scheduleCurrentUserScreenShareVideoStreamParameterSync() {
+    if (!isLinux) {
+        return;
+    }
+
+    const currentSequence = ++screenShareParameterSyncSequence;
+
+    syncCurrentUserScreenShareVideoStreamParameters();
+
+    for (const delayMs of screenShareSyncDelaysMs) {
+        window.setTimeout(() => {
+            if (currentSequence !== screenShareParameterSyncSequence) {
+                return;
+            }
+
+            syncCurrentUserScreenShareVideoStreamParameters();
+        }, delayMs);
+    }
+}
 
 addPatch({
     patches: [
@@ -90,31 +525,29 @@ addPatch({
         }
     ],
     patchStreamQuality(opts: any) {
-        const { screenshareQuality } = State.store;
-        if (!screenshareQuality) return opts;
-
-        const framerate = Number(screenshareQuality.frameRate);
-        const height = Number(screenshareQuality.resolution);
-        const width = Math.round(height * (16 / 9));
+        if (!State.store.screenshareQuality) return opts;
+        const profile = getSelectedScreenShareProfile();
 
         Object.assign(opts, {
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
+            // Keep the upstream global bitrate policy stable. Linux-specific
+            // runtime parameter recovery happens in the Linux patch path.
+            bitrateMin: getScreenShareBitrateValueAtLeast(opts?.bitrateMin, screenShareBitrateMin),
+            bitrateMax: getScreenShareBitrateValueAtLeast(opts?.bitrateMax, screenShareBitrateMaxFloor),
+            bitrateTarget: getScreenShareBitrateValueAtLeast(opts?.bitrateTarget, screenShareBitrateTarget)
         });
         if (opts?.encode) {
             Object.assign(opts.encode, {
-                framerate,
-                width,
-                height,
-                pixelCount: height * width
+                framerate: profile.frameRate,
+                width: profile.width,
+                height: profile.height,
+                pixelCount: profile.pixelCount
             });
         }
         Object.assign(opts.capture, {
-            framerate,
-            width,
-            height,
-            pixelCount: height * width
+            framerate: profile.frameRate,
+            width: profile.width,
+            height: profile.height,
+            pixelCount: profile.pixelCount
         });
         return opts;
     }
@@ -747,18 +1180,22 @@ function ModalComponent({
                     onClick={() => {
                         currentSettings = settings;
                         try {
-                            const frameRate = Number(qualitySettings.frameRate);
-                            const height = Number(qualitySettings.resolution);
-                            const width = Math.round(height * (16 / 9));
+                            if (isLinux) {
+                                scheduleCurrentUserScreenShareVideoStreamParameterSync();
+                            } else {
+                                const frameRate = Number(qualitySettings.frameRate);
+                                const height = Number(qualitySettings.resolution);
+                                const width = Math.round(height * (16 / 9));
 
-                            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                connection => connection.streamUserId === UserStore.getCurrentUser().id
-                            );
+                                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
+                                );
 
-                            if (conn) {
-                                conn.videoStreamParameters[0].maxFrameRate = frameRate;
-                                conn.videoStreamParameters[0].maxResolution.height = height;
-                                conn.videoStreamParameters[0].maxResolution.width = width;
+                                if (conn) {
+                                    conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                                    conn.videoStreamParameters[0].maxResolution.height = height;
+                                    conn.videoStreamParameters[0].maxResolution.width = width;
+                                }
                             }
 
                             submit({
@@ -766,34 +1203,35 @@ function ModalComponent({
                                 ...settings
                             });
 
-                            setTimeout(async () => {
-                                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
-                                );
-                                if (!conn) return;
+                            if (!isLinux) {
+                                const frameRate = Number(qualitySettings.frameRate);
+                                const height = Number(qualitySettings.resolution);
+                                const width = Math.round(height * (16 / 9));
 
-                                const track = conn.input.stream.getVideoTracks()[0];
-
-                                const constraints = {
-                                    ...track.getConstraints(),
-                                    frameRate: { min: frameRate, ideal: frameRate },
-                                    width: { min: 640, ideal: width, max: width },
-                                    height: { min: 480, ideal: height, max: height },
-                                    advanced: [{ width: width, height: height }],
-                                    resizeMode: "none"
-                                };
-
-                                try {
-                                    await track.applyConstraints(constraints);
-
-                                    logger.info(
-                                        "Applied constraints successfully. New constraints:",
-                                        track.getConstraints()
+                                setTimeout(async () => {
+                                    const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                                        connection => connection.streamUserId === UserStore.getCurrentUser().id
                                     );
-                                } catch (e) {
-                                    logger.error("Failed to apply constraints.", e);
-                                }
-                            }, 100);
+                                    if (!conn) return;
+
+                                    const track = conn.input.stream.getVideoTracks()[0];
+
+                                    const constraints = {
+                                        ...track.getConstraints(),
+                                        frameRate: { min: frameRate, ideal: frameRate },
+                                        width: { min: 640, ideal: width, max: width },
+                                        height: { min: 480, ideal: height, max: height },
+                                        advanced: [{ width: width, height: height }],
+                                        resizeMode: "none"
+                                    };
+
+                                    try {
+                                        await track.applyConstraints(constraints);
+                                    } catch (error) {
+                                        logger.error("Failed to apply constraints.", error);
+                                    }
+                                }, 100);
+                            }
                         } catch (error) {
                             logger.error("Error while submitting stream.", error);
                         }
