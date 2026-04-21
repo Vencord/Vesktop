@@ -32,16 +32,14 @@ export interface ReleaseData {
 }
 
 export async function githubGet(endpoint: string) {
-    const opts: RequestInit = {
-        headers: {
-            Accept: "application/vnd.github+json",
-            "User-Agent": USER_AGENT
-        }
+    const headers: Record<string, string> = {
+        Accept: "application/vnd.github+json",
+        "User-Agent": USER_AGENT
     };
 
-    if (process.env.GITHUB_TOKEN) (opts.headers! as any).Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 
-    return fetchie(API_BASE + endpoint, opts, { retryOnNetworkError: true });
+    return fetchie(API_BASE + endpoint, { headers }, { retryOnNetworkError: true });
 }
 
 export async function downloadVencordFiles() {
