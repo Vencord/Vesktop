@@ -9,11 +9,13 @@
  * @param fn Function to wrap
  * @returns New function that can only be called once
  */
-export function once<T extends Function>(fn: T): T {
+export function once<T extends (...args: any[]) => any>(fn: T): (...args: Parameters<T>) => ReturnType<T> | undefined {
     let called = false;
-    return function (this: any, ...args: any[]) {
-        if (called) return;
+    let result: ReturnType<T> | undefined;
+    return (...args: Parameters<T>) => {
+        if (called) return result;
         called = true;
-        return fn.apply(this, args);
-    } as any;
+        result = fn(...args);
+        return result;
+    };
 }
