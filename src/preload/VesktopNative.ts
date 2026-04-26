@@ -107,5 +107,10 @@ export const VesktopNative = {
             ipcRenderer.on(IpcEvents.IPC_COMMAND, (_, message) => cb(message));
         },
         respond: (response: IpcResponse) => ipcRenderer.send(IpcEvents.IPC_COMMAND, response)
+    },
+    safeStorage: {
+        isAvailable: () => sendSync<boolean>(IpcEvents.SAFE_STORAGE_AVAILABLE),
+        encryptToken: (plaintext: string) => sendSync<string | null>(IpcEvents.TOKEN_ENCRYPT, plaintext),
+        decryptToken: (encrypted: string) => sendSync<string | null>(IpcEvents.TOKEN_DECRYPT, encrypted)
     }
 };

@@ -12,6 +12,7 @@ import {
     MenuItemConstructorOptions,
     nativeTheme,
     Rectangle,
+    safeStorage,
     screen,
     session
 } from "electron";
@@ -437,6 +438,43 @@ function retryUrl(url: string, description: string) {
     setTimeout(() => loadUrl(url), retryDelay);
 }
 
+async function migrateTokenCookie() {
+    if (!safeStorage.isEncryptionAvailable()) return;
+
+    const cookies = await session.defaultSession.cookies.get({ name: "tokens" });
+    for (const cookie of cookies) {
+        let decoded: string;
+        try {
+            decoded = decodeURIComponent(cookie.value);
+        } catch {
+            continue;
+        }
+
+        // Only migrate plaintext JSON values — already-encrypted blobs won't
+        // start with '{'.
+        if (!decoded.startsWith("{")) continue;
+
+        try {
+            const encrypted = safeStorage.encryptString(decoded).toString("base64");
+            // Let Chromium derive domain/path from the URL to avoid
+            // inconsistencies that cause cookies.set to reject the call.
+            const url = `https://${(cookie.domain || "discord.com").replace(/^\./, "")}${cookie.path || "/"}`;
+
+            await session.defaultSession.cookies.set({
+                url,
+                name: cookie.name,
+                value: encodeURIComponent(encrypted),
+                secure: cookie.secure,
+                httpOnly: cookie.httpOnly,
+                sameSite: cookie.sameSite as "unspecified" | "no_restriction" | "lax" | "strict",
+                expirationDate: cookie.expirationDate
+            });
+        } catch (e) {
+            console.error("[Vesktop] Failed to migrate token cookie:", e);
+        }
+    }
+}
+
 export async function createWindows() {
     const startMinimized = CommandLine.values["start-minimized"];
 
@@ -450,6 +488,7 @@ export async function createWindows() {
 
     await ensureVencordFiles();
     runVencordMain();
+    await migrateTokenCookie();
 
     mainWin = createMainWindow();
 
