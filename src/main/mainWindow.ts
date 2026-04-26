@@ -38,6 +38,7 @@ import { downloadVencordFiles, ensureVencordFiles, vencordSupportsSandboxing } f
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 let isQuitting = false;
+let lastRendererCrashAt = 0;
 
 applyDeckKeyboardFix();
 
@@ -485,6 +486,25 @@ export async function createWindows() {
         }
     });
 
-    mainWin.webContents.on("render-process-gone", (event, details) => console.log(details));
+    mainWin.webContents.on("render-process-gone", (_, details) => {
+        console.error("Renderer process gone:", details);
+
+        // Only auto-reload on actual crashes, not clean exits or user-initiated kills.
+        // See https://www.electronjs.org/docs/latest/api/web-contents#event-render-process-gone
+        const recoverableReasons = new Set(["crashed", "oom", "abnormal-exit"]);
+        if (!recoverableReasons.has(details.reason)) return;
+
+        // Loop-breaker: if we crashed again within 30s of the last crash, give up
+        // so a renderer that crashes on load doesn't reload forever.
+        const now = Date.now();
+        if (now - lastRendererCrashAt < 30_000) {
+            console.error("Renderer crashed twice within 30s; not auto-reloading");
+            return;
+        }
+        lastRendererCrashAt = now;
+
+        console.log("Auto-reloading renderer after crash");
+        mainWin.webContents.reload();
+    });
     initArRPC();
 }
