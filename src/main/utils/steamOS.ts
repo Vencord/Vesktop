@@ -19,7 +19,10 @@ const numberRegex = /^[0-9]*$/;
 
 let steamPipeQueue = Promise.resolve();
 
-export const isDeckGameMode = process.env.SteamOS === "1" && process.env.SteamGamepadUI === "1";
+export const isDeckGameMode =
+    process.env.SteamOS === "1" &&
+    process.env.SteamGamepadUI === "1" &&
+    process.env.XDG_CURRENT_DESKTOP === "gamescope";
 
 export function applyDeckKeyboardFix() {
     if (!isDeckGameMode) return;
