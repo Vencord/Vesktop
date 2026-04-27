@@ -409,6 +409,9 @@ function createMainWindow() {
 
     win.webContents.setUserAgent(BrowserUserAgent);
 
+    // Fixes voice/video calls hanging at DTLS Connecting when using VPNs like Tailscale
+    win.webContents.setWebRTCIPHandlingPolicy("default_public_and_private_interfaces");
+
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
     // win.webContents.session.clearCache().then(() => {
     loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
