@@ -107,7 +107,11 @@ function getWindow(e: IpcMainInvokeEvent, key?: string) {
 }
 
 handle(IpcEvents.FOCUS, () => {
+    if (mainWin.isMinimized()) {
+        mainWin.restore();
+    }
     mainWin.show();
+    mainWin.focus();
     mainWin.setSkipTaskbar(false);
 });
 
