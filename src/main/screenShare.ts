@@ -58,7 +58,15 @@ export function registerScreenShareHandler() {
                 if (stream === null) return callback({});
             }
 
-            callback(video ? { video: sources[0] } : {});
+            // Workaround for electron/electron#30652: Chromium's
+            // WebRTCPipeWireCapturer creates a fresh portal session in Start()
+            // that is independent from the one desktopCapturer.getSources just
+            // used. On non-GNOME compositors (niri, hyprland, sway) this
+            // surfaces as TWO portal chooser dialogs. Passing a synthetic
+            // source ID here lets PipeWire's portal show its picker only
+            // once, when the actual stream starts.
+            const placeholder = { id: "screen:0:0", name: "Entire Screen" } as Electron.DesktopCapturerSource;
+            callback(video ? { video: placeholder } : {});
             return;
         }
 
