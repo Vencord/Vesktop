@@ -8,7 +8,7 @@
 
 import fs from "fs/promises";
 import path from "path";
-import AppImageTarget from "app-builder-lib/out/targets/AppImageTarget.js";
+import AppImageTarget from "app-builder-lib/out/targets/appimage/AppImageTarget.js";
 
 let isApplied = false;
 

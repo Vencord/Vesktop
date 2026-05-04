@@ -6,7 +6,7 @@
 
 import "./UserAssets.css";
 
-import { FormSwitch } from "@vencord/types/components";
+import { BaseText, Button, FormSwitch } from "@vencord/types/components";
 import {
     Margins,
     ModalCloseButton,
@@ -18,7 +18,7 @@ import {
     wordsFromCamel,
     wordsToTitle
 } from "@vencord/types/utils";
-import { Button, showToast, Text, useState } from "@vencord/types/webpack/common";
+import { showToast, useState } from "@vencord/types/webpack/common";
 import { UserAssetType } from "main/userAssets";
 import { useSettings } from "renderer/settings";
 
@@ -34,9 +34,9 @@ function openAssetsModal() {
     openModal(props => (
         <ModalRoot {...props} size={ModalSize.MEDIUM}>
             <ModalHeader>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>
+                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
                     User Assets
-                </Text>
+                </BaseText>
                 <ModalCloseButton onClick={props.onClose} />
             </ModalHeader>
 
@@ -73,9 +73,9 @@ function Asset({ asset }: { asset: UserAssetType }) {
 
     return (
         <section>
-            <Text tag="h3" variant="text-md/semibold">
+            <BaseText size="md" weight="medium" tag="h3">
                 {wordsToTitle(wordsFromCamel(asset))}
-            </Text>
+            </BaseText>
             <div className="vcd-user-assets-asset">
                 <img
                     className="vcd-user-assets-image"
@@ -86,7 +86,7 @@ function Asset({ asset }: { asset: UserAssetType }) {
                 <div className="vcd-user-assets-actions">
                     <div className="vcd-user-assets-buttons">
                         <Button onClick={onChooseAsset()}>Customize</Button>
-                        <Button color={Button.Colors.PRIMARY} onClick={onChooseAsset(null)}>
+                        <Button variant="secondary" onClick={onChooseAsset(null)}>
                             Reset to default
                         </Button>
                     </div>

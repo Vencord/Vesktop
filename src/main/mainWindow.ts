@@ -34,7 +34,7 @@ import { destroyTray, initTray } from "./tray";
 import { clearData } from "./utils/clearData";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordFiles, ensureVencordFiles, vencordSupportsSandboxing } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 import { initWaylandIdleHandler } from "./waylandIdle";
 
@@ -186,8 +186,11 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("maximize", saveState);
     win.on("minimize", saveState);
     win.on("unmaximize", saveState);
+    win.on("restore", saveState);
 
     const saveBounds = () => {
+        if (win.isMaximized()) return;
+
         State.store.windowBounds = win.getBounds();
     };
 
@@ -313,18 +316,18 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
         Settings.store;
 
-    const { frameless, transparent, macosTranslucency } = VencordSettings.store;
+    const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
     const backgroundColor =
         splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const options: BrowserWindowConstructorOptions = {
-        show: Settings.store.enableSplashScreen === false,
+        show: Settings.store.enableSplashScreen === false && !CommandLine.values["start-minimized"],
         backgroundColor,
         webPreferences: {
             nodeIntegration: false,
-            sandbox: false, // TODO
+            sandbox: vencordSupportsSandboxing(),
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
@@ -359,9 +362,9 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         options.titleBarStyle = "hidden";
         options.trafficLightPosition = { x: 10, y: 10 };
 
-        if (macosTranslucency) {
-            options.vibrancy = "sidebar";
-            options.backgroundColor = "#ffffff00";
+        if (macosVibrancyStyle) {
+            options.vibrancy = macosVibrancyStyle;
+            options.backgroundColor = "#00000000";
         }
     }
 
@@ -388,6 +391,10 @@ function createMainWindow() {
         else win.hide();
 
         return false;
+    });
+
+    win.on("focus", () => {
+        win.flashFrame(false);
     });
 
     initWindowBoundsListeners(win);
@@ -481,5 +488,6 @@ export async function createWindows() {
         }
     });
 
+    mainWin.webContents.on("render-process-gone", (event, details) => console.log(details));
     initArRPC();
 }

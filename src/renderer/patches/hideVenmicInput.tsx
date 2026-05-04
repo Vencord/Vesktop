@@ -11,7 +11,6 @@ addPatch({
         {
             find: 'setSinkId"in',
             replacement: {
-                // eslint-disable-next-line no-useless-escape
                 match: /return (\i)\?navigator\.mediaDevices\.enumerateDevices/,
                 replace: "return $1 ? $self.filteredDevices"
             }

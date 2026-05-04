@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Node } from "@vencord/venmic";
-import { ipcRenderer } from "electron";
-import { IpcMessage, IpcResponse } from "main/ipcCommands";
+import type { Node } from "@vencord/venmic";
+import { ipcRenderer } from "electron/renderer";
+import type { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
 
 import { IpcEvents } from "../shared/IpcEvents";
@@ -34,7 +34,14 @@ export const VesktopNative = {
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
         getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION),
         isOutdated: () => invoke<boolean>(IpcEvents.UPDATER_IS_OUTDATED),
-        openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN)
+        openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN),
+        // used by vencord
+        getRendererCss: () => invoke<string>(IpcEvents.GET_VESKTOP_RENDERER_CSS),
+        onRendererCssUpdate: (cb: (newCss: string) => void) => {
+            if (!IS_DEV) return;
+
+            ipcRenderer.on(IpcEvents.VESKTOP_RENDERER_CSS_UPDATE, (_e, newCss: string) => cb(newCss));
+        }
     },
     powerMonitor: {
         isWaylandIdle: () => sendSync<boolean>(IpcEvents.IS_WAYLAND_IDLE)
@@ -45,8 +52,8 @@ export const VesktopNative = {
         disable: () => invoke<void>(IpcEvents.DISABLE_AUTOSTART)
     },
     fileManager: {
-        showItemInFolder: (path: string) => invoke<void>(IpcEvents.SHOW_ITEM_IN_FOLDER, path),
-        getVencordDir: () => sendSync<string | undefined>(IpcEvents.GET_VENCORD_DIR),
+        isUsingCustomVencordDir: () => sendSync<boolean>(IpcEvents.IS_USING_CUSTOM_VENCORD_DIR),
+        showCustomVencordDir: () => invoke<void>(IpcEvents.SHOW_CUSTOM_VENCORD_DIR),
         selectVencordDir: (value?: null) => invoke<"cancelled" | "invalid" | "ok">(IpcEvents.SELECT_VENCORD_DIR, value),
         chooseUserAsset: (asset: string, value?: null) =>
             invoke<"cancelled" | "invalid" | "ok" | "failed">(IpcEvents.CHOOSE_USER_ASSET, asset, value)
@@ -71,6 +78,7 @@ export const VesktopNative = {
         close: (key?: string) => invoke<void>(IpcEvents.CLOSE, key),
         minimize: (key?: string) => invoke<void>(IpcEvents.MINIMIZE, key),
         maximize: (key?: string) => invoke<void>(IpcEvents.MAXIMIZE, key),
+        flashFrame: (flag: boolean) => invoke<void>(IpcEvents.FLASH_FRAME, flag),
         setDevtoolsCallbacks: (onOpen: () => void, onClose: () => void) => {
             onDevtoolsOpen = onOpen;
             onDevtoolsClose = onClose;
