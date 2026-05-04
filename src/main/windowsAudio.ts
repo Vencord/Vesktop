@@ -4,18 +4,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ChildProcessByStdio, spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { BrowserWindow, ipcMain } from "electron";
 import { existsSync } from "fs";
 import { join } from "path";
-import { Readable } from "stream";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
 import { getWindowProcessId, supportsProcessLoopback } from "./dbus";
 
 interface ActiveCapture {
-    child: ChildProcessByStdio<null, Readable, Readable>;
+    child: ChildProcessWithoutNullStreams;
 }
 
 let activeCapture: ActiveCapture | null = null;

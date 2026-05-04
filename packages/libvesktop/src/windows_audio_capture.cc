@@ -37,21 +37,8 @@ public:
             return E_POINTER;
         }
 
-        if (riid == __uuidof(IUnknown))
-        {
-            *ppvObject = static_cast<IActivateAudioInterfaceCompletionHandler *>(this);
-            AddRef();
-            return S_OK;
-        }
-
-        if (riid == __uuidof(IActivateAudioInterfaceCompletionHandler))
-        {
-            *ppvObject = static_cast<IActivateAudioInterfaceCompletionHandler *>(this);
-            AddRef();
-            return S_OK;
-        }
-
-        if (riid == __uuidof(IAgileObject))
+        if (riid == __uuidof(IUnknown) || riid == __uuidof(IActivateAudioInterfaceCompletionHandler) ||
+            riid == __uuidof(IAgileObject))
         {
             *ppvObject = static_cast<IAgileObject *>(this);
             AddRef();
