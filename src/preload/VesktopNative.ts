@@ -98,6 +98,11 @@ export const VesktopNative = {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
     },
+    tray: {
+        setIcon: (variant: "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened") =>
+            invoke<void>(IpcEvents.SET_TRAY_ICON, variant),
+        setIsInCall: (inCall: Boolean) => invoke<void>(IpcEvents.SET_IN_CALL, inCall)
+    },
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
         launchWebrtcInternals: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS)

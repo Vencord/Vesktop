@@ -24,7 +24,15 @@ import { useSettings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
 
-const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash", "tray", "trayUnread"];
+const CUSTOMIZABLE_ASSETS: UserAssetType[] = [
+    "splash",
+    "tray",
+    "trayUnread",
+    "traySpeaking",
+    "trayIdle",
+    "trayMuted",
+    "trayDeafened"
+];
 
 export const UserAssetsButton: SettingsComponent = () => {
     return <Button onClick={() => openAssetsModal()}>Customize App Assets</Button>;
