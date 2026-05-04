@@ -5,7 +5,7 @@
  */
 
 import { desktopCapturer, session, Streams } from "electron";
-import type { StreamPick } from "renderer/components/ScreenSharePicker";
+import type { Source, StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 
 import { sendRendererCommand } from "./ipcCommands";
@@ -13,6 +13,10 @@ import { handle } from "./utils/ipcWrappers";
 
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
+function isPickerAbort(error: unknown) {
+    return error === "Aborted" || (error instanceof Error && error.message === "Aborted");
+}
 
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
@@ -41,9 +45,10 @@ export function registerScreenShareHandler() {
 
         if (!sources) return callback({});
 
-        const data = sources.map(({ id, name, thumbnail }) => ({
+        const data: Source[] = sources.map(({ id, name, thumbnail }) => ({
             id,
             name,
+            kind: id.startsWith("screen:") ? "screen" : "window",
             url: thumbnail.toDataURL()
         }));
 
@@ -53,7 +58,12 @@ export function registerScreenShareHandler() {
                 const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
                     screens: [video],
                     skipPicker: true
-                }).catch(() => null);
+                }).catch(error => {
+                    if (!isPickerAbort(error)) {
+                        console.error("Error during screenshare picker", error);
+                    }
+                    return null;
+                });
 
                 if (stream === null) return callback({});
             }
@@ -66,7 +76,9 @@ export function registerScreenShareHandler() {
             screens: data,
             skipPicker: false
         }).catch(e => {
-            console.error("Error during screenshare picker", e);
+            if (!isPickerAbort(e)) {
+                console.error("Error during screenshare picker", e);
+            }
             return null;
         });
 
@@ -78,7 +90,7 @@ export function registerScreenShareHandler() {
         const streams: Streams = {
             video: source
         };
-        if (choice.audio && process.platform === "win32") streams.audio = "loopback";
+        if (choice.audio && choice.kind === "screen" && process.platform === "win32") streams.audio = "loopback";
 
         callback(streams);
     });

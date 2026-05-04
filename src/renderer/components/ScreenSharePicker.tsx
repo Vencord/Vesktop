@@ -67,15 +67,24 @@ interface StreamSettings {
 
 export interface StreamPick extends StreamSettings {
     id: string;
+    kind: SourceKind;
 }
 
-interface Source {
+export interface CurrentStreamSettings extends StreamSettings {
+    id: string;
+    kind: SourceKind;
+}
+
+type SourceKind = "screen" | "window";
+
+export interface Source {
     id: string;
     name: string;
+    kind: SourceKind;
     url: string;
 }
 
-export let currentSettings: StreamSettings | null = null;
+export let currentSettings: CurrentStreamSettings | null = null;
 
 const logger = new Logger("VesktopScreenShare");
 
@@ -745,7 +754,13 @@ function ModalComponent({
                 <Button
                     disabled={!selected}
                     onClick={() => {
-                        currentSettings = settings;
+                        const source = screens.find(s => s.id === selected)!;
+                        const submitSettings = settings;
+                        currentSettings = {
+                            id: selected!,
+                            kind: source.kind,
+                            ...submitSettings
+                        };
                         try {
                             const frameRate = Number(qualitySettings.frameRate);
                             const height = Number(qualitySettings.resolution);
@@ -763,7 +778,8 @@ function ModalComponent({
 
                             submit({
                                 id: selected!,
-                                ...settings
+                                kind: source.kind,
+                                ...submitSettings
                             });
 
                             setTimeout(async () => {

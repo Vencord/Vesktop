@@ -26,6 +26,10 @@ export function getAccentColor() {
     return loadLibVesktop()?.getAccentColor() ?? null;
 }
 
+export function getWindowProcessId(windowHandle: string | number) {
+    return loadLibVesktop()?.getWindowProcessId(windowHandle) ?? null;
+}
+
 export function updateUnityLauncherCount(count: number) {
     const libVesktop = loadLibVesktop();
     if (!libVesktop) {
@@ -37,4 +41,8 @@ export function updateUnityLauncherCount(count: number) {
 
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
     return loadLibVesktop()?.requestBackground(autoStart, commandLine) ?? false;
+}
+
+export function supportsProcessLoopback() {
+    return loadLibVesktop()?.supportsProcessLoopback() ?? false;
 }

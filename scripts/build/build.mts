@@ -54,15 +54,25 @@ async function copyVenmic() {
 }
 
 async function copyLibVesktop() {
-    if (process.platform !== "linux") return;
+    if (process.platform !== "linux" && process.platform !== "win32") return;
 
     try {
         await copyFile(
-            "./packages/libvesktop/build/Release/vesktop.node",
+            "./packages/libvesktop/build/Release/libvesktop.node",
             `./static/dist/libvesktop-${process.arch}.node`
         );
+        if (process.platform === "win32") {
+            await copyFile(
+                "./packages/libvesktop/build/Release/vesktop-audio-capture.exe",
+                "./static/dist/vesktop-audio-capture.exe"
+            );
+        }
         console.log("Using local libvesktop build");
     } catch {
+        if (process.platform === "win32") {
+            console.log("No local Windows libvesktop build found. Run `pnpm buildLibVesktop` to enable per-app audio capture.");
+            return;
+        }
         console.log(
             "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
         );

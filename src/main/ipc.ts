@@ -5,6 +5,7 @@
  */
 
 if (process.platform === "linux") import("./venmic");
+if (process.platform === "win32") import("./windowsAudio");
 
 import { execFile } from "child_process";
 import {

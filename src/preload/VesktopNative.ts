@@ -13,11 +13,18 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpc";
 
 type SpellCheckerResultCallback = (word: string, suggestions: string[]) => void;
+type WinAppAudioDataCallback = (chunk: Uint8Array) => void;
 
 const spellCheckCallbacks = new Set<SpellCheckerResultCallback>();
+const winAppAudioCallbacks = new Set<WinAppAudioDataCallback>();
 
 ipcRenderer.on(IpcEvents.SPELLCHECK_RESULT, (_, w: string, s: string[]) => {
     spellCheckCallbacks.forEach(cb => cb(w, s));
+});
+
+ipcRenderer.on(IpcEvents.WIN_APP_AUDIO_DATA, (_, chunk: Uint8Array) => {
+    const data = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+    winAppAudioCallbacks.forEach(cb => cb(data));
 });
 
 let onDevtoolsOpen = () => {};
@@ -93,6 +100,20 @@ export const VesktopNative = {
         start: (include: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, include),
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
+    },
+    winAppAudio: {
+        start: (sourceId: string) =>
+            invoke<{ sampleRate: number; channels: number; bitsPerSample: number } | null>(
+                IpcEvents.WIN_APP_AUDIO_START,
+                sourceId
+            ),
+        stop: () => invoke<void>(IpcEvents.WIN_APP_AUDIO_STOP),
+        onData(cb: WinAppAudioDataCallback) {
+            winAppAudioCallbacks.add(cb);
+        },
+        offData(cb: WinAppAudioDataCallback) {
+            winAppAudioCallbacks.delete(cb);
+        }
     },
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
