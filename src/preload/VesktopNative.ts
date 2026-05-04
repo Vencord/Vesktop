@@ -44,7 +44,11 @@ export const VesktopNative = {
         }
     },
     powerMonitor: {
-        isWaylandIdle: () => sendSync<boolean>(IpcEvents.IS_WAYLAND_IDLE)
+        isWaylandIdle: () => sendSync<boolean>(IpcEvents.IS_WAYLAND_IDLE),
+        on: (event: string, cb: () => void) =>
+            ipcRenderer.on(IpcEvents.POWERMONITOR_EVENT, (_, e: string) => {
+                if (e === event) cb();
+            })
     },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),

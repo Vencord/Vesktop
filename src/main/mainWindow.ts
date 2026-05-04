@@ -28,6 +28,7 @@ import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH 
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
+import { initNativeIdle } from "./nativeIdle";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
@@ -36,7 +37,6 @@ import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles, vencordSupportsSandboxing } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
-import { initWaylandIdleHandler } from "./waylandIdle";
 
 let isQuitting = false;
 
@@ -449,7 +449,7 @@ export async function createWindows() {
         if (isDeckGameMode) splash.setFullScreen(true);
     }
 
-    initWaylandIdleHandler();
+    initNativeIdle();
 
     await ensureVencordFiles();
     runVencordMain();

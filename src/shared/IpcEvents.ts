@@ -64,7 +64,8 @@ export const enum IpcEvents {
 
     CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET",
 
-    IS_WAYLAND_IDLE = "VCD_IS_WAYLAND_IDLE"
+    IS_WAYLAND_IDLE = "VCD_IS_WAYLAND_IDLE",
+    POWERMONITOR_EVENT = "VCD_POWERMONITOR_EVENT"
 }
 
 export const enum UpdaterIpcEvents {

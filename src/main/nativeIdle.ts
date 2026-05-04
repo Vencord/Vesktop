@@ -4,22 +4,29 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { powerMonitor } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 import { Millis } from "shared/utils/millis";
 
 import { isWayland } from "./constants";
+import { mainWin } from "./mainWindow";
 import { VencordSettings } from "./settings";
 import { handleSync } from "./utils/ipcWrappers";
 
 let isWaylandIdle: () => boolean;
 
-export function initWaylandIdleHandler() {
+export function initNativeIdle() {
     handleSync(IpcEvents.IS_WAYLAND_IDLE, () => {
         isWaylandIdle ??= initWaylandIdleWatcher();
         return isWaylandIdle();
     });
+
+    for (const event of ["suspend", "resume", "lock-screen", "unlock-screen"]) {
+        // @ts-ignore
+        powerMonitor.on(event, () => mainWin.webContents.send(IpcEvents.POWERMONITOR_EVENT, event));
+    }
 }
 
 function initWaylandIdleWatcher(): () => boolean {
