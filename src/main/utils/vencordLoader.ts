@@ -48,13 +48,22 @@ export async function downloadVencordFiles() {
     const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
 
     const { assets }: ReleaseData = await release.json();
+    const assetsByName = new Map(assets.map(asset => [asset.name, asset]));
+    const missingAssets = FILES_TO_DOWNLOAD.filter(name => !assetsByName.has(name));
+
+    if (missingAssets.length) throw new Error(`Vencord release is missing assets: ${missingAssets.join(", ")}`);
 
     await Promise.all(
-        assets
-            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
-            .map(({ name, browser_download_url }) =>
-                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
+        FILES_TO_DOWNLOAD.map(name =>
+            downloadFile(
+                assetsByName.get(name)!.browser_download_url,
+                join(VENCORD_FILES_DIR, name),
+                {},
+                {
+                    retryOnNetworkError: true
+                }
             )
+        )
     );
 }
 
