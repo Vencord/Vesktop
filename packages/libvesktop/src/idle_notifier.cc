@@ -108,6 +108,7 @@ IdleNotifier::IdleNotifier(const Napi::CallbackInfo& info) : Napi::ObjectWrap<Id
 
     notification_ = ext_idle_notifier_v1_get_idle_notification(notifier_, timeout_ms, seat_);
     ext_idle_notification_v1_add_listener(notification_, &idle_listener, this);
+    wl_display_roundtrip(display_);
 
     running_.store(true);
     event_thread_ = std::thread(&IdleNotifier::runEventLoop, this);
