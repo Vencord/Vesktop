@@ -149,6 +149,7 @@
                 "com.apple.security.device.camera": true,
                 "CFBundleIconName": "Icon"
             },
+            "requirements": "build/signing-requirements.txt",
             "notarize": true
         },
         "dmg": {
