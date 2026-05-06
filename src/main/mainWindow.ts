@@ -28,6 +28,7 @@ import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH 
 import { AppEvents } from "./events";
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
+import { initNativeIdle } from "./nativeIdle";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
@@ -447,6 +448,8 @@ export async function createWindows() {
         // SteamOS letterboxes and scales it terribly, so just full screen it
         if (isDeckGameMode) splash.setFullScreen(true);
     }
+
+    initNativeIdle();
 
     await ensureVencordFiles();
     runVencordMain();

@@ -7,6 +7,8 @@
 #include <cmath>
 #include <memory>
 
+#include "idle_notifier.hh"
+
 template <typename T>
 struct GObjectDeleter
 {
@@ -263,6 +265,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set("updateUnityLauncherCount", Napi::Function::New(env, updateUnityLauncherCount));
     exports.Set("getAccentColor", Napi::Function::New(env, getAccentColor));
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
+
+    IdleNotifier::Init(env, exports);
+
     return exports;
 }
 

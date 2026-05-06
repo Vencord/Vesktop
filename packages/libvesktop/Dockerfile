@@ -9,7 +9,8 @@ RUN dpkg --add-architecture arm64
 RUN apt-get update && apt-get install -y \
     build-essential python3 curl pkg-config \
     g++-aarch64-linux-gnu libglib2.0-dev:amd64 libglib2.0-dev:arm64 \
-    ca-certificates \
+    libwayland-dev:amd64 libwayland-dev:arm64 ca-certificates \
+    wayland-protocols wayland-scanner++ \
  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
