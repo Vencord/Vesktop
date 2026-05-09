@@ -20,7 +20,6 @@
     flex-grow: 1;
 }
 
-
 /* Screen Grid */
 .vcd-screen-picker-screen-grid {
     display: grid;
@@ -54,6 +53,19 @@
     margin-inline: 0.5em;
 }
 
+.vcd-screen-picker-camera-source-preview {
+    width: 90%;
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.5em;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--primary-800);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
 .vcd-screen-picker-card {
     padding: 0.5em;
     box-sizing: border-box;
@@ -77,6 +89,9 @@
     margin-bottom: 1em;
 }
 
+.vcd-screen-picker-preview-camera {
+    width: 90%;
+}
 
 /* Option Radios */
 
@@ -148,7 +163,18 @@
     display: flex;
     gap: 1em;
 
-    >section {
+    > section {
         flex: 1;
+    }
+}
+
+.vcd-screen-picker-media-devices {
+    display: flex;
+    gap: 1em;
+    margin-bottom: 0.5em;
+
+    > section {
+        flex: 1;
+        min-width: 0;
     }
 }

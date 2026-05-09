@@ -61,6 +61,8 @@ interface AudioItem {
 interface StreamSettings {
     audio: boolean;
     contentHint?: string;
+    cameraDeviceId?: string;
+    audioInputDeviceId?: string;
     includeSources?: AudioSources;
     excludeSources?: AudioSources;
 }
@@ -72,7 +74,9 @@ export interface StreamPick extends StreamSettings {
 interface Source {
     id: string;
     name: string;
-    url: string;
+    url?: string;
+    kind?: "display" | "camera";
+    deviceId?: string;
 }
 
 export let currentSettings: StreamSettings | null = null;
@@ -177,21 +181,25 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
     });
 }
 
-function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (id: string) => void }) {
+function ScreenPicker({ screens, chooseScreen }: { screens: Source[]; chooseScreen: (source: Source) => void }) {
     return (
         <div className={cl("screen-grid")}>
-            {screens.map(({ id, name, url }) => (
-                <label key={id} className={cl("screen-label")}>
+            {screens.map(source => (
+                <label key={source.id} className={cl("screen-label")}>
                     <input
                         type="radio"
                         className={cl("screen-radio")}
                         name="screen"
-                        value={id}
-                        onChange={() => chooseScreen(id)}
+                        value={source.id}
+                        onChange={() => chooseScreen(source)}
                     />
 
-                    <img src={url} alt="" />
-                    <Paragraph className={cl("screen-name")}>{name}</Paragraph>
+                    {source.url ? (
+                        <img src={source.url} alt="" />
+                    ) : (
+                        <div className={cl("camera-source-preview")}>Camera</div>
+                    )}
+                    <Paragraph className={cl("screen-name")}>{source.name}</Paragraph>
                 </label>
             ))}
         </div>
@@ -355,7 +363,10 @@ function StreamSettingsUi({
     const qualitySettings = State.store.screenshareQuality!;
 
     const [thumb] = useAwaiter(
-        () => (skipPicker ? Promise.resolve(source.url) : VesktopNative.capturer.getLargeThumbnail(source.id)),
+        () =>
+            source.kind === "camera" || skipPicker
+                ? Promise.resolve(source.url)
+                : VesktopNative.capturer.getLargeThumbnail(source.id),
         {
             fallbackValue: source.url,
             deps: [source.id]
@@ -374,11 +385,31 @@ function StreamSettingsUi({
         ));
     };
 
+    const [mediaDevicesSignal, refreshMediaDevices] = useForceUpdater(true);
+    const [mediaDevices] = useAwaiter(() => navigator.mediaDevices.enumerateDevices(), {
+        fallbackValue: [] as MediaDeviceInfo[],
+        deps: [mediaDevicesSignal]
+    });
+
+    const audioInputs = mediaDevices.filter(device => device.kind === "audioinput");
+    const mapDeviceOptions = (devices: MediaDeviceInfo[], fallback: string) => [
+        { label: "None", value: "None", default: true },
+        { label: "Default", value: "default" },
+        ...devices.map((device, index) => ({
+            label: device.label || `${fallback} ${index + 1}`,
+            value: device.deviceId
+        }))
+    ];
+
     return (
         <div>
             <HeadingTertiary className={Margins.bottom8}>What you're streaming</HeadingTertiary>
             <Card className={cl("card", "preview")}>
-                <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
+                {thumb ? (
+                    <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
+                ) : (
+                    <div className={cl("camera-source-preview", "preview-camera")}>Camera</div>
+                )}
                 <Paragraph>{source.name}</Paragraph>
             </Card>
 
@@ -433,6 +464,31 @@ function StreamSettingsUi({
                             />
                         )}
                     </section>
+                </div>
+
+                <div className={cl("media-devices")}>
+                    <section>
+                        <Heading tag="h5">Audio Source</Heading>
+                        <Paragraph className={Margins.top8}>
+                            Choose a specific audio input to share, or leave it as "None" to share the desktop audio.
+                        </Paragraph>
+                        <SimpleErrorBoundary>
+                            <Select
+                                options={mapDeviceOptions(audioInputs, "Leave none for desktop audio")}
+                                isSelected={value => (settings.audioInputDeviceId ?? "None") === value}
+                                select={value => setSettings(s => ({ ...s, audioInputDeviceId: value }))}
+                                serialize={String}
+                                popoutPosition="top"
+                                closeOnSelect
+                            />
+                        </SimpleErrorBoundary>
+                    </section>
+                </div>
+                <div className={cl("settings-buttons")}>
+                    <Button variant="secondary" onClick={refreshMediaDevices} className={cl("settings-button")}>
+                        <RestartIcon className={cl("settings-button-icon")} />
+                        Refresh Media Devices
+                    </Button>
                 </div>
 
                 {isLinux && (
@@ -720,6 +776,26 @@ function ModalComponent({
         resolution: "720",
         frameRate: "30"
     });
+    const [mediaDevices] = useAwaiter(() => navigator.mediaDevices.enumerateDevices(), {
+        fallbackValue: [] as MediaDeviceInfo[]
+    });
+    const cameraSources: Source[] = mediaDevices
+        .filter(device => device.kind === "videoinput")
+        .map((device, index) => ({
+            id: `camera:${device.deviceId || index}`,
+            name: device.label || `Camera ${index + 1}`,
+            kind: "camera",
+            deviceId: device.deviceId
+        }));
+    const sources = skipPicker ? screens : [...screens, ...cameraSources];
+    const selectedSource = sources.find(s => s.id === selected);
+    const chooseSource = (source: Source) => {
+        setSelected(source.id);
+        setSettings(s => ({
+            ...s,
+            cameraDeviceId: source.kind === "camera" ? source.deviceId || "default" : "None"
+        }));
+    };
 
     return (
         <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
@@ -731,10 +807,10 @@ function ModalComponent({
             </Modals.ModalHeader>
             <Modals.ModalContent className={cl("modal")}>
                 {!selected ? (
-                    <ScreenPicker screens={screens} chooseScreen={setSelected} />
+                    <ScreenPicker screens={sources} chooseScreen={chooseSource} />
                 ) : (
                     <StreamSettingsUi
-                        source={screens.find(s => s.id === selected)!}
+                        source={selectedSource!}
                         settings={settings}
                         setSettings={setSettings}
                         skipPicker={skipPicker}
@@ -762,7 +838,7 @@ function ModalComponent({
                             }
 
                             submit({
-                                id: selected!,
+                                id: selectedSource?.kind === "camera" ? screens[0].id : selected!,
                                 ...settings
                             });
 
