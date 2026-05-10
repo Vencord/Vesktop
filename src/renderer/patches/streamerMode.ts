@@ -9,10 +9,10 @@ import { addPatch } from "./shared";
 addPatch({
     patches: [
         {
-            find: ".STREAMING_AUTO_STREAMER_MODE,",
+            find: ".STREAMING_AUTO_STREAMER_MODE,{",
             replacement: {
                 // remove if (platformEmbedded) check from streamer mode toggle
-                match: /(?<=usePredicate.{0,20}?return )\i\.\i/g,
+                match: /(?<=\.STREAMING_AUTO_STREAMER_MODE,\{.{0,300}?usePredicate:.{0,20}return )\i\.\i(?=\})/g,
                 replace: "true"
             }
         }

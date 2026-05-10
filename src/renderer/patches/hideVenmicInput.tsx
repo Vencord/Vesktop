@@ -11,13 +11,13 @@ addPatch({
         {
             find: 'setSinkId"in',
             replacement: {
-                match: /return (\i)\?navigator\.mediaDevices\.enumerateDevices/,
-                replace: "return $1 ? $self.filteredDevices"
+                match: /navigator\.mediaDevices\.enumerateDevices\(\)/,
+                replace: "$self.getFilteredDevices()"
             }
         }
     ],
 
-    async filteredDevices() {
+    async getFilteredDevices() {
         const original = await navigator.mediaDevices.enumerateDevices();
         return original.filter(x => x.label !== "vencord-screen-share");
     }
