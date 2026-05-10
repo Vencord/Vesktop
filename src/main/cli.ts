@@ -6,7 +6,6 @@
 
 import { app } from "electron";
 import { basename } from "path";
-import { ShortcutAction } from "renderer/globalShortcuts/ShortcutSettings";
 import { stripIndent } from "shared/utils/text";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
@@ -48,12 +47,7 @@ const options = {
         type: "string",
         description:
             "Run a predefined shortcut action (for custom key binds). Vesktop has to be open for this to have any effect",
-        options: [
-            "toggleMute",
-            "toggleDeafen",
-            "toggleStreamerMode",
-            "disconnectFromVoiceChannel"
-        ] satisfies Array<ShortcutAction>
+        argumentName: "action"
     }
 } satisfies Record<string, Option>;
 

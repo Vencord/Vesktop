@@ -30,9 +30,17 @@ const cl = classNameFactory("vcd-shortcuts-");
 
 const ShortcutActions = {
     unassigned: "Unassigned",
+    mute: "Mute",
+    unmute: "Unmute",
     toggleMute: "Toggle Mute",
     toggleDeafen: "Toggle Deafen",
     toggleStreamerMode: "Toggle Streamer Mode",
+    pushToTalkNormalToggle: "Push-to-Talk (Normal) Toggle",
+    pushToTalkNormalStart: "Push-to-Talk (Normal) Start",
+    pushToTalkNormalStop: "Push-to-Talk (Normal) Stop",
+    pushToTalkPriorityToggle: "Push-to-Talk (Priority) Toggle",
+    pushToTalkPriorityStart: "Push-to-Talk (Priority) Start",
+    pushToTalkPriorityStop: "Push-to-Talk (Priority) Stop",
     disconnectFromVoiceChannel: "Disconnect from VC"
 } as const;
 
@@ -173,7 +181,7 @@ export function KeyBindSettings() {
 
 export function openKeybindsModal() {
     openModal(props => (
-        <ModalRoot {...props} size={ModalSize.MEDIUM}>
+        <ModalRoot {...props} size={ModalSize.LARGE}>
             <ModalHeader>
                 <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
                     Keybinds
