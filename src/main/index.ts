@@ -11,10 +11,12 @@ import "./userAssets";
 import "./vesktopProtocol";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { IpcCommands } from "shared/IpcEvents";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, mainWin } from "./mainWindow";
+import { sendRendererCommand } from "./ipcCommands";
+import { createWindows, loadUrl, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -101,12 +103,15 @@ function init() {
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
-    app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
+    app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
         else if (mainWin) {
             if (mainWin.isMinimized()) mainWin.restore();
             if (!mainWin.isVisible()) mainWin.show();
             mainWin.focus();
+
+            const url = cmdLine.find(arg => arg.startsWith("discord://"));
+            if (url) handleProtocolUrl(url);
         }
     });
 
@@ -147,8 +152,30 @@ async function bootstrap() {
 // MacOS only event
 export let darwinURL: string | undefined;
 app.on("open-url", (_, url) => {
-    darwinURL = url;
+    // Until the main window exists, stash the URL so the initial loadUrl call picks it up.
+    // After that, route through the renderer so we don't reload the entire client.
+    if (mainWin) handleProtocolUrl(url);
+    else darwinURL = url;
 });
+
+async function handleProtocolUrl(url: string) {
+    let parsed: URL;
+    try {
+        parsed = new URL(url);
+    } catch {
+        return;
+    }
+    if (parsed.protocol !== "discord:") return;
+
+    // Canonical form is discord://-/<path> — the "-" is a placeholder host.
+    const inviteMatch = parsed.pathname.match(/^\/invite\/([\w-]+)\/?$/);
+    if (inviteMatch) {
+        const handled = await sendRendererCommand(IpcCommands.RPC_INVITE, inviteMatch[1]).catch(() => false);
+        if (handled) return;
+    }
+
+    loadUrl(url);
+}
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
