@@ -19,22 +19,21 @@ export function registerScreenShareHandler() {
         const sources = await desktopCapturer.getSources({
             types: ["window", "screen"],
             thumbnailSize: {
-                width: 1920,
-                height: 1080
+                width: 1280,
+                height: 720
             }
         });
         return sources.find(s => s.id === id)?.thumbnail.toDataURL();
     });
 
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
-        // request full resolution on wayland right away because we always only end up with one result anyway
-        const width = isWayland ? 1920 : 176;
+        const width = isWayland ? 320 : 176;
         const sources = await desktopCapturer
             .getSources({
                 types: ["window", "screen"],
                 thumbnailSize: {
                     width,
-                    height: width * (9 / 16)
+                    height: Math.round(width * (9 / 16))
                 }
             })
             .catch(err => console.error("Error during screenshare picker", err));
@@ -49,16 +48,16 @@ export function registerScreenShareHandler() {
 
         if (isWayland) {
             const video = data[0];
-            if (video) {
-                const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
-                    screens: [video],
-                    skipPicker: true
-                }).catch(() => null);
+            if (!video) return callback({});
 
-                if (stream === null) return callback({});
-            }
+            const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
+                screens: [video],
+                skipPicker: true
+            }).catch(() => null);
 
-            callback(video ? { video: sources[0] } : {});
+            if (stream === null) return callback({});
+
+            callback({ video: sources[0] });
             return;
         }
 

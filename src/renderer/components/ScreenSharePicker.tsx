@@ -772,7 +772,8 @@ function ModalComponent({
                                 );
                                 if (!conn) return;
 
-                                const track = conn.input.stream.getVideoTracks()[0];
+                                const track = conn.input?.stream?.getVideoTracks()[0];
+                                if (!track) return;
 
                                 const constraints = {
                                     ...track.getConstraints(),

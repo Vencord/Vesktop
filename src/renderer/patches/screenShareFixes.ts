@@ -33,6 +33,8 @@ if (isLinux) {
         const width = Math.round(height * (16 / 9));
         const track = stream.getVideoTracks()[0];
 
+        if (!track) return stream;
+
         track.contentHint = String(currentSettings?.contentHint);
 
         const constraints = {
@@ -66,8 +68,17 @@ if (isLinux) {
                 }
             });
 
-            stream.getAudioTracks().forEach(t => stream.removeTrack(t));
-            stream.addTrack(audio.getAudioTracks()[0]);
+            const audioTrack = audio.getAudioTracks()[0];
+            stream.getAudioTracks().forEach(t => {
+                t.stop();
+                stream.removeTrack(t);
+            });
+            stream.addTrack(audioTrack);
+
+            track.addEventListener("ended", () => {
+                audioTrack.stop();
+                audio.getTracks().forEach(t => t.stop());
+            }, { once: true });
         }
 
         return stream;
