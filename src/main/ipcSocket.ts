@@ -38,7 +38,7 @@ export async function initSocket() {
                 const [command, ...args] = data.trim().split(":");
 
                 if (command === "run-shortcut") {
-                    await sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, args[0]);
+                    await sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, { action: args[0], keyup: false });
                     return;
                 }
 
@@ -50,9 +50,7 @@ export async function initSocket() {
     });
 
     server.listen(SOCKET_PATH);
-    server.on("error", err => {
-        console.error("Vesktop IPC Socket Error:", err);
-    });
+    server.on("error", err => console.error("Vesktop IPC Socket Error:", err));
 }
 
 app.on("will-quit", () => {

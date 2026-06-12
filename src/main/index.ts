@@ -65,9 +65,6 @@ function init() {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
 
-    // Enable Wayland Portal for global shortcuts
-    enabledFeatures.add("GlobalShortcutsPortal");
-
     // disable renderer backgrounding to prevent the app from unloading when in the background
     // https://github.com/electron/electron/issues/2822
     // https://github.com/GoogleChrome/chrome-launcher/blob/5a27dd574d47a75fec0fb50f7b774ebf8a9791ba/docs/chrome-flags-for-tools.md#task-throttling
@@ -169,5 +166,5 @@ app.on("second-instance", (_e, _argv, _cwd, data) => {
     const { args } = data as { args: typeof CommandLine; IS_DEV: boolean };
     const { "run-shortcut": shortcut } = args.values;
 
-    if (shortcut) sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, shortcut);
+    if (shortcut) sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, { action: shortcut, keyup: false });
 });

@@ -62,7 +62,9 @@ export const enum IpcEvents {
     DEVTOOLS_OPENED = "VCD_DEVTOOLS_OPENED",
     DEVTOOLS_CLOSED = "VCD_DEVTOOLS_CLOSED",
 
-    CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET"
+    CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET",
+    IS_WAYLAND = "IS_WAYLAND",
+    CONFIGURE_XDP_SHORTCUTS = "CONFIGURE_XDP_SHORTCUTS"
 }
 
 export const enum UpdaterIpcEvents {
@@ -86,5 +88,6 @@ export const enum IpcCommands {
     SCREEN_SHARE_PICKER = "screenshare:picker",
 
     KEY_BINDS_HANDLE = "keyBinds:handle",
-    KEY_BINDS_SET_STATUS = "keyBinds:setStatus"
+    KEY_BINDS_SET_STATUS = "keyBinds:setStatus",
+    KEY_BINDS_WUPDATE = "keyBinds:waylandUpdate"
 }
