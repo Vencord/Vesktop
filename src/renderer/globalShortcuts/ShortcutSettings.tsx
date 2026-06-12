@@ -23,37 +23,39 @@ import { onIpcCommand } from "renderer/ipcCommands";
 import { reactiveValue } from "renderer/reactiveState";
 import { Settings } from "renderer/settings";
 import { IpcCommands } from "shared/IpcEvents";
+import { ACTION_DESCRIPTIONS, ShortcutAction } from "shared/utils/keybind";
 
-import { recordKeybind } from "./recordKeybind";
+import { acceleratorToDisplay, recordKeybind } from "./recordKeybind";
 
 const cl = classNameFactory("vcd-shortcuts-");
 
-const ShortcutActions = {
-    unassigned: "Unassigned",
-    mute: "Mute",
-    unmute: "Unmute",
-    toggleMute: "Toggle Mute",
-    toggleDeafen: "Toggle Deafen",
-    toggleStreamerMode: "Toggle Streamer Mode",
-    pushToTalkNormalToggle: "Push-to-Talk (Normal) Toggle",
-    pushToTalkNormalStart: "Push-to-Talk (Normal) Start",
-    pushToTalkNormalStop: "Push-to-Talk (Normal) Stop",
-    pushToTalkPriorityToggle: "Push-to-Talk (Priority) Toggle",
-    pushToTalkPriorityStart: "Push-to-Talk (Priority) Start",
-    pushToTalkPriorityStop: "Push-to-Talk (Priority) Stop",
-    disconnectFromVoiceChannel: "Disconnect from VC"
-} as const;
-
-export type ShortcutAction = keyof typeof ShortcutActions;
-
-const shortcutStatus = reactiveValue(true);
+const shortcutStatus = reactiveValue<boolean | number>(true);
 onIpcCommand(IpcCommands.KEY_BINDS_SET_STATUS, status => (shortcutStatus.value = status));
+
+const waylandKeyBinds = reactiveValue<KeyBind[]>([]);
+onIpcCommand(IpcCommands.KEY_BINDS_WUPDATE, (binds: KeyBind[]) => (waylandKeyBinds.value = binds));
+const isWayland = VesktopNative.wayland.isWayland();
 
 export interface KeyBind {
     id: string;
     enabled: boolean;
     action: ShortcutAction;
     key: string;
+}
+
+function WaylandKeyBindDisplay({ keyBind }: { keyBind: KeyBind }) {
+    const displayKey = acceleratorToDisplay(keyBind.key);
+
+    return (
+        <div className={cl("group", "wayland-group")}>
+            <BaseText size="md" weight="medium">
+                {ACTION_DESCRIPTIONS[keyBind.action] ?? keyBind.action}
+            </BaseText>
+            <BaseText size="md" className={cl("trigger")}>
+                {displayKey || "No trigger set"}
+            </BaseText>
+        </div>
+    );
 }
 
 function KeyBindGroup({
@@ -70,6 +72,7 @@ function KeyBindGroup({
 
     const actionId = React.useId();
     const keyId = React.useId();
+    const displayKey = acceleratorToDisplay(keyBind.key);
 
     return (
         <div className={cl("group")}>
@@ -83,7 +86,7 @@ function KeyBindGroup({
             {/* @ts-expect-error incorrect type for aria-labelledby */}
             <Select
                 aria-labelledby={actionId}
-                options={Object.entries(ShortcutActions).map(([action, label]) => ({ label, value: action }))}
+                options={Object.entries(ACTION_DESCRIPTIONS).map(([action, label]) => ({ label, value: action }))}
                 isSelected={o => o === keyBind.action}
                 select={o => setKeyBind({ ...keyBind, action: o })}
                 serialize={identity}
@@ -92,9 +95,9 @@ function KeyBindGroup({
                 <input
                     className={cl("record-input")}
                     type="text"
-                    value={keyBind.key || "No Keybind Set"}
+                    value={displayKey || "No Keybind Set"}
                     readOnly
-                    disabled={!keyBind.key}
+                    disabled={!displayKey}
                 />
                 <Button
                     className="record-button"
@@ -132,6 +135,10 @@ function KeyBindGroup({
 export function KeyBindSettings() {
     const [keyBinds, setKeyBinds] = useState<KeyBind[]>(Settings.store.keyBinds ?? []);
     const shortcutsStatus = shortcutStatus.use();
+    const waylandBinds = waylandKeyBinds.use();
+
+    const useWaylandBinds = isWayland && Settings.store.keyBinds !== undefined;
+    const canConfigure = typeof shortcutsStatus === "number" && shortcutsStatus >= 2;
 
     return (
         <div className={cl("container")}>
@@ -143,38 +150,48 @@ export function KeyBindSettings() {
                 </Card>
             )}
 
-            {keyBinds.map((keyBind, index) => (
-                <KeyBindGroup
-                    key={keyBind.id}
-                    keyBind={keyBind}
-                    setKeyBind={newKeyBind => {
-                        const newKeyBinds = [...keyBinds];
-                        newKeyBinds[index] = newKeyBind;
-                        setKeyBinds(newKeyBinds);
-                        Settings.store.keyBinds = newKeyBinds;
-                    }}
-                    deleteKeyBind={() => {
-                        const newKeyBinds = keyBinds.filter((_, i) => i !== index);
-                        setKeyBinds(newKeyBinds);
-                        Settings.store.keyBinds = newKeyBinds;
-                    }}
-                />
-            ))}
-            <Button
-                onClick={() => {
-                    setKeyBinds(binds => [
-                        ...binds,
-                        {
-                            action: "unassigned",
-                            key: "",
-                            enabled: true,
-                            id: crypto.randomUUID()
+            {useWaylandBinds
+                ? waylandBinds.map(keyBind => <WaylandKeyBindDisplay key={keyBind.id} keyBind={keyBind} />)
+                : keyBinds.map((keyBind, index) => (
+                      <KeyBindGroup
+                          key={keyBind.id}
+                          keyBind={keyBind}
+                          setKeyBind={newKeyBind => {
+                              const newKeyBinds = [...keyBinds];
+                              newKeyBinds[index] = newKeyBind;
+                              setKeyBinds(newKeyBinds);
+                              Settings.store.keyBinds = newKeyBinds;
+                          }}
+                          deleteKeyBind={() => {
+                              const newKeyBinds = keyBinds.filter((_, i) => i !== index);
+                              setKeyBinds(newKeyBinds);
+                              Settings.store.keyBinds = newKeyBinds;
+                          }}
+                      />
+                  ))}
+
+            {(!useWaylandBinds || canConfigure) && (
+                <Button
+                    onClick={() => {
+                        if (canConfigure) {
+                            VesktopNative.wayland.configureShortcuts();
+                        } else if (isWayland) {
+                            Settings.store.keyBinds = [];
+                        } else {
+                            setKeyBinds(binds => [
+                                ...binds,
+                                { action: "unassigned", key: "", enabled: true, id: crypto.randomUUID() }
+                            ]);
                         }
-                    ]);
-                }}
-            >
-                Add a Keybind
-            </Button>
+                    }}
+                >
+                    {isWayland
+                        ? canConfigure
+                            ? "Configure Global Shortcuts"
+                            : "Register Global Shortcuts"
+                        : "Add a Keybind"}
+                </Button>
+            )}
         </div>
     );
 }
@@ -188,7 +205,6 @@ export function openKeybindsModal() {
                 </BaseText>
                 <ModalCloseButton onClick={props.onClose} />
             </ModalHeader>
-
             <ModalContent>
                 <KeyBindSettings />
             </ModalContent>

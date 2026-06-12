@@ -6,84 +6,45 @@
 
 import { Logger } from "@vencord/types/utils";
 import { waitFor } from "@vencord/types/webpack";
-import { FluxDispatcher } from "@vencord/types/webpack/common";
-
-import { ShortcutAction } from "./ShortcutSettings";
+import { ACTION_MAP, ShortcutAction } from "shared/utils/keybind";
 
 const logger = new Logger("VesktopKeyBindHandler");
 
 interface KeyBindAction {
     onTrigger(...args: any[]): void;
     isPressed?: boolean;
+    keyEvents: { keydown: boolean; keyup: boolean };
 }
 
 let KeyBindActions: Record<string, KeyBindAction>;
 
-waitFor(["dispatch", "subscribe"], FluxDispatcher => {
-    FluxDispatcher.subscribe("KEYBINDS_REGISTER_GLOBAL_KEYBIND_ACTIONS", event => {
+waitFor(["dispatch", "subscribe"], fd => {
+    fd.subscribe("KEYBINDS_REGISTER_GLOBAL_KEYBIND_ACTIONS", (event: any) => {
         KeyBindActions = event.keybinds;
     });
 });
 
-export function handleKeyBind(keyBind: ShortcutAction) {
-    logger.debug(`Handling key bind action: ${keyBind}`);
+export function handleKeyBind(action: ShortcutAction, keyup: boolean) {
+    if (action === "unassigned") return;
 
     if (!KeyBindActions) {
-        logger.error("Failed to retrieve KeyBindActions, cannot handle key bind");
+        logger.error("KeyBindActions not yet available");
         return;
     }
 
-    switch (keyBind) {
-        case "unassigned":
-            break;
-
-        case "mute":
-        case "unmute":
-            FluxDispatcher.dispatch({
-                type: "AUDIO_SET_SELF_MUTE",
-                context: "default",
-                syncRemote: true,
-                playSoundEffect: true,
-                mute: keyBind === "mute"
-            });
-            break;
-        case "toggleMute":
-            KeyBindActions.TOGGLE_MUTE.onTrigger();
-            break;
-
-        case "toggleDeafen":
-            KeyBindActions.TOGGLE_DEAFEN.onTrigger();
-            break;
-
-        case "toggleStreamerMode":
-            KeyBindActions.TOGGLE_STREAMER_MODE.onTrigger();
-            break;
-
-        case "disconnectFromVoiceChannel":
-            KeyBindActions.DISCONNECT_FROM_VOICE_CHANNEL.onTrigger();
-            break;
-
-        case "pushToTalkNormalStart":
-        case "pushToTalkNormalStop":
-        case "pushToTalkNormalToggle": {
-            const isPressed = keyBind.includes("Toggle")
-                ? !KeyBindActions.PUSH_TO_TALK.isPressed
-                : keyBind.includes("Start");
-
-            KeyBindActions.PUSH_TO_TALK.onTrigger(isPressed, "default");
-            break;
-        }
-        case "pushToTalkPriorityStart":
-        case "pushToTalkPriorityStop":
-        case "pushToTalkPriorityToggle": {
-            const isPressed = keyBind.includes("Toggle")
-                ? !KeyBindActions.PUSH_TO_TALK_PRIORITY.isPressed
-                : keyBind.includes("Start");
-
-            KeyBindActions.PUSH_TO_TALK_PRIORITY.onTrigger(isPressed, "default");
-            break;
-        }
-        default:
-            logger.warn(`Unknown key bind action: ${keyBind}`);
+    const discordKey = ACTION_MAP[action];
+    if (!discordKey) {
+        logger.warn(`Unknown action: ${action}`);
+        return;
     }
+
+    const kb = KeyBindActions[discordKey];
+    if (!kb) {
+        logger.warn(`Discord KeyBindAction not found: ${discordKey}`);
+        return;
+    }
+
+    // Discord's own sloplogic handles this
+    if (!keyup && kb.keyEvents.keydown) kb.onTrigger(true, "default");
+    if (keyup && kb.keyEvents.keyup) kb.onTrigger(false, "default");
 }
