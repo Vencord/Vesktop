@@ -6,6 +6,7 @@
 
 import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
+const { UiohookKey } = await import("uiohook-napi");
 
 import vencordDep from "./vencordDep.mjs";
 import { includeDirPlugin } from "./includeDirPlugin.mts";
@@ -53,6 +54,16 @@ async function copyVenmic() {
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
+async function copyUIOHook() {
+    const p = process.platform;
+    const base = `./node_modules/uiohook-napi/prebuilds/${p}`;
+    if (p == "linux" || p == "win32" || p == "darwin")
+        return Promise.all([
+            copyFile(`${base}-x64/uiohook-napi.node`, "./static/dist/uiohook-napi-x64.node"),
+            copyFile(`${base}-arm64/uiohook-napi.node`, "./static/dist/uiohook-napi-arm64.node")
+        ]).catch(() => console.error("Failed to copy uiohook. exploding"));
+}
+
 async function copyLibVesktop() {
     if (process.platform !== "linux") return;
 
@@ -76,9 +87,28 @@ async function copyLibVesktop() {
 await Promise.all([
     copyVenmic(),
     copyLibVesktop(),
+    copyUIOHook(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
+        plugins: [
+            {
+                name: "uiohook-napi-native",
+                setup(build) {
+                    build.onResolve({ filter: /^node-gyp-build$/ }, args => {
+                        if (args.importer.includes("uiohook-napi"))
+                            return { path: "uiohook-gyp-build", namespace: "uiohook-gyp-build" };
+                    });
+                    build.onLoad({ filter: /.*/, namespace: "uiohook-gyp-build" }, () => ({
+                        contents: `
+                            const { join } = require("path");
+                            module.exports = () => require(join(__dirname, "..", "..", \`static/dist/uiohook-napi-\${process.arch}.node\`));`,
+                        loader: "js"
+                    }));
+                }
+            }
+        ],
+
         outfile: "dist/js/main.js",
         footer: { js: "//# sourceURL=VesktopMain" }
     }),
@@ -116,7 +146,25 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
-        plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
+        plugins: [
+            vencordDep,
+            includeDirPlugin("patches", "src/renderer/patches"),
+            {
+                name: "uiohook-napi-stub",
+                setup(build) {
+                    build.onResolve({ filter: /^uiohook-napi$/ }, () => ({
+                        path: "uiohook-napi-stub",
+                        namespace: "uiohook-napi-stub"
+                    }));
+                    build.onLoad({ filter: /.*/, namespace: "uiohook-napi-stub" }, () => {
+                        return {
+                            contents: `export const UiohookKey = ${JSON.stringify(UiohookKey, null, 2)} as const;`,
+                            loader: "ts"
+                        };
+                    });
+                }
+            }
+        ],
         footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);
