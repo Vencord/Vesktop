@@ -21,6 +21,7 @@ import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles } from "./utils/vencordLoader";
+import { CommandLine } from "./cli";
 
 console.log("Vesktop v" + app.getVersion());
 
@@ -56,9 +57,8 @@ function init() {
         }
     }
 
-    console.log(process.argv.includes("--repair"))
-    if (process.argv.includes("--repair")) {
-                console.log("Repaired");
+    if (CommandLine.values["repair"]) {
+                console.log("Repairing Vesktop");
                 async () => {
                         await downloadVencordFiles();
                         app.relaunch();
