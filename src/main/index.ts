@@ -20,8 +20,9 @@ import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
+import { downloadVencordFiles } from "./utils/vencordLoader";
 
-console.log("Vesktop v" + app.getVersion());
+console.log("Vesktop vAAAA" + app.getVersion());
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
@@ -55,6 +56,16 @@ function init() {
         }
     }
 
+    console.log(process.argv.includes("--repair"))
+    if (process.argv.includes("--repair")) {
+                console.log("Repaired");
+                async () => {
+                        await downloadVencordFiles();
+                        app.relaunch();
+                        app.quit();
+                }
+                
+    }
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
