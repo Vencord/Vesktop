@@ -19,6 +19,7 @@ export interface Settings {
     hardwareAcceleration?: boolean;
     hardwareVideoAcceleration?: boolean;
     arRPC?: boolean;
+    automaticStreamer?: boolean;
     appBadge?: boolean;
     enableTaskbarFlashing?: boolean;
     disableMinSize?: boolean;

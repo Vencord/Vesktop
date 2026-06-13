@@ -24,7 +24,7 @@ onIpcCommand(IpcCommands.RPC_ACTIVITY, async jsonData => {
 
     const data = JSON.parse(jsonData);
 
-    if (data.socketId === "STREAMERMODE" && StreamerModeStore.autoToggle) {
+    if (data.socketId === "STREAMERMODE" && StreamerModeStore.autoToggle && Settings.store.automaticStreamer) {
         FluxDispatcher.dispatch({
             type: "STREAMER_MODE_UPDATE",
             key: "enabled",

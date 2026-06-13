@@ -142,6 +142,14 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
 
         {
+            key: "automaticStreamer",
+            title: "Automatic Streamer mode",
+            description: "Enables streamer mode automatically when OBS is open",
+            defaultValue: true,
+            disabled: () => Settings.store.arRPC === false
+        },
+
+        {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",
             description: "Opens links in a new Vesktop window instead of your web browser",
