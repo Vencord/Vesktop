@@ -22,7 +22,7 @@ import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
-console.log("Vesktop vAAAA" + app.getVersion());
+console.log("Vesktop v" + app.getVersion());
 
 // Make the Vencord files use our DATA_DIR
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
