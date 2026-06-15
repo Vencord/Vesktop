@@ -46,7 +46,7 @@ export function offIpcCommand(channel: string) {
 /* Generic Handlers */
 
 onIpcCommand(IpcCommands.NAVIGATE_SETTINGS, () => {
-    SettingsRouter.open("My Account");
+    SettingsRouter.openUserSettings("my_account_panel");
 });
 
 onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
