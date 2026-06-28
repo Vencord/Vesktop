@@ -73,7 +73,14 @@ function makeAutoStartLinuxPortal() {
 }
 
 const autoStartWindowsMac: AutoStart = {
-    isEnabled: () => app.getLoginItemSettings().openAtLogin,
+    isEnabled: () => {
+        const { openAtLogin, executableWillLaunchAtLogin } = app.getLoginItemSettings();
+        // On Windows, openAtLogin only returns true when the same args passed to setLoginItemSettings are
+        // passed here too. enable() registers with "--start-minimized" when autoStartMinimized is on, so an
+        // arg-less query always reads false and the toggle appears off. executableWillLaunchAtLogin reflects
+        // the entry regardless of args; it is undefined on macOS, where openAtLogin already suffices.
+        return openAtLogin || executableWillLaunchAtLogin;
+    },
     enable: () =>
         app.setLoginItemSettings({
             openAtLogin: true,
