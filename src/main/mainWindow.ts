@@ -8,20 +8,15 @@ import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
-    Menu,
-    MenuItemConstructorOptions,
     nativeTheme,
     Rectangle,
     screen,
-    session
-} from "electron";
+    session} from "electron";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
-import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
@@ -31,11 +26,11 @@ import { sendRendererCommand } from "./ipcCommands";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
-import { clearData } from "./utils/clearData";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { downloadVencordFiles, ensureVencordFiles, vencordSupportsSandboxing } from "./utils/vencordLoader";
+import { ensureVencordFiles, vencordSupportsSandboxing } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
+import { initMenuBar as initDefaultMenuBar } from "windowMenus";
 
 let isQuitting = false;
 
@@ -68,113 +63,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-type MenuItemList = Array<MenuItemConstructorOptions | false>;
-
-function initMenuBar(win: BrowserWindow) {
-    const isWindows = process.platform === "win32";
-    const isDarwin = process.platform === "darwin";
-    const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
-
-    const subMenu = [
-        {
-            label: "About Vesktop",
-            click: createAboutWindow
-        },
-        {
-            label: "Force Update Vencord",
-            async click() {
-                await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
-            },
-            toolTip: "Vesktop will automatically restart after this operation"
-        },
-        {
-            label: "Reset Vesktop",
-            async click() {
-                await clearData(win);
-            },
-            toolTip: "Vesktop will automatically restart after this operation"
-        },
-        {
-            label: "Relaunch",
-            accelerator: "CmdOrCtrl+Shift+R",
-            click() {
-                app.relaunch();
-                app.quit();
-            }
-        },
-        ...(!isDarwin
-            ? []
-            : ([
-                  {
-                      type: "separator"
-                  },
-                  {
-                      label: "Settings",
-                      accelerator: "CmdOrCtrl+,",
-                      async click() {
-                          sendRendererCommand(IpcCommands.NAVIGATE_SETTINGS);
-                      }
-                  },
-                  {
-                      type: "separator"
-                  },
-                  {
-                      role: "hide"
-                  },
-                  {
-                      role: "hideOthers"
-                  },
-                  {
-                      role: "unhide"
-                  },
-                  {
-                      type: "separator"
-                  }
-              ] satisfies MenuItemList)),
-        {
-            label: "Quit",
-            accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
-            visible: !isWindows,
-            role: "quit",
-            click() {
-                app.quit();
-            }
-        },
-        isWindows && {
-            label: "Quit",
-            accelerator: "Alt+F4",
-            role: "quit",
-            click() {
-                app.quit();
-            }
-        },
-        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
-        {
-            label: "Zoom in (hidden, hack for Qwertz and others)",
-            accelerator: "CmdOrCtrl+=",
-            role: "zoomIn",
-            visible: false
-        }
-    ] satisfies MenuItemList;
-
-    const menuItems = [
-        {
-            label: "Vesktop",
-            role: "appMenu",
-            submenu: subMenu.filter(isTruthy)
-        },
-        { role: "fileMenu" },
-        { role: "editMenu" },
-        { role: "viewMenu" },
-        isDarwin && { role: "windowMenu" }
-    ] satisfies MenuItemList;
-
-    const menu = Menu.buildFromTemplate(menuItems.filter(isTruthy));
-
-    Menu.setApplicationMenu(menu);
-}
+// type MenuItemList = Array<MenuItemConstructorOptions | false>;
 
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
@@ -400,7 +289,7 @@ function createMainWindow() {
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")
         initTray(win, q => (isQuitting = q));
 
-    initMenuBar(win);
+    initDefaultMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
