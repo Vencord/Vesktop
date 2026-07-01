@@ -9,6 +9,7 @@ allowBuilds:
   esbuild: true
 pmOnFail: warn
 verifyDepsBeforeRun: warn
+recursiveInstall: false
 packages:
   - packages/*
 minimumReleaseAgeExclude:
