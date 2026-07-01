@@ -757,6 +757,7 @@ function ModalComponent({
 
                             if (conn) {
                                 conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                                conn.videoStreamParameters[0].maxResolution ??= { width: 0, height: 0 };
                                 conn.videoStreamParameters[0].maxResolution.height = height;
                                 conn.videoStreamParameters[0].maxResolution.width = width;
                             }
@@ -772,6 +773,7 @@ function ModalComponent({
                                 );
                                 if (!conn) return;
 
+                                // @ts-expect-error incorrect type
                                 const track = conn.input.stream.getVideoTracks()[0];
 
                                 const constraints = {

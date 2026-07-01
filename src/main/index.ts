@@ -81,6 +81,11 @@ function init() {
     if (isLinux) {
         // Support TTS on Linux using https://wiki.archlinux.org/title/Speech_dispatcher
         app.commandLine.appendSwitch("enable-speech-dispatcher");
+
+        // This is needed to fix washed out colours - https://github.com/electron/electron/issues/49566
+        // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
+        // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
+        disabledFeatures.add("WaylandWpColorManagerV1");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
