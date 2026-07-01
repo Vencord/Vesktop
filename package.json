@@ -62,8 +62,8 @@
     },
     "packageManager": "pnpm@11.9.0",
     "engines": {
-        "node": ">=18",
-        "pnpm": ">=8"
+        "node": ">=22",
+        "pnpm": ">=11"
     },
     "build": {
         "appId": "dev.vencord.vesktop",
