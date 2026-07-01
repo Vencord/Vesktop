@@ -35,9 +35,6 @@ import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
-handleSync(IpcEvents.DEPRECATED_GET_VENCORD_PRELOAD_SCRIPT_PATH, () =>
-    join(VENCORD_FILES_DIR, "vencordDesktopPreload.js")
-);
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_SCRIPT, () =>
     readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"), "utf-8")
 );
