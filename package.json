@@ -12,6 +12,7 @@
         "build": "tsx scripts/build/build.mts",
         "build:dev": "pnpm build --dev",
         "buildLibVesktop": "pnpm -C packages/libvesktop install && pnpm -C packages/libvesktop run build",
+        "buildWaylandProtocols": "pnpm -C packages/wayland-protocols install && pnpm -C packages/wayland-protocols run build",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "lint": "eslint",
@@ -58,6 +59,7 @@
         "type-fest": "^5.7.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.62.1",
+        "wayland-protocols": "link:packages/wayland-protocols",
         "xml-formatter": "^3.6.7"
     },
     "packageManager": "pnpm@11.9.0",
