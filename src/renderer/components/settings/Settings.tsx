@@ -20,6 +20,7 @@ import { OutdatedVesktopWarning } from "./OutdatedVesktopWarning";
 import { UserAssetsButton } from "./UserAssets";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
+import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
@@ -146,8 +147,11 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Open Links in app (experimental)",
             description: "Opens links in a new Vesktop window instead of your web browser",
             defaultValue: false
-        }
+        },
+
+        WebRTCIPHandlingPolicyPicker
     ],
+
     "Developer Options": [DeveloperOptionsButton]
 };
 
