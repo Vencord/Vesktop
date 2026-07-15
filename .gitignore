@@ -1,6 +1,11 @@
-dist
-node_modules
+dist/
+build/
+node_modules/
 .env
+.env.local
+*.env
 .DS_Store
 .idea/
 .pnpm-store/
+.vscode/
+.idea/
