@@ -1,0 +1,16 @@
+patchedDependencies:
+  arrpc@3.5.0: patches/arrpc@3.5.0.patch
+  electron-updater: patches/electron-updater.patch
+nodeLinker: hoisted
+allowBuilds:
+  "@vencord/venmic": true
+  electron: true
+  electron-winstaller: false
+  esbuild: true
+pmOnFail: warn
+verifyDepsBeforeRun: warn
+recursiveInstall: false
+packages:
+  - packages/*
+minimumReleaseAgeExclude:
+  - electron
