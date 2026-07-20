@@ -36,7 +36,7 @@ import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
-import { isLinux, isWindows } from "renderer/utils";
+import { isLinux } from "renderer/utils";
 
 import { SimpleErrorBoundary } from "./SimpleErrorBoundary";
 
@@ -134,13 +134,14 @@ if (isLinux) {
     });
 }
 
-export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
+export function openScreenSharePicker(screens: Source[], skipPicker: boolean, canShareAudio: boolean) {
     let didSubmit = false;
     return new Promise<StreamPick>((resolve, reject) => {
         const key = openModal(
             props => (
                 <ModalComponent
                     screens={screens}
+                    canShareAudio={canShareAudio}
                     modalProps={props}
                     submit={async v => {
                         didSubmit = true;
@@ -344,12 +345,14 @@ function StreamSettingsUi({
     source,
     settings,
     setSettings,
-    skipPicker
+    skipPicker,
+    canShareAudio
 }: {
     source: Source;
     settings: StreamSettings;
     setSettings: Dispatch<SetStateAction<StreamSettings>>;
     skipPicker: boolean;
+    canShareAudio: boolean;
 }) {
     const Settings = useSettings();
     const qualitySettings = State.store.screenshareQuality!;
@@ -423,7 +426,7 @@ function StreamSettingsUi({
                                 a much sharper and clearer image.
                             </Paragraph>
                         </div>
-                        {isWindows && (
+                        {canShareAudio && (
                             <FormSwitch
                                 title="Stream With Audio"
                                 hideBorder
@@ -702,13 +705,15 @@ function ModalComponent({
     modalProps,
     submit,
     close,
-    skipPicker
+    skipPicker,
+    canShareAudio
 }: {
     screens: Source[];
     modalProps: any;
     submit: (data: StreamPick) => void;
     close: () => void;
     skipPicker: boolean;
+    canShareAudio: boolean;
 }) {
     const [selected, setSelected] = useState<string | undefined>(skipPicker ? screens[0].id : void 0);
     const [settings, setSettings] = useState<StreamSettings>({
@@ -738,6 +743,7 @@ function ModalComponent({
                         settings={settings}
                         setSettings={setSettings}
                         skipPicker={skipPicker}
+                        canShareAudio={canShareAudio}
                     />
                 )}
             </Modals.ModalContent>

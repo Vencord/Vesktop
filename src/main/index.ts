@@ -88,6 +88,15 @@ function init() {
         disabledFeatures.add("WaylandWpColorManagerV1");
     }
 
+    if (process.platform === "darwin") {
+        // Opt into the ScreenCaptureKit loopback-audio path for screenshare.
+        // Below macOS 15 this is already the default; on 15+ Chromium disables it
+        // due to a permission-prompt bug, but it's still the documented way to get
+        // system audio there. Core Audio Taps (macOS 14.2+) is enabled by default
+        // and needs no flag. https://github.com/electron/electron/issues/42605
+        enabledFeatures.add("MacSckSystemAudioLoopbackOverride");
+    }
+
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
 
     const enabledFeaturesArray = enabledFeatures.values().filter(Boolean).toArray();

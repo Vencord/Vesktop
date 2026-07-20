@@ -14,6 +14,12 @@ import { handle } from "./utils/ipcWrappers";
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
+const supportsMacLoopbackAudio = () => {
+    if (process.platform !== "darwin") return false;
+    const [major, minor] = process.getSystemVersion().split(".").map(Number);
+    return major > 12 || (major === 12 && minor >= 3);
+};
+
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
         const sources = await desktopCapturer.getSources({
@@ -52,7 +58,8 @@ export function registerScreenShareHandler() {
             if (video) {
                 const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
                     screens: [video],
-                    skipPicker: true
+                    skipPicker: true,
+                    canShareAudio: process.platform === "win32" || supportsMacLoopbackAudio()
                 }).catch(() => null);
 
                 if (stream === null) return callback({});
@@ -64,7 +71,8 @@ export function registerScreenShareHandler() {
 
         const choice = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
             screens: data,
-            skipPicker: false
+            skipPicker: false,
+            canShareAudio: process.platform === "win32" || supportsMacLoopbackAudio()
         }).catch(e => {
             console.error("Error during screenshare picker", e);
             return null;
@@ -78,7 +86,7 @@ export function registerScreenShareHandler() {
         const streams: Streams = {
             video: source
         };
-        if (choice.audio && process.platform === "win32") streams.audio = "loopback";
+        if (choice.audio && (process.platform === "win32" || supportsMacLoopbackAudio())) streams.audio = "loopback";
 
         callback(streams);
     });
