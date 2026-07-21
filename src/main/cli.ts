@@ -48,6 +48,10 @@ const options = {
         description:
             "Run a predefined shortcut action (for custom key binds). Vesktop has to be open for this to have any effect",
         argumentName: "action"
+    },
+    repair: {
+        type: "boolean",
+        description: "Repair the application by re-downloading the latest Vencord files"
     }
 } satisfies Record<string, Option>;
 
