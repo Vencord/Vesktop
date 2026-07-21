@@ -48,17 +48,16 @@ export function registerScreenShareHandler() {
         }));
 
         if (isWayland) {
-            const video = data[0];
-            if (video) {
-                const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
-                    screens: [video],
-                    skipPicker: true
-                }).catch(() => null);
+            const video = sources[0];
 
-                if (stream === null) return callback({});
+            if (!video) {
+                return callback({});
             }
 
-            callback(video ? { video: sources[0] } : {});
+            // On Wayland, xdg-desktop-portal has already handled source selection,
+            // so there is no need to show the renderer-side screen share picker.
+            // Just use the selected source directly.
+            callback({ video });
             return;
         }
 
