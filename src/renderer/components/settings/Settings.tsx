@@ -9,6 +9,7 @@ import "./settings.css";
 import { classNameFactory } from "@vencord/types/api/Styles";
 import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
 import { ComponentType } from "react";
+import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
@@ -20,7 +21,6 @@ import { OutdatedVesktopWarning } from "./OutdatedVesktopWarning";
 import { UserAssetsButton } from "./UserAssets";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
-import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 
 interface BooleanSetting {
     key: keyof typeof Settings.store;
