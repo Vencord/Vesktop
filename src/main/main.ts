@@ -27,6 +27,7 @@ console.log("Vesktop v" + app.getVersion());
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
+const isDarwin = process.platform === "darwin";
 
 export let enableHardwareAcceleration = true;
 
@@ -86,6 +87,15 @@ function init() {
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
         disabledFeatures.add("WaylandWpColorManagerV1");
+    }
+
+    if (isDarwin) {
+        // Opt into the ScreenCaptureKit loopback-audio path for screenshare.
+        // Below macOS 15 this is already the default; on 15+ Chromium disables it
+        // due to a permission-prompt bug, but it's still the documented way to get
+        // system audio there. Core Audio Taps (macOS 14.2+) is enabled by default
+        // and needs no flag. https://github.com/electron/electron/issues/42605
+        enabledFeatures.add("MacSckSystemAudioLoopbackOverride");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
