@@ -28,8 +28,7 @@
     },
     "dependencies": {
         "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
-        "electron-updater": "^6.8.3",
-        "uiohook-napi": "=1.5.5"
+        "electron-updater": "6.6.2"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^6.1.0"
@@ -37,34 +36,34 @@
     "devDependencies": {
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@stylistic/eslint-plugin": "^5.10.0",
-        "@types/node": "^25.9.1",
+        "@types/node": "^26.0.1",
         "@types/react": "19.2.9",
         "@vencord/types": "^1.14.1",
-        "dotenv": "^17.4.2",
-        "electron": "^41.7.1",
-        "electron-builder": "^26.8.1",
-        "esbuild": "^0.27.7",
-        "eslint": "^10.4.1",
+        "dotenv": "^17.3.1",
+        "electron": "^43.0.0",
+        "electron-builder": "^26.15.3",
+        "esbuild": "^0.28.1",
+        "eslint": "^10.6.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "^2.1.0",
         "eslint-plugin-prettier": "^5.5.6",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-simple-header": "^1.2.2",
-        "eslint-plugin-simple-import-sort": "^12.1.1",
+        "eslint-plugin-simple-import-sort": "^13.0.0",
         "eslint-plugin-unused-imports": "^4.4.1",
         "libvesktop": "link:packages/libvesktop",
-        "prettier": "^3.8.3",
+        "prettier": "^3.9.4",
         "source-map-support": "^0.5.21",
         "tsx": "^4.22.4",
         "type-fest": "^5.7.0",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.60.0",
-        "xml-formatter": "^3.7.0"
+        "typescript-eslint": "^8.62.1",
+        "xml-formatter": "^3.6.7"
     },
-    "packageManager": "pnpm@11.3.0",
+    "packageManager": "pnpm@11.9.0",
     "engines": {
-        "node": ">=18",
-        "pnpm": ">=8"
+        "node": ">=22",
+        "pnpm": ">=11"
     },
     "build": {
         "appId": "dev.vencord.vesktop",
@@ -150,6 +149,7 @@
                 "com.apple.security.device.camera": true,
                 "CFBundleIconName": "Icon"
             },
+            "requirements": "build/signing-requirements.txt",
             "notarize": true
         },
         "dmg": {
