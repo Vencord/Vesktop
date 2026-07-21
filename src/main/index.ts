@@ -12,6 +12,8 @@ import "./vesktopProtocol";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
 
+// eslint-disable-next-line no-duplicate-imports
+import { CommandLine } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
@@ -21,7 +23,6 @@ import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles } from "./utils/vencordLoader";
-import { CommandLine } from "./cli";
 
 console.log("Vesktop v" + app.getVersion());
 
@@ -32,7 +33,7 @@ const isLinux = process.platform === "linux";
 
 export let enableHardwareAcceleration = true;
 
-function init() {
+async function init() {
     setAsDefaultProtocolClient("discord");
 
     const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
@@ -57,15 +58,13 @@ function init() {
         }
     }
 
-    if (CommandLine.values["repair"]) {
-                console.log("Repairing Vesktop");
-                async () => {
-                        await downloadVencordFiles();
-                        app.relaunch();
-                        app.quit();
-                }
-                
+    if (CommandLine.values.repair) {
+        console.log("Repairing Vesktop");
+        await downloadVencordFiles();
+        app.relaunch();
+        app.quit();
     }
+
     if (disableSmoothScroll) {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }

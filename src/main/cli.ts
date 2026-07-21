@@ -43,10 +43,10 @@ const options = {
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
     },
-    "repair": {
+    repair: {
         type: "boolean",
         description: "Repair Vesktop"
-    } 
+    }
 } satisfies Record<string, Option>;
 
 // only for help display
