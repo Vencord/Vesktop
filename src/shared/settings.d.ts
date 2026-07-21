@@ -9,6 +9,11 @@ import type { Rectangle } from "electron";
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
     transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
+    webRTCIPHandlingPolicy?:
+        | "default"
+        | "default_public_interface_only"
+        | "default_public_and_private_interfaces"
+        | "disable_non_proxied_udp";
     tray?: boolean;
     minimizeToTray?: boolean;
     autoStartMinimized?: boolean;
