@@ -69,14 +69,8 @@ function getRendererAudioServicePid() {
 function linkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) {
     const pid = getRendererAudioServicePid();
 
-    const {
-        ignoreDevices,
-        ignoreInputMedia,
-        ignoreVirtual,
-        workaround,
-        onlySpeakers,
-        onlyDefaultSpeakers,
-    } = Settings.store.audio ?? {};
+    const { ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround, onlySpeakers, onlyDefaultSpeakers } =
+        Settings.store.audio ?? {};
 
     const rtn: LinkData = {
         include: include ?? [],
