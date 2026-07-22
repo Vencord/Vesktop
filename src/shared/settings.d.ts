@@ -40,7 +40,6 @@ export interface Settings {
 
     audio?: {
         workaround?: boolean;
-        legacyWorkaround?: boolean;
 
         deviceSelect?: boolean;
         granularSelect?: boolean;

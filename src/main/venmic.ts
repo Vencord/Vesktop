@@ -76,7 +76,6 @@ function linkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) 
         workaround,
         onlySpeakers,
         onlyDefaultSpeakers,
-        legacyWorkaround
     } = Settings.store.audio ?? {};
 
     const rtn: LinkData = {
@@ -84,7 +83,6 @@ function linkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) 
         exclude: exclude ?? [],
         only_speakers: onlySpeakers,
         ignore_devices: ignoreDevices,
-        legacy_workaround: legacyWorkaround,
         only_default_speakers: onlyDefaultSpeakers
     };
 
