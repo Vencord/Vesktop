@@ -227,23 +227,19 @@ function AudioSettingsModal({
                     value={Settings.audio?.workaround ?? false}
                 />
                 <FormSwitch
-                    title="Only Speakers"
+                    title="Legacy Workaround"
                     description={
-                        'When sharing entire desktop audio, only share apps that play to a speaker. You may want to disable this when using "mix bussing".'
+                        'Use a non redirect based approach for the microphone workaround. Only use this if your pipewire version is ancient.'
                     }
                     hideBorder
                     onChange={v => (Settings.audio = { ...Settings.audio, legacyWorkaround: v })}
                     value={Settings.audio?.legacyWorkaround ?? false}
-                    note={
-                        <>
-                            Use a non-redirection based approach for the above workaround. This should not be enabled
-                            unless your pipewire version is ancient.
-                        </>
+                />
+                <FormSwitch
+                    title="Only Speakers"
+                    description={
+                        'When sharing entire desktop audio, only share apps that play to a speaker. You may want to disable this when using "mix bussing".'
                     }
-                >
-                    Microphone Workaround
-                </Switch>
-                <Switch
                     hideBorder
                     onChange={v => (Settings.audio = { ...Settings.audio, onlySpeakers: v })}
                     value={Settings.audio?.onlySpeakers ?? true}
