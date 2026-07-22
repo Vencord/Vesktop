@@ -229,7 +229,7 @@ function AudioSettingsModal({
                 <FormSwitch
                     title="Legacy Workaround"
                     description={
-                        'Use a non redirect based approach for the microphone workaround. Only use this if your pipewire version is ancient.'
+                        "Use a non redirect based approach for the microphone workaround. Only use this if your pipewire version is ancient."
                     }
                     hideBorder
                     onChange={v => (Settings.audio = { ...Settings.audio, legacyWorkaround: v })}
