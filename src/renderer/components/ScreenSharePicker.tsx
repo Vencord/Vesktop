@@ -658,6 +658,7 @@ function AudioSourcePickerLinux({
                             serialize={JSON.stringify}
                             popoutPosition="top"
                             closeOnSelect={false}
+                            renderOptionLabel={o => o.label}
                         />
                     </SimpleErrorBoundary>
                 </section>
@@ -678,6 +679,7 @@ function AudioSourcePickerLinux({
                                 serialize={JSON.stringify}
                                 popoutPosition="top"
                                 closeOnSelect={false}
+                                renderOptionLabel={o => o.label}
                             />
                         </SimpleErrorBoundary>
                     </section>
