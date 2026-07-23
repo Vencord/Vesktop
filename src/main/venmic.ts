@@ -66,13 +66,14 @@ function getRendererAudioServicePid() {
     );
 }
 
-function linkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) {
+function buildLinkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) {
     const pid = getRendererAudioServicePid();
 
-    const { ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround, onlySpeakers, onlyDefaultSpeakers } =
+    const { mute, ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround, onlySpeakers, onlyDefaultSpeakers } =
         Settings.store.audio ?? {};
 
-    const rtn: LinkData = {
+    const data: LinkData = {
+        mute: mute ?? true,
         include: include ?? [],
         exclude: exclude ?? [],
         only_speakers: onlySpeakers,
@@ -80,21 +81,21 @@ function linkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) 
         only_default_speakers: onlyDefaultSpeakers
     };
 
-    rtn.exclude.push({ "application.process.id": pid });
+    data.exclude.push({ "application.process.id": pid });
 
     if (ignoreInputMedia ?? true) {
-        rtn.exclude.push({ "media.class": "Stream/Input/Audio" });
+        data.exclude.push({ "media.class": "Stream/Input/Audio" });
     }
 
     if (ignoreVirtual) {
-        rtn.exclude.push({ "node.virtual": "true" });
+        data.exclude.push({ "node.virtual": "true" });
     }
 
     if (workaround) {
-        rtn.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
+        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
     }
 
-    return rtn;
+    return data;
 }
 
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
@@ -110,11 +111,15 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
-    return obtainVenmic()?.link(linkData({ include }));
+    return obtainVenmic()?.link(buildLinkData({ include }));
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
-    return obtainVenmic()?.link(linkData({ exclude }));
+    return obtainVenmic()?.link(buildLinkData({ exclude }));
+});
+
+ipcMain.handle(IpcEvents.VIRT_MIC_UNMUTE, () => {
+    return obtainVenmic()?.unmute();
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());

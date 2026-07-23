@@ -122,14 +122,24 @@ addPatch({
 
 if (isLinux) {
     onceReady.then(() => {
-        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
-            const owner = streamKey.split(":").at(-1);
+        const ownsStream = (streamKey: string) => {
+            return streamKey.split(":").at(-1) === UserStore.getCurrentUser().id;
+        };
 
-            if (owner !== UserStore.getCurrentUser().id) {
+        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
                 return;
             }
 
             VesktopNative.virtmic.stop();
+        });
+
+        FluxDispatcher.subscribe("STREAM_UPDATE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
+                return;
+            }
+
+            VesktopNative.virtmic.unmute();
         });
     });
 }
@@ -219,6 +229,13 @@ function AudioSettingsModal({
             </Modals.ModalHeader>
 
             <Modals.ModalContent className={cl("modal", "venmic-settings")}>
+                <FormSwitch
+                    title="Initial Mute"
+                    description="Fix an initial audio spike caused by chromium."
+                    hideBorder
+                    onChange={v => (Settings.audio = { ...Settings.audio, mute: v })}
+                    value={Settings.audio?.mute ?? true}
+                />
                 <FormSwitch
                     title="Microphone Workaround"
                     description="Work around an issue that causes the microphone to be shared instead of the correct audio. Only enable if you're experiencing this issue."
