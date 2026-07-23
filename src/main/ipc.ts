@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { configureXDPShortcuts } from "main/dbus";
+
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
@@ -65,6 +67,14 @@ handleSync(
     () => process.platform === "win32" && Number(release().split(".").pop()) >= 22621
 );
 
+handleSync(
+    IpcEvents.IS_WAYLAND,
+    () =>
+        process.platform === "linux" &&
+        (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY) &&
+        app.commandLine.getSwitchValue("ozone-platform") === "wayland"
+);
+handle(IpcEvents.CONFIGURE_XDP_SHORTCUTS, () => configureXDPShortcuts());
 handleSync(IpcEvents.AUTOSTART_ENABLED, () => autoStart.isEnabled());
 handle(IpcEvents.ENABLE_AUTOSTART, autoStart.enable);
 handle(IpcEvents.DISABLE_AUTOSTART, autoStart.disable);

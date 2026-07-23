@@ -20,6 +20,8 @@ addPatch({
         }
     ],
 
+    // TODO: PTT under voice & video
+
     renderKeybindsButton: ErrorBoundary.wrap(
         () => <Button onClick={() => openKeybindsModal()}>Configure Vesktop Keybinds</Button>,
         { noop: true }

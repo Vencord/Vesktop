@@ -54,4 +54,4 @@ onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
 
 onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data => openScreenSharePicker(data.screens, data.skipPicker));
 
-onIpcCommand(IpcCommands.KEY_BINDS_HANDLE, handleKeyBind);
+onIpcCommand(IpcCommands.KEY_BINDS_HANDLE, ({ action, keyup }) => handleKeyBind(action, keyup));
