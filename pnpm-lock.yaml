@@ -96,8 +96,8 @@ importers:
         version: 3.7.0
     optionalDependencies:
       '@vencord/venmic':
-        specifier: ^6.1.0
-        version: 6.1.0
+        specifier: ^7.1.0
+        version: 7.1.0
 
   packages/libvesktop:
     devDependencies:
@@ -555,8 +555,8 @@ packages:
       '@types/react': 18.3.1
       '@types/react-dom': 18.3.1
 
-  '@vencord/venmic@6.1.0':
-    resolution: {integrity: sha512-YiCtzml/W8tYbGhu3jm5jfbbEnl2slKKARNK0jO+8qV979k9eFnfIRTxvhMN/SWq1h8ZNJdXVwvXpffQwq0RuA==}
+  '@vencord/venmic@7.1.0':
+    resolution: {integrity: sha512-HQpZoUKGz8j7m1+1BCgE+7B6T/+/IArVO8km7SjsWxe/5+2YblAs0Fwgy9C9XqCCir/u0+F1FMqrQQUX2PATYw==}
     engines: {node: '>=14.15'}
     os: [linux]
 
@@ -3317,7 +3317,7 @@ snapshots:
       ts-pattern: 5.9.0
       type-fest: 4.41.0
 
-  '@vencord/venmic@6.1.0':
+  '@vencord/venmic@7.1.0':
     dependencies:
       cmake-js: 7.4.0
       node-addon-api: 8.9.0
