@@ -31,7 +31,7 @@ import {
     useForceUpdater
 } from "@vencord/types/utils";
 import { onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, MediaEngineStore, Select, UserStore, useState } from "@vencord/types/webpack/common";
+import { FluxDispatcher, MediaEngineStore, SearchableSelect, UserStore, useState } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
@@ -54,7 +54,7 @@ type AudioSource = SpecialSource | Node;
 type AudioSources = SpecialSource | Node[];
 
 interface AudioItem {
-    name: string;
+    label: string;
     value: AudioSource;
 }
 
@@ -474,7 +474,7 @@ function isSpecialSource(value?: AudioSource | AudioSources): value is SpecialSo
 
 function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelect?: boolean): AudioItem[] {
     if (isSpecialSource(node)) {
-        return [{ name: node, value: node }];
+        return [{ label: node, value: node }];
     }
 
     const mediaClass = node["media.class"];
@@ -495,7 +495,7 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelec
     }
 
     const name = node[prop]!;
-    const items: AudioItem[] = [{ name: name, value: { [prop]: name } }];
+    const items: AudioItem[] = [{ label: name, value: { [prop]: name } }];
 
     if (!granularSelect) {
         return items;
@@ -519,7 +519,7 @@ function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelec
     append("application.process.binary", "()");
     append("media.name", "[]");
 
-    items.push({ name: granularName, value: granularProps });
+    items.push({ label: granularName, value: granularProps });
 
     return items;
 }
@@ -543,24 +543,17 @@ function isItemSelected(sources?: AudioSources) {
     };
 }
 
-function updateItems(setSources: (s: AudioSources) => void, sources?: AudioSources) {
-    return (value: AudioSource) => {
-        if (isSpecialSource(value)) {
-            setSources(value);
+function updateSources(setSources: (s: AudioSources) => void, sources?: AudioSources) {
+    return (values: AudioSource[]) => {
+        const added = values.find(value => !isItemSelected(sources)(value));
+
+        if (added && isSpecialSource(added)) {
+            setSources(added);
             return;
         }
 
-        if (isSpecialSource(sources)) {
-            setSources([value]);
-            return;
-        }
-
-        if (isItemSelected(sources)(value)) {
-            setSources(sources?.filter(x => !hasMatchingProps(x, value)) ?? "None");
-            return;
-        }
-
-        setSources([...(sources || []), value]);
+        const nodes = values.filter((value): value is Node => !isSpecialSource(value));
+        setSources(nodes.length ? nodes : "None");
     };
 }
 
@@ -632,7 +625,7 @@ function AudioSourcePickerLinux({
     const specialSources: SpecialSource[] = ["None", "Entire System"] as const;
 
     const uniqueName = (value: AudioItem, index: number, list: AudioItem[]) =>
-        list.findIndex(x => x.name === value.name) === index;
+        list.findIndex(x => x.label === value.label) === index;
 
     const allSources = sources.ok
         ? [...specialSources, ...sources.targets]
@@ -647,17 +640,14 @@ function AudioSourcePickerLinux({
                 <section>
                     <Heading tag="h5">{loading ? "Loading Sources..." : "Audio Sources"}</Heading>
                     <SimpleErrorBoundary>
-                        <Select
-                            options={allSources.map(({ name, value }) => ({
-                                label: name,
-                                value: value,
-                                default: name === "None"
-                            }))}
-                            isSelected={isItemSelected(includeSources)}
-                            select={updateItems(setIncludeSources, includeSources)}
-                            serialize={JSON.stringify}
-                            popoutPosition="top"
+                        <SearchableSelect
+                            key={isSpecialSource(includeSources) ? includeSources : "nodes"}
+                            multi
                             closeOnSelect={false}
+                            options={allSources}
+                            value={allSources.map(s => s.value).filter(isItemSelected(includeSources))}
+                            onChange={updateSources(setIncludeSources, includeSources)}
+                            popoutPosition="top"
                         />
                     </SimpleErrorBoundary>
                 </section>
@@ -665,19 +655,14 @@ function AudioSourcePickerLinux({
                     <section>
                         <Heading tag="h5">Exclude Sources</Heading>
                         <SimpleErrorBoundary>
-                            <Select
-                                options={allSources
-                                    .filter(x => x.name !== "Entire System")
-                                    .map(({ name, value }) => ({
-                                        label: name,
-                                        value: value,
-                                        default: name === "None"
-                                    }))}
-                                isSelected={isItemSelected(excludeSources)}
-                                select={updateItems(setExcludeSources, excludeSources)}
-                                serialize={JSON.stringify}
-                                popoutPosition="top"
+                            <SearchableSelect
+                                key={isSpecialSource(excludeSources) ? excludeSources : "nodes"}
+                                multi
                                 closeOnSelect={false}
+                                options={allSources.filter(x => x.label !== "Entire System")}
+                                value={allSources.map(s => s.value).filter(isItemSelected(excludeSources))}
+                                onChange={updateSources(setExcludeSources, excludeSources)}
+                                popoutPosition="top"
                             />
                         </SimpleErrorBoundary>
                     </section>
