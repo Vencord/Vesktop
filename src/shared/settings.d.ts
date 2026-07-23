@@ -52,6 +52,7 @@ export interface Settings {
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
+    scrollSpeed?: number;
 }
 
 export interface State {
