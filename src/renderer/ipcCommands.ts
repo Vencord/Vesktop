@@ -51,4 +51,6 @@ onIpcCommand(IpcCommands.NAVIGATE_SETTINGS, () => {
 
 onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
 
-onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data => openScreenSharePicker(data.screens, data.skipPicker));
+onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data =>
+    openScreenSharePicker(data.screens, data.skipPicker, data.canShareAudio)
+);
