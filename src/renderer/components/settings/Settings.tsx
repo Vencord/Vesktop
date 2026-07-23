@@ -75,6 +75,20 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             disabled: () => Settings.store.customTitleBar ?? isWindows
         },
         {
+            key: "enableShadow",
+            title: "Enable Window Shadow",
+            description: "Enables the window shadow. Requires a full restart.",
+            defaultValue: true,
+            disabled: () => Settings.store.customTitleBar !== true
+        },
+        {
+            key: "enableRoundedCorners",
+            title: "Enable Rounded Corners",
+            description: "Enables rounded corners. Requires a full restart.",
+            defaultValue: true,
+            disabled: () => Settings.store.customTitleBar !== true
+        },
+        {
             key: "enableSplashScreen",
             title: "Enable Splash Screen",
             description:

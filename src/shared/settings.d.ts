@@ -20,6 +20,8 @@ export interface Settings {
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
+    enableShadow?: boolean;
+    enableRoundedCorners?: boolean;
     disableSmoothScroll?: boolean;
     hardwareAcceleration?: boolean;
     hardwareVideoAcceleration?: boolean;
