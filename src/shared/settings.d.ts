@@ -5,6 +5,7 @@
  */
 
 import type { Rectangle } from "electron";
+import { KeyBind } from "renderer/globalShortcuts/ShortcutSettings";
 
 export interface Settings {
     discordBranch?: "stable" | "canary" | "ptb";
@@ -52,6 +53,8 @@ export interface Settings {
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
+
+    keyBinds?: KeyBind[];
 }
 
 export interface State {

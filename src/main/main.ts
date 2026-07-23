@@ -11,9 +11,15 @@ import "./userAssets";
 import "./vesktopProtocol";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { IpcCommands } from "shared/IpcEvents";
 
+// eslint-disable-next-line no-duplicate-imports
+import { CommandLine } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { sendRendererCommand } from "./ipcCommands";
+import { initSocket } from "./ipcSocket";
+import { registerKeyBinds } from "./keyBinds";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
@@ -86,6 +92,9 @@ function init() {
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
         disabledFeatures.add("WaylandWpColorManagerV1");
+
+        // Enable Wayland Portal for global shortcuts
+        enabledFeatures.add("GlobalShortcutsPortal");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
@@ -120,6 +129,8 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        registerKeyBinds();
+        initSocket();
 
         bootstrap();
 
@@ -129,7 +140,7 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV })) {
+if (!app.requestSingleInstanceLock({ IS_DEV, args: CommandLine })) {
     if (IS_DEV) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
@@ -157,6 +168,13 @@ app.on("open-url", (_, url) => {
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
+});
+
+app.on("second-instance", (_e, _argv, _cwd, data) => {
+    const { args } = data as { args: typeof CommandLine; IS_DEV: boolean };
+    const { "run-shortcut": shortcut } = args.values;
+
+    if (shortcut) sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, shortcut);
 });
 
 // Sets the WebRTC IP handling policy for all current and future windows.
