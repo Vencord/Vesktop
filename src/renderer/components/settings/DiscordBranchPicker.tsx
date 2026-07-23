@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Select } from "@vencord/types/webpack/common";
+import { Alerts, Select } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
 import { SettingsComponent } from "./Settings";
@@ -20,7 +20,15 @@ export const DiscordBranchPicker: SettingsComponent = ({ settings }) => {
                     { label: "PTB", value: "ptb" }
                 ]}
                 closeOnSelect={true}
-                select={v => (settings.discordBranch = v)}
+                select={v => {
+                    if (v !== "stable" && settings.discordBranch !== v) {
+                        Alerts.show({
+                            title: "Warning",
+                            body: "In most cases you do not need to use canary or PTB branches. These branches sometimes have breaking changes that affect the functionality of Vencord."
+                        });
+                    }
+                    settings.discordBranch = v;
+                }}
                 isSelected={v => v === settings.discordBranch}
                 serialize={s => s}
             />
