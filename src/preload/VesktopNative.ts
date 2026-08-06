@@ -43,6 +43,14 @@ export const VesktopNative = {
             ipcRenderer.on(IpcEvents.VESKTOP_RENDERER_CSS_UPDATE, (_e, newCss: string) => cb(newCss));
         }
     },
+    powerMonitor: {
+        idleWatcherActive: () => sendSync<boolean>(IpcEvents.WAYLAND_IDLE_WATCHER_ACTIVE),
+        isWaylandIdle: () => sendSync<boolean>(IpcEvents.IS_WAYLAND_IDLE),
+        on: (event: string, cb: () => void) =>
+            ipcRenderer.on(IpcEvents.POWERMONITOR_EVENT, (_, e: string) => {
+                if (e === event) cb();
+            })
+    },
     autostart: {
         isEnabled: () => sendSync<boolean>(IpcEvents.AUTOSTART_ENABLED),
         enable: () => invoke<void>(IpcEvents.ENABLE_AUTOSTART),
