@@ -20,13 +20,13 @@ import {
 } from "electron";
 import { readFileSync, watch } from "fs";
 import { readFile, stat } from "fs/promises";
-import { enableHardwareAcceleration } from "main";
 import { release } from "os";
 import { join } from "path";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
+import { enableHardwareAcceleration } from "./main";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";

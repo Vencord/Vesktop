@@ -9,6 +9,7 @@ import "./settings.css";
 import { classNameFactory } from "@vencord/types/api/Styles";
 import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
 import { ComponentType } from "react";
+import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 import { Settings, useSettings } from "renderer/settings";
 import { isMac, isWindows } from "renderer/utils";
 
@@ -146,8 +147,11 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Open Links in app (experimental)",
             description: "Opens links in a new Vesktop window instead of your web browser",
             defaultValue: false
-        }
+        },
+
+        WebRTCIPHandlingPolicyPicker
     ],
+
     "Developer Options": [DeveloperOptionsButton]
 };
 
