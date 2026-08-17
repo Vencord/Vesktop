@@ -8,7 +8,6 @@ import "./screenSharePicker.css";
 
 import { classNameFactory } from "@vencord/types/api/Styles";
 import {
-    BaseText,
     Button,
     Card,
     CogWheel,
@@ -20,18 +19,18 @@ import {
     RestartIcon,
     Span
 } from "@vencord/types/components";
+import { Logger, useAwaiter, useForceUpdater } from "@vencord/types/utils";
+import { onceReady } from "@vencord/types/webpack";
 import {
     closeModal,
-    Logger,
-    ModalCloseButton,
-    Modals,
-    ModalSize,
+    FluxDispatcher,
+    MediaEngineStore,
+    Modal,
     openModal,
-    useAwaiter,
-    useForceUpdater
-} from "@vencord/types/utils";
-import { onceReady } from "@vencord/types/webpack";
-import { FluxDispatcher, MediaEngineStore, Select, UserStore, useState } from "@vencord/types/webpack/common";
+    Select,
+    UserStore,
+    useState
+} from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
 import { addPatch } from "renderer/patches/shared";
@@ -220,15 +219,13 @@ function AudioSettingsModal({
     const Settings = useSettings();
 
     return (
-        <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
-            <Modals.ModalHeader className={cl("header")}>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    Audio Settings
-                </BaseText>
-                <ModalCloseButton onClick={close} />
-            </Modals.ModalHeader>
-
-            <Modals.ModalContent className={cl("modal", "venmic-settings")}>
+        <Modal
+            {...modalProps}
+            size="lg"
+            title="Audio Settings"
+            actions={[{ text: "Back", variant: "secondary", onClick: close }]}
+        >
+            <div className={cl("venmic-settings")}>
                 <FormSwitch
                     title="Initial Mute"
                     description="Fix an initial audio spike caused by chromium."
@@ -319,13 +316,8 @@ function AudioSettingsModal({
                     value={Settings.audio?.deviceSelect ?? false}
                     disabled={Settings.audio?.ignoreDevices}
                 />
-            </Modals.ModalContent>
-            <Modals.ModalFooter className={cl("footer")}>
-                <Button variant="secondary" onClick={close}>
-                    Back
-                </Button>
-            </Modals.ModalFooter>
-        </Modals.ModalRoot>
+            </div>
+        </Modal>
     );
 }
 
@@ -723,101 +715,91 @@ function ModalComponent({
         frameRate: "30"
     });
 
+    function handleGoLive() {
+        currentSettings = settings;
+        try {
+            const frameRate = Number(qualitySettings.frameRate);
+            const height = Number(qualitySettings.resolution);
+            const width = Math.round(height * (16 / 9));
+
+            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                connection => connection.streamUserId === UserStore.getCurrentUser().id
+            );
+
+            if (conn) {
+                conn.videoStreamParameters[0].maxFrameRate = frameRate;
+                conn.videoStreamParameters[0].maxResolution ??= { width: 0, height: 0 };
+                conn.videoStreamParameters[0].maxResolution.height = height;
+                conn.videoStreamParameters[0].maxResolution.width = width;
+            }
+
+            submit({
+                id: selected!,
+                ...settings
+            });
+
+            setTimeout(async () => {
+                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
+                    connection => connection.streamUserId === UserStore.getCurrentUser().id
+                );
+                if (!conn) return;
+
+                // @ts-expect-error incorrect type
+                const track = conn.input.stream.getVideoTracks()[0];
+
+                const constraints = {
+                    ...track.getConstraints(),
+                    frameRate: { min: frameRate, ideal: frameRate },
+                    width: { min: 640, ideal: width, max: width },
+                    height: { min: 480, ideal: height, max: height },
+                    advanced: [{ width: width, height: height }],
+                    resizeMode: "none"
+                };
+
+                try {
+                    await track.applyConstraints(constraints);
+
+                    logger.info("Applied constraints successfully. New constraints:", track.getConstraints());
+                } catch (e) {
+                    logger.error("Failed to apply constraints.", e);
+                }
+            }, 100);
+        } catch (error) {
+            logger.error("Error while submitting stream.", error);
+        }
+
+        close();
+    }
+
+    const showGoBack = selected && !skipPicker;
     return (
-        <Modals.ModalRoot {...modalProps} size={ModalSize.MEDIUM}>
-            <Modals.ModalHeader className={cl("header")}>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    Screen Share Picker
-                </BaseText>
-                <ModalCloseButton onClick={close} />
-            </Modals.ModalHeader>
-            <Modals.ModalContent className={cl("modal")}>
-                {!selected ? (
-                    <ScreenPicker screens={screens} chooseScreen={setSelected} />
-                ) : (
-                    <StreamSettingsUi
-                        source={screens.find(s => s.id === selected)!}
-                        settings={settings}
-                        setSettings={setSettings}
-                        skipPicker={skipPicker}
-                    />
-                )}
-            </Modals.ModalContent>
-            <Modals.ModalFooter className={cl("footer")}>
-                <Button
-                    disabled={!selected}
-                    onClick={() => {
-                        currentSettings = settings;
-                        try {
-                            const frameRate = Number(qualitySettings.frameRate);
-                            const height = Number(qualitySettings.resolution);
-                            const width = Math.round(height * (16 / 9));
-
-                            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                connection => connection.streamUserId === UserStore.getCurrentUser().id
-                            );
-
-                            if (conn) {
-                                conn.videoStreamParameters[0].maxFrameRate = frameRate;
-                                conn.videoStreamParameters[0].maxResolution ??= { width: 0, height: 0 };
-                                conn.videoStreamParameters[0].maxResolution.height = height;
-                                conn.videoStreamParameters[0].maxResolution.width = width;
-                            }
-
-                            submit({
-                                id: selected!,
-                                ...settings
-                            });
-
-                            setTimeout(async () => {
-                                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                                    connection => connection.streamUserId === UserStore.getCurrentUser().id
-                                );
-                                if (!conn) return;
-
-                                // @ts-expect-error incorrect type
-                                const track = conn.input.stream.getVideoTracks()[0];
-
-                                const constraints = {
-                                    ...track.getConstraints(),
-                                    frameRate: { min: frameRate, ideal: frameRate },
-                                    width: { min: 640, ideal: width, max: width },
-                                    height: { min: 480, ideal: height, max: height },
-                                    advanced: [{ width: width, height: height }],
-                                    resizeMode: "none"
-                                };
-
-                                try {
-                                    await track.applyConstraints(constraints);
-
-                                    logger.info(
-                                        "Applied constraints successfully. New constraints:",
-                                        track.getConstraints()
-                                    );
-                                } catch (e) {
-                                    logger.error("Failed to apply constraints.", e);
-                                }
-                            }, 100);
-                        } catch (error) {
-                            logger.error("Error while submitting stream.", error);
-                        }
-
-                        close();
-                    }}
-                >
-                    Go Live
-                </Button>
-
-                {selected && !skipPicker ? (
-                    <Button variant="secondary" onClick={() => setSelected(void 0)}>
-                        Back
-                    </Button>
-                ) : (
-                    <Button variant="secondary" onClick={close}>
-                        Cancel
-                    </Button>
-                )}
-            </Modals.ModalFooter>
-        </Modals.ModalRoot>
+        <Modal
+            {...modalProps}
+            size="lg"
+            title="Screen Share Picker"
+            actions={[
+                {
+                    text: showGoBack ? "Back" : "Cancel",
+                    variant: "secondary",
+                    onClick: () => (showGoBack ? setSelected(void 0) : close())
+                },
+                {
+                    text: "Go Live",
+                    disabled: !selected,
+                    onClick: handleGoLive
+                }
+            ]}
+        >
+            {!selected ? (
+                <ScreenPicker screens={screens} chooseScreen={setSelected} />
+            ) : (
+                <StreamSettingsUi
+                    source={screens.find(s => s.id === selected)!}
+                    settings={settings}
+                    setSettings={setSettings}
+                    skipPicker={skipPicker}
+                />
+            )}
+        </Modal>
     );
 }
