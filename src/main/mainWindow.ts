@@ -312,8 +312,16 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
 }
 
 function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
-    const { staticTitle, transparencyOption, enableMenu, enableShadow, enableRoundedCorners, customTitleBar, splashTheming, splashBackground } =
-        Settings.store;
+    const {
+        staticTitle,
+        transparencyOption,
+        enableMenu,
+        enableShadow,
+        enableRoundedCorners,
+        customTitleBar,
+        splashTheming,
+        splashBackground
+    } = Settings.store;
 
     const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
 
