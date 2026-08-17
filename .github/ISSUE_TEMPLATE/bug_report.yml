@@ -21,14 +21,14 @@ body:
       id: vesktop-version
       attributes:
           label: Vesktop Version
-          placeholder: 1.6.7
+          placeholder: e.g. 1.6.7
       validations:
           required: true
 
     - type: input
       id: os
       attributes:
-          label: Operation System
+          label: Operating System
           placeholder: e.g. Windows 11, macOS Tahoe, Fedora Linux 44 (GNOME), Arch Linux (Hyprland)
       validations:
           required: true
@@ -76,11 +76,8 @@ body:
       id: crash-log
       attributes:
           label: Errors
-          description: Open the Developer Console with `Ctrl+Shift+i` / `Cmd+Option+i`. Then look for any red errors (Ignore network errors like Failed to load resource) and paste them between the "```". Run Vesktop from the command line to get console output and also paste that here
-          value: |
-              ```
-              Replace this text with your crash-log.
-              ```
+          render: text
+          description: Open the Developer Console with `Ctrl+Shift+i` / `Cmd+Option+i`. Then look for any red errors (Ignore network errors like Failed to load resource) and paste them. Run Vesktop from the command line to get console output and also paste that here
       validations:
           required: false
 
