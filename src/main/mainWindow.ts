@@ -312,8 +312,16 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
 }
 
 function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
-    const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
-        Settings.store;
+    const {
+        staticTitle,
+        transparencyOption,
+        enableMenu,
+        enableShadow,
+        enableRoundedCorners,
+        customTitleBar,
+        splashTheming,
+        splashBackground
+    } = Settings.store;
 
     const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
 
@@ -336,6 +344,8 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         },
         frame: !noFrame,
         autoHideMenuBar: enableMenu,
+        hasShadow: enableShadow !== false,
+        roundedCorners: enableRoundedCorners !== false,
         ...getWindowBoundsOptions()
     };
 
