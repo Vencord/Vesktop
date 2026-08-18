@@ -647,9 +647,10 @@ function AudioSourcePickerLinux({
                             }))}
                             isSelected={isItemSelected(includeSources)}
                             select={updateItems(setIncludeSources, includeSources)}
-                            serialize={String}
+                            serialize={JSON.stringify}
                             popoutPosition="top"
                             closeOnSelect={false}
+                            renderOptionLabel={o => o.label}
                         />
                     </SimpleErrorBoundary>
                 </section>
@@ -667,9 +668,10 @@ function AudioSourcePickerLinux({
                                     }))}
                                 isSelected={isItemSelected(excludeSources)}
                                 select={updateItems(setExcludeSources, excludeSources)}
-                                serialize={String}
+                                serialize={JSON.stringify}
                                 popoutPosition="top"
                                 closeOnSelect={false}
+                                renderOptionLabel={o => o.label}
                             />
                         </SimpleErrorBoundary>
                     </section>
