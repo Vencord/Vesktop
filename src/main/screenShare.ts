@@ -15,8 +15,7 @@ import { handle } from "./utils/ipcWrappers";
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
-const loopbackWithoutVesktop = "loopbackWithoutChrome" as unknown as NonNullable<Streams["audio"]>;
-const supportsLoopbackWithoutVesktop = process.platform === "win32" && Number(release().split(".").pop()) >= 20348;
+const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 20348;
 
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
@@ -83,7 +82,8 @@ export function registerScreenShareHandler() {
             video: source
         };
         if (choice.audio && process.platform === "win32") {
-            streams.audio = supportsLoopbackWithoutVesktop ? loopbackWithoutVesktop : "loopback";
+            // @ts-expect-error loopbackWithoutChrome is real but not documented
+            streams.audio = supportsLoopbackWithoutChrome ? "loopbackWithoutChrome" : "loopback";
         }
 
         callback(streams);
