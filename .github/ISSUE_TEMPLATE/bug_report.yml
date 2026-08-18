@@ -1,0 +1,93 @@
+name: Bug/Crash Report
+description: Create a bug or crash report for Vesktop.
+labels: [bug]
+title: "[Bug] <title>"
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              GitHub Issues are for development, not support!
+
+              Vesktop and Vencord are two separate things. This issue tracker is only for Vesktop. If your Vesktop crashes, it is very likely an issue with Vencord, not Vesktop.
+
+              If you are experiencing any of the following issues, go to our [Discord server](https://discord.gg/D9uwnFnqmd) for support:
+              - Vesktop doesn't work or crashes
+              - A Vencord plugin doesn't work anymore
+              - You are having issues installing Vesktop
+              - You want to ask a question about Vesktop, Vencord or one of its plugins
+
+    - type: input
+      id: vesktop-version
+      attributes:
+          label: Vesktop Version
+          placeholder: e.g. 1.6.7
+      validations:
+          required: true
+
+    - type: input
+      id: os
+      attributes:
+          label: Operating System
+          placeholder: e.g. Windows 11, macOS Tahoe, Fedora Linux 44 (GNOME), Arch Linux (Hyprland)
+      validations:
+          required: true
+
+    - type: input
+      id: install-method
+      attributes:
+          label: Install Method
+          placeholder: e.g. Setup exe, dmg, Flatpak, rpm, vesktop-git AUR
+      validations:
+          required: true
+
+    - type: textarea
+      id: bug-description
+      attributes:
+          label: What happens when the bug or crash occurs?
+          description: Where does this bug or crash occur, when does it occur, etc.
+          placeholder: The bug/crash happens sometimes when I do ..., causing this to not work/the app to crash. I think it happens because of ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: expected-behaviour
+      attributes:
+          label: What is the expected behaviour?
+          description: Simply detail what the expected behaviour is.
+          placeholder: I expect Vesktop/Discord to open the ... page instead of ..., it prevents me from doing ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps-to-take
+      attributes:
+          label: How do you recreate this bug or crash?
+          description: Give us a list of steps in order to recreate the bug or crash.
+          placeholder: |
+              1. Do ...
+              2. Then ...
+              3. Do this ..., ... and then ...
+              4. Observe "the bug" or "the crash"
+      validations:
+          required: true
+
+    - type: textarea
+      id: crash-log
+      attributes:
+          label: Errors
+          render: text
+          description: Open the Developer Console with `Ctrl+Shift+i` / `Cmd+Option+i`. Then look for any red errors (Ignore network errors like Failed to load resource) and paste them. Run Vesktop from the command line to get console output and also paste that here
+      validations:
+          required: false
+
+    - type: checkboxes
+      id: agreement-check
+      attributes:
+          label: Request Agreement
+          description: We only accept reports for bugs that happen on official builds on Discord Stable. Canary and PTB are Development branches and may be unstable
+          options:
+              - label: I've searched existing issues and this hasn't been reported before
+              - label: I installed Vesktop via an official method (download from vesktop.dev or from source), not via something like Nix packages
+              - label: This is not a support request
+              - label: I am willing to submit a fix for this myself

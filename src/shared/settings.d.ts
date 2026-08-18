@@ -20,6 +20,8 @@ export interface Settings {
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
     enableMenu?: boolean;
+    enableShadow?: boolean;
+    enableRoundedCorners?: boolean;
     disableSmoothScroll?: boolean;
     hardwareAcceleration?: boolean;
     hardwareVideoAcceleration?: boolean;
@@ -48,7 +50,6 @@ export interface Settings {
         ignoreDevices?: boolean;
         ignoreInputMedia?: boolean;
 
-        mute?: boolean;
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };

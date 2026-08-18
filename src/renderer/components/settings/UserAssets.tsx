@@ -7,18 +7,8 @@
 import "./UserAssets.css";
 
 import { BaseText, Button, FormSwitch } from "@vencord/types/components";
-import {
-    Margins,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalRoot,
-    ModalSize,
-    openModal,
-    wordsFromCamel,
-    wordsToTitle
-} from "@vencord/types/utils";
-import { showToast, useState } from "@vencord/types/webpack/common";
+import { Margins, wordsFromCamel, wordsToTitle } from "@vencord/types/utils";
+import { Modal, openModal, showToast, useState } from "@vencord/types/webpack/common";
 import { UserAssetType } from "main/userAssets";
 import { useSettings } from "renderer/settings";
 
@@ -32,22 +22,13 @@ export const UserAssetsButton: SettingsComponent = () => {
 
 function openAssetsModal() {
     openModal(props => (
-        <ModalRoot {...props} size={ModalSize.MEDIUM}>
-            <ModalHeader>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    User Assets
-                </BaseText>
-                <ModalCloseButton onClick={props.onClose} />
-            </ModalHeader>
-
-            <ModalContent>
-                <div className="vcd-user-assets">
-                    {CUSTOMIZABLE_ASSETS.map(asset => (
-                        <Asset key={asset} asset={asset} />
-                    ))}
-                </div>
-            </ModalContent>
-        </ModalRoot>
+        <Modal {...props} size="lg" title="User Assets">
+            <div className="vcd-user-assets">
+                {CUSTOMIZABLE_ASSETS.map(asset => (
+                    <Asset key={asset} asset={asset} />
+                ))}
+            </div>
+        </Modal>
     ));
 }
 
