@@ -36,6 +36,8 @@ jobs:
 
             - name: Update metainfo
               run: pnpm generateMeta
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Upload metainfo to release
               run: |
