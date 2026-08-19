@@ -28,19 +28,18 @@ if (isLinux) {
         const stream = await original.call(this, opts);
         const id = await getVirtmic();
 
+        const contentHint = String(currentSettings?.contentHint);
         const frameRate = Number(State.store.screenshareQuality?.frameRate ?? 30);
         const height = Number(State.store.screenshareQuality?.resolution ?? 720);
         const width = Math.round(height * (16 / 9));
         const track = stream.getVideoTracks()[0];
 
-        track.contentHint = String(currentSettings?.contentHint);
+        track.contentHint = contentHint;
 
         const constraints = {
             ...track.getConstraints(),
-            frameRate: { min: frameRate, ideal: frameRate },
-            width: { min: 640, ideal: width, max: width },
-            height: { min: 480, ideal: height, max: height },
-            advanced: [{ width: width, height: height }],
+            ...getContentResolutionSettings(contentHint, { width, height }),
+            frameRate: getContentFrameSettings(contentHint, frameRate),
             resizeMode: "none"
         };
 
@@ -71,5 +70,27 @@ if (isLinux) {
         }
 
         return stream;
+    };
+}
+
+function getContentResolutionSettings(contentHint: string, targetResolution: { width: number; height: number }) {
+    if (contentHint === "detail") {
+        return {
+            height: { min: targetResolution.height, ideal: targetResolution.height },
+            width: { min: targetResolution.width, ideal: targetResolution.width }
+        };
+    }
+    return {
+        height: { ideal: targetResolution.height },
+        width: { ideal: targetResolution.width }
+    };
+}
+
+function getContentFrameSettings(contentHint: string, targetFrameRate: number) {
+    if (contentHint === "motion") {
+        return { min: targetFrameRate, ideal: targetFrameRate };
+    }
+    return {
+        ideal: targetFrameRate
     };
 }
