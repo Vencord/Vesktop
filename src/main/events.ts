@@ -11,5 +11,5 @@ import { UserAssetType } from "./userAssets";
 export const AppEvents = new EventEmitter<{
     appLoaded: [];
     userAssetChanged: [UserAssetType];
-    setTrayVariant: ["tray" | "trayUnread"];
+    setTrayVariant: ["tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened"];
 }>();
