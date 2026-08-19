@@ -81,7 +81,7 @@
             color: var(--fg-secondary);
         }
 
-        #buttons {
+        .buttons {
             display: flex;
             justify-content: end;
             gap: 0.5em;
@@ -105,6 +105,31 @@
         #submit {
             background: green;
         }
+
+        #warning {
+            background-color: var(--bg);
+            border-radius: 8px;
+            padding: 1.5em;
+            padding-bottom: 1em;
+            width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #warningWrapper {
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0000007f;
+            position: absolute;
+            display: none;
+        }
+
+        #dismiss {
+            background-color: var(--link);
+        }
     </style>
 </head>
 
@@ -115,7 +140,7 @@
     <form>
         <label>
             <h2>Discord Branch</h2>
-            <select name="discordBranch">
+            <select name="discordBranch" id="discordBranch">
                 <option value="stable">stable</option>
                 <option value="canary">canary</option>
                 <option value="ptb">ptb</option>
@@ -155,9 +180,24 @@
             <input type="checkbox" name="minimizeToTray" checked />
         </label>
     </form>
-    <div id="buttons">
+
+    <div class="buttons">
         <button id="cancel">Quit</button>
         <button id="submit">Submit</button>
+    </div>
+
+    <div id="warningWrapper">
+        <div id="warning">
+            <h2>Warning</h2>
+            <p>
+                In most cases you do not need to use canary or PTB branches.
+                These branches sometimes have breaking changes that affect the
+                functionality of Vencord.
+            </p>
+            <div class="buttons">
+                <button id="dismiss">Dismiss</button>
+            </div>
+        </div>
     </div>
 </body>
 
@@ -170,4 +210,10 @@
         console.info("form:" + JSON.stringify(data));
         e.preventDefault();
     };
+    discordBranch.onchange = e => {
+        if (e.target.value !== "stable") {
+            warningWrapper.style.display = "block";
+        }
+    };
+    dismiss.onclick = () => (warningWrapper.style.display = "none");
 </script>
