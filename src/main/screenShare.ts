@@ -15,7 +15,7 @@ import { handle } from "./utils/ipcWrappers";
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
 
-const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 20348;
+const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 19045;
 
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
