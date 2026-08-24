@@ -64,7 +64,7 @@ const existsAsync = (path: string) =>
         .catch(() => false);
 
 export async function isValidVencordInstall(dir: string) {
-    const results = await Promise.all(["package.json", ...FILES_TO_DOWNLOAD].map(f => existsAsync(join(dir, f))));
+    const results = await Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f))));
     return !results.includes(false);
 }
 
