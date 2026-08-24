@@ -25,10 +25,12 @@ export function useSettings() {
     return Settings.store;
 }
 
-export function getValueAndOnChange(key: keyof typeof Settings.store) {
+export function getValueAndOnChange<K extends keyof typeof Settings.store, V extends (typeof Settings.store)[K]>(
+    key: K
+) {
     return {
-        value: Settings.store[key] as any,
-        onChange: (value: any) => (Settings.store[key] = value)
+        value: Settings.store[key] as V,
+        onChange: (value: V) => (Settings.store[key] = value)
     };
 }
 

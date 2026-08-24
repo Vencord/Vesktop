@@ -74,7 +74,7 @@ function Asset({ asset }: { asset: UserAssetType }) {
                     {isSplash && (
                         <FormSwitch
                             title="Nearest-Neighbor Scaling (for pixel art)"
-                            value={settings.splashPixelated ?? false}
+                            value={settings.splashPixelated}
                             onChange={val => (settings.splashPixelated = val)}
                             className={Margins.top16}
                             hideBorder
