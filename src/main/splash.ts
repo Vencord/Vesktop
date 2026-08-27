@@ -26,7 +26,7 @@ export function createSplashWindow(startMinimized = false) {
 
     const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
-    if (splashTheming !== false) {
+    if (splashTheming) {
         if (splashColor) {
             const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
 

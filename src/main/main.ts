@@ -40,7 +40,7 @@ function init() {
     app.commandLine.removeSwitch("enable-features");
     app.commandLine.removeSwitch("disable-features");
 
-    if (hardwareAcceleration === false || process.argv.includes("--disable-gpu")) {
+    if (!hardwareAcceleration || process.argv.includes("--disable-gpu")) {
         enableHardwareAcceleration = false;
         app.disableHardwareAcceleration();
     } else {
