@@ -121,14 +121,24 @@ addPatch({
 
 if (isLinux) {
     onceReady.then(() => {
-        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
-            const owner = streamKey.split(":").at(-1);
+        const ownsStream = (streamKey: string) => {
+            return streamKey.split(":").at(-1) === UserStore.getCurrentUser().id;
+        };
 
-            if (owner !== UserStore.getCurrentUser().id) {
+        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
                 return;
             }
 
             VesktopNative.virtmic.stop();
+        });
+
+        FluxDispatcher.subscribe("STREAM_UPDATE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
+                return;
+            }
+
+            VesktopNative.virtmic.unmute();
         });
     });
 }
@@ -216,6 +226,13 @@ function AudioSettingsModal({
             actions={[{ text: "Back", variant: "secondary", onClick: close }]}
         >
             <div className={cl("venmic-settings")}>
+                <FormSwitch
+                    title="Initial Mute"
+                    description="Fix an initial audio spike caused by chromium."
+                    hideBorder
+                    onChange={v => (Settings.audio = { ...Settings.audio, mute: v })}
+                    value={Settings.audio?.mute ?? true}
+                />
                 <FormSwitch
                     title="Microphone Workaround"
                     description="Work around an issue that causes the microphone to be shared instead of the correct audio. Only enable if you're experiencing this issue."
@@ -447,78 +464,61 @@ function isSpecialSource(value?: AudioSource | AudioSources): value is SpecialSo
     return typeof value === "string";
 }
 
-function hasMatchingProps(value: Node, other: Node) {
-    return Object.keys(value).every(key => value[key] === other[key]);
-}
-
 function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelect?: boolean): AudioItem[] {
     if (isSpecialSource(node)) {
         return [{ name: node, value: node }];
     }
 
-    const rtn: AudioItem[] = [];
-
     const mediaClass = node["media.class"];
 
     if (mediaClass?.includes("Video") || mediaClass?.includes("Midi")) {
-        return rtn;
+        return [];
     }
 
     if (!deviceSelect && node["device.id"]) {
-        return rtn;
+        return [];
     }
 
-    const name = node["application.name"];
+    const preferred = ["application.name", "node.description", "node.name", "application.process.binary"] as const;
+    const prop = preferred.find(prop => node[prop]);
 
-    if (name) {
-        rtn.push({ name: name, value: { "application.name": name } });
+    if (!prop) {
+        return [];
     }
+
+    const name = node[prop]!;
+    const items: AudioItem[] = [{ name: name, value: { [prop]: name } }];
 
     if (!granularSelect) {
-        return rtn;
+        return items;
     }
 
-    const rawName = node["node.name"];
+    let granularName = name;
+    const granularProps: Node = { [prop]: name };
 
-    if (!name) {
-        rtn.push({ name: rawName, value: { "node.name": rawName } });
-    }
+    const append = (name: string, brackets: string) => {
+        const value = node[name];
 
-    const binary = node["application.process.binary"];
+        if (!value) {
+            return;
+        }
 
-    if (!name && binary) {
-        rtn.push({ name: binary, value: { "application.process.binary": binary } });
-    }
+        granularName += ` ${brackets[0]}${value}${brackets[1]}`;
+        granularProps[name] = value;
+    };
 
-    const pid = node["application.process.id"];
+    append("application.process.id", "<>");
+    append("application.process.binary", "()");
+    append("media.name", "[]");
 
-    const first = rtn[0];
-    const firstValues = first.value as Node;
+    items.push({ name: granularName, value: granularProps });
 
-    if (pid) {
-        rtn.push({
-            name: `${first.name} (${pid})`,
-            value: { ...firstValues, "application.process.id": pid }
-        });
-    }
+    return items;
+}
 
-    const mediaName = node["media.name"];
-
-    if (mediaName) {
-        rtn.push({
-            name: `${first.name} [${mediaName}]`,
-            value: { ...firstValues, "media.name": mediaName }
-        });
-    }
-
-    if (mediaClass) {
-        rtn.push({
-            name: `${first.name} [${mediaClass}]`,
-            value: { ...firstValues, "media.class": mediaClass }
-        });
-    }
-
-    return rtn;
+function hasMatchingProps(value: Node, other: Node) {
+    const keys = Object.keys(value);
+    return keys.length === Object.keys(other).length && keys.every(key => value[key] === other[key]);
 }
 
 function isItemSelected(sources?: AudioSources) {
