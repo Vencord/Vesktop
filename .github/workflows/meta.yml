@@ -1,9 +1,6 @@
-name: Update metainfo on release
+name: Upload release metainfo
 
 on:
-    release:
-        types:
-            - published
     workflow_dispatch:
 
 permissions:
@@ -15,10 +12,22 @@ jobs:
 
         steps:
             - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+
+            - name: Get latest tag
+              id: latest_tag
+              run: |
+                  tag=$(git tag --sort=-creatordate | head -n1)
+                  echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+            - name: Checkout latest tag
+              run: git checkout "${{ steps.latest_tag.outputs.tag }}"
+
             - uses: pnpm/action-setup@v6 # Install pnpm using packageManager key in package.json
 
             - name: Use Node.js 24
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: 24
 
@@ -27,12 +36,11 @@ jobs:
 
             - name: Update metainfo
               run: pnpm generateMeta
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Commit and merge in changes
+            - name: Upload metainfo to release
               run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-                  gh release upload "${{ github.event.release.tag_name }}" dist/dev.vencord.Vesktop.metainfo.xml
+                  gh release upload "${{ steps.latest_tag.outputs.tag }}" dist/dev.vencord.Vesktop.metainfo.xml
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

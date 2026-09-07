@@ -7,15 +7,17 @@
 import { type Settings as TVencordSettings } from "@vencord/types/Vencord";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
+import { DefaultVesktopSettings } from "shared/defaultSettings";
 import type { Settings as TSettings, State as TState } from "shared/settings";
 import { SettingsStore } from "shared/utils/SettingsStore";
 
 import { DATA_DIR, VENCORD_SETTINGS_FILE } from "./constants";
+import { mergeDefaults } from "./utils/mergeDefaults";
 
 const SETTINGS_FILE = join(DATA_DIR, "settings.json");
 const STATE_FILE = join(DATA_DIR, "state.json");
 
-function loadSettings<T extends object = any>(file: string, name: string) {
+function loadSettings<T extends object = any>(file: string, name: string, defaults?: T) {
     let settings = {} as T;
     try {
         const content = readFileSync(file, "utf8");
@@ -25,6 +27,10 @@ function loadSettings<T extends object = any>(file: string, name: string) {
             console.error(`Failed to parse ${name}.json:`, err);
         }
     } catch {}
+
+    if (defaults) {
+        mergeDefaults(settings, defaults);
+    }
 
     const store = new SettingsStore(settings);
     store.addGlobalChangeListener(o => {
@@ -39,6 +45,6 @@ function loadSettings<T extends object = any>(file: string, name: string) {
     return store;
 }
 
-export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings");
+export const Settings = loadSettings<TSettings>(SETTINGS_FILE, "Vesktop settings", DefaultVesktopSettings);
 export const VencordSettings = loadSettings<TVencordSettings>(VENCORD_SETTINGS_FILE, "Vencord settings");
 export const State = loadSettings<TState>(STATE_FILE, "Vesktop state");

@@ -66,70 +66,60 @@ function getRendererAudioServicePid() {
     );
 }
 
+function buildLinkData({ include, exclude }: { include?: Node[]; exclude?: Node[] }) {
+    const pid = getRendererAudioServicePid();
+
+    const { mute, ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround, onlySpeakers, onlyDefaultSpeakers } =
+        Settings.store.audio ?? {};
+
+    const data: LinkData = {
+        mute: mute ?? true,
+        include: include ?? [],
+        exclude: exclude ?? [],
+        only_speakers: onlySpeakers,
+        ignore_devices: ignoreDevices,
+        only_default_speakers: onlyDefaultSpeakers
+    };
+
+    data.exclude.push({ "application.process.id": pid });
+
+    if (ignoreInputMedia ?? true) {
+        data.exclude.push({ "media.class": "Stream/Input/Audio" });
+    }
+
+    if (ignoreVirtual) {
+        data.exclude.push({ "node.virtual": "true" });
+    }
+
+    if (workaround) {
+        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
+    }
+
+    return data;
+}
+
 ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
 
     const { granularSelect } = Settings.store.audio ?? {};
 
     const targets = obtainVenmic()
-        ?.list(granularSelect ? ["node.name"] : undefined)
+        ?.list(granularSelect ? [] : ["application.name", "node.name"])
         .filter(s => s["application.process.id"] !== audioPid);
 
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
-    const pid = getRendererAudioServicePid();
-    const { ignoreDevices, ignoreInputMedia, ignoreVirtual, workaround } = Settings.store.audio ?? {};
-
-    const data: LinkData = {
-        include,
-        exclude: [{ "application.process.id": pid }],
-        ignore_devices: ignoreDevices
-    };
-
-    if (ignoreInputMedia ?? true) {
-        data.exclude.push({ "media.class": "Stream/Input/Audio" });
-    }
-
-    if (ignoreVirtual) {
-        data.exclude.push({ "node.virtual": "true" });
-    }
-
-    if (workaround) {
-        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
-    }
-
-    return obtainVenmic()?.link(data);
+    return obtainVenmic()?.link(buildLinkData({ include }));
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
-    const pid = getRendererAudioServicePid();
+    return obtainVenmic()?.link(buildLinkData({ exclude }));
+});
 
-    const { workaround, ignoreDevices, ignoreInputMedia, ignoreVirtual, onlySpeakers, onlyDefaultSpeakers } =
-        Settings.store.audio ?? {};
-
-    const data: LinkData = {
-        include: [],
-        exclude: [{ "application.process.id": pid }, ...exclude],
-        only_speakers: onlySpeakers,
-        ignore_devices: ignoreDevices,
-        only_default_speakers: onlyDefaultSpeakers
-    };
-
-    if (ignoreInputMedia ?? true) {
-        data.exclude.push({ "media.class": "Stream/Input/Audio" });
-    }
-
-    if (ignoreVirtual) {
-        data.exclude.push({ "node.virtual": "true" });
-    }
-
-    if (workaround) {
-        data.workaround = [{ "application.process.id": pid, "media.name": "RecordStream" }];
-    }
-
-    return obtainVenmic()?.link(data);
+ipcMain.handle(IpcEvents.VIRT_MIC_UNMUTE, () => {
+    return obtainVenmic()?.unmute();
 });
 
 ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());
