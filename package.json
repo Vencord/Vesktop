@@ -83,6 +83,9 @@
         },
         "beforePack": "scripts/build/beforePack.mjs",
         "afterPack": "scripts/build/afterPack.mjs",
+        "toolset": {
+            "appimage": "1.0.3"
+        },
         "linux": {
             "icon": "build/icon.svg",
             "category": "Network",
