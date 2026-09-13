@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       arrpc:
-        specifier: github:Vencord/arrpc#82ece7442564d725d8202a8bb9bed5903ee85026
-        version: https://codeload.github.com/Vencord/arrpc/tar.gz/82ece7442564d725d8202a8bb9bed5903ee85026
+        specifier: github:Vencord/arrpc#1dc801e8ea14d96ce8dccff416417614f058afb8
+        version: https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8
       electron-updater:
         specifier: 6.6.2
         version: 6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)(supports-color@7.2.0)
@@ -681,8 +681,8 @@ packages:
     resolution: {integrity: sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==}
     engines: {node: '>= 0.4'}
 
-  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/82ece7442564d725d8202a8bb9bed5903ee85026:
-    resolution: {gitHosted: true, integrity: sha512-2Tj4F1K+WEmu2gOLZC3Do8NtIPlMhLFvA2OrlE3lOV/HV9Lf8i5KboRv+NWv86zyrlCMzZUSVnzjYKPKuP3Ssw==, tarball: https://codeload.github.com/Vencord/arrpc/tar.gz/82ece7442564d725d8202a8bb9bed5903ee85026}
+  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8:
+    resolution: {gitHosted: true, integrity: sha512-/hVH9ZN2J1S2uExkz/8DjsuskA3YYcWb9oXRyaRbPExybJkvx33bpZsWOIVqgZO85ihn4wb9J97JdeWO+HIhrQ==, tarball: https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8}
     version: 3.7.0
     hasBin: true
 
@@ -3513,7 +3513,7 @@ snapshots:
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
 
-  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/82ece7442564d725d8202a8bb9bed5903ee85026:
+  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8:
     dependencies:
       ws: 8.21.3
     transitivePeerDependencies:
