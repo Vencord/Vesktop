@@ -83,7 +83,7 @@
         },
         "beforePack": "scripts/build/beforePack.mjs",
         "afterPack": "scripts/build/afterPack.mjs",
-        "toolset": {
+        "toolsets": {
             "appimage": "1.0.3"
         },
         "linux": {
