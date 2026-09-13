@@ -25,7 +25,7 @@
         "generateMeta": "tsx scripts/utils/generateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:Vencord/arrpc#82ece7442564d725d8202a8bb9bed5903ee85026",
+        "arrpc": "github:Vencord/arrpc#1dc801e8ea14d96ce8dccff416417614f058afb8",
         "electron-updater": "6.6.2"
     },
     "optionalDependencies": {
