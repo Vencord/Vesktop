@@ -23,3 +23,16 @@ app.whenReady().then(() => {
         }
     });
 });
+
+protocol.registerSchemesAsPrivileged([
+    {
+        scheme: "vesktop",
+        privileges: {
+            standard: true,
+            secure: true,
+            supportFetchAPI: true,
+            corsEnabled: true,
+            stream: true
+        }
+    }
+]);

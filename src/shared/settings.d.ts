@@ -7,29 +7,36 @@
 import type { Rectangle } from "electron";
 
 export interface Settings {
-    discordBranch?: "stable" | "canary" | "ptb";
-    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
-    tray?: boolean;
-    minimizeToTray?: boolean;
-    autoStartMinimized?: boolean;
-    openLinksWithElectron?: boolean;
-    staticTitle?: boolean;
-    enableMenu?: boolean;
-    disableSmoothScroll?: boolean;
-    hardwareAcceleration?: boolean;
-    hardwareVideoAcceleration?: boolean;
-    arRPC?: boolean;
-    appBadge?: boolean;
-    enableTaskbarFlashing?: boolean;
-    disableMinSize?: boolean;
-    clickTrayToShowHide?: boolean;
-    customTitleBar?: boolean;
+    discordBranch: "stable" | "canary" | "ptb";
+    transparencyOption: "none" | "mica" | "tabbed" | "acrylic";
+    webRTCIPHandlingPolicy:
+        | "default"
+        | "default_public_interface_only"
+        | "default_public_and_private_interfaces"
+        | "disable_non_proxied_udp";
+    tray: boolean;
+    minimizeToTray: boolean;
+    autoStartMinimized: boolean;
+    openLinksWithElectron: boolean;
+    staticTitle: boolean;
+    enableMenu: boolean;
+    enableShadow: boolean;
+    enableRoundedCorners: boolean;
+    disableSmoothScroll: boolean;
+    hardwareAcceleration: boolean;
+    hardwareVideoAcceleration: boolean;
+    arRPC: boolean;
+    appBadge: boolean;
+    enableTaskbarFlashing: boolean;
+    disableMinSize: boolean;
+    clickTrayToShowHide: boolean;
+    nativeTitleBar: boolean;
 
-    enableSplashScreen?: boolean;
-    splashTheming?: boolean;
+    enableSplashScreen: boolean;
+    splashTheming: boolean;
+    splashPixelated: boolean;
     splashColor?: string;
     splashBackground?: string;
-    splashPixelated?: boolean;
 
     spellCheckLanguages?: string[];
 
@@ -43,6 +50,7 @@ export interface Settings {
         ignoreDevices?: boolean;
         ignoreInputMedia?: boolean;
 
+        mute?: boolean;
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };

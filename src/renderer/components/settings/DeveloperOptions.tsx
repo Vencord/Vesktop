@@ -4,18 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText, Button, Heading, Paragraph, TextButton } from "@vencord/types/components";
-import {
-    Margins,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalRoot,
-    ModalSize,
-    openModal,
-    useForceUpdater
-} from "@vencord/types/utils";
-import { Toasts } from "@vencord/types/webpack/common";
+import { Button, Heading, Paragraph, TextButton } from "@vencord/types/components";
+import { Margins, useForceUpdater } from "@vencord/types/utils";
+import { Modal, openModal, Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "shared/settings";
 
 import { cl, SettingsComponent } from "./Settings";
@@ -26,31 +17,20 @@ export const DeveloperOptionsButton: SettingsComponent = ({ settings }) => {
 
 function openDeveloperOptionsModal(settings: Settings) {
     openModal(props => (
-        <ModalRoot {...props} size={ModalSize.MEDIUM}>
-            <ModalHeader>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    Vesktop Developer Options
-                </BaseText>
-                <ModalCloseButton onClick={props.onClose} />
-            </ModalHeader>
+        <Modal {...props} size="lg" title="Vesktop Developer Options">
+            <Heading tag="h4">Vencord Location</Heading>
+            <VencordLocationPicker settings={settings} />
 
-            <ModalContent>
-                <div style={{ padding: "1em 0" }}>
-                    <Heading tag="h5">Vencord Location</Heading>
-                    <VencordLocationPicker settings={settings} />
-
-                    <Heading tag="h5" className={Margins.top16}>
-                        Debugging
-                    </Heading>
-                    <div className={cl("button-grid")}>
-                        <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
-                        <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
-                            Open chrome://webrtc-internals
-                        </Button>
-                    </div>
-                </div>
-            </ModalContent>
-        </ModalRoot>
+            <Heading tag="h4" className={Margins.top16}>
+                Debugging
+            </Heading>
+            <div className={cl("button-grid")}>
+                <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
+                <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
+                    Open chrome://webrtc-internals
+                </Button>
+            </div>
+        </Modal>
     ));
 }
 

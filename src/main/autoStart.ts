@@ -73,7 +73,11 @@ function makeAutoStartLinuxPortal() {
 }
 
 const autoStartWindowsMac: AutoStart = {
-    isEnabled: () => app.getLoginItemSettings().openAtLogin,
+    isEnabled: () => {
+        const { openAtLogin, executableWillLaunchAtLogin } = app.getLoginItemSettings();
+        // Windows only reports openAtLogin as true when queried with the same args set in enable()
+        return openAtLogin || executableWillLaunchAtLogin;
+    },
     enable: () =>
         app.setLoginItemSettings({
             openAtLogin: true,

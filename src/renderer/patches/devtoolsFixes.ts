@@ -8,7 +8,7 @@ import { addPatch } from "./shared";
 
 addPatch({
     patches: [
-        // Discord Web blocks the devtools keybin on mac specifically, disable that
+        // Discord Web blocks the devtools key-bind on mac specifically, disable that
         {
             find: '"mod+alt+i"',
             replacement: {

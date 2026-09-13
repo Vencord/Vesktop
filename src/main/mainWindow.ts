@@ -21,14 +21,14 @@ import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
-import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
+import { darwinURL } from "./main";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { ensureVencordFiles, vencordSupportsSandboxing } from "./utils/vencordLoader";
+import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 import { initMenuBar as initDefaultMenuBar } from "windowMenus";
 
@@ -63,7 +63,132 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
-// type MenuItemList = Array<MenuItemConstructorOptions | false>;
+type MenuItemList = Array<MenuItemConstructorOptions | false>;
+
+function initMenuBar(win: BrowserWindow) {
+    const isWindows = process.platform === "win32";
+    const isDarwin = process.platform === "darwin";
+    const wantCtrlQ = !isWindows || VencordSettings.store.winCtrlQ;
+
+    const subMenu = [
+        {
+            label: "About Vesktop",
+            click: createAboutWindow
+        },
+        {
+            label: "Force Update Vencord",
+            async click() {
+                await downloadVencordFiles();
+                app.relaunch();
+                app.quit();
+            },
+            toolTip: "Vesktop will automatically restart after this operation"
+        },
+        {
+            label: "Reset Vesktop",
+            async click() {
+                await clearData(win);
+            },
+            toolTip: "Vesktop will automatically restart after this operation"
+        },
+        {
+            label: "Relaunch",
+            accelerator: "CmdOrCtrl+Shift+R",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        ...(!isDarwin
+            ? []
+            : ([
+                  {
+                      type: "separator"
+                  },
+                  {
+                      label: "Settings",
+                      accelerator: "CmdOrCtrl+,",
+                      async click() {
+                          sendRendererCommand(IpcCommands.NAVIGATE_SETTINGS);
+                      }
+                  },
+                  {
+                      type: "separator"
+                  },
+                  {
+                      role: "hide"
+                  },
+                  {
+                      role: "hideOthers"
+                  },
+                  {
+                      role: "unhide"
+                  },
+                  {
+                      type: "separator"
+                  }
+              ] satisfies MenuItemList)),
+        {
+            label: "Quit",
+            accelerator: wantCtrlQ ? "CmdOrCtrl+Q" : void 0,
+            visible: !isWindows,
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        isWindows && {
+            label: "Quit",
+            accelerator: "Alt+F4",
+            role: "quit",
+            click() {
+                app.quit();
+            }
+        },
+        // See https://github.com/electron/electron/issues/14742 and https://github.com/electron/electron/issues/5256
+        {
+            label: "Zoom in (hidden, hack for Qwertz and others)",
+            accelerator: "CmdOrCtrl+=",
+            role: "zoomIn",
+            visible: false
+        },
+        // numpad zooms
+        {
+            label: "Zoom in (hidden)",
+            accelerator: "CmdOrCtrl+numadd",
+            role: "zoomIn",
+            visible: false
+        },
+        {
+            label: "Zoom out (hidden)",
+            accelerator: "CmdOrCtrl+numsub",
+            role: "zoomOut",
+            visible: false
+        },
+        {
+            label: "Reset Zoom (hidden)",
+            accelerator: "CmdOrCtrl+num0",
+            role: "resetZoom",
+            visible: false
+        }
+    ] satisfies MenuItemList;
+
+    const menuItems = [
+        {
+            label: "Vesktop",
+            role: "appMenu",
+            submenu: subMenu.filter(isTruthy)
+        },
+        { role: "fileMenu" },
+        { role: "editMenu" },
+        { role: "viewMenu" },
+        isDarwin && { role: "windowMenu" }
+    ] satisfies MenuItemList;
+
+    const menu = Menu.buildFromTemplate(menuItems.filter(isTruthy));
+
+    Menu.setApplicationMenu(menu);
+}
 
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
@@ -201,21 +326,28 @@ function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
 }
 
 function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
-    const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
-        Settings.store;
+    const {
+        staticTitle,
+        transparencyOption,
+        enableMenu,
+        enableShadow,
+        enableRoundedCorners,
+        nativeTitleBar,
+        splashTheming,
+        splashBackground
+    } = Settings.store;
 
-    const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
+    const { transparent, macosVibrancyStyle } = VencordSettings.store;
 
-    const noFrame = frameless === true || customTitleBar === true;
-    const backgroundColor =
-        splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
+    const frameless = !nativeTitleBar;
+    const backgroundColor = splashTheming ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const options: BrowserWindowConstructorOptions = {
-        show: Settings.store.enableSplashScreen === false && !CommandLine.values["start-minimized"],
+        show: !Settings.store.enableSplashScreen && !CommandLine.values["start-minimized"],
         backgroundColor,
         webPreferences: {
             nodeIntegration: false,
-            sandbox: vencordSupportsSandboxing(),
+            sandbox: true,
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
@@ -223,8 +355,10 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
             // disable renderer backgrounding to prevent the app from unloading when in the background
             backgroundThrottling: false
         },
-        frame: !noFrame,
+        frame: !frameless,
         autoHideMenuBar: enableMenu,
+        hasShadow: enableShadow,
+        roundedCorners: enableRoundedCorners,
         ...getWindowBoundsOptions()
     };
 
@@ -237,7 +371,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         options.backgroundColor = "#00000000";
         options.backgroundMaterial = transparencyOption;
 
-        if (customTitleBar) {
+        if (frameless) {
             options.transparent = true;
         }
     }
@@ -267,10 +401,10 @@ function createMainWindow() {
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
 
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && Settings.store.customTitleBar) win.setWindowButtonVisibility(false);
+    if (process.platform === "darwin" && Settings.store.nativeTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
-        const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
+        const useTray = !isDeckGameMode && Settings.store.minimizeToTray && Settings.store.tray;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
@@ -330,7 +464,7 @@ export async function createWindows() {
     const startMinimized = CommandLine.values["start-minimized"];
 
     let splash: BrowserWindow | undefined;
-    if (Settings.store.enableSplashScreen !== false) {
+    if (Settings.store.enableSplashScreen) {
         splash = createSplashWindow(startMinimized);
 
         // SteamOS letterboxes and scales it terribly, so just full screen it

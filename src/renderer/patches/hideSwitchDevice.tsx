@@ -11,13 +11,13 @@ addPatch({
         {
             find: "lastOutputSystemDevice.justChanged",
             replacement: {
-                match: /(\i)\.\i\.getState\(\).neverShowModal/,
+                match: /\.getState\(\)\.neverShowModal(?=.{0,50}?(\i)\.lastDeviceConnected)/,
                 replace: "$& || $self.shouldIgnoreDevice($1)"
             }
         }
     ],
 
     shouldIgnoreDevice(state: any) {
-        return Object.keys(state?.default?.lastDeviceConnected ?? {})?.[0] === "vencord-screen-share";
+        return Object.keys(state.lastDeviceConnected ?? {})[0] === "vencord-screen-share";
     }
 });

@@ -42,6 +42,10 @@ const options = {
         type: "string",
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
+    },
+    repair: {
+        type: "boolean",
+        description: "Repair the application by re-downloading the latest Vencord files"
     }
 } satisfies Record<string, Option>;
 
