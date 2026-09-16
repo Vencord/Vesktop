@@ -23,6 +23,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
+import { stopBackgroundAccountNotifications } from "./backgroundAccountNotifications";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
@@ -252,6 +253,10 @@ function initSettingsListeners(win: BrowserWindow) {
     });
 
     addSettingsListener("spellCheckLanguages", languages => initSpellCheckLanguages(win, languages));
+
+    addSettingsListener("enableMultiAccountNotifications", enabled => {
+        if (!enabled) stopBackgroundAccountNotifications();
+    });
 }
 
 async function initSpellCheckLanguages(win: BrowserWindow, languages?: string[]) {
@@ -423,6 +428,7 @@ function createMainWindow() {
     win.on("focus", () => {
         win.flashFrame(false);
     });
+    win.once("closed", stopBackgroundAccountNotifications);
 
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")

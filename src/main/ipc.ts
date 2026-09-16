@@ -26,6 +26,11 @@ import { join } from "path";
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
+import {
+    getBackgroundAccountContext,
+    getBackgroundAccountId,
+    syncBackgroundAccounts
+} from "./backgroundAccountNotifications";
 import { enableHardwareAcceleration } from "./main";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
@@ -57,6 +62,7 @@ if (IS_DEV) {
 }
 
 handleSync(IpcEvents.GET_SETTINGS, () => Settings.plain);
+handleSync(IpcEvents.GET_BACKGROUND_ACCOUNT_CONTEXT, event => getBackgroundAccountContext(event.sender));
 handleSync(IpcEvents.GET_VERSION, () => app.getVersion());
 handleSync(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION, () => enableHardwareAcceleration);
 
@@ -157,6 +163,26 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
 });
 
 handle(IpcEvents.SET_BADGE_COUNT, (_, count: number) => setBadgeCount(count));
+
+handle(IpcEvents.SYNC_BACKGROUND_ACCOUNTS, (event, tokens: unknown, currentUserId: unknown, accounts: unknown) => {
+    if (event.sender === mainWin?.webContents) syncBackgroundAccounts(tokens, currentUserId, accounts);
+});
+
+handle(IpcEvents.BACKGROUND_NOTIFICATION_CLICKED, (event, route: unknown) => {
+    const accountId = getBackgroundAccountId(event.sender);
+    if (
+        accountId == null ||
+        typeof route !== "string" ||
+        !/^\/channels\/(?:@me|\d{16,22})\/\d{16,22}(?:\/\d{16,22})?$/.test(route) ||
+        !mainWin ||
+        mainWin.isDestroyed()
+    )
+        return;
+
+    mainWin.webContents.send(IpcEvents.BACKGROUND_NOTIFICATION_CLICKED, accountId, route);
+    mainWin.show();
+    mainWin.setSkipTaskbar(false);
+});
 
 handle(IpcEvents.FLASH_FRAME, (_, flag: boolean) => {
     if (!mainWin || mainWin.isDestroyed() || (flag && mainWin.isFocused())) return;

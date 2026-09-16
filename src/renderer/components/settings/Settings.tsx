@@ -127,6 +127,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     Notifications: [
         NotificationBadgeToggle,
         {
+            key: "enableMultiAccountNotifications",
+            title: "Inactive Account Notifications",
+            description:
+                "Keep other accounts in Discord's account switcher connected so they can show notifications. Clicking one switches accounts and opens its message. Each account uses additional memory."
+        },
+        {
             key: "enableTaskbarFlashing",
             title: "Enable Taskbar Flashing",
             description: "Flashes the app in your taskbar when you have new notifications."

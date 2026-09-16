@@ -29,5 +29,6 @@ export const DefaultVesktopSettings: Settings = {
     splashPixelated: false,
     webRTCIPHandlingPolicy: "default",
     appBadge: true,
+    enableMultiAccountNotifications: false,
     transparencyOption: "none"
 };

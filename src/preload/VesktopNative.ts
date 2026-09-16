@@ -33,6 +33,12 @@ export const VesktopNative = {
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
         getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION),
+        syncBackgroundAccounts: (tokens: string | null, currentUserId: string | null, accounts: string | null) =>
+            invoke<void>(IpcEvents.SYNC_BACKGROUND_ACCOUNTS, tokens, currentUserId, accounts),
+        onBackgroundNotificationClick: (callback: (accountId: string, route: string) => void) =>
+            void ipcRenderer.on(IpcEvents.BACKGROUND_NOTIFICATION_CLICKED, (_event, accountId: string, route: string) =>
+                callback(accountId, route)
+            ),
         isOutdated: () => invoke<boolean>(IpcEvents.UPDATER_IS_OUTDATED),
         openUpdater: () => invoke<void>(IpcEvents.UPDATER_OPEN),
         // used by vencord

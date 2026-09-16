@@ -28,6 +28,7 @@ export interface Settings {
     arRPC: boolean;
     appBadge: boolean;
     enableTaskbarFlashing: boolean;
+    enableMultiAccountNotifications: boolean;
     disableMinSize: boolean;
     clickTrayToShowHide: boolean;
     nativeTitleBar: boolean;

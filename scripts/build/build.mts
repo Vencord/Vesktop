@@ -96,6 +96,12 @@ await Promise.all([
     }),
     createContext({
         ...NodeCommonOpts,
+        entryPoints: ["src/preload/background.ts"],
+        outfile: "dist/js/backgroundPreload.js",
+        footer: { js: "//# sourceURL=VesktopBackgroundPreload" }
+    }),
+    createContext({
+        ...NodeCommonOpts,
         entryPoints: ["src/preload/splash.ts"],
         outfile: "dist/js/splashPreload.js",
         footer: { js: "//# sourceURL=VesktopSplashPreload" }
