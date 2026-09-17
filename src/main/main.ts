@@ -75,7 +75,7 @@ function init() {
         // Chromium's Web Speech synthesis API auto-spawns speech-dispatcher on first use, forking
         // from a background thread. If speech-dispatcher isn't installed/running, that fork trips
         // Chromium's sandbox and crashes the whole app with SIGTRAP. We don't use this API, so
-        // just turn it off - see https://github.com/Vencord/Vesktop/issues/<ISSUE_NUMBER>
+        // just turn it off - see https://github.com/Vencord/Vesktop/issues/1336
         app.commandLine.appendSwitch("disable-speech-synthesis-api");
     }
 
