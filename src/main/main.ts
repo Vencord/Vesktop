@@ -71,6 +71,12 @@ function init() {
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
         disabledFeatures.add("WaylandWpColorManagerV1");
+
+        // Chromium's Web Speech synthesis API auto-spawns speech-dispatcher on first use, forking
+        // from a background thread. If speech-dispatcher isn't installed/running, that fork trips
+        // Chromium's sandbox and crashes the whole app with SIGTRAP. We don't use this API, so
+        // just turn it off - see https://github.com/Vencord/Vesktop/issues/<ISSUE_NUMBER>
+        app.commandLine.appendSwitch("disable-speech-synthesis-api");
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
