@@ -39,7 +39,7 @@
         "@vencord/types": "^1.15.1",
         "dotenv": "^17.3.1",
         "electron": "44.4.3",
-        "electron-builder": "^26.15.3",
+        "electron-builder": "^26.16.1",
         "esbuild": "^0.28.2",
         "eslint": "^10.11.0",
         "eslint-import-resolver-alias": "^1.1.2",
