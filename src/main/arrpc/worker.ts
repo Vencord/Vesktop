@@ -5,6 +5,7 @@
  */
 
 import Server from "arrpc";
+import * as Bridge from "arrpc/src/bridge.js";
 import { randomUUID } from "crypto";
 import { MessagePort, workerData } from "worker_threads";
 
@@ -24,6 +25,8 @@ const linkCallbacks = new Map<string, LinkCallback>();
     server = await new Server();
 
     server.on("activity", (data: any) => {
+        Bridge.send(data);
+
         const event: ArRpcEvent = {
             type: "activity",
             data: JSON.stringify(data),
