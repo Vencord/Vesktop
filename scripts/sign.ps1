@@ -31,7 +31,6 @@ Submit-SigningRequest `
     };
     BuildData=@{
       Url="$Env:GITHUB_SERVER_URL/$Env:GITHUB_REPOSITORY/actions/runs/$Env:GITHUB_RUN_ID";
-      BuildSettingsFile="@$Env:GITHUB_WORKSPACE/.github/workflows/release.yml";
     };
   } `
   -Force # because electron-builder wants to do in-place signing
