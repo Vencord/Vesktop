@@ -36,7 +36,7 @@ jobs:
                   pnpm electron-builder --${{ matrix.platform }}
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  SIGNPATH_API_TOKEN: ${{ matrix.platform == "windows" && secrets.SIGNPATH_API_TOKEN }}
+                  SIGNPATH_API_TOKEN: ${{ matrix.platform == 'windows' && secrets.SIGNPATH_API_TOKEN }}
 
             - name: Upload artifacts
               uses: actions/upload-artifact@v7
