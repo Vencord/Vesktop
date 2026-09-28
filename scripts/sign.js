@@ -20,7 +20,7 @@ export function sign({ path, resultOutputPath }) {
     resultOutputPath ??= path;
 
     return spawnAsync(join(import.meta.dirname, "sign.ps1"), [path, resultOutputPath], {
-        shell: "powershell",
+        shell: "pwsh",
         stdio: "inherit",
         windowsHide: true
     });
