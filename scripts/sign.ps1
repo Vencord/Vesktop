@@ -24,13 +24,13 @@ Submit-SigningRequest `
   -WaitForCompletion -WaitForCompletionTimeoutInSeconds 1800 `
   -Origin @{
     RepositoryData=@{
-      SourceControlManagementType="git";
-      Url="$Env:GITHUB_SERVER_URL/$Env:GITHUB_REPOSITORY";
-      BranchName=$Env:GITHUB_REF_NAME;
-      CommitId=$Env:GITHUB_SHA;
-    };
+      SourceControlManagementType="git"
+      Url="$Env:GITHUB_SERVER_URL/$Env:GITHUB_REPOSITORY.git"
+      BranchName=$Env:GITHUB_REF_NAME
+      CommitId=$Env:GITHUB_SHA
+    }
     BuildData=@{
-      Url="$Env:GITHUB_SERVER_URL/$Env:GITHUB_REPOSITORY/actions/runs/$Env:GITHUB_RUN_ID";
-    };
+      Url="$Env:GITHUB_SERVER_URL/$Env:GITHUB_REPOSITORY/actions/runs/$Env:GITHUB_RUN_ID"
+    }
   } `
   -Force # because electron-builder wants to do in-place signing
