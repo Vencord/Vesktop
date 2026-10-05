@@ -7,6 +7,7 @@
 import { app, BrowserWindow, Menu, Tray } from "electron";
 
 import { createAboutWindow } from "./about";
+import { lastBadgeCount } from "./appBadge";
 import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
@@ -14,10 +15,19 @@ import { clearData } from "./utils/clearData";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
-let trayVariant: "tray" | "trayUnread" = "tray";
+let trayVariant: "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened" = "tray";
+export let isInCall: Boolean = false;
 
 AppEvents.on("userAssetChanged", async asset => {
-    if (tray && (asset === "tray" || asset === "trayUnread")) {
+    if (
+        tray &&
+        (asset === "tray" ||
+            asset === "trayUnread" ||
+            asset === "traySpeaking" ||
+            asset === "trayIdle" ||
+            asset === "trayMuted" ||
+            asset === "trayDeafened")
+    ) {
         tray.setImage(await resolveAssetPath(trayVariant));
     }
 });
@@ -25,7 +35,8 @@ AppEvents.on("userAssetChanged", async asset => {
 AppEvents.on("setTrayVariant", async variant => {
     if (trayVariant === variant) return;
 
-    trayVariant = variant;
+    if (variant === "tray" && lastBadgeCount > 0) trayVariant = "trayUnread";
+    else trayVariant = variant;
     if (!tray) return;
 
     tray.setImage(await resolveAssetPath(trayVariant));
@@ -89,4 +100,12 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
     tray.setToolTip("Vesktop");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);
+}
+
+export async function setTrayIcon(asset: typeof trayVariant) {
+    AppEvents.emit("setTrayVariant", asset);
+}
+
+export async function setInCall(inCall: Boolean) {
+    isInCall = inCall;
 }

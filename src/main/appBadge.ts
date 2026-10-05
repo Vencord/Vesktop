@@ -1,6 +1,6 @@
 /*
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
- * Copyright (c) 2023 Vendicated and Vencord contributors
+ * Copyright (c) 2026 Vendicated and Vesktop contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -11,6 +11,7 @@ import { BADGE_DIR } from "shared/paths";
 import { updateUnityLauncherCount } from "./dbus";
 import { AppEvents } from "./events";
 import { mainWin } from "./mainWindow";
+import { isInCall } from "./tray";
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -23,14 +24,18 @@ function loadBadge(index: number) {
     return img;
 }
 
-let lastIndex: null | number = -1;
+let lastBadgeIndex: null | number = -1;
+export let lastBadgeCount: number = -1;
 
 /**
  * -1 = show unread indicator
  * 0 = clear
  */
 export function setBadgeCount(count: number) {
-    AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+    lastBadgeCount = count;
+    if (!isInCall) {
+        AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+    }
 
     switch (process.platform) {
         case "linux":
@@ -46,9 +51,9 @@ export function setBadgeCount(count: number) {
             break;
         case "win32":
             const [index, description] = getBadgeIndexAndDescription(count);
-            if (lastIndex === index) break;
+            if (lastBadgeIndex === index) break;
 
-            lastIndex = index;
+            lastBadgeIndex = index;
 
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;

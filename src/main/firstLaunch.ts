@@ -46,6 +46,7 @@ export function createFirstLaunchTour() {
 
         State.store.firstLaunch = false;
         Settings.store.discordBranch = data.discordBranch;
+        Settings.store.tray = true;
         Settings.store.minimizeToTray = !!data.minimizeToTray;
         Settings.store.arRPC = !!data.richPresence;
 
