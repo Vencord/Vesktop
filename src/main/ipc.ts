@@ -15,6 +15,7 @@ import {
     dialog,
     IpcMainInvokeEvent,
     RelaunchOptions,
+    safeStorage,
     session,
     shell
 } from "electron";
@@ -184,3 +185,11 @@ function openDebugPage(page: string) {
 
 handle(IpcEvents.DEBUG_LAUNCH_GPU, () => openDebugPage("chrome://gpu"));
 handle(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS, () => openDebugPage("chrome://webrtc-internals"));
+
+handleSync(IpcEvents.SAFE_STORAGE_IS_AVAILABLE, () => safeStorage.isEncryptionAvailable());
+handleSync(IpcEvents.SAFE_STORAGE_ENCRYPT_STRING, (_, plainText: string) =>
+    safeStorage.encryptString(plainText).toString("base64")
+);
+handleSync(IpcEvents.SAFE_STORAGE_DECRYPT_STRING, (_, encrypted: string) =>
+    safeStorage.decryptString(Buffer.from(encrypted, "base64"))
+);
