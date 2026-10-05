@@ -386,9 +386,10 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     }
 
     if (process.platform === "darwin") {
-        options.titleBarStyle = "hidden";
-        options.trafficLightPosition = { x: 10, y: 10 };
-
+        if (!nativeTitleBar) {
+            options.titleBarStyle = "hidden";
+            options.trafficLightPosition = { x: 10, y: 10 };
+        }
         if (macosVibrancyStyle) {
             options.vibrancy = macosVibrancyStyle;
             options.backgroundColor = "#00000000";
@@ -406,7 +407,6 @@ function createMainWindow() {
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
 
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && Settings.store.nativeTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray && Settings.store.tray;

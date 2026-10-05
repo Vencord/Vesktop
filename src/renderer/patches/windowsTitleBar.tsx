@@ -5,10 +5,11 @@
  */
 
 import { Settings } from "renderer/settings";
+import { isMac } from "renderer/utils";
 
 import { addPatch } from "./shared";
 
-if (!Settings.store.nativeTitleBar)
+if (!isMac && !Settings.store.nativeTitleBar)
     addPatch({
         patches: [
             {
