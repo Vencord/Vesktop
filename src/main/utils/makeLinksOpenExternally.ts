@@ -10,6 +10,7 @@ import { DISCORD_HOSTNAMES } from "main/constants";
 import { Settings } from "../settings";
 import { createOrFocusPopup, setupPopout } from "./popout";
 import { execSteamURL, isDeckGameMode, steamOpenURL } from "./steamOS";
+import { initBrowserPopupMenuBar } from "windowMenus";
 
 export function handleExternalUrl(url: string, protocol?: string): { action: "deny" | "allow" } {
     if (protocol == null) {
@@ -49,6 +50,9 @@ export function handleExternalUrl(url: string, protocol?: string): { action: "de
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url, frameName, features }) => {
+        
+        initBrowserPopupMenuBar(win, url);
+
         try {
             var { protocol, hostname, pathname, searchParams } = new URL(url);
         } catch {

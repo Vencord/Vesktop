@@ -8,20 +8,15 @@ import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
-    Menu,
-    MenuItemConstructorOptions,
     nativeTheme,
     Rectangle,
     screen,
-    session
-} from "electron";
+    session} from "electron";
 import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
-import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
-import { createAboutWindow } from "./about";
 import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
@@ -31,11 +26,11 @@ import { darwinURL } from "./main";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
-import { clearData } from "./utils/clearData";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
+import { initMenuBar as initDefaultMenuBar } from "windowMenus";
 
 let isQuitting = false;
 
@@ -428,7 +423,7 @@ function createMainWindow() {
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")
         initTray(win, q => (isQuitting = q));
 
-    initMenuBar(win);
+    initDefaultMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
     initSpellCheck(win);
