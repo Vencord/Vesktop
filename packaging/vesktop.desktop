@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Vesktop
+GenericName=Discord Client
+Comment=Cliente Discord nativo em Rust e egui
+Exec=vesktop
+Icon=vesktop
+Categories=Network;InstantMessaging;
+Keywords=discord;chat;vesktop;
+Terminal=false
+StartupWMClass=vesktop

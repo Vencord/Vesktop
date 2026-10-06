@@ -1,0 +1,76 @@
+[package]
+name = "vesktop"
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.98"
+license = "GPL-3.0-or-later"
+description = "A native Discord client built with Rust and egui"
+repository = "https://github.com/FelipeMayerDev/Vesktop"
+keywords = ["discord", "chat", "egui", "messaging"]
+categories = ["gui"]
+
+[lib]
+name = "vesktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vesktop"
+path = "src/main.rs"
+
+[features]
+default = []
+# Experimental system tray, written against tray-icon 0.19. Off by default so
+# the first build on a machine needs no GTK/libappindicator dev packages;
+# enable with `cargo build --release --features tray`.
+tray = ["dep:tray-icon"]
+
+[dependencies]
+anyhow = "1"
+thiserror = "2"
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+env_logger = "0.11"
+directories = "6"
+# The whole UI. glow keeps the binary and the dependency tree small; wgpu is
+# not needed for a 2D chat client. accesskit connects egui's control names,
+# states, and actions to native screen readers.
+eframe = { version = "0.36", default-features = false, features = [
+    "accesskit",
+    "glow",
+    "default_fonts",
+    "links",
+    "wayland",
+    "x11",
+    "persistence",
+] }
+egui = "0.36"
+# Decodes PNG, JPEG, WebP and GIF (avatars, guild icons) and ICO (window icon).
+image = { version = "0.25", default-features = false, features = [
+    "png",
+    "jpeg",
+    "webp",
+    "gif",
+    "ico",
+] }
+# Discord REST API.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+# Discord Gateway (WebSocket) and the background runtime.
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-webpki-roots"] }
+futures-util = { version = "0.3", default-features = false, features = ["std", "sink"] }
+# Snowflake timestamps and ISO-8601 message timestamps.
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+# System tray (feature `tray`).
+tray-icon = { version = "0.19", optional = true }
+
+[profile.release]
+lto = "thin"
+strip = "symbols"
+
+# egui fork maintained by crmne (fastframe) — the same setup spotifast and
+# zapfast use. The fork tracks upstream at the same version, so patching
+# crates.io keeps every egui crate on the maintained sources.
+[patch.crates-io]
+egui = { git = "https://github.com/crmne/egui", branch = "main" }

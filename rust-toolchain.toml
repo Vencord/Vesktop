@@ -1,0 +1,5 @@
+# Use the same compiler, clippy, and rustfmt versions locally and in CI.
+# Fix new formatting or lint failures when updating this version.
+[toolchain]
+channel = "1.98.0"
+components = ["rustfmt", "clippy"]
