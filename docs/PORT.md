@@ -37,8 +37,8 @@ meaning without a browser engine and were dropped. `zoom` maps to egui's
 
 ## Not ported yet (roadmap)
 
-- **Voice & screenshare** — the largest gap; needs Discord's voice UDP
-  protocol (opus, encryption, NAT traversal).
+- **Voice & screenshare** — the largest gap; planned on songbird following
+  the Acheron model, see [VOICE.md](VOICE.md).
 - **Vencord plugins** — a native plugin story needs design; the Electron
   plugin runtime cannot be reused.
 - **Gateway RESUME** — reconnects currently re-IDENTIFY.
