@@ -46,6 +46,8 @@ meaning without a browser engine and were dropped. `zoom` maps to egui's
   the token currently sits in `settings.json`.
 - **Clickable links, image previews, reactions, threads, pins, nitro
   emojis** — chat rendering is text-first right now.
+- **UI/UX pass** — splash, QR login layout, server rail, chat timeline:
+  see [UI.md](UI.md).
 - **arRPC** (Rich Presence bridge), **autostart**, **app badge**,
   **spellcheck**, **auto-update** (`fastframe-update` once the pattern's
   framework crates are adopted).
