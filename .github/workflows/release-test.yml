@@ -1,0 +1,48 @@
+name: Releasetest
+
+on:
+    workflow_dispatch:
+    pull_request:
+
+jobs:
+    release:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                os: [windows-latest]
+                include:
+                    - os: windows-latest
+                      platform: windows
+
+        steps:
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6 # Install pnpm using packageManager key in package.json
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 24
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: pnpm build
+
+            - name: Run Electron Builder
+              if: ${{ matrix.platform != 'mac' }}
+              run: |
+                  pnpm electron-builder --${{ matrix.platform }}
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SIGNPATH_API_TOKEN: ${{ matrix.platform == 'windows' && secrets.SIGNPATH_API_TOKEN }}
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  path: |
+                      dist/*.exe
+                      dist/*.zip
+                      
