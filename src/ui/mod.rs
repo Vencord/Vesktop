@@ -8,7 +8,7 @@ pub mod settings_window;
 
 use egui::{Align2, Color32, FontId, Rect, Sense, TextureHandle, Vec2, pos2};
 
-pub fn draw_texture(ui: &egui::Ui, texture: &TextureHandle, size: Vec2) {
+pub fn draw_texture(ui: &mut egui::Ui, texture: &TextureHandle, size: Vec2) {
     let (rect, _) = ui.allocate_exact_size(size, Sense::hover());
     ui.painter().image(
         texture.id(),
@@ -20,7 +20,7 @@ pub fn draw_texture(ui: &egui::Ui, texture: &TextureHandle, size: Vec2) {
 
 /// A colored circle with the first letter — the fallback while an avatar or
 /// icon hasn't loaded (or the account has none).
-pub fn initial_circle(ui: &egui::Ui, size: f32, label: &str, color: Color32) {
+pub fn initial_circle(ui: &mut egui::Ui, size: f32, label: &str, color: Color32) {
     let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
     ui.painter().circle_filled(rect.center(), size / 2.0, color);
     let letter: String = label

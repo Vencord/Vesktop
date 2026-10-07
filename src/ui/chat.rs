@@ -2,7 +2,8 @@
 
 use std::collections::HashMap;
 
-use egui::{FontId, Label, LayoutJob, RichText, ScrollArea, Sense, TextFormat, Vec2};
+use egui::text::LayoutJob;
+use egui::{FontId, Label, RichText, ScrollArea, Sense, TextEdit, TextFormat, Vec2};
 
 use crate::app::{ChannelRef, VesktopApp};
 use crate::markup::{self, Style};
@@ -21,7 +22,10 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
                         .strong()
                         .color(theme::MUTED),
                 );
-                ui.label(RichText::new("Escolha um servidor ou uma conversa à esquerda.").color(theme::MUTED));
+                ui.label(
+                    RichText::new("Escolha um servidor ou uma conversa à esquerda.")
+                        .color(theme::MUTED),
+                );
             });
         });
         return;
@@ -49,6 +53,38 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
         }
     });
     ui.separator();
+
+    // The compose box goes in first as a bottom panel: the message list's
+    // ScrollArea takes all remaining height, so anything after it is clipped.
+    egui::Panel::bottom("compose")
+        .frame(egui::Frame::NONE)
+        .show(ui, |ui| {
+            ui.add_space(6.0);
+            if let Some(error) = &app.compose_error {
+                ui.label(RichText::new(error).small().color(theme::RED));
+                ui.add_space(2.0);
+            }
+            ui.horizontal(|ui| {
+                ui.add_space(14.0);
+                let hint = if name.is_empty() {
+                    "Enviar uma mensagem".to_string()
+                } else {
+                    format!("Conversar em {prefix}{name}")
+                };
+                let edit = TextEdit::singleline(&mut app.compose)
+                    .hint_text(hint)
+                    .desired_width(ui.available_width() - 90.0)
+                    .show(ui);
+                let send_clicked = ui.button("Enviar").clicked();
+                let pressed_enter = edit.response.lost_focus()
+                    && ui.ctx().input(|input| input.key_pressed(egui::Key::Enter));
+                if send_clicked || pressed_enter {
+                    app.send_current_message();
+                }
+                ui.add_space(14.0);
+            });
+            ui.add_space(8.0);
+        });
 
     let channel_names = app.channel_names();
     let mut load_older = false;
@@ -86,7 +122,9 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
                         let avatar_url = util::user_avatar_url(&message.author);
                         match app.images.get(ui.ctx(), &app.handle, &avatar_url) {
                             Some(texture) => draw_texture(ui, &texture, Vec2::splat(38.0)),
-                            None => initial_circle(ui, 38.0, author_name, util::name_color(author_name)),
+                            None => {
+                                initial_circle(ui, 38.0, author_name, util::name_color(author_name))
+                            }
                         }
                         ui.add_space(8.0);
                         ui.vertical(|ui| {
@@ -103,7 +141,9 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
                                         .color(theme::MUTED),
                                 );
                                 if message.edited_timestamp.is_some() {
-                                    ui.label(RichText::new("(editada)").small().color(theme::MUTED));
+                                    ui.label(
+                                        RichText::new("(editada)").small().color(theme::MUTED),
+                                    );
                                 }
                             });
                             if !message.content.is_empty() {
@@ -126,12 +166,14 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
                                     continue;
                                 }
                                 ui.horizontal(|ui| {
-                                    let (bar, _) =
-                                        ui.allocate_exact_size(Vec2::new(3.0, 30.0), Sense::hover());
+                                    let (bar, _) = ui
+                                        .allocate_exact_size(Vec2::new(3.0, 30.0), Sense::hover());
                                     ui.painter().rect_filled(bar, 1.5, theme::BLURPLE);
                                     ui.vertical(|ui| {
                                         if let Some(title) = &embed.title {
-                                            ui.label(RichText::new(title).strong().color(theme::TEXT));
+                                            ui.label(
+                                                RichText::new(title).strong().color(theme::TEXT),
+                                            );
                                         }
                                         if let Some(description) = &embed.description {
                                             ui.label(
@@ -153,32 +195,6 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
     if load_older {
         app.load_older_messages();
     }
-
-    ui.add_space(6.0);
-    if let Some(error) = &app.compose_error {
-        ui.label(RichText::new(error).small().color(theme::RED));
-        ui.add_space(2.0);
-    }
-    ui.horizontal(|ui| {
-        ui.add_space(14.0);
-        let hint = if name.is_empty() {
-            "Enviar uma mensagem".to_string()
-        } else {
-            format!("Conversar em {prefix}{name}")
-        };
-        let edit = TextEdit::singleline(&mut app.compose)
-            .hint_text(hint)
-            .desired_width(ui.available_width() - 90.0)
-            .show(ui);
-        let send_clicked = ui.button("Enviar").clicked();
-        let pressed_enter = edit.response.lost_focus()
-            && ui.ctx().input(|input| input.key_pressed(egui::Key::Enter));
-        if send_clicked || pressed_enter {
-            app.send_current_message();
-        }
-        ui.add_space(14.0);
-    });
-    ui.add_space(8.0);
 }
 
 /// Maps markup segments to a styled `LayoutJob`, resolving mention and
@@ -189,7 +205,6 @@ fn content_job(
     channels: &HashMap<String, String>,
 ) -> LayoutJob {
     let mut job = LayoutJob::default();
-    let mut offset = 0usize;
     for segment in markup::tokenize(text) {
         let mut format = TextFormat {
             font_id: FontId::proportional(14.5),
@@ -236,8 +251,7 @@ fn content_job(
             }
         };
         let text = resolved.unwrap_or(segment.text);
-        job.append(&text, offset, format);
-        offset += text.len();
+        job.append(&text, 0.0, format);
     }
     job
 }

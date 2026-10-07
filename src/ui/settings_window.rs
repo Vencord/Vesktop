@@ -10,6 +10,7 @@ use crate::theme;
 
 pub fn show(app: &mut VesktopApp, ctx: &egui::Context) {
     let mut open = app.settings_open;
+    let mut logged_out = false;
     egui::Window::new(RichText::new("Configurações").strong())
         .open(&mut open)
         .resizable(false)
@@ -48,7 +49,7 @@ pub fn show(app: &mut VesktopApp, ctx: &egui::Context) {
                 .clicked()
             {
                 app.logout();
-                open = false;
+                logged_out = true;
             }
 
             ui.separator();
@@ -81,7 +82,7 @@ pub fn show(app: &mut VesktopApp, ctx: &egui::Context) {
             );
         });
 
-    if !open && app.settings_open {
+    if (!open || logged_out) && app.settings_open {
         app.settings_open = false;
         app.settings.save();
     }

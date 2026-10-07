@@ -47,7 +47,7 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
             ui,
             selected,
             unread,
-            initial(&guild.name),
+            &initial(&guild.name),
             theme::INPUT,
             texture.as_ref(),
             &guild.name,

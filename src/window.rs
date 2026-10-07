@@ -9,8 +9,8 @@ pub fn load_icon() -> Option<IconData> {
     let img = image::load_from_memory(APP_ICON).ok()?.into_rgba8();
     let (width, height) = img.dimensions();
     Some(IconData {
-        width: width as usize,
-        height: height as usize,
+        width: width,
+        height: height,
         rgba: img.into_raw(),
     })
 }

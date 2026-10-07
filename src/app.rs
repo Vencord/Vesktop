@@ -29,6 +29,16 @@ pub(crate) enum ConnState {
     LoginError(String),
 }
 
+/// Where the login screen's QR-code session stands.
+#[derive(Debug, Clone)]
+pub(crate) enum QrState {
+    Idle,
+    Loading,
+    Code(String),
+    Scanned(String),
+    Failed(String),
+}
+
 /// How a channel id maps back to its owner, for unread routing and titles.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum ChannelRef {
@@ -43,6 +53,8 @@ pub struct VesktopApp {
     pub(crate) event_rx: UnboundedReceiver<UiEvent>,
     pub(crate) cmd_tx: UnboundedSender<Command>,
     backend: Option<JoinHandle<()>>,
+    qr_task: Option<JoinHandle<()>>,
+    pub(crate) qr: QrState,
     #[cfg_attr(not(feature = "tray"), allow(dead_code))]
     tray_tx: std::sync::mpsc::Sender<TrayCommand>,
     pub(crate) tray_rx: std::sync::mpsc::Receiver<TrayCommand>,
@@ -113,6 +125,8 @@ impl VesktopApp {
             event_rx,
             cmd_tx,
             backend: None,
+            qr_task: None,
+            qr: QrState::Idle,
             tray_tx,
             tray_rx,
         };
@@ -153,9 +167,30 @@ impl VesktopApp {
             return;
         }
         self.login_token.clear();
+        self.login_with(token);
+    }
+
+    fn login_with(&mut self, token: String) {
+        self.stop_qr();
         self.settings.token = Some(token.clone());
         self.settings.save();
         self.start_backend(token);
+    }
+
+    pub(crate) fn start_qr(&mut self) {
+        self.stop_qr();
+        self.qr = QrState::Loading;
+        self.qr_task = Some(
+            self.handle
+                .spawn(backend::remote_auth::run(self.event_tx.clone())),
+        );
+    }
+
+    fn stop_qr(&mut self) {
+        if let Some(task) = self.qr_task.take() {
+            task.abort();
+        }
+        self.qr = QrState::Idle;
     }
 
     pub(crate) fn logout(&mut self) {
@@ -183,6 +218,7 @@ impl VesktopApp {
         self.compose_error = None;
         self.settings_open = false;
         self.login_token.clear();
+        self.stop_qr();
         self.conn = ConnState::Disconnected("sessão encerrada".into());
     }
 
@@ -475,12 +511,20 @@ impl VesktopApp {
                 }
             }
             UiEvent::Error { context } => log::warn!("{context}"),
+            UiEvent::QrReady { url } => self.qr = QrState::Code(url),
+            UiEvent::QrScanned { username } => self.qr = QrState::Scanned(username),
+            UiEvent::QrLogin { token } => self.login_with(token),
+            UiEvent::QrFailed { reason } => {
+                self.qr_task = None;
+                self.qr = QrState::Failed(reason);
+            }
         }
     }
 }
 
 impl eframe::App for VesktopApp {
-    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, root: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        let ctx = &root.ctx().clone();
         if self.applied_theme != Some(self.settings.theme) {
             theme::apply(ctx, self.settings.theme);
             self.applied_theme = Some(self.settings.theme);
@@ -502,14 +546,13 @@ impl eframe::App for VesktopApp {
         self.poll_events(ctx);
 
         if self.me.is_none() {
-            ui::login::show(self, ctx);
-            if matches!(self.conn, ConnState::Connecting) {
-                ctx.request_repaint_after(Duration::from_millis(400));
-            }
+            ui::login::show(self, root);
+            // Backend and QR events only land on the next frame; keep polling.
+            ctx.request_repaint_after(Duration::from_millis(400));
             return;
         }
 
-        egui::TopBottomPanel::bottom("status_bar").show(ctx, |ui| {
+        egui::Panel::bottom("status_bar").show(root, |ui| {
             ui.painter().rect_filled(ui.max_rect(), 0.0, theme::RAIL);
             ui.horizontal(|ui| {
                 ui.add_space(10.0);
@@ -541,21 +584,21 @@ impl eframe::App for VesktopApp {
             });
         });
 
-        egui::SidePanel::left("server_rail")
-            .exact_width(72.0)
+        egui::Panel::left("server_rail")
+            .exact_size(72.0)
             .resizable(false)
-            .show(ctx, |ui| {
+            .show(root, |ui| {
                 ui::server_rail::paint(self, ui);
             });
 
-        egui::SidePanel::left("channel_sidebar")
-            .exact_width(240.0)
+        egui::Panel::left("channel_sidebar")
+            .exact_size(240.0)
             .resizable(false)
-            .show(ctx, |ui| {
+            .show(root, |ui| {
                 ui::channel_sidebar::paint(self, ui);
             });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show(root, |ui| {
             ui::chat::paint(self, ui);
         });
 

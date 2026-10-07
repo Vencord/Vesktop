@@ -81,7 +81,7 @@ fn paint_guild_channels(app: &mut VesktopApp, ui: &mut egui::Ui) {
     let selected = app.selected_channel.clone();
     let mut clicked: Option<String> = None;
 
-    let mut render = |app: &mut VesktopApp,
+    let render = |app: &mut VesktopApp,
                       ui: &mut egui::Ui,
                       channel: &Channel,
                       clicked: &mut Option<String>| {
@@ -181,9 +181,9 @@ fn row(
     if let Some(user) = avatar_user {
         let url = util::user_avatar_url(user);
         match app.images.get(ui.ctx(), &app.handle, &url) {
-            Some(texture) => draw_texture(&content, &texture, Vec2::splat(26.0)),
+            Some(texture) => draw_texture(&mut content, &texture, Vec2::splat(26.0)),
             None => initial_circle(
-                &content,
+                &mut content,
                 26.0,
                 user.display_name(),
                 util::name_color(user.display_name()),

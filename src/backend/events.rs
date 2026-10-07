@@ -28,4 +28,10 @@ pub enum UiEvent {
     MessageDeleted { channel_id: String, message_id: String },
     SendFailed { channel_id: String, error: String },
     Error { context: String },
+    /// QR login: a code is ready to scan.
+    QrReady { url: String },
+    /// QR login: scanned, waiting for approval on the phone.
+    QrScanned { username: String },
+    QrLogin { token: String },
+    QrFailed { reason: String },
 }

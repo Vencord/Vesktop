@@ -62,6 +62,11 @@ tokio-tungstenite = { version = "0.24", features = ["rustls-tls-webpki-roots"] }
 futures-util = { version = "0.3", default-features = false, features = ["std", "sink"] }
 # Snowflake timestamps and ISO-8601 message timestamps.
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+# QR-code login: the remote auth gateway encrypts the token to an RSA-OAEP
+# keypair; qrcode only builds the module matrix, egui paints it.
+rsa = { version = "0.9", features = ["sha2"] }
+base64 = "0.22"
+qrcode = { version = "0.14", default-features = false }
 # System tray (feature `tray`).
 tray-icon = { version = "0.19", optional = true }
 
@@ -69,8 +74,6 @@ tray-icon = { version = "0.19", optional = true }
 lto = "thin"
 strip = "symbols"
 
-# egui fork maintained by crmne (fastframe) — the same setup spotifast and
-# zapfast use. The fork tracks upstream at the same version, so patching
-# crates.io keeps every egui crate on the maintained sources.
-[patch.crates-io]
-egui = { git = "https://github.com/crmne/egui", branch = "main" }
+# RSA keygen is unusably slow unoptimized; keep debug builds snappy.
+[profile.dev.package.num-bigint-dig]
+opt-level = 3

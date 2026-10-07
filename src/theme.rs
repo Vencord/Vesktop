@@ -30,7 +30,7 @@ pub fn apply(ctx: &egui::Context, theme: Theme) {
         visuals.widgets.hovered.bg_fill = HOVER;
         visuals.widgets.active.bg_fill = SELECTED;
         visuals.selection.bg_fill = BLURPLE;
-        visuals.link_color = BLURPLE;
+        visuals.hyperlink_color = BLURPLE;
     }
-    ctx.style_mut(move |style| style.visuals = visuals);
+    ctx.set_visuals(visuals);
 }

@@ -4,5 +4,6 @@
 pub mod api;
 pub mod events;
 pub mod gateway;
+pub mod remote_auth;
 
 pub use events::{Command, UiEvent};

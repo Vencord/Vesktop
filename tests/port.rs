@@ -8,12 +8,11 @@ use vesktop::util;
 #[test]
 fn markup_pipeline_end_to_end() {
     let segments = markup::tokenize("oi <@123> **veja** `código`");
-    assert_eq!(segments.len(), 5);
-    assert_eq!(segments[0].style, Style::Normal);
-    assert_eq!(segments[1].style, Style::Mention);
-    assert_eq!(segments[2].style, Style::Bold);
-    assert_eq!(segments[3].style, Style::Normal);
-    assert_eq!(segments[4].style, Style::Code);
+    let styles: Vec<Style> = segments.iter().map(|s| s.style).collect();
+    assert_eq!(
+        styles,
+        [Style::Normal, Style::Mention, Style::Normal, Style::Bold, Style::Normal, Style::Code]
+    );
 }
 
 #[test]
