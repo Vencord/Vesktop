@@ -120,6 +120,8 @@ pub struct VesktopApp {
     /// Screen share capture (docs/SCREENSHARE.md); local preview for now.
     pub(crate) screen: Option<crate::backend::capture::Capture>,
     pub(crate) screen_texture: Option<egui::TextureHandle>,
+    /// Our Go Live stream key while op 18 is in effect.
+    pub(crate) stream_key: Option<String>,
     pub(crate) voice_deaf: bool,
     /// Voice-state user ids we already asked the API for.
     voice_users_pending: HashSet<String>,
@@ -189,6 +191,7 @@ impl VesktopApp {
             voice_muted: false,
             screen: None,
             screen_texture: None,
+            stream_key: None,
             voice_deaf: false,
             disconnected_at: None,
             selected_guild: None,
@@ -547,13 +550,42 @@ impl VesktopApp {
         });
     }
 
-    /// Starts the portal picker + capture, or stops a running one.
+    /// Starts the portal picker + capture and goes live in the connected
+    /// voice channel, or stops a running share.
     pub(crate) fn toggle_screen_share(&mut self, ctx: &egui::Context) {
-        if self.screen.take().is_none() {
-            let ctx = ctx.clone();
-            self.screen = Some(crate::backend::capture::start(move || ctx.request_repaint()));
+        if self.screen.is_some() {
+            self.stop_screen_share();
+            return;
         }
+        let VoiceConn::Connected {
+            guild_id,
+            channel_id,
+        } = &self.voice
+        else {
+            return;
+        };
+        let Some(me) = &self.me else {
+            return;
+        };
+        let stream_key = format!("guild:{guild_id}:{channel_id}:{}", me.id);
+        self.send(Command::StartStream {
+            guild_id: guild_id.clone(),
+            channel_id: channel_id.clone(),
+            stream_key: stream_key.clone(),
+        });
+        self.stream_key = Some(stream_key);
+        let ctx = ctx.clone();
+        self.screen = Some(crate::backend::capture::start(move || ctx.request_repaint()));
+    }
+
+    /// The one way a share ends (button, picker cancelled, source gone,
+    /// left voice, deleted by Discord): capture off, op 19 if still live.
+    pub(crate) fn stop_screen_share(&mut self) {
+        self.screen = None;
         self.screen_texture = None;
+        if let Some(stream_key) = self.stream_key.take() {
+            self.send(Command::StopStream { stream_key });
+        }
     }
 
     /// Mute the microphone (op 4 flags; deafening implies it).
@@ -660,6 +692,7 @@ impl VesktopApp {
             }
             VoiceConn::Failed { .. } | VoiceConn::Disconnected => None,
         };
+        self.stop_screen_share();
         self.voice = VoiceConn::Disconnected;
         if let Some(guild_id) = guild_id {
             self.send(Command::LeaveVoice { guild_id });
@@ -1074,7 +1107,19 @@ impl VesktopApp {
                     self.join_voice(guild_id, channel_id);
                 }
             }
+            UiEvent::StreamCreated { stream_key } => {
+                log::info!("transmissão criada: {stream_key}");
+            }
+            UiEvent::StreamDeleted { stream_key, reason } => {
+                if self.stream_key.as_ref() == Some(&stream_key) {
+                    log::info!("o Discord encerrou a transmissão: {reason}");
+                    // Already gone server-side: no op 19.
+                    self.stream_key = None;
+                    self.stop_screen_share();
+                }
+            }
             UiEvent::VoiceLeft => {
+                self.stop_screen_share();
                 self.voice = VoiceConn::Disconnected;
                 self.speaking.clear();
             }

@@ -55,6 +55,17 @@ pub enum Command {
     LeaveVoice {
         guild_id: String,
     },
+    /// Go Live (docs/SCREENSHARE.md): op 18 CREATE_STREAM + op 22 unpause,
+    /// for the voice channel we're connected to.
+    StartStream {
+        guild_id: String,
+        channel_id: String,
+        stream_key: String,
+    },
+    /// op 19 DELETE_STREAM.
+    StopStream {
+        stream_key: String,
+    },
     /// Fetch a guild member (name/avatar) for a voice state that only
     /// carries a user id, as in READY.
     LoadVoiceUser {
@@ -140,6 +151,16 @@ pub enum UiEvent {
     VoiceSpeaking {
         user_id: String,
         speaking: bool,
+    },
+    /// Discord allocated a stream server for a Go Live stream.
+    StreamCreated {
+        stream_key: String,
+    },
+    /// A stream ended server-side (`reason`: user_requested, stream_full,
+    /// unauthorized, …).
+    StreamDeleted {
+        stream_key: String,
+        reason: String,
     },
     /// An unmapped SSRC kept speaking for seconds: the voice session lost
     /// sync (DAVE re-key, reconnect) and needs a fresh handshake.

@@ -301,6 +301,36 @@ fn dispatch(value: Value, event_tx: &EventTx, voice_tx: &UnboundedSender<Wire>, 
             }
             Err(err) => log::warn!("VOICE_STATE_UPDATE não parseou: {err}"),
         },
+        // Go Live (docs/SCREENSHARE.md). The rtc_* fields and the stream
+        // server's endpoint/token feed the stream connection in phase 3.
+        "STREAM_CREATE" => {
+            let key = data.get("stream_key").and_then(Value::as_str).unwrap_or_default();
+            log::info!(
+                "STREAM_CREATE: {key} rtc_server={:?} rtc_channel={:?} região={:?}",
+                data.get("rtc_server_id"),
+                data.get("rtc_channel_id"),
+                data.get("region")
+            );
+            event_tx.send(UiEvent::StreamCreated {
+                stream_key: key.to_string(),
+            });
+        }
+        "STREAM_SERVER_UPDATE" => {
+            log::info!(
+                "STREAM_SERVER_UPDATE: {:?} endpoint={:?} token={}",
+                data.get("stream_key"),
+                data.get("endpoint"),
+                data.get("token").is_some_and(Value::is_string)
+            );
+        }
+        "STREAM_DELETE" => {
+            let field = |name| data.get(name).and_then(Value::as_str).unwrap_or_default().to_string();
+            log::info!("STREAM_DELETE: {data}");
+            event_tx.send(UiEvent::StreamDeleted {
+                stream_key: field("stream_key"),
+                reason: field("reason"),
+            });
+        }
         "VOICE_SERVER_UPDATE" => {
             let guild_id = data.get("guild_id").and_then(Value::as_str);
             let endpoint = data.get("endpoint").and_then(Value::as_str);
@@ -447,6 +477,35 @@ async fn handle_command(api: &Api, command: Command, event_tx: &EventTx, write: 
             });
             if let Err(err) = write.send(WsMessage::text(payload.to_string())).await {
                 log::warn!("falha ao sair do canal de voz: {err}");
+            }
+        }
+        Command::StartStream {
+            guild_id,
+            channel_id,
+            stream_key,
+        } => {
+            log::info!("enviando op 18: guild={guild_id} canal={channel_id}");
+            let create = json!({
+                "op": 18,
+                "d": {
+                    "type": "guild",
+                    "guild_id": guild_id,
+                    "channel_id": channel_id,
+                    "preferred_region": Value::Null,
+                }
+            });
+            // Discord-video-stream unpauses right after creating.
+            let unpause = json!({ "op": 22, "d": { "stream_key": stream_key, "paused": false } });
+            for payload in [create, unpause] {
+                if let Err(err) = write.send(WsMessage::text(payload.to_string())).await {
+                    log::warn!("falha ao criar a transmissão: {err}");
+                }
+            }
+        }
+        Command::StopStream { stream_key } => {
+            let payload = json!({ "op": 19, "d": { "stream_key": stream_key } });
+            if let Err(err) = write.send(WsMessage::text(payload.to_string())).await {
+                log::warn!("falha ao encerrar a transmissão: {err}");
             }
         }
         Command::LoadVoiceUser { guild_id, user_id } => {

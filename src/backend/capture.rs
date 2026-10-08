@@ -1,8 +1,10 @@
 //! Screen capture for Go Live (docs/SCREENSHARE.md, phase 1): the
 //! ScreenCast portal picks a monitor or window and hands over a PipeWire
 //! node; a PipeWire stream on its own thread copies each frame (SHM, BGRx
-//! or RGBx) into a latest-frame slot as RGBA. Consumers (the preview now,
-//! the encoder later) read the slot at their own pace.
+//! or RGBx) into a latest-frame slot. The copy is a plain row memcpy so the
+//! buffer goes back to the portal at once — converting in the callback
+//! starved xdph ("Out of buffers") and made it renegotiate ~8x a second.
+//! Consumers (the preview now, the encoder later) convert at their pace.
 
 use std::os::fd::OwnedFd;
 use std::sync::{Arc, Mutex};
@@ -14,13 +16,37 @@ use pw::properties::properties;
 use pw::spa;
 use pw::spa::param::video::VideoFormat;
 
-/// One captured frame, tightly packed RGBA.
+/// One captured frame: tightly packed 32-bit pixels, BGRx or RGBx order.
 pub struct Frame {
     pub width: u32,
     pub height: u32,
-    pub rgba: Vec<u8>,
+    pub pixels: Vec<u8>,
+    /// Blue first (BGRx/BGRA, the usual XRGB8888 desktop format).
+    pub bgr: bool,
     /// Bumps on every new frame so readers can skip ones they've seen.
     pub seq: u64,
+}
+
+impl Frame {
+    /// Opaque RGBA, nearest-neighbour downscaled by an integer step so it
+    /// is at most `max_width` wide: cheap enough for a per-frame preview.
+    pub fn preview_rgba(&self, max_width: u32) -> ([usize; 2], Vec<u8>) {
+        let step = self.width.div_ceil(max_width.max(1)).max(1) as usize;
+        let (width, height) = (self.width as usize, self.height as usize);
+        let (out_w, out_h) = (width.div_ceil(step), height.div_ceil(step));
+        let mut out = Vec::with_capacity(out_w * out_h * 4);
+        for y in (0..height).step_by(step) {
+            let row = &self.pixels[y * width * 4..(y + 1) * width * 4];
+            for px in row.chunks_exact(4).step_by(step) {
+                if self.bgr {
+                    out.extend_from_slice(&[px[2], px[1], px[0], 255]);
+                } else {
+                    out.extend_from_slice(&[px[0], px[1], px[2], 255]);
+                }
+            }
+        }
+        ([out_w, out_h], out)
+    }
 }
 
 /// A running capture. Dropping it stops the PipeWire stream and closes the
@@ -183,19 +209,19 @@ fn stream_frames(
             if chunk.size() == 0 || width == 0 || height == 0 {
                 return;
             }
-            let swap = matches!(format.format(), VideoFormat::BGRx | VideoFormat::BGRA);
-            let Some(pixels) = data.data() else {
+            let bgr = matches!(format.format(), VideoFormat::BGRx | VideoFormat::BGRA);
+            let Some(src) = data.data() else {
                 return;
             };
-            let Some(rgba) = to_rgba(&pixels[offset.min(pixels.len())..], width, height, stride, swap)
-            else {
+            let Some(pixels) = pack(&src[offset.min(src.len())..], width, height, stride) else {
                 return;
             };
             seq += 1;
             *slot.lock().unwrap() = Some(Frame {
                 width,
                 height,
-                rgba,
+                pixels,
+                bgr,
                 seq,
             });
             on_frame();
@@ -276,9 +302,9 @@ fn stream_frames(
     Ok(())
 }
 
-/// Packed 32-bit rows (any stride) to tight RGBA with opaque alpha; `swap`
-/// for BGR order. `None` if the buffer is shorter than the frame.
-fn to_rgba(src: &[u8], width: u32, height: u32, stride: usize, swap: bool) -> Option<Vec<u8>> {
+/// Packed 32-bit rows (any stride) to tightly packed rows, one memcpy per
+/// row. `None` if the buffer is shorter than the frame.
+fn pack(src: &[u8], width: u32, height: u32, stride: usize) -> Option<Vec<u8>> {
     let row = width as usize * 4;
     let stride = if stride == 0 { row } else { stride };
     if stride < row || src.len() < stride * (height as usize - 1) + row {
@@ -286,30 +312,31 @@ fn to_rgba(src: &[u8], width: u32, height: u32, stride: usize, swap: bool) -> Op
     }
     let mut out = Vec::with_capacity(row * height as usize);
     for line in src.chunks(stride).take(height as usize) {
-        for px in line[..row].chunks_exact(4) {
-            if swap {
-                out.extend_from_slice(&[px[2], px[1], px[0], 255]);
-            } else {
-                out.extend_from_slice(&[px[0], px[1], px[2], 255]);
-            }
-        }
+        out.extend_from_slice(&line[..row]);
     }
     Some(out)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::to_rgba;
+    use super::{Frame, pack};
 
     #[test]
-    fn bgrx_with_padded_stride_becomes_tight_rgba() {
+    fn padded_stride_packs_and_previews_as_rgba() {
         // 2x2 BGRx, 12-byte stride (4 bytes of row padding).
         let src = [
             1, 2, 3, 0, 4, 5, 6, 0, 9, 9, 9, 9, //
             7, 8, 9, 0, 10, 11, 12, 0, 9, 9, 9, 9,
         ];
-        let rgba = to_rgba(&src, 2, 2, 12, true).unwrap();
+        let pixels = pack(&src, 2, 2, 12).unwrap();
+        assert_eq!(pixels, [1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0]);
+        assert!(pack(&src[..19], 2, 2, 12).is_none());
+
+        let frame = Frame { width: 2, height: 2, pixels, bgr: true, seq: 1 };
+        let (size, rgba) = frame.preview_rgba(640);
+        assert_eq!(size, [2, 2]);
         assert_eq!(rgba, [3, 2, 1, 255, 6, 5, 4, 255, 9, 8, 7, 255, 12, 11, 10, 255]);
-        assert!(to_rgba(&src[..19], 2, 2, 12, true).is_none());
+        // Downscale keeps every 2nd pixel of every 2nd row.
+        assert_eq!(frame.preview_rgba(1), ([1, 1], vec![3, 2, 1, 255]));
     }
 }

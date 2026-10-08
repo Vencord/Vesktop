@@ -754,6 +754,16 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
             .size(13.0)
             .color(theme::MUTED),
     );
+    if member.self_stream {
+        content.add_space(6.0);
+        content.label(
+            RichText::new(" AO VIVO ")
+                .size(9.5)
+                .strong()
+                .color(egui::Color32::WHITE)
+                .background_color(theme::RED),
+        );
+    }
 
     let mut percent = *app
         .settings

@@ -27,17 +27,15 @@ pub fn poll(app: &mut VesktopApp, ctx: &egui::Context) {
     let ended = capture.ended.lock().unwrap().take();
     if let Some(reason) = ended {
         log::info!("compartilhamento encerrado: {reason}");
-        app.screen = None;
-        app.screen_texture = None;
+        app.stop_screen_share();
         return;
     }
     let Some(frame) = capture.frame.lock().unwrap().take() else {
         return;
     };
-    let image = egui::ColorImage::from_rgba_unmultiplied(
-        [frame.width as usize, frame.height as usize],
-        &frame.rgba,
-    );
+    // The sidebar box is ~224 px wide; 640 keeps it sharp on HiDPI.
+    let (size, rgba) = frame.preview_rgba(640);
+    let image = egui::ColorImage::from_rgba_unmultiplied(size, &rgba);
     match &mut app.screen_texture {
         Some(texture) => texture.set(image, egui::TextureOptions::LINEAR),
         None => {

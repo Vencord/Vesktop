@@ -179,6 +179,9 @@ pub struct VoiceState {
     pub deaf: bool,
     #[serde(default)]
     pub suppress: bool,
+    /// Go Live: set by the server while the user streams.
+    #[serde(default)]
+    pub self_stream: bool,
 }
 
 /// A guild member, fetched to turn voice-state user ids into names.
