@@ -127,8 +127,14 @@ impl Api {
         if let Some(before) = before {
             query.push(("before", before.to_string()));
         }
-        self.get_json(&format!("/channels/{channel_id}/messages"), &query)
-            .await
+        // Discord returns newest first; the rest of the app (timeline,
+        // gateway appends, the `before` cursor = first message) expects
+        // chronological order.
+        let mut messages: Vec<Message> = self
+            .get_json(&format!("/channels/{channel_id}/messages"), &query)
+            .await?;
+        messages.reverse();
+        Ok(messages)
     }
 
     pub async fn send_message(&self, channel_id: &str, content: &str) -> ApiResult<Message> {
