@@ -2,6 +2,7 @@
 
 pub mod channel_sidebar;
 pub mod chat;
+pub mod screen_share;
 pub mod login;
 pub mod server_rail;
 pub mod settings_window;

@@ -3,6 +3,7 @@
 
 pub mod api;
 pub mod audio;
+pub mod capture;
 pub mod events;
 pub mod gateway;
 pub mod remote_auth;

@@ -34,8 +34,9 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
     } else {
         0.0
     };
-    let total = voice_h + USER_PANEL_H;
     let available = ui.available_rect_before_wrap();
+    let preview_h = crate::ui::screen_share::height(app, available.width());
+    let total = preview_h + voice_h + USER_PANEL_H;
     let block = egui::Rect::from_min_max(
         pos2(available.left(), available.bottom() - total),
         pos2(available.right(), available.bottom()),
@@ -64,7 +65,8 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
             }
         });
 
-    // Bottom block: voice status row, action row, user panel.
+    // Bottom block: screen share preview, voice status row, action row,
+    // user panel.
     ui.painter().rect_filled(block, 0.0, theme::RAIL);
     let mut bottom = ui.new_child(
         egui::UiBuilder::new()
@@ -74,6 +76,7 @@ pub fn paint(app: &mut VesktopApp, ui: &mut egui::Ui) {
     // Explicit add_space calls do the gaps; the default 8px item spacing
     // would overflow the reserved height and get clipped.
     bottom.spacing_mut().item_spacing = Vec2::ZERO;
+    crate::ui::screen_share::paint(app, &mut bottom);
     voice_panel(app, &mut bottom);
     user_panel(app, &mut bottom);
 }
@@ -664,7 +667,15 @@ fn voice_panel(app: &mut VesktopApp, ui: &mut egui::Ui) {
                     .on_hover_text(tooltip)
                     .clicked()
                 };
-                let _ = action(ui, "🖥️", theme::TEXT, "Compartilhar tela (em breve)");
+                let sharing = app.screen.is_some();
+                if action(
+                    ui,
+                    "🖥️",
+                    if sharing { theme::GREEN } else { theme::TEXT },
+                    if sharing { "Parar de compartilhar" } else { "Compartilhar tela" },
+                ) {
+                    app.toggle_screen_share(ui.ctx());
+                }
                 let _ = action(ui, "🎯", theme::TEXT, "Atividades (em breve)");
                 let _ = action(ui, "🎵", theme::TEXT, "Soundboard (em breve)");
                 ui.add_space(8.0);

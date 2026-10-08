@@ -101,6 +101,11 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "tracing-log"]
 # feature being unified in ("no compatible track found").
 symphonia = { version = "0.5", default-features = false, features = ["pcm"] }
 
+# Screen share capture (docs/SCREENSHARE.md): the ScreenCast portal picks
+# the source and hands over a PipeWire node; pipewire streams its frames.
+ashpd = { version = "0.13", default-features = false, features = ["tokio", "screencast"] }
+pipewire = "0.10"
+
 # Vendored songbird 0.6 with DAVE opt-out (docs/VOICE.md; upstream #310).
 [patch.crates-io]
 songbird = { path = "third_party/songbird" }

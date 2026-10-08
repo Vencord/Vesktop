@@ -117,6 +117,9 @@ pub struct VesktopApp {
     pub(crate) speaking: HashSet<String>,
     /// Own mic/headphone flags; op 4 sends them, the panel shows them.
     pub(crate) voice_muted: bool,
+    /// Screen share capture (docs/SCREENSHARE.md); local preview for now.
+    pub(crate) screen: Option<crate::backend::capture::Capture>,
+    pub(crate) screen_texture: Option<egui::TextureHandle>,
     pub(crate) voice_deaf: bool,
     /// Voice-state user ids we already asked the API for.
     voice_users_pending: HashSet<String>,
@@ -184,6 +187,8 @@ impl VesktopApp {
             voice_users_pending: HashSet::new(),
             speaking: HashSet::new(),
             voice_muted: false,
+            screen: None,
+            screen_texture: None,
             voice_deaf: false,
             disconnected_at: None,
             selected_guild: None,
@@ -540,6 +545,15 @@ impl VesktopApp {
             channel_id,
             user_id,
         });
+    }
+
+    /// Starts the portal picker + capture, or stops a running one.
+    pub(crate) fn toggle_screen_share(&mut self, ctx: &egui::Context) {
+        if self.screen.take().is_none() {
+            let ctx = ctx.clone();
+            self.screen = Some(crate::backend::capture::start(move || ctx.request_repaint()));
+        }
+        self.screen_texture = None;
     }
 
     /// Mute the microphone (op 4 flags; deafening implies it).
@@ -1171,6 +1185,7 @@ impl eframe::App for VesktopApp {
         if self.settings_open {
             ui::settings_window::show(self, ctx);
         }
+        ui::screen_share::poll(self, ctx);
         if matches!(self.conn, ConnState::Connecting) {
             ctx.request_repaint_after(Duration::from_millis(400));
         }
