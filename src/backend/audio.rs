@@ -350,18 +350,20 @@ fn run_pulse(
         log::warn!("pulse: sem mainloop");
         return;
     };
-    // Without start(), the mainloop's thread never runs and the context
-    // never reaches Ready.
-    if let Err(err) = mainloop.start() {
-        log::warn!("pulse: mainloop não iniciou: {err}");
-        return;
-    }
     let Some(mut context) = Context::new(&mainloop, "FastDiscord voice") else {
         log::warn!("pulse: sem contexto");
         return;
     };
     if let Err(err) = context.connect(None, ContextFlagSet::NOFLAGS, None) {
         log::warn!("pulse: sem conexão ao servidor de som: {err}");
+        return;
+    }
+    // Start only after connect: once the loop thread runs, every libpulse
+    // call needs the mainloop lock, and an unlocked connect raced it
+    // ("Assertion 'c->defer_event == e' failed", abort). Without start()
+    // the context never reaches Ready.
+    if let Err(err) = mainloop.start() {
+        log::warn!("pulse: mainloop não iniciou: {err}");
         return;
     }
     if !wait_for_ready(&mut mainloop, &mut context, Duration::from_secs(5)) {
