@@ -222,11 +222,15 @@ fn bitrate_for(width: u32, height: u32) -> u64 {
     }
 }
 
-/// fockytv-share's encoder ladder (Linux): hardware first.
+/// fockytv-share's encoder ladder: hardware first (VAAPI on Linux; NVENC
+/// and Media Foundation on Windows), then x264 and openh264. Elements the
+/// platform lacks fail the probe and drop out.
 #[derive(Clone, Copy)]
 enum Encoder {
     VaH264Lp,
     VaH264,
+    NvH264,
+    MfH264,
     X264,
     OpenH264,
 }
@@ -236,6 +240,8 @@ impl Encoder {
         match self {
             Self::VaH264Lp => "vah264lpenc",
             Self::VaH264 => "vah264enc",
+            Self::NvH264 => "nvh264enc",
+            Self::MfH264 => "mfh264enc",
             Self::X264 => "x264enc",
             Self::OpenH264 => "openh264enc",
         }
@@ -248,6 +254,11 @@ impl Encoder {
             Self::VaH264Lp | Self::VaH264 => {
                 format!("{} name=venc bitrate={kbps} key-int-max={gop}", self.element())
             }
+            Self::NvH264 => format!(
+                "nvh264enc name=venc preset=low-latency-hq tune=ultra-low-latency \
+                 rc-mode=cbr bitrate={kbps} gop-size={gop}"
+            ),
+            Self::MfH264 => format!("mfh264enc name=venc bitrate={kbps} gop-size={gop}"),
             Self::X264 => format!(
                 "x264enc name=venc tune=zerolatency speed-preset=superfast bitrate={kbps} key-int-max={gop}"
             ),
@@ -266,7 +277,15 @@ fn select_encoder() -> Result<Encoder, String> {
     if let Some(encoder) = *CHOSEN.lock().unwrap() {
         return Ok(encoder);
     }
-    for encoder in [Encoder::VaH264Lp, Encoder::VaH264, Encoder::X264, Encoder::OpenH264] {
+    let ladder = [
+        Encoder::VaH264Lp,
+        Encoder::VaH264,
+        Encoder::NvH264,
+        Encoder::MfH264,
+        Encoder::X264,
+        Encoder::OpenH264,
+    ];
+    for encoder in ladder {
         if gst::ElementFactory::find(encoder.element()).is_none() {
             continue;
         }
@@ -391,7 +410,7 @@ fn play(
         // must be static: with decodebin3's dynamic output, the bin's ghost
         // "sink" landed on videoconvert, the link failed ("Noformat") and
         // whepsrc died "not-linked" ~3 s in.
-        let decoder = ["vah264dec", "openh264dec"]
+        let decoder = ["vah264dec", "d3d11h264dec", "openh264dec"]
             .into_iter()
             .find(|name| gst::ElementFactory::find(name).is_some())
             .unwrap_or("avdec_h264");

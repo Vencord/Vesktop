@@ -83,9 +83,6 @@ songbird = { version = "0.6", default-features = false, features = [
     "rustls",
     "tungstenite",
 ] }
-# Voice audio I/O through the desktop's sound server (PipeWire via the
-# PulseAudio API): real device names, resampling and per-app volume.
-libpulse-binding = "2"
 # RNNoise-style noise suppression for the microphone (docs/VOICE.md, phase 4).
 nnnoiseless = "0.5"
 # Zero-copy slice casts for the diagnostic mix dump.
@@ -101,21 +98,34 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "tracing-log"]
 # feature being unified in ("no compatible track found").
 symphonia = { version = "0.5", default-features = false, features = ["pcm"] }
 
-# Screen share capture (docs/SCREENSHARE.md): the ScreenCast portal picks
-# the source and hands over a PipeWire node; pipewire streams its frames.
-# The stream connection's own DAVE session (the same crate songbird uses).
+# Go Live (docs/SCREENSHARE.md): the stream connection's own DAVE session
+# (the same crate songbird uses) and its transport encryption
+# (aead_aes256_gcm_rtpsize).
 davey = "0.1"
-# Go Live transport encryption (aead_aes256_gcm_rtpsize), as songbird uses.
 aes-gcm = "0.10"
-ashpd = { version = "0.13", default-features = false, features = ["tokio", "screencast"] }
-pipewire = "0.10"
 # FockyTV backend (docs/SCREENSHARE.md): WHIP publish with fockytv-share's
 # own GStreamer pipeline (whipsink, VAAPI/x264 ladder).
 gstreamer = "0.25"
 gstreamer-app = "0.25"
-# H.264 for Go Live: decodes watched streams now, encodes ours in phase 4.
-# Built from source (BSD), no system library needed.
+# H.264 for Go Live, encode and decode. Built from source (BSD), no
+# system library needed.
 openh264 = "0.9"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# Voice audio I/O through the desktop's sound server (PipeWire via the
+# PulseAudio API): real device names, resampling and per-app volume.
+libpulse-binding = "2"
+# Screen capture: the ScreenCast portal picks the source and hands over a
+# PipeWire node; pipewire streams its frames.
+ashpd = { version = "0.13", default-features = false, features = ["tokio", "screencast"] }
+pipewire = "0.10"
+
+[target.'cfg(windows)'.dependencies]
+# Voice audio I/O through WASAPI (src/backend/audio/windows.rs).
+cpal = "0.18"
+# No system libopus on Windows: build it from source for songbird's opus2
+# (feature unification turns it on for songbird's copy too).
+opus2 = { version = "0.4", features = ["bundled"] }
 
 # Vendored songbird 0.6 with DAVE opt-out (docs/VOICE.md; upstream #310).
 [patch.crates-io]

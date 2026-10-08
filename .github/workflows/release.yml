@@ -1,6 +1,6 @@
-# Release builds: Linux AppImage. A `v*` tag publishes them on the tag's
-# GitHub release; "Run workflow" (or a push touching the packaging) builds
-# the same artifacts without publishing.
+# Release builds: Linux AppImage and portable Windows zip. A `v*` tag
+# publishes them on the tag's release; "Run workflow" (or a push touching
+# the packaging) builds the same artifacts without publishing.
 name: release
 
 on:
@@ -38,9 +38,41 @@ jobs:
           path: dist/FastDiscord-x86_64.AppImage
           if-no-files-found: error
 
+  windows:
+    runs-on: windows-latest
+    env:
+      # The last release with MSI installers (1.28 switched to an .exe with
+      # undocumented silent options). Its binaries include gst-plugins-rs.
+      GST_VERSION: "1.26.11"
+    steps:
+      - uses: actions/checkout@v4
+      - name: GStreamer (runtime + devel)
+        shell: pwsh
+        run: |
+          $base = "https://gstreamer.freedesktop.org/data/pkg/windows/$env:GST_VERSION/msvc"
+          foreach ($msi in "gstreamer-1.0-msvc-x86_64-$env:GST_VERSION.msi", "gstreamer-1.0-devel-msvc-x86_64-$env:GST_VERSION.msi") {
+            Invoke-WebRequest "$base/$msi" -OutFile $msi
+            Start-Process msiexec -Wait -ArgumentList "/i", $msi, "/passive", "INSTALLLEVEL=1000", "INSTALLDIR=C:\gstreamer"
+          }
+          $root = "C:\gstreamer\1.0\msvc_x86_64"
+          if (-not (Test-Path "$root\bin\gst-inspect-1.0.exe")) { throw "GStreamer not installed at $root" }
+          if (-not (Test-Path "$root\bin\pkg-config.exe")) { choco install -y pkgconfiglite }
+          "GSTREAMER_1_0_ROOT_MSVC_X86_64=$root\" >> $env:GITHUB_ENV
+          "PKG_CONFIG_PATH=$root\lib\pkgconfig" >> $env:GITHUB_ENV
+          "$root\bin" >> $env:GITHUB_PATH
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - shell: bash
+        run: packaging/windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FastDiscord-windows-x86_64.zip
+          path: dist/FastDiscord-windows-x86_64.zip
+          if-no-files-found: error
+
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [appimage]
+    needs: [appimage, windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
