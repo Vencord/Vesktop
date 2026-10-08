@@ -12,10 +12,18 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+    // tracing-subscriber instead of env_logger: it captures both our `log`
+    // records and songbird's `tracing` internals (voice WS, DAVE, mixer).
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
+        )
+        .without_time()
+        .init();
     let args = Args::parse();
 
-    let mut settings = vesktop::settings::Settings::load().unwrap_or_default();
+    let mut settings = fastdiscord::settings::Settings::load().unwrap_or_default();
     if let Some(token) = args.token {
         settings.token = Some(token);
         settings.save();
@@ -30,8 +38,8 @@ fn main() -> anyhow::Result<()> {
     let mut viewport = egui::ViewportBuilder::default()
         .with_inner_size([1280.0, 800.0])
         .with_min_inner_size([940.0, 600.0])
-        .with_title("Vesktop");
-    if let Some(icon) = vesktop::window::load_icon() {
+        .with_title("FastDiscord");
+    if let Some(icon) = fastdiscord::window::load_icon() {
         viewport = viewport.with_icon(icon);
     }
 
@@ -41,11 +49,10 @@ fn main() -> anyhow::Result<()> {
     };
 
     eframe::run_native(
-        "Vesktop",
+        "FastDiscord",
         options,
         Box::new(move |cc| {
-            let app =
-                vesktop::app::VesktopApp::new(cc, settings, handle, event_tx, event_rx);
+            let app = fastdiscord::app::VesktopApp::new(cc, settings, handle, event_tx, event_rx);
             Ok(Box::new(app))
         }),
     )

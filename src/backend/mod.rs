@@ -2,8 +2,10 @@
 //! connect them to the UI thread.
 
 pub mod api;
+pub mod audio;
 pub mod events;
 pub mod gateway;
 pub mod remote_auth;
+pub mod voice;
 
-pub use events::{Command, UiEvent};
+pub use events::{Command, EventTx, UiEvent};

@@ -5,7 +5,7 @@ use directories::ProjectDirs;
 use std::path::PathBuf;
 
 fn project_dirs() -> ProjectDirs {
-    ProjectDirs::from("app", "Vesktop", "Vesktop").expect("no home directory known to the OS")
+    ProjectDirs::from("app", "FastDiscord", "FastDiscord").expect("no home directory known to the OS")
 }
 
 pub fn settings_file() -> PathBuf {
@@ -18,5 +18,5 @@ pub fn data_dir() -> PathBuf {
 
 /// Reserved for the file logger (the spotifast/zapfast pattern).
 pub fn log_file() -> PathBuf {
-    data_dir().join("vesktop.log")
+    data_dir().join("fastdiscord.log")
 }

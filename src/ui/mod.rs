@@ -5,8 +5,9 @@ pub mod chat;
 pub mod login;
 pub mod server_rail;
 pub mod settings_window;
+pub mod splash;
 
-use egui::{Align2, Color32, FontId, Rect, Sense, TextureHandle, Vec2, pos2};
+use egui::{Align2, Color32, CornerRadius, FontId, Image, Rect, Sense, TextureHandle, Vec2, pos2};
 
 pub fn draw_texture(ui: &mut egui::Ui, texture: &TextureHandle, size: Vec2) {
     let (rect, _) = ui.allocate_exact_size(size, Sense::hover());
@@ -16,6 +17,28 @@ pub fn draw_texture(ui: &mut egui::Ui, texture: &TextureHandle, size: Vec2) {
         Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
         Color32::WHITE,
     );
+}
+
+/// A loaded texture clipped to a circle — Discord renders every avatar round.
+pub fn draw_texture_round(ui: &mut egui::Ui, texture: &TextureHandle, size: f32) {
+    let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
+    Image::new((texture.id(), Vec2::splat(size)))
+        .corner_radius(CornerRadius::same((size / 2.0) as u8))
+        .paint_at(ui, rect);
+}
+
+/// Round avatar when loaded, letter circle otherwise.
+pub fn round_avatar(
+    ui: &mut egui::Ui,
+    texture: Option<&TextureHandle>,
+    size: f32,
+    name: &str,
+    color: Color32,
+) {
+    match texture {
+        Some(texture) => draw_texture_round(ui, texture, size),
+        None => initial_circle(ui, size, name, color),
+    }
 }
 
 /// A colored circle with the first letter — the fallback while an avatar or

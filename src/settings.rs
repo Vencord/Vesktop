@@ -30,6 +30,15 @@ pub struct Settings {
     pub tray: bool,
     pub minimize_to_tray: bool,
     pub check_for_updates: bool,
+    /// Voice: chosen sound-server device names (`None` = system default).
+    pub input_device: Option<String>,
+    pub output_device: Option<String>,
+    /// Voice-activity threshold, 0 (sempre aberto) to 100.
+    pub input_sensitivity: u8,
+    /// RNNoise-style microphone noise suppression.
+    pub noise_suppression: bool,
+    /// Per-user playback volume, as a percentage (100 = normal).
+    pub user_volumes: HashMap<String, u8>,
 }
 
 impl Default for Settings {
@@ -44,6 +53,11 @@ impl Default for Settings {
             tray: true,
             minimize_to_tray: true,
             check_for_updates: true,
+            input_device: None,
+            output_device: None,
+            input_sensitivity: 0,
+            noise_suppression: false,
+            user_volumes: HashMap::new(),
         }
     }
 }
@@ -89,14 +103,19 @@ mod tests {
         settings.theme = Theme::Light;
         settings.zoom = 1.25;
         settings.token = Some("abc".to_string());
-        settings.last_channel_by_guild.insert("g".into(), "c".into());
+        settings
+            .last_channel_by_guild
+            .insert("g".into(), "c".into());
 
         let json = serde_json::to_string(&settings).unwrap();
         let back: Settings = serde_json::from_str(&json).unwrap();
         assert_eq!(back.theme, Theme::Light);
         assert_eq!(back.zoom, 1.25);
         assert_eq!(back.token.as_deref(), Some("abc"));
-        assert_eq!(back.last_channel_by_guild.get("g").map(String::as_str), Some("c"));
+        assert_eq!(
+            back.last_channel_by_guild.get("g").map(String::as_str),
+            Some("c")
+        );
     }
 
     #[test]

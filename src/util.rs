@@ -1,7 +1,7 @@
 //! Small pure helpers: snowflake math, timestamps, CDN URLs, name colors.
 
 use crate::model::{Guild, User};
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Datelike, Local};
 use egui::Color32;
 
 /// Discord epoch: 2015-01-01T00:00:00.000+00:00.
@@ -28,6 +28,62 @@ pub fn day_label(iso: &str) -> String {
         .unwrap_or_default()
 }
 
+/// Discord's pt-BR date separator label, e.g. "6 de outubro de 2026".
+pub fn day_label_long(iso: &str) -> String {
+    const MONTHS: [&str; 12] = [
+        "janeiro",
+        "fevereiro",
+        "março",
+        "abril",
+        "maio",
+        "junho",
+        "julho",
+        "agosto",
+        "setembro",
+        "outubro",
+        "novembro",
+        "dezembro",
+    ];
+    DateTime::parse_from_rfc3339(iso)
+        .map(|time| {
+            let local = time.with_timezone(&Local);
+            format!(
+                "{} de {} de {}",
+                local.day(),
+                MONTHS[(local.month0() as usize).min(11)],
+                local.year()
+            )
+        })
+        .unwrap_or_default()
+}
+
+/// The date a timestamp falls on, in the local timezone.
+pub fn local_day(iso: &str) -> Option<chrono::NaiveDate> {
+    DateTime::parse_from_rfc3339(iso)
+        .ok()
+        .map(|time| time.with_timezone(&Local).date_naive())
+}
+
+/// Message header time, Discord-style: "Hoje às 14:32", "Ontem às 09:10" or
+/// the plain date. Returns `(label, exact time)` — the latter for the tooltip.
+pub fn header_time(iso: &str) -> (String, String) {
+    let Ok(time) = DateTime::parse_from_rfc3339(iso) else {
+        return (String::new(), String::new());
+    };
+    let local = time.with_timezone(&Local);
+    let hhmm = local.format("%H:%M").to_string();
+    let exact = local.format("%d/%m/%Y %H:%M").to_string();
+    let today = Local::now().date_naive();
+    let day = local.date_naive();
+    if day == today {
+        (format!("Hoje às {hhmm}"), exact)
+    } else if Some(day) == today.pred_opt() {
+        (format!("Ontem às {hhmm}"), exact)
+    } else {
+        (day_label(iso), exact)
+    }
+}
+
 /// A stable, pleasant color for a username, derived from its content.
 pub fn name_color(name: &str) -> Color32 {
     let mut hash: u32 = 5381;
@@ -46,8 +102,7 @@ pub fn user_avatar_url(user: &User) -> String {
         ),
         None => format!(
             "https://cdn.discordapp.com/embed/avatars/{}.png",
-            user
-                .id
+            user.id
                 .parse::<u64>()
                 .map(|value| (value >> 22) % 6)
                 .unwrap_or(0)

@@ -1,20 +1,20 @@
 [package]
-name = "vesktop"
+name = "fastdiscord"
 version = "2.0.0"
 edition = "2024"
 rust-version = "1.98"
 license = "GPL-3.0-or-later"
 description = "A native Discord client built with Rust and egui"
-repository = "https://github.com/FelipeMayerDev/Vesktop"
+repository = "https://github.com/FelipeMayerDev/FastDiscord"
 keywords = ["discord", "chat", "egui", "messaging"]
 categories = ["gui"]
 
 [lib]
-name = "vesktop"
+name = "fastdiscord"
 path = "src/lib.rs"
 
 [[bin]]
-name = "vesktop"
+name = "fastdiscord"
 path = "src/main.rs"
 
 [features]
@@ -31,7 +31,8 @@ clap = { version = "4.5", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
-env_logger = "0.11"
+# replaced by tracing-subscriber (captures songbird tracing too).
+# env_logger = "0.11"
 directories = "6"
 # The whole UI. glow keeps the binary and the dependency tree small; wgpu is
 # not needed for a 2D chat client. accesskit connects egui's control names,
@@ -46,6 +47,9 @@ eframe = { version = "0.36", default-features = false, features = [
     "persistence",
 ] }
 egui = "0.36"
+# Animated WebP splash: the loaders parse the frames, the Image widget
+# animates them (webp implies image).
+egui_extras = { version = "0.36", default-features = false, features = ["webp", "image"] }
 # Decodes PNG, JPEG, WebP and GIF (avatars, guild icons) and ICO (window icon).
 image = { version = "0.25", default-features = false, features = [
     "png",
@@ -69,6 +73,37 @@ base64 = "0.22"
 qrcode = { version = "0.14", default-features = false }
 # System tray (feature `tray`).
 tray-icon = { version = "0.19", optional = true }
+# Voice: WS + UDP + DAVE through the standalone driver (docs/VOICE.md).
+# `gateway` is only there because `receive` fails to build without it in
+# 0.6.0 (`dashmap` is gated behind `gateway`).
+songbird = { version = "0.6", default-features = false, features = [
+    "driver",
+    "gateway",
+    "receive",
+    "rustls",
+    "tungstenite",
+] }
+# Voice audio I/O through the desktop's sound server (PipeWire via the
+# PulseAudio API): real device names, resampling and per-app volume.
+libpulse-binding = "2"
+# RNNoise-style noise suppression for the microphone (docs/VOICE.md, phase 4).
+nnnoiseless = "0.5"
+# Zero-copy slice casts for the diagnostic mix dump.
+bytemuck = "1"
+# songbird's EventHandler is an async trait; implementing it needs the macro.
+async-trait = "0.1"
+# MediaSource trait for the microphone's live PCM source; matches songbird's.
+symphonia-core = "0.5"
+# Bridges songbird's tracing logs into the RUST_LOG output.
+tracing-subscriber = { version = "0.3", features = ["env-filter", "tracing-log"] }
+# PCM decode for the microphone feed: songbird's own symphonia ships with no
+# codecs enabled, so its registry can't parse RawAdapter streams without this
+# feature being unified in ("no compatible track found").
+symphonia = { version = "0.5", default-features = false, features = ["pcm"] }
+
+# Vendored songbird 0.6 with DAVE opt-out (docs/VOICE.md; upstream #310).
+[patch.crates-io]
+songbird = { path = "third_party/songbird" }
 
 [profile.release]
 lto = "thin"

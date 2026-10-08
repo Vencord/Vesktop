@@ -48,8 +48,11 @@ Follow Discord's layout:
 - **Order:** Discord's own. `/users/@me/guilds` ignores the user's order;
   the real one is `user_settings.guild_folders` in `READY`. Folders render
   as in Discord (2×2 mini icons in the folder color, expand on click).
-  Needs validating: user-account `READY` may only carry it as protobuf
-  (`user_settings_proto`).
+  **Validated (outubro/2026):** user-account `READY` no longer carries
+  `guild_folders` as JSON — `user_guild_settings` only has per-guild
+  overrides; the folders live solely in `user_settings_proto` (protobuf),
+  so rendering them means decoding that blob (prost schema). Deferred
+  until the settings-proto work in PORT.md.
 - **Rounded icons** (`src/ui/server_rail.rs` draws them square today):
   - Circle via `Image::corner_radius(24)`, animating to a rounded square
     (radius 16) on hover/selection with `animate_bool`.

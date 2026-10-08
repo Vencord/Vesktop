@@ -18,7 +18,7 @@ use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::{Message as WsMessage, client::IntoClientRequest};
 
 use super::api::USER_AGENT;
-use super::events::UiEvent;
+use super::events::{EventTx, UiEvent};
 
 const GATEWAY: &str = "wss://remote-auth-gateway.discord.gg/?v=2";
 const LOGIN_URL: &str = "https://discord.com/api/v9/users/@me/remote-auth/login";
@@ -26,9 +26,12 @@ const QR_BASE: &str = "https://discord.com/ra/";
 
 /// Runs one QR session and reports its outcome; the UI starts a new one to
 /// get a fresh code.
-pub async fn run(event_tx: UnboundedSender<UiEvent>) {
+pub async fn run(event_tx: EventTx) {
     let event = match session(&event_tx).await {
         Ok(token) => UiEvent::QrLogin { token },
+        // Expiry is routine: Discord rotates the code, so regenerate
+        // silently instead of showing an error.
+        Err(err) if err.to_string() == EXPIRED => UiEvent::QrExpired,
         Err(err) => UiEvent::QrFailed {
             reason: err.to_string(),
         },
@@ -36,7 +39,10 @@ pub async fn run(event_tx: UnboundedSender<UiEvent>) {
     let _ = event_tx.send(event);
 }
 
-async fn session(event_tx: &UnboundedSender<UiEvent>) -> anyhow::Result<String> {
+/// Message of the error raised when the gateway closes the code's session.
+const EXPIRED: &str = "o QR code expirou";
+
+async fn session(event_tx: &EventTx) -> anyhow::Result<String> {
     // 2048-bit keygen is CPU-bound; keep it off the async workers.
     let key = tokio::task::spawn_blocking(|| RsaPrivateKey::new(&mut rsa::rand_core::OsRng, 2048))
         .await??;
@@ -69,7 +75,7 @@ async fn session(event_tx: &UnboundedSender<UiEvent>) -> anyhow::Result<String> 
                 let text = match frame {
                     Some(Ok(WsMessage::Text(text))) => text,
                     Some(Ok(WsMessage::Close(_))) | None => {
-                        anyhow::bail!("o QR code expirou")
+                        anyhow::bail!("{EXPIRED}")
                     }
                     Some(Ok(_)) => continue,
                     Some(Err(err)) => return Err(err.into()),
@@ -102,8 +108,18 @@ async fn session(event_tx: &UnboundedSender<UiEvent>) -> anyhow::Result<String> 
                     "pending_ticket" => {
                         // Decrypts to "id:discriminator:avatar_hash:username".
                         let payload = String::from_utf8(decrypt(field("encrypted_user_payload"))?)?;
-                        let username = payload.rsplit(':').next().unwrap_or_default().to_string();
-                        let _ = event_tx.send(UiEvent::QrScanned { username });
+                        let mut parts = payload.rsplitn(4, ':');
+                        let username = parts.next().unwrap_or_default().to_string();
+                        let avatar = match parts.next() {
+                            Some(hash) if !hash.is_empty() && hash != "null" => Some(hash.to_string()),
+                            _ => None,
+                        };
+                        let user_id = parts.next().unwrap_or_default().to_string();
+                        let _ = event_tx.send(UiEvent::QrScanned {
+                            username,
+                            user_id,
+                            avatar,
+                        });
                     }
                     "pending_login" => {
                         let encrypted = redeem_ticket(field("ticket")).await?;

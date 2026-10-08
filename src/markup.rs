@@ -146,9 +146,7 @@ pub fn tokenize(text: &str) -> Vec<Segment> {
         if rest.starts_with("<@!") || rest.starts_with("<@") {
             if let Some(close) = plausible_close(rest) {
                 flush(&mut plain, &mut segments);
-                let id = rest[2..close]
-                    .trim_start_matches('!')
-                    .to_string();
+                let id = rest[2..close].trim_start_matches('!').to_string();
                 segments.push(Segment {
                     text: format!("@{id}"),
                     style: Style::Mention,
@@ -221,7 +219,10 @@ mod tests {
 
     #[test]
     fn plain_text_stays_plain() {
-        assert_eq!(styles("olá mundo"), vec![("olá mundo".to_string(), Style::Normal)]);
+        assert_eq!(
+            styles("olá mundo"),
+            vec![("olá mundo".to_string(), Style::Normal)]
+        );
     }
 
     #[test]
@@ -238,7 +239,10 @@ mod tests {
 
     #[test]
     fn inline_code_and_fence() {
-        assert_eq!(styles("`cargo run`"), vec![("cargo run".to_string(), Style::Code)]);
+        assert_eq!(
+            styles("`cargo run`"),
+            vec![("cargo run".to_string(), Style::Code)]
+        );
         assert_eq!(
             styles("antes```rust\nfn main() {}\n```depois"),
             vec![

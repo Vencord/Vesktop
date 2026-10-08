@@ -8,15 +8,15 @@ use std::sync::mpsc::Sender;
 use crate::app::TrayCommand;
 
 pub fn install(quit_tx: Sender<TrayCommand>) -> Result<()> {
-    use tray_icon::menu::{Menu, MenuEvent, MenuItem};
     use tray_icon::TrayIconBuilder;
+    use tray_icon::menu::{Menu, MenuEvent, MenuItem};
 
     let menu = Menu::new();
     let quit = MenuItem::new("Sair do Vesktop", true, None);
     menu.append_items(&[&quit])?;
 
     let mut builder = TrayIconBuilder::with_id("vesktop-tray")
-        .with_tooltip("Vesktop")
+        .with_tooltip("FastDiscord")
         .with_menu(Box::new(menu));
     if let Some(icon) = crate::window::load_tray_icon() {
         builder = builder.with_icon(icon);

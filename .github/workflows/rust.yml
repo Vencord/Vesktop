@@ -15,6 +15,9 @@ jobs:
           toolchain: "1.98.0"
           components: clippy, rustfmt
       - uses: Swatinem/rust-cache@v2
+      # Voice stack: opus2 links the system libopus and cpal's ALSA backend
+      # needs alsa-lib headers (docs/VOICE.md).
+      - run: sudo apt-get update && sudo apt-get install -y libopus-dev libpulse-dev
       - run: cargo check --all-targets
       - run: cargo test
       - run: cargo clippy --all-targets

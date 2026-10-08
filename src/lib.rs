@@ -1,4 +1,4 @@
-//! Vesktop — a native Discord client built with Rust and egui.
+//! FastDiscord — a native Discord client built with Rust and egui.
 //!
 //! This crate is the Rust port of the Electron-based Vesktop desktop app:
 //! the UI is drawn directly with egui instead of hosting discord.com in a

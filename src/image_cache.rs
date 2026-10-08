@@ -41,10 +41,16 @@ impl ImageCache {
     /// Returns the texture for `url`, kicking off a background fetch on the
     /// first call. Call every frame; the returned `Option` turns into `Some`
     /// once the download and decode finish.
-    pub fn get(&mut self, ctx: &egui::Context, handle: &Handle, url: &str) -> Option<TextureHandle> {
+    pub fn get(
+        &mut self,
+        ctx: &egui::Context,
+        handle: &Handle,
+        url: &str,
+    ) -> Option<TextureHandle> {
         while let Ok(decoded) = self.rx.try_recv() {
             self.pending.remove(&decoded.url);
-            let texture = ctx.load_texture(&decoded.url, decoded.image, egui::TextureOptions::LINEAR);
+            let texture =
+                ctx.load_texture(&decoded.url, decoded.image, egui::TextureOptions::LINEAR);
             self.textures.insert(decoded.url, texture);
         }
 

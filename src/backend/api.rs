@@ -4,13 +4,13 @@
 
 use serde::de::DeserializeOwned;
 
-use crate::model::{Channel, Guild, Message, User};
+use crate::model::{Channel, Guild, Member, Message, User};
 
 pub const REST_BASE: &str = "https://discord.com/api/v10";
 pub const USER_AGENT: &str = concat!(
-    "Vesktop/",
+    "FastDiscord/",
     env!("CARGO_PKG_VERSION"),
-    " (https://github.com/FelipeMayerDev/Vesktop)"
+    " (https://github.com/FelipeMayerDev/FastDiscord)"
 );
 
 pub const MESSAGES_PER_PAGE: u64 = 50;
@@ -67,11 +67,7 @@ impl Api {
                 .json::<serde_json::Value>()
                 .await
                 .ok()
-                .and_then(|value| {
-                    value
-                        .get("retry_after")
-                        .and_then(serde_json::Value::as_f64)
-                })
+                .and_then(|value| value.get("retry_after").and_then(serde_json::Value::as_f64))
                 .unwrap_or(1.0);
             return Err(ApiError::RateLimited(retry_after.ceil() as u64));
         }
@@ -144,5 +140,24 @@ impl Api {
             .send()
             .await?;
         Ok(Self::check_status(resp).await?.json::<Message>().await?)
+    }
+
+    /// Fire-and-forget typing indicator; Discord replies with an empty 204.
+    pub async fn send_typing(&self, channel_id: &str) -> ApiResult<()> {
+        let resp = self
+            .http
+            .post(format!("{REST_BASE}/channels/{channel_id}/typing"))
+            .header(reqwest::header::AUTHORIZATION, &self.token)
+            .send()
+            .await?;
+        Self::check_status(resp).await?;
+        Ok(())
+    }
+
+    /// One guild member; used to name users that voice states only
+    /// reference by id (READY seeds carry no member payload).
+    pub async fn guild_member(&self, guild_id: &str, user_id: &str) -> ApiResult<Member> {
+        self.get_json(&format!("/guilds/{guild_id}/members/{user_id}"), &[])
+            .await
     }
 }

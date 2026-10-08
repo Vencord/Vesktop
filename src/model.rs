@@ -55,6 +55,9 @@ pub struct Channel {
     pub position: i64,
     #[serde(default)]
     pub recipients: Vec<User>,
+    /// Snowflake of the last message, for ordering DMs by recency.
+    #[serde(default)]
+    pub last_message_id: Option<String>,
 }
 
 impl Channel {
@@ -65,7 +68,10 @@ impl Channel {
     pub fn is_selectable(&self) -> bool {
         matches!(
             self.kind,
-            CHANNEL_KIND_GUILD_TEXT | CHANNEL_KIND_ANNOUNCEMENT | CHANNEL_KIND_DM | CHANNEL_KIND_GROUP_DM
+            CHANNEL_KIND_GUILD_TEXT
+                | CHANNEL_KIND_ANNOUNCEMENT
+                | CHANNEL_KIND_DM
+                | CHANNEL_KIND_GROUP_DM
         )
     }
 
@@ -76,10 +82,7 @@ impl Channel {
                 .first()
                 .map(|user| user.display_name().to_string())
                 .unwrap_or_else(|| "Mensagem direta".to_string()),
-            CHANNEL_KIND_GROUP_DM => self
-                .name
-                .clone()
-                .unwrap_or_else(|| "Grupo".to_string()),
+            CHANNEL_KIND_GROUP_DM => self.name.clone().unwrap_or_else(|| "Grupo".to_string()),
             _ => self.name.clone().unwrap_or_default(),
         }
     }
@@ -103,6 +106,24 @@ pub struct Message {
     pub attachments: Vec<Attachment>,
     #[serde(default)]
     pub embeds: Vec<Embed>,
+    #[serde(default)]
+    pub mention_everyone: bool,
+    #[serde(default)]
+    pub mentions: Vec<User>,
+    #[serde(default)]
+    pub message_reference: Option<MessageReference>,
+    /// The original message, when Discord embeds it alongside the reply.
+    #[serde(default)]
+    pub referenced_message: Option<Box<Message>>,
+}
+
+/// `message_reference`: which message a reply points at.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct MessageReference {
+    #[serde(default)]
+    pub message_id: Option<String>,
+    #[serde(default)]
+    pub channel_id: Option<String>,
 }
 
 impl Message {
@@ -119,6 +140,12 @@ pub struct Attachment {
     pub size: u64,
     #[serde(default)]
     pub url: Option<String>,
+    #[serde(default)]
+    pub content_type: Option<String>,
+    #[serde(default)]
+    pub width: Option<u32>,
+    #[serde(default)]
+    pub height: Option<u32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -129,4 +156,35 @@ pub struct Embed {
     pub description: Option<String>,
     #[serde(default)]
     pub url: Option<String>,
+}
+
+/// Who is in which voice channel, from VOICE_STATE_UPDATE and the
+/// voice_states seeded in READY. `guild_id` is always filled by the
+/// dispatch layer, even though READY entries omit it.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct VoiceState {
+    #[serde(default)]
+    pub guild_id: Option<String>,
+    pub channel_id: Option<String>,
+    pub user_id: String,
+    #[serde(default)]
+    pub session_id: String,
+    #[serde(default)]
+    pub self_mute: bool,
+    #[serde(default)]
+    pub self_deaf: bool,
+    #[serde(default)]
+    pub mute: bool,
+    #[serde(default)]
+    pub deaf: bool,
+    #[serde(default)]
+    pub suppress: bool,
+}
+
+/// A guild member, fetched to turn voice-state user ids into names.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Member {
+    pub user: User,
+    #[serde(default)]
+    pub nick: Option<String>,
 }

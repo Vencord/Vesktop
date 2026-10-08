@@ -1,6 +1,6 @@
-# Vesktop
+# FastDiscord
 
-**Vesktop é um cliente Discord nativo** — construído em **Rust + egui**, sem
+**FastDiscord é um cliente Discord nativo** — construído em **Rust + egui**, sem
 nenhum browser engine. Este é o port do [Vesktop](https://github.com/Vencord/Vesktop)
 (originalmente Electron/TypeScript) para o padrão dos apps nativos
 [spotifast](https://github.com/crmne/spotifast) e
@@ -44,7 +44,7 @@ instala sozinho) e das libs gráficas do seu desktop; no Linux, os pacotes de
 runtime usuais do X11/Wayland. Nenhum header de GTK/WebKit é necessário.
 
 ```sh
-git clone https://github.com/FelipeMayerDev/Vesktop
+git clone https://github.com/FelipeMayerDev/FastDiscord
 cd Vesktop
 
 cargo run --release

@@ -1,9 +1,9 @@
 //! Integration test through the public crate API — also proves the library
 //! builds standalone, not just as the binary's implementation detail.
 
-use vesktop::markup::{self, Style};
-use vesktop::settings::Settings;
-use vesktop::util;
+use fastdiscord::markup::{self, Style};
+use fastdiscord::settings::Settings;
+use fastdiscord::util;
 
 #[test]
 fn markup_pipeline_end_to_end() {
@@ -11,7 +11,14 @@ fn markup_pipeline_end_to_end() {
     let styles: Vec<Style> = segments.iter().map(|s| s.style).collect();
     assert_eq!(
         styles,
-        [Style::Normal, Style::Mention, Style::Normal, Style::Bold, Style::Normal, Style::Code]
+        [
+            Style::Normal,
+            Style::Mention,
+            Style::Normal,
+            Style::Bold,
+            Style::Normal,
+            Style::Code
+        ]
     );
 }
 
