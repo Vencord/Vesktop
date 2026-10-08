@@ -346,16 +346,13 @@ struct VoiceMember {
 }
 
 fn identify_payload(token: &str) -> String {
-    // `intents` is required by the protocol. 0 selects no bot-only intents,
-    // but GUILD_VOICE_STATES (1 << 25) must be set: without it Discord does
-    // not deliver VOICE_STATE_UPDATE, which the voice handshake depends on
-    // for our own session id (docs/VOICE.md).
-    const GUILD_VOICE_STATES: i64 = 1 << 25;
+    // No `intents`: like the official client. On a user account they act
+    // as a filter, and with them Discord stopped delivering
+    // VOICE_STATE_UPDATE (channel rosters and our own session).
     json!({
         "op": 2,
         "d": {
             "token": token,
-            "intents": GUILD_VOICE_STATES,
             "properties": {
                 "os": std::env::consts::OS,
                 "browser": "FastDiscord",

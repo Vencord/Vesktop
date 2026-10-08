@@ -50,6 +50,9 @@ const PACKET_BYTES: usize = 2 * VOICE_RATE as usize / 50 * 4;
 /// How long the voice-activity gate stays open after audio drops below the
 /// sensitivity threshold, so word tails aren't clipped.
 const VAD_HANGOVER: Duration = Duration::from_millis(300);
+/// Minimum RMS that lights the speaking indicator, so it isn't stuck on
+/// when the sensitivity is 0 (gate always open).
+const SPEAKING_FLOOR: f32 = 0.01;
 /// f32 block to little-endian bytes for the pulse stream.
 fn block_as_bytes(block: &[f32]) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(block.len() * 4);
@@ -161,25 +164,29 @@ pub fn enumerate_devices(output: bool) -> Vec<(String, String)> {
         return Vec::new();
     }
 
-    let (tx, rx) = std::sync::mpsc::channel();
+    // `None` marks the end of the list, so the wait below returns as soon
+    // as the server is done instead of running out the deadline.
+    let (tx, rx) = std::sync::mpsc::channel::<Option<(String, String)>>();
     {
         let introspector = context.introspect();
-        let done = tx.clone();
         if output {
-            introspector.get_sink_info_list(move |result| {
-                if let ListResult::Item(info) = result {
+            introspector.get_sink_info_list(move |result| match result {
+                ListResult::Item(info) => {
                     let description = info
                         .proplist
                         .get_str("device.description")
                         .unwrap_or_default();
                     if let Some(name) = info.name.as_ref() {
-                        let _ = done.send((name.to_string(), description));
+                        let _ = tx.send(Some((name.to_string(), description)));
                     }
+                }
+                ListResult::End | ListResult::Error => {
+                    let _ = tx.send(None);
                 }
             });
         } else {
-            introspector.get_source_info_list(move |result| {
-                if let ListResult::Item(info) = result {
+            introspector.get_source_info_list(move |result| match result {
+                ListResult::Item(info) => {
                     // Monitors loop a sink back into capture; only real
                     // microphones matter for voice.
                     if info.monitor_of_sink.is_some() {
@@ -190,8 +197,11 @@ pub fn enumerate_devices(output: bool) -> Vec<(String, String)> {
                         .get_str("device.description")
                         .unwrap_or_default();
                     if let Some(name) = info.name.as_ref() {
-                        let _ = done.send((name.to_string(), description));
+                        let _ = tx.send(Some((name.to_string(), description)));
                     }
+                }
+                ListResult::End | ListResult::Error => {
+                    let _ = tx.send(None);
                 }
             });
         }
@@ -199,15 +209,16 @@ pub fn enumerate_devices(output: bool) -> Vec<(String, String)> {
 
     let mut devices = Vec::new();
     let deadline = Instant::now() + Duration::from_secs(2);
-    while Instant::now() < deadline {
-        match rx.recv_timeout(Duration::from_millis(50)) {
-            Ok(device) => devices.push(device),
-            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
-                if let IterateResult::Quit(_) = mainloop.iterate(false) {
-                    break;
-                }
+    'pump: while Instant::now() < deadline {
+        if let IterateResult::Quit(_) = mainloop.iterate(false) {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(1));
+        while let Ok(item) = rx.try_recv() {
+            match item {
+                Some(device) => devices.push(device),
+                None => break 'pump,
             }
-            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
         }
     }
     let _ = context.disconnect();
@@ -432,11 +443,13 @@ fn run_pulse(
         log::warn!("pulse: stream de entrada não abriu");
         return;
     };
-    let capture = Arc::new(Mutex::new(Capture::new(
-        sensitivity,
-        noise_suppression,
-        Arc::clone(&input_ring),
-    )));
+    // The shared capture (voice.rs tweaks it live) now feeds this ring.
+    {
+        let mut capture = capture.lock().unwrap();
+        capture.ring = Arc::clone(&input_ring);
+        capture.set_sensitivity(sensitivity);
+        capture.set_noise_suppression(noise_suppression);
+    }
     if let Err(err) =
         in_stream.connect_record(input_device.as_deref(), Some(&attrs), StreamFlagSet::ADJUST_LATENCY)
     {
@@ -631,6 +644,9 @@ pub struct Capture {
     sensitivity: f32,
     open_until: Option<Instant>,
     ring: Arc<Ring>,
+    /// Called every frame with whether we're speaking (voice.rs dedupes it
+    /// into the green indicator).
+    pub on_speaking: Option<Box<dyn FnMut(bool) + Send>>,
     last_log: Instant,
     peak: f32,
 }
@@ -657,6 +673,7 @@ impl Capture {
             sensitivity: f32::from(sensitivity) / 100.0,
             open_until: None,
             ring,
+            on_speaking: None,
             last_log: Instant::now(),
             peak: 0.0,
         }
@@ -682,7 +699,8 @@ impl Capture {
                     *sample = (*sample * limiter).clamp(-0.95, 0.95) * 32768.0;
                 }
             }
-            let threshold = self.sensitivity * if denoised { 32768.0 } else { 1.0 };
+            let threshold =
+                self.sensitivity.max(SPEAKING_FLOOR) * if denoised { 32768.0 } else { 1.0 };
             let loud = if let Some(state) = self.denoiser.as_mut() {
                 state.process_frame(&mut self.denoised, &frame);
                 rms(&self.denoised) >= threshold
@@ -705,9 +723,11 @@ impl Capture {
             if loud {
                 self.open_until = Some(now + VAD_HANGOVER);
             }
-            let open = self.sensitivity <= 0.0
-                || loud
-                || self.open_until.is_some_and(|until| now < until);
+            let speaking = loud || self.open_until.is_some_and(|until| now < until);
+            if let Some(notify) = self.on_speaking.as_mut() {
+                notify(speaking);
+            }
+            let open = self.sensitivity <= 0.0 || speaking;
             if open {
                 let gain = if denoised { 1.0 / 32768.0 } else { 1.0 };
                 if denoised {

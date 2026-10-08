@@ -780,6 +780,22 @@ async fn try_connect(
         Ok(()) => {
             log::info!("voz conectada ao canal {}", info.channel_id);
             ensure_audio(driver, shared, audio_links, audio_cfg);
+            // Our own green indicator comes from the mic's voice-activity
+            // gate; VoiceTicks only carry other users.
+            let (tx, me, flags) = (event_tx.clone(), info.user_id.to_string(), Arc::clone(shared));
+            let mut lit = false;
+            shared.capture.lock().unwrap().on_speaking = Some(Box::new(move |speaking| {
+                let now = speaking
+                    && !flags.self_muted.load(Ordering::Relaxed)
+                    && !flags.deafened.load(Ordering::Relaxed);
+                if now != lit {
+                    lit = now;
+                    tx.send(UiEvent::VoiceSpeaking {
+                        user_id: me.clone(),
+                        speaking: now,
+                    });
+                }
+            }));
             // The MLS group must recognize every member or their media
             // stays encrypted (vendored songbird patch, upstream #310).
             driver.set_recognized_users(shared.roster.lock().unwrap().clone());

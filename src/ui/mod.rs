@@ -20,11 +20,12 @@ pub fn draw_texture(ui: &mut egui::Ui, texture: &TextureHandle, size: Vec2) {
 }
 
 /// A loaded texture clipped to a circle — Discord renders every avatar round.
-pub fn draw_texture_round(ui: &mut egui::Ui, texture: &TextureHandle, size: f32) {
+pub fn draw_texture_round(ui: &mut egui::Ui, texture: &TextureHandle, size: f32) -> Rect {
     let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
     Image::new((texture.id(), Vec2::splat(size)))
         .corner_radius(CornerRadius::same((size / 2.0) as u8))
         .paint_at(ui, rect);
+    rect
 }
 
 /// Round avatar when loaded, letter circle otherwise.
@@ -34,7 +35,7 @@ pub fn round_avatar(
     size: f32,
     name: &str,
     color: Color32,
-) {
+) -> Rect {
     match texture {
         Some(texture) => draw_texture_round(ui, texture, size),
         None => initial_circle(ui, size, name, color),
@@ -43,7 +44,7 @@ pub fn round_avatar(
 
 /// A colored circle with the first letter — the fallback while an avatar or
 /// icon hasn't loaded (or the account has none).
-pub fn initial_circle(ui: &mut egui::Ui, size: f32, label: &str, color: Color32) {
+pub fn initial_circle(ui: &mut egui::Ui, size: f32, label: &str, color: Color32) -> Rect {
     let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
     ui.painter().circle_filled(rect.center(), size / 2.0, color);
     let letter: String = label
@@ -58,4 +59,5 @@ pub fn initial_circle(ui: &mut egui::Ui, size: f32, label: &str, color: Color32)
         FontId::proportional(size * 0.5),
         Color32::WHITE,
     );
+    rect
 }

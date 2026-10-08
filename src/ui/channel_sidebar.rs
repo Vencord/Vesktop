@@ -644,7 +644,8 @@ fn voice_panel(app: &mut VesktopApp, ui: &mut egui::Ui) {
         leave = true;
     }
 
-    // Action row: mic, screen share, activities, soundboard.
+    // Action row: screen share, activities, soundboard (mute lives in the
+    // user panel below, as in Discord).
     if in_voice {
         ui.add_space(2.0);
         let width = ui.available_width();
@@ -654,7 +655,7 @@ fn voice_panel(app: &mut VesktopApp, ui: &mut egui::Ui) {
             |ui| {
                 ui.add_space(8.0);
                 let gap = 6.0;
-                let button_width = (width - 16.0 - 3.0 * gap) / 4.0;
+                let button_width = (width - 16.0 - 2.0 * gap) / 3.0;
                 let action = |ui: &mut egui::Ui, glyph: &str, color, tooltip: &str| {
                     ui.add_sized(
                         [button_width, VOICE_ACTIONS_H],
@@ -663,23 +664,6 @@ fn voice_panel(app: &mut VesktopApp, ui: &mut egui::Ui) {
                     .on_hover_text(tooltip)
                     .clicked()
                 };
-                let mic_color = if app.voice_muted {
-                    theme::RED
-                } else {
-                    theme::TEXT
-                };
-                if action(
-                    ui,
-                    if app.voice_muted { "🎙" } else { "🎤" },
-                    mic_color,
-                    if app.voice_muted {
-                        "Ativar microfone"
-                    } else {
-                        "Silenciar microfone"
-                    },
-                ) {
-                    app.set_voice_mute(!app.voice_muted);
-                }
                 let _ = action(ui, "🖥️", theme::TEXT, "Compartilhar tela (em breve)");
                 let _ = action(ui, "🎯", theme::TEXT, "Atividades (em breve)");
                 let _ = action(ui, "🎵", theme::TEXT, "Soundboard (em breve)");
@@ -727,10 +711,6 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
             ))
             .layout(egui::Layout::left_to_right(egui::Align::Center)),
     );
-    let (avatar_left, avatar_top) = {
-        let cursor = content.cursor();
-        (cursor.left(), cursor.top())
-    };
     // The avatar comes from the resolved member; the letter circle is only
     // the fallback while the member lookup is still in flight.
     let member_user = app.user_cache.get(&member.user_id).cloned();
@@ -738,14 +718,14 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
         let url = util::user_avatar_url(user);
         app.images.get(content.ctx(), &app.handle, &url)
     });
-    match avatar_texture {
-        Some(texture) => draw_texture_round(&mut content, &texture, 18.0),
-        None => initial_circle(&mut content, 18.0, &label, util::name_color(&label)),
-    }
+    let avatar = match avatar_texture {
+        Some(texture) => draw_texture_round(&mut content, &texture, 24.0),
+        None => initial_circle(&mut content, 24.0, &label, util::name_color(&label)),
+    };
     if speaking {
         content.painter().circle_stroke(
-            pos2(avatar_left + 9.0, avatar_top + 9.0),
-            10.5,
+            avatar.center(),
+            avatar.width() / 2.0 + 1.5,
             egui::Stroke::new(2.0, theme::GREEN),
         );
     }
@@ -944,11 +924,7 @@ fn row(
     );
     if let Some(user) = avatar_user {
         let url = util::user_avatar_url(user);
-        let (avatar_left, avatar_top) = {
-            let cursor = content.cursor();
-            (cursor.left(), cursor.top())
-        };
-        match app.images.get(ui.ctx(), &app.handle, &url) {
+        let avatar = match app.images.get(ui.ctx(), &app.handle, &url) {
             Some(texture) => draw_texture_round(&mut content, &texture, 26.0),
             None => initial_circle(
                 &mut content,
@@ -956,10 +932,10 @@ fn row(
                 user.display_name(),
                 util::name_color(user.display_name()),
             ),
-        }
+        };
         // Presence dot, Discord-style, on the avatar's bottom-right.
         if let Some(status) = app.presence.get(&user.id) {
-            let center = pos2(avatar_left + 22.0, avatar_top + 22.0);
+            let center = avatar.max - Vec2::splat(4.0);
             let color = match status.as_str() {
                 "online" => theme::GREEN,
                 "idle" => theme::YELLOW,
