@@ -12,7 +12,9 @@ cd "$(dirname "$0")/.."
 
 OUT=dist/FastDiscord-x86_64.AppImage
 APPDIR=target/appdir
-TOOLS=target/appimage-tools
+# Outside target/: CI's rust-cache restores and prunes target/, which left
+# a tools directory without its contents.
+TOOLS=.cache/appimage-tools
 rm -rf "$APPDIR"
 
 # Required elements: WHIP publish, WHEP watch, the encoder probe and the
@@ -70,6 +72,12 @@ done
 for el in "${OPTIONAL[@]}"; do
     copy_plugin "$el" || echo "   optional, absent: $el"
 done
+# gst-plugin-va only registers its elements when a VA device exists at
+# load time — never in a GPU-less CI container — so take it by file.
+plugins_dir=$(pkg-config --variable=pluginsdir gstreamer-1.0)
+if [ -f "$plugins_dir/libgstva.so" ] && [ -z "${SEEN[$plugins_dir/libgstva.so]:-}" ]; then
+    cp -L "$plugins_dir/libgstva.so" "$APPDIR/usr/lib/gstreamer-1.0/"
+fi
 
 # Libraries that must come from the host.
 from_host() {
@@ -113,7 +121,8 @@ chmod +x "$APPDIR/AppRun"
 
 echo "── appimagetool"
 mkdir -p "$TOOLS"
-if [ ! -d "$TOOLS/appimagetool" ]; then
+if [ ! -x "$TOOLS/appimagetool/AppRun" ]; then
+    rm -rf "$TOOLS/appimagetool"
     curl -fsSL --retry 3 -o "$TOOLS/appimagetool.AppImage" \
         https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
     chmod +x "$TOOLS/appimagetool.AppImage"
