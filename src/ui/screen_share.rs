@@ -88,3 +88,52 @@ pub fn paint(app: &VesktopApp, ui: &mut egui::Ui) {
         egui::Color32::WHITE,
     );
 }
+
+/// A watched stream in place of the chat: the video, letterboxed, with a
+/// bar to leave it.
+pub fn paint_watch(app: &mut VesktopApp, ui: &mut egui::Ui) {
+    let Some(watch) = &app.watch else {
+        return;
+    };
+    let frame = watch.frames.lock().unwrap().take();
+    if let Some(frame) = frame {
+        let (size, rgba) = frame.preview_rgba(frame.width);
+        let image = egui::ColorImage::from_rgba_unmultiplied(size, &rgba);
+        match &mut app.watch_texture {
+            Some(texture) => texture.set(image, egui::TextureOptions::LINEAR),
+            None => {
+                app.watch_texture =
+                    Some(ui.ctx().load_texture("watch_stream", image, egui::TextureOptions::LINEAR));
+            }
+        }
+    }
+    let mut leave = false;
+    ui.horizontal(|ui| {
+        ui.label(egui::RichText::new("Assistindo à transmissão").strong().color(theme::TEXT));
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            leave = ui.button("Parar de assistir").clicked();
+        });
+    });
+    let area = ui.available_rect_before_wrap();
+    ui.painter().rect_filled(area, 6.0, egui::Color32::BLACK);
+    match &app.watch_texture {
+        Some(texture) => {
+            let size = texture.size_vec2();
+            let scale = (area.width() / size.x).min(area.height() / size.y);
+            egui::Image::new((texture.id(), size * scale))
+                .paint_at(ui, Rect::from_center_size(area.center(), size * scale));
+        }
+        None => {
+            ui.painter().text(
+                area.center(),
+                egui::Align2::CENTER_CENTER,
+                "Conectando à transmissão…",
+                egui::FontId::proportional(14.0),
+                theme::MUTED,
+            );
+        }
+    }
+    if leave {
+        app.stop_watching();
+    }
+}

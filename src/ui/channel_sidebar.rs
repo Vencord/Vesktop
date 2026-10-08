@@ -713,7 +713,21 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
     };
     let speaking = app.speaking.contains(&member.user_id);
     let width = ui.available_width();
-    let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 34.0), Sense::hover());
+    // A live member is clickable: it opens their stream.
+    let watchable = member.self_stream && app.me.as_ref().is_none_or(|me| me.id != member.user_id);
+    let sense = if watchable { Sense::click() } else { Sense::hover() };
+    let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 34.0), sense);
+    if watchable && response.hovered() {
+        ui.painter().rect_filled(rect, 4.0, theme::HOVER);
+    }
+    let response = if watchable {
+        response.on_hover_text("Assistir à transmissão")
+    } else {
+        response
+    };
+    if response.clicked() {
+        app.watch_stream(&member.user_id);
+    }
     let mut content = ui.new_child(
         egui::UiBuilder::new()
             .max_rect(egui::Rect::from_min_max(

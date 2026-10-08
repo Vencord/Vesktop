@@ -62,6 +62,19 @@ voice-WS + UDP client, following
     songbird (`driver/connection/mod.rs:378` passes `key_pair: None`) to
     take a shared one.
 - Done when: the handshake and the DAVE commit complete on the stream.
+  **Done**: raw UDP is accepted, and two FastDiscord accounts (streamer
+  + viewer) reach a ready DAVE session in group `rtc_server_id - 1`.
+
+## Phase 3b — watching
+
+- op 20 WATCH_STREAM; the viewer identifies like the streamer, sends op 12
+  with `video_ssrc: 0, streams: []` and op 15 `{any: 100}`; the server's
+  op 12 carries the streamer's ssrcs.
+- `src/backend/rtp.rs`: rtpsize AES-GCM open/seal, H.264 depacketizer
+  (single NAL, STAP-A, FU-A), PLI and an empty RR every 5 s (keepalive).
+- Depacketize → `davey.decrypt(streamer, VIDEO)` → openh264 on its own
+  thread (the decoder isn't `Send`) → texture in place of the chat.
+- Done when: a stream from the official client plays in FastDiscord.
 
 ## Phase 4 — send video
 
@@ -81,8 +94,6 @@ voice-WS + UDP client, following
 
 ## Later
 
-- **Watching** others' streams: op 20 WATCH_STREAM, depacketize (incl.
-  STAP-A), decrypt, openh264 decode, egui texture; send PLI on start.
 - Stream audio (venmic-style app audio).
 - VAAPI encode (`ffmpeg-next`, `h264_vaapi`; this machine supports it) if
   openh264's CPU cost hurts.
@@ -94,10 +105,7 @@ voice-WS + UDP client, following
   banned seconds after starting a stream, attributed to the JA3/JA4 TLS
   fingerprint; rustls doesn't look like a browser. Test on a throwaway
   account first.
-- **UDP vs WebRTC**: Discord-video-stream moved to WebRTC (Dec 2025)
-  saying "only WebRTC connections are allowed", yet discord-native-voice
-  streams over raw UDP (Aug 2026). Phase 3 settles it; fallback is
-  `str0m`.
+- ~~UDP vs WebRTC~~: settled in phase 3, raw UDP works.
 - Header extension ids: Userdoccers/DNV say playout-delay is 6, older DVS
   used 5. Unverified which the server enforces.
 - 720p30 without Nitro: unverified whether the server enforces it.

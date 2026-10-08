@@ -2,6 +2,7 @@
 //! selection bookkeeping and settings persistence.
 
 use std::collections::{HashMap, HashSet};
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use egui::Context;
@@ -68,6 +69,36 @@ pub(crate) enum VoiceConn {
     },
 }
 
+/// One Go Live stream we take part in, as its streamer or a viewer.
+pub(crate) struct GoLive {
+    pub(crate) key: String,
+    /// `(rtc_server_id, rtc_channel_id)` from STREAM_CREATE.
+    rtc: Option<(String, u64)>,
+    /// The stream connection (docs/SCREENSHARE.md, phase 3).
+    task: Option<JoinHandle<()>>,
+    /// Viewer only: the latest decoded frame.
+    pub(crate) frames: Arc<Mutex<Option<crate::backend::capture::Frame>>>,
+}
+
+impl GoLive {
+    fn new(key: String) -> Self {
+        Self {
+            key,
+            rtc: None,
+            task: None,
+            frames: Arc::default(),
+        }
+    }
+}
+
+impl Drop for GoLive {
+    fn drop(&mut self) {
+        if let Some(task) = self.task.take() {
+            task.abort();
+        }
+    }
+}
+
 pub struct VesktopApp {
     pub(crate) settings: Settings,
     pub(crate) handle: tokio::runtime::Handle,
@@ -120,8 +151,11 @@ pub struct VesktopApp {
     /// Screen share capture (docs/SCREENSHARE.md); local preview for now.
     pub(crate) screen: Option<crate::backend::capture::Capture>,
     pub(crate) screen_texture: Option<egui::TextureHandle>,
-    /// Our Go Live stream key while op 18 is in effect.
-    pub(crate) stream_key: Option<String>,
+    /// Our Go Live stream while op 18 is in effect.
+    pub(crate) stream: Option<GoLive>,
+    /// The stream we watch (op 20), with its decoded frames.
+    pub(crate) watch: Option<GoLive>,
+    pub(crate) watch_texture: Option<egui::TextureHandle>,
     pub(crate) voice_deaf: bool,
     /// Voice-state user ids we already asked the API for.
     voice_users_pending: HashSet<String>,
@@ -191,7 +225,9 @@ impl VesktopApp {
             voice_muted: false,
             screen: None,
             screen_texture: None,
-            stream_key: None,
+            stream: None,
+            watch: None,
+            watch_texture: None,
             voice_deaf: false,
             disconnected_at: None,
             selected_guild: None,
@@ -573,9 +609,11 @@ impl VesktopApp {
             channel_id: channel_id.clone(),
             stream_key: stream_key.clone(),
         });
-        self.stream_key = Some(stream_key);
+        self.stream = Some(GoLive::new(stream_key));
         let ctx = ctx.clone();
-        self.screen = Some(crate::backend::capture::start(move || ctx.request_repaint()));
+        self.screen = Some(crate::backend::capture::start(self.handle.clone(), move || {
+            ctx.request_repaint()
+        }));
     }
 
     /// The one way a share ends (button, picker cancelled, source gone,
@@ -583,9 +621,51 @@ impl VesktopApp {
     pub(crate) fn stop_screen_share(&mut self) {
         self.screen = None;
         self.screen_texture = None;
-        if let Some(stream_key) = self.stream_key.take() {
-            self.send(Command::StopStream { stream_key });
+        if let Some(stream) = self.stream.take() {
+            self.send(Command::StopStream {
+                stream_key: stream.key.clone(),
+            });
         }
+    }
+
+    /// Starts watching `user_id`'s stream in the voice channel we're in.
+    pub(crate) fn watch_stream(&mut self, user_id: &str) {
+        let VoiceConn::Connected {
+            guild_id,
+            channel_id,
+        } = &self.voice
+        else {
+            return;
+        };
+        let stream_key = format!("guild:{guild_id}:{channel_id}:{user_id}");
+        if self.watch.as_ref().is_some_and(|watch| watch.key == stream_key) {
+            return;
+        }
+        self.stop_watching();
+        self.send(Command::WatchStream {
+            stream_key: stream_key.clone(),
+        });
+        self.watch = Some(GoLive::new(stream_key));
+    }
+
+    pub(crate) fn stop_watching(&mut self) {
+        self.watch_texture = None;
+        if let Some(watch) = self.watch.take() {
+            self.send(Command::StopStream {
+                stream_key: watch.key.clone(),
+            });
+        }
+    }
+
+    /// Our stream or the watched one, by key, and whether we're the viewer.
+    fn go_live(&mut self, stream_key: &str) -> Option<(&mut GoLive, bool)> {
+        if let Some(stream) = self.stream.as_mut().filter(|stream| stream.key == stream_key) {
+            return Some((stream, false));
+        }
+        self.watch
+            .as_mut()
+            .filter(|watch| watch.key == stream_key)
+            .map(|watch| (watch, true))
     }
 
     /// Mute the microphone (op 4 flags; deafening implies it).
@@ -693,6 +773,7 @@ impl VesktopApp {
             VoiceConn::Failed { .. } | VoiceConn::Disconnected => None,
         };
         self.stop_screen_share();
+        self.stop_watching();
         self.voice = VoiceConn::Disconnected;
         if let Some(guild_id) = guild_id {
             self.send(Command::LeaveVoice { guild_id });
@@ -1107,19 +1188,83 @@ impl VesktopApp {
                     self.join_voice(guild_id, channel_id);
                 }
             }
-            UiEvent::StreamCreated { stream_key } => {
-                log::info!("transmissão criada: {stream_key}");
+            UiEvent::StreamCreated {
+                stream_key,
+                rtc_server_id,
+                rtc_channel_id,
+            } => {
+                if let Some((go_live, _)) = self.go_live(&stream_key) {
+                    go_live.rtc = rtc_channel_id
+                        .parse()
+                        .ok()
+                        .map(|channel| (rtc_server_id, channel));
+                }
+            }
+            UiEvent::StreamServer {
+                stream_key,
+                endpoint,
+                token,
+                session_id,
+            } => {
+                let me = self.me.as_ref().and_then(|me| me.id.parse().ok());
+                let handle = self.handle.clone();
+                let events = self.event_tx.clone();
+                let Some((go_live, viewer)) = self.go_live(&stream_key) else {
+                    return;
+                };
+                // A new server (or none) replaces the old connection.
+                if let Some(task) = go_live.task.take() {
+                    task.abort();
+                }
+                let role = if viewer {
+                    // The key ends with the streamer's user id.
+                    let streamer = stream_key.rsplit(':').next().and_then(|id| id.parse().ok());
+                    let Some(streamer) = streamer else {
+                        return;
+                    };
+                    crate::backend::stream::Role::Watch {
+                        streamer,
+                        frames: Arc::clone(&go_live.frames),
+                        events,
+                    }
+                } else {
+                    crate::backend::stream::Role::Stream
+                };
+                if let (Some(endpoint), Some((rtc_server_id, rtc_channel_id)), Some(user_id)) =
+                    (endpoint, go_live.rtc.clone(), me)
+                {
+                    let info = crate::backend::stream::StreamInfo {
+                        endpoint,
+                        token,
+                        rtc_server_id,
+                        rtc_channel_id,
+                        session_id,
+                        user_id,
+                    };
+                    go_live.task = Some(handle.spawn(crate::backend::stream::run(info, role)));
+                }
             }
             UiEvent::StreamDeleted { stream_key, reason } => {
-                if self.stream_key.as_ref() == Some(&stream_key) {
-                    log::info!("o Discord encerrou a transmissão: {reason}");
-                    // Already gone server-side: no op 19.
-                    self.stream_key = None;
+                // `user_requested` echoes our own op 19, already handled —
+                // and since the key repeats per channel, a late echo would
+                // otherwise kill the share that was just restarted.
+                if reason == "user_requested" {
+                    return;
+                }
+                log::info!("transmissão {stream_key} encerrada pelo Discord: {reason}");
+                // Already gone server-side: no op 19.
+                if self.stream.as_ref().is_some_and(|stream| stream.key == stream_key) {
+                    self.stream = None;
                     self.stop_screen_share();
+                }
+                if self.watch.as_ref().is_some_and(|watch| watch.key == stream_key) {
+                    self.watch = None;
+                    self.watch_texture = None;
                 }
             }
             UiEvent::VoiceLeft => {
                 self.stop_screen_share();
+                self.stop_watching();
                 self.voice = VoiceConn::Disconnected;
                 self.speaking.clear();
             }
@@ -1224,7 +1369,11 @@ impl eframe::App for VesktopApp {
             });
 
         egui::CentralPanel::default().show(root, |ui| {
-            ui::chat::paint(self, ui);
+            if self.watch.is_some() {
+                ui::screen_share::paint_watch(self, ui);
+            } else {
+                ui::chat::paint(self, ui);
+            }
         });
 
         if self.settings_open {

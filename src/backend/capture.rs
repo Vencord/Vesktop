@@ -9,7 +9,7 @@
 use std::os::fd::OwnedFd;
 use std::sync::{Arc, Mutex};
 
-use ashpd::desktop::PersistMode;
+use ashpd::desktop::{PersistMode, Session};
 use ashpd::desktop::screencast::{CursorMode, Screencast, SelectSourcesOptions, SourceType};
 use pipewire as pw;
 use pw::properties::properties;
@@ -66,7 +66,10 @@ impl Drop for Capture {
 
 /// Opens the portal picker and starts streaming. `on_frame` runs on the
 /// capture thread after each new frame (the UI passes a repaint request).
-pub fn start(on_frame: impl Fn() + Send + 'static) -> Capture {
+/// `runtime` must outlive every capture: ashpd caches its D-Bus connection
+/// in a static, bound to the runtime that first opened it — a per-capture
+/// runtime left every later picker hanging forever.
+pub fn start(runtime: tokio::runtime::Handle, on_frame: impl Fn() + Send + 'static) -> Capture {
     let frame = Arc::new(Mutex::new(None));
     let ended = Arc::new(Mutex::new(None));
     let (stop, stop_rx) = pw::channel::channel();
@@ -75,7 +78,7 @@ pub fn start(on_frame: impl Fn() + Send + 'static) -> Capture {
     let spawned = std::thread::Builder::new()
         .name("fastdiscord-capture".into())
         .spawn(move || {
-            let reason = match run(&thread_frame, stop_rx, on_frame) {
+            let reason = match run(&runtime, &thread_frame, stop_rx, on_frame) {
                 Ok(()) => "captura encerrada".to_string(),
                 Err(err) => {
                     log::warn!("captura de tela: {err}");
@@ -91,25 +94,26 @@ pub fn start(on_frame: impl Fn() + Send + 'static) -> Capture {
 }
 
 fn run(
+    runtime: &tokio::runtime::Handle,
     slot: &Arc<Mutex<Option<Frame>>>,
     stop_rx: pw::channel::Receiver<()>,
     on_frame: impl Fn() + 'static,
 ) -> Result<(), String> {
-    // The portal is D-Bus (zbus on tokio); a small runtime on this thread
-    // keeps it away from the backend's. It must outlive the stream: the
-    // session closes when the proxy goes away.
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .map_err(|err| err.to_string())?;
-    let (node_id, fd) = runtime
+    let (node_id, fd, session) = runtime
         .block_on(open_portal())
         .map_err(|err| format!("portal: {err}"))?;
     log::info!("captura: portal entregou o nó {node_id}");
-    stream_frames(node_id, fd, slot, stop_rx, on_frame).map_err(|err| format!("pipewire: {err}"))
+    let streamed =
+        stream_frames(node_id, fd, slot, stop_rx, on_frame).map_err(|err| format!("pipewire: {err}"));
+    // The cached connection outlives us, so the portal would keep this
+    // session (and its screencopy) alive unless it's closed explicitly.
+    if let Err(err) = runtime.block_on(session.close()) {
+        log::warn!("captura: falha ao fechar a sessão do portal: {err}");
+    }
+    streamed
 }
 
-async fn open_portal() -> ashpd::Result<(u32, OwnedFd)> {
+async fn open_portal() -> ashpd::Result<(u32, OwnedFd, Session<Screencast>)> {
     let proxy = Screencast::new().await?;
     let session = proxy.create_session(Default::default()).await?;
     proxy
@@ -134,7 +138,7 @@ async fn open_portal() -> ashpd::Result<(u32, OwnedFd)> {
     let fd = proxy
         .open_pipe_wire_remote(&session, Default::default())
         .await?;
-    Ok((node_id, fd))
+    Ok((node_id, fd, session))
 }
 
 fn stream_frames(

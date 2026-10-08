@@ -18,6 +18,11 @@ impl EventTx {
         Self { tx, ctx }
     }
 
+    /// Wakes the UI without an event (new video frame).
+    pub fn repaint(&self) {
+        self.ctx.request_repaint();
+    }
+
     pub fn send(&self, event: UiEvent) {
         let _ = self.tx.send(event);
         self.ctx.request_repaint();
@@ -62,7 +67,11 @@ pub enum Command {
         channel_id: String,
         stream_key: String,
     },
-    /// op 19 DELETE_STREAM.
+    /// op 20 WATCH_STREAM: join someone's stream as a viewer.
+    WatchStream {
+        stream_key: String,
+    },
+    /// op 19 DELETE_STREAM: ends our stream, or leaves one we watch.
     StopStream {
         stream_key: String,
     },
@@ -155,6 +164,15 @@ pub enum UiEvent {
     /// Discord allocated a stream server for a Go Live stream.
     StreamCreated {
         stream_key: String,
+        rtc_server_id: String,
+        rtc_channel_id: String,
+    },
+    /// The stream server to connect to; `endpoint: None` = it went away.
+    StreamServer {
+        stream_key: String,
+        endpoint: Option<String>,
+        token: String,
+        session_id: String,
     },
     /// A stream ended server-side (`reason`: user_requested, stream_full,
     /// unauthorized, …).

@@ -103,8 +103,15 @@ symphonia = { version = "0.5", default-features = false, features = ["pcm"] }
 
 # Screen share capture (docs/SCREENSHARE.md): the ScreenCast portal picks
 # the source and hands over a PipeWire node; pipewire streams its frames.
+# The stream connection's own DAVE session (the same crate songbird uses).
+davey = "0.1"
+# Go Live transport encryption (aead_aes256_gcm_rtpsize), as songbird uses.
+aes-gcm = "0.10"
 ashpd = { version = "0.13", default-features = false, features = ["tokio", "screencast"] }
 pipewire = "0.10"
+# H.264 for Go Live: decodes watched streams now, encodes ours in phase 4.
+# Built from source (BSD), no system library needed.
+openh264 = "0.9"
 
 # Vendored songbird 0.6 with DAVE opt-out (docs/VOICE.md; upstream #310).
 [patch.crates-io]
