@@ -12,6 +12,18 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
+    // The portable Windows build ships its GStreamer plugins next to the
+    // exe (the DLLs they need sit beside it too, where the loader looks).
+    #[cfg(windows)]
+    if let Some(plugins) = std::env::current_exe()
+        .ok()
+        .and_then(|exe| Some(exe.parent()?.join("lib").join("gstreamer-1.0")))
+        .filter(|dir| dir.is_dir())
+    {
+        // SAFETY: still single-threaded here, before any GStreamer use.
+        unsafe { std::env::set_var("GST_PLUGIN_SYSTEM_PATH_1_0", plugins) };
+    }
+
     // tracing-subscriber instead of env_logger: it captures both our `log`
     // records and songbird's `tracing` internals (voice WS, DAVE, mixer).
     tracing_subscriber::fmt()
@@ -45,6 +57,16 @@ fn main() -> anyhow::Result<()> {
 
     let options = eframe::NativeOptions {
         viewport,
+        // With vsync, eglSwapBuffers waits for the compositor's frame
+        // callback, which Hyprland withholds from windows that aren't
+        // visible (other workspace): any repaint while hidden (voice events,
+        // the FockyTV poll) blocked the main thread, pings went unanswered
+        // and Hyprland showed "Application Not Responding". egui repaints
+        // only on demand, so no vsync costs nothing.
+        glow_options: eframe::egui_glow::GlowConfiguration {
+            vsync: false,
+            ..Default::default()
+        },
         ..Default::default()
     };
 
