@@ -1,0 +1,56 @@
+# Release builds: Linux AppImage. A `v*` tag publishes them on the tag's
+# GitHub release; "Run workflow" (or a push touching the packaging) builds
+# the same artifacts without publishing.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+    # Branch pushes build only when the packaging changes (GitHub skips
+    # path filters on tag pushes, so tags always build and publish).
+    branches: ["**"]
+    paths: ["packaging/**", ".github/workflows/release.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  appimage:
+    runs-on: ubuntu-latest
+    # Arch packages gst-plugins-rs (whipsink/whepsrc, docs/SCREENSHARE.md);
+    # Ubuntu doesn't. Cost: the AppImage needs a recent glibc on the host.
+    container: archlinux:base-devel
+    steps:
+      - name: system packages
+        run: |
+          pacman -Syu --noconfirm --needed git rustup clang opus libpulse pipewire librsvg \
+            gstreamer gst-plugins-base-libs gst-plugins-good gst-plugins-bad gst-plugins-bad-libs \
+            gst-plugins-ugly gst-plugin-va gst-plugin-webrtchttp libnice
+      - uses: actions/checkout@v4
+      # rust-toolchain.toml pins the compiler; rustup picks it up.
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: packaging/appimage.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FastDiscord-x86_64.AppImage
+          path: dist/FastDiscord-x86_64.AppImage
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [appimage]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      # One job creates the release and uploads everything, so parallel
+      # uploads never race to create it (FockyTV lost assets that way).
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" \
+            --title "${GITHUB_REF_NAME#v}" --generate-notes
