@@ -161,6 +161,10 @@ pub enum UiEvent {
         user_id: String,
         speaking: bool,
     },
+    /// FockyTV `/api/status`: the stream keys live right now.
+    FockyLive {
+        keys: Vec<String>,
+    },
     /// Discord allocated a stream server for a Go Live stream.
     StreamCreated {
         stream_key: String,

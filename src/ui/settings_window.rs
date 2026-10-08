@@ -81,6 +81,10 @@ pub fn show(app: &mut VesktopApp, ctx: &egui::Context) {
             voice_settings(app, ui);
 
             ui.separator();
+            ui.heading("Compartilhamento de tela");
+            screen_share_settings(app, ui);
+
+            ui.separator();
             ui.label(
                 RichText::new(format!(
                     "Configurações salvas em {}",
@@ -183,5 +187,54 @@ fn voice_settings(app: &mut VesktopApp, ui: &mut egui::Ui) {
     if changed {
         app.settings.save();
         app.push_voice_audio_config();
+    }
+}
+
+/// FockyTV as the share backend; off falls back to Discord's Go Live.
+fn screen_share_settings(app: &mut VesktopApp, ui: &mut egui::Ui) {
+    let mut changed = ui
+        .checkbox(
+            &mut app.settings.fockytv_share,
+            "Usar backend de compartilhamento do FockyTV",
+        )
+        .on_hover_text("Desligado: Go Live do Discord (experimental)")
+        .changed();
+    ui.add_enabled_ui(app.settings.fockytv_share, |ui| {
+        ui.horizontal(|ui| {
+            ui.label("Servidor:");
+            changed |= ui
+                .text_edit_singleline(&mut app.settings.fockytv_url)
+                .changed();
+        });
+        ui.horizontal(|ui| {
+            ui.label("Taxa de quadros:");
+            for fps in [60, 30, 15] {
+                if ui
+                    .radio(app.settings.fockytv_fps == fps, format!("{fps} fps"))
+                    .clicked()
+                {
+                    app.settings.fockytv_fps = fps;
+                    changed = true;
+                }
+            }
+        })
+        .response
+        .on_hover_text("Vale para a próxima transmissão");
+        ui.horizontal(|ui| {
+            ui.label("Nick:");
+            let username = app.me.as_ref().map(|me| me.username.clone()).unwrap_or_default();
+            let mut nick = app.settings.fockytv_nick.clone().unwrap_or_default();
+            if ui
+                .add(egui::TextEdit::singleline(&mut nick).hint_text(username))
+                .on_hover_text("A chave da transmissão no FockyTV; vazio = seu usuário do Discord")
+                .changed()
+            {
+                app.settings.fockytv_nick = Some(nick).filter(|nick| !nick.trim().is_empty());
+                changed = true;
+            }
+        });
+    });
+    if changed {
+        app.settings.save();
     }
 }

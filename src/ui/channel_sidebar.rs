@@ -714,7 +714,8 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
     let speaking = app.speaking.contains(&member.user_id);
     let width = ui.available_width();
     // A live member is clickable: it opens their stream.
-    let watchable = member.self_stream && app.me.as_ref().is_none_or(|me| me.id != member.user_id);
+    let live = app.is_live(&member.user_id, member.self_stream);
+    let watchable = live && app.me.as_ref().is_none_or(|me| me.id != member.user_id);
     let sense = if watchable { Sense::click() } else { Sense::hover() };
     let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 34.0), sense);
     if watchable && response.hovered() {
@@ -726,7 +727,7 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
         response
     };
     if response.clicked() {
-        app.watch_stream(&member.user_id);
+        app.watch(&member.user_id);
     }
     let mut content = ui.new_child(
         egui::UiBuilder::new()
@@ -768,7 +769,7 @@ fn voice_member_row(app: &mut VesktopApp, ui: &mut egui::Ui, guild_id: &str, mem
             .size(13.0)
             .color(theme::MUTED),
     );
-    if member.self_stream {
+    if live {
         content.add_space(6.0);
         content.label(
             RichText::new(" AO VIVO ")

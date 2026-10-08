@@ -39,6 +39,15 @@ pub struct Settings {
     pub noise_suppression: bool,
     /// Per-user playback volume, as a percentage (100 = normal).
     pub user_volumes: HashMap<String, u8>,
+    /// Screen share through FockyTV (WHIP) instead of Discord's Go Live,
+    /// which stays in the code for later (docs/SCREENSHARE.md).
+    pub fockytv_share: bool,
+    pub fockytv_url: String,
+    /// Stream key on FockyTV; `None` = the Discord username, which is also
+    /// how others' lives are matched to voice members.
+    pub fockytv_nick: Option<String>,
+    /// Frame rate cap for FockyTV broadcasts: 60, 30 or 15.
+    pub fockytv_fps: u32,
 }
 
 impl Default for Settings {
@@ -58,6 +67,10 @@ impl Default for Settings {
             input_sensitivity: 0,
             noise_suppression: false,
             user_volumes: HashMap::new(),
+            fockytv_share: true,
+            fockytv_url: "https://tv.huestavo.com".into(),
+            fockytv_nick: None,
+            fockytv_fps: 60,
         }
     }
 }

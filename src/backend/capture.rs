@@ -1,4 +1,4 @@
-//! Screen capture for Go Live (docs/SCREENSHARE.md, phase 1): the
+//! Screen capture for both share backends (docs/SCREENSHARE.md): the
 //! ScreenCast portal picks a monitor or window and hands over a PipeWire
 //! node; a PipeWire stream on its own thread copies each frame (SHM, BGRx
 //! or RGBx) into a latest-frame slot. The copy is a plain row memcpy so the
@@ -49,10 +49,17 @@ impl Frame {
     }
 }
 
+/// The latest-frame slot.
+pub type Shared = Arc<Mutex<Option<Arc<Frame>>>>;
+
 /// A running capture. Dropping it stops the PipeWire stream and closes the
 /// portal session.
 pub struct Capture {
-    pub frame: Arc<Mutex<Option<Frame>>>,
+    /// Latest frame, shared: the preview and the encoder both read it and
+    /// tell new frames apart by `seq`.
+    pub frame: Shared,
+    /// `seq` of the frame the preview last uploaded.
+    pub preview_seq: u64,
     /// Set by the capture thread when the stream ends or fails.
     pub ended: Arc<Mutex<Option<String>>>,
     stop: pw::channel::Sender<()>,
@@ -90,12 +97,17 @@ pub fn start(runtime: tokio::runtime::Handle, on_frame: impl Fn() + Send + 'stat
     if let Err(err) = spawned {
         *ended.lock().unwrap() = Some(format!("thread de captura: {err}"));
     }
-    Capture { frame, ended, stop }
+    Capture {
+        frame,
+        preview_seq: 0,
+        ended,
+        stop,
+    }
 }
 
 fn run(
     runtime: &tokio::runtime::Handle,
-    slot: &Arc<Mutex<Option<Frame>>>,
+    slot: &Shared,
     stop_rx: pw::channel::Receiver<()>,
     on_frame: impl Fn() + 'static,
 ) -> Result<(), String> {
@@ -144,7 +156,7 @@ async fn open_portal() -> ashpd::Result<(u32, OwnedFd, Session<Screencast>)> {
 fn stream_frames(
     node_id: u32,
     fd: OwnedFd,
-    slot: &Arc<Mutex<Option<Frame>>>,
+    slot: &Shared,
     stop_rx: pw::channel::Receiver<()>,
     on_frame: impl Fn() + 'static,
 ) -> Result<(), pw::Error> {
@@ -221,13 +233,13 @@ fn stream_frames(
                 return;
             };
             seq += 1;
-            *slot.lock().unwrap() = Some(Frame {
+            *slot.lock().unwrap() = Some(Arc::new(Frame {
                 width,
                 height,
                 pixels,
                 bgr,
                 seq,
-            });
+            }));
             on_frame();
         })
         .register()?;

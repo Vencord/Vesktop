@@ -1,4 +1,4 @@
-//! Go Live stream connection (docs/SCREENSHARE.md, phase 3): a second
+//! Go Live stream connection (docs/SCREENSHARE.md): a second
 //! voice-gateway session next to the call's, on the stream server Discord
 //! allocated. Songbird can't carry video (fixed Identify, no `codecs`), so
 //! the handshake is spelled out here; the DAVE messages reuse songbird's
@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 use std::net::IpAddr;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::num::NonZeroU16;
 use std::time::Duration;
@@ -23,7 +24,8 @@ use tokio_tungstenite::tungstenite::Message;
 
 use crate::backend::EventTx;
 use crate::backend::capture::Frame;
-use crate::backend::rtp::{self, Cipher, H264Depacketizer};
+use crate::backend::encode;
+use crate::backend::rtp::{self, Cipher, H264Depacketizer, H264Packetizer};
 
 /// Payload types we offer; Discord echoes the chosen video codec back.
 const H264_PT: u8 = 105;
@@ -33,8 +35,8 @@ const MODE: &str = "aead_aes256_gcm_rtpsize";
 
 /// Which side of the stream we are.
 pub enum Role {
-    /// Our own Go Live: we send video.
-    Stream,
+    /// Our own Go Live: we encode and send the capture's frames.
+    Stream { frames: crate::backend::capture::Shared },
     /// Watching `streamer`'s stream: decoded frames land in `frames`.
     Watch {
         streamer: u64,
@@ -191,9 +193,13 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
     .await?;
 
     // Session Description (4): transport key, codec and DAVE version.
+    // The streamer's op 12 (its video ssrcs) can arrive first; a viewer
+    // must name them in op 15 or the SFU forwards nothing.
+    let mut video_ssrcs = Vec::new();
     let description = loop {
         match next_json(&mut ws).await? {
             (4, d) => break d,
+            (12, d) => video_ssrcs.extend(stream_ssrcs(&d)),
             (op, d) => log::debug!("transmissão: antes da descrição, op {op}: {d}"),
         }
     };
@@ -219,7 +225,7 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
 
     // Video (12) must precede any media, sent or received.
     match role {
-        Role::Stream => {
+        Role::Stream { .. } => {
             send_json(
                 &mut ws,
                 json!({
@@ -231,8 +237,10 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                         "streams": [{
                             "type": "video", "rid": "100", "ssrc": video_ssrc, "rtx_ssrc": rtx_ssrc,
                             "active": true, "quality": 100,
-                            "max_bitrate": 2_500_000, "max_framerate": 30,
-                            "max_resolution": { "type": "fixed", "width": 1280, "height": 720 },
+                            "max_bitrate": encode::BITRATE, "max_framerate": encode::FPS,
+                            "max_resolution": {
+                                "type": "fixed", "width": encode::MAX_WIDTH, "height": encode::MAX_HEIGHT,
+                            },
                         }],
                     }
                 }),
@@ -247,7 +255,7 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                 json!({ "op": 12, "d": { "audio_ssrc": audio_ssrc, "video_ssrc": 0, "rtx_ssrc": 0, "streams": [] } }),
             )
             .await?;
-            send_json(&mut ws, json!({ "op": 15, "d": { "any": 100 } })).await?;
+            send_json(&mut ws, sink_wants(&video_ssrcs)).await?;
         }
     }
 
@@ -255,8 +263,28 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
     let mut depacketizer = H264Depacketizer::default();
     let decoder = match role {
         Role::Watch { frames, events, .. } => Some(spawn_decoder(frames.clone(), events.clone())?),
-        Role::Stream => None,
+        Role::Stream { .. } => None,
     };
+    // The streamer's path: encoder thread → DAVE → packetize → seal.
+    // Start with an IDR; DAVE becoming ready and viewer PLIs ask for more.
+    let keyframe = Arc::new(AtomicBool::new(true));
+    let mut encoded = match role {
+        Role::Stream { frames } => Some(encode::spawn(frames.clone(), Arc::clone(&keyframe))?),
+        Role::Watch { .. } => None,
+    };
+    let mut packetizer = H264Packetizer {
+        ssrc: video_ssrc,
+        payload_type: H264_PT,
+        sequence: (video_ssrc as u16).wrapping_mul(7919),
+        transport_sequence: 0,
+        rid: "100",
+    };
+    let mut sent_frames = 0u64;
+    // Sender Report bookkeeping: one SR per second of video.
+    let (mut sent_packets, mut sent_octets) = (0u32, 0u32);
+    let mut last_report: Option<std::time::Instant> = None;
+    // Diagnostics, logged with each 5 s report.
+    let mut stats = Stats::default();
     let mut keyframe_asked: Option<std::time::Instant> = None;
     let mut buf = vec![0u8; 2048];
 
@@ -273,16 +301,87 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                 send_json(&mut ws, json!({ "op": 3, "d": nonce })).await?;
             }
             _ = report.tick() => {
+                log::info!("transmissão: últimos 5 s: {stats:?}");
+                stats = Stats::default();
                 counter = counter.wrapping_add(1);
                 if let Some(packet) = rtp::receiver_report(&cipher, audio_ssrc, counter) {
                     let _ = udp.send(&packet).await;
                 }
             }
+            Some((frame, timestamp)) = async {
+                match encoded.as_mut() {
+                    Some(rx) => rx.recv().await,
+                    None => std::future::pending().await,
+                }
+            } => {
+                // Under DAVE, frames go out only once the group can read
+                // them; until then (no viewer yet) they're dropped.
+                let sealed = match dave.session.as_mut() {
+                    Some(session) if dave.version != 0 => {
+                        if !session.is_ready() {
+                            continue;
+                        }
+                        match session.encrypt(davey::MediaType::VIDEO, davey::Codec::H264, &frame) {
+                            Ok(sealed) => sealed.into_owned(),
+                            Err(err) => {
+                                log::debug!("transmissão: DAVE não cifrou: {err:?}");
+                                continue;
+                            }
+                        }
+                    }
+                    _ => frame,
+                };
+                stats.frames_out += 1;
+                stats.biggest_frame_out = stats.biggest_frame_out.max(sealed.len());
+                for mut packet in packetizer.packetize(&sealed, timestamp) {
+                    stats.packets_out += 1;
+                    sent_packets = sent_packets.wrapping_add(1);
+                    sent_octets = sent_octets.wrapping_add((packet.len() - rtp::VIDEO_CLEAR) as u32);
+                    counter = counter.wrapping_add(1);
+                    if cipher.seal(&mut packet, rtp::VIDEO_CLEAR, counter).is_some() {
+                        let _ = udp.send(&packet).await;
+                    }
+                }
+                sent_frames += 1;
+                if last_report.is_none_or(|at| at.elapsed() >= Duration::from_secs(1)) {
+                    last_report = Some(std::time::Instant::now());
+                    counter = counter.wrapping_add(1);
+                    if let Some(sr) =
+                        rtp::sender_report(&cipher, video_ssrc, timestamp, sent_packets, sent_octets, counter)
+                    {
+                        let _ = udp.send(&sr).await;
+                    }
+                }
+                if sent_frames % (10 * u64::from(encode::FPS)) == 1 {
+                    log::info!("transmissão: {sent_frames} quadros enviados (último {} bytes)", sealed.len());
+                }
+            }
             received = udp.recv(&mut buf) => {
                 let Ok(len) = received else { continue };
-                let (Some(rtp), Role::Watch { streamer, .. }) = (cipher.open_rtp(&buf[..len]), role) else {
+                stats.udp_in += 1;
+                // Viewers ask for keyframes over RTCP (PLI/FIR).
+                if let Some(rtcp) = cipher.open_rtcp(&buf[..len]) {
+                    stats.rtcp_in += 1;
+                    if stats.rtcp_in <= 2 {
+                        log::info!("transmissão: rtcp {}", describe_rtcp(&rtcp));
+                    }
+                    if rtp::wants_keyframe(&rtcp) {
+                        stats.keyframe_requests += 1;
+                        keyframe.store(true, Ordering::Relaxed);
+                    }
+                    continue;
+                }
+                if matches!(role, Role::Stream { .. }) {
+                    continue;
+                }
+                let Some(rtp) = cipher.open_rtp(&buf[..len]) else {
+                    stats.undecryptable += 1;
                     continue;
                 };
+                let Role::Watch { streamer, .. } = role else {
+                    continue;
+                };
+                *stats.payload_types.entry(rtp.payload_type).or_default() += 1;
                 // ponytail: any H264 packet is the streamer's (one sender per
                 // stream); op 12's ssrc map would matter with simulcast.
                 if rtp.payload_type != H264_PT {
@@ -291,6 +390,7 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                 let frame = depacketizer.push(&rtp);
                 let want_keyframe = match &frame {
                     Ok(Some(frame)) => {
+                        stats.frames_in += 1;
                         let plain = match dave.session.as_mut() {
                             Some(session) if dave.version != 0 => {
                                 session.decrypt(*streamer, davey::MediaType::VIDEO, frame)
@@ -303,13 +403,17 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                                 false
                             }
                             Err(err) => {
+                                stats.dave_failures += 1;
                                 log::debug!("transmissão: DAVE não decifrou: {err:?}");
                                 true
                             }
                         }
                     }
                     Ok(None) => keyframe_asked.is_none(),
-                    Err(()) => true,
+                    Err(()) => {
+                        stats.broken_frames += 1;
+                        true
+                    }
                 };
                 // At most one PLI a second (startup, losses, undecryptable).
                 if want_keyframe && keyframe_asked.is_none_or(|at| at.elapsed() > Duration::from_secs(1)) {
@@ -336,6 +440,23 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                     // everything else (acks, op 12/15 from the server…) is
                     // only logged.
                     Message::Text(text) => {
+                        // A streamer (re)announcing its layers: ask for them.
+                        if let Role::Watch { .. } = role
+                            && let Ok(value) = serde_json::from_str::<Value>(&text)
+                            && value.get("op").and_then(Value::as_u64) == Some(12)
+                        {
+                            let fresh: Vec<u32> = value
+                                .get("d")
+                                .map(stream_ssrcs)
+                                .unwrap_or_default()
+                                .into_iter()
+                                .filter(|ssrc| !video_ssrcs.contains(ssrc))
+                                .collect();
+                            if !fresh.is_empty() {
+                                video_ssrcs.extend(fresh);
+                                send_json(&mut ws, sink_wants(&video_ssrcs)).await?;
+                            }
+                        }
                         let event = serde_json::from_str::<Event>(&text).ok();
                         if event.is_none() {
                             log::debug!("transmissão: recebido {}", &text[..text.len().min(300)]);
@@ -356,6 +477,8 @@ async fn connect(info: &StreamInfo, role: &Role) -> Result<(), String> {
                 }
                 if !was_ready && dave.is_ready() {
                     was_ready = true;
+                    // New readers need an IDR they can decrypt.
+                    keyframe.store(true, Ordering::Relaxed);
                     log::info!("transmissão: DAVE pronto (grupo {})", info.rtc_channel_id);
                 }
             }
@@ -406,6 +529,31 @@ fn spawn_decoder(
     Ok(tx)
 }
 
+/// Active video ssrcs in a server op 12 (`streams[].ssrc`).
+fn stream_ssrcs(video: &Value) -> Vec<u32> {
+    video
+        .get("streams")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter(|stream| stream.get("active").and_then(Value::as_bool) != Some(false))
+        .filter_map(|stream| stream.get("ssrc").and_then(Value::as_u64))
+        .map(|ssrc| ssrc as u32)
+        .collect()
+}
+
+/// op 15 Media Sink Wants: full quality for each named ssrc, as
+/// discord-native-voice's `request_video` sends it.
+fn sink_wants(ssrcs: &[u32]) -> Value {
+    let mut wants = serde_json::Map::new();
+    for ssrc in ssrcs {
+        wants.insert(ssrc.to_string(), json!(100));
+    }
+    wants.insert("any".into(), json!(100));
+    log::info!("transmissão: pedindo vídeo de {ssrcs:?}");
+    json!({ "op": 15, "d": wants })
+}
+
 /// Discord's IP discovery: 74-byte request (type 1, length 70, ssrc),
 /// answered with our external address and port.
 async fn discover_ip(udp: &UdpSocket, ssrc: u32) -> Result<(IpAddr, u16), String> {
@@ -429,6 +577,59 @@ fn parse_discovery(packet: &[u8]) -> Option<(IpAddr, u16)> {
     let end = address.iter().position(|&b| b == 0)?;
     let ip = std::str::from_utf8(&address[..end]).ok()?.parse().ok()?;
     Some((ip, u16::from_be_bytes([packet[72], packet[73]])))
+}
+
+/// Diagnostic: RTCP packet kinds and, for reports, what the far side says
+/// it received from each source (RFC 3550 report blocks).
+fn describe_rtcp(rtcp: &[u8]) -> String {
+    let mut out = Vec::new();
+    let mut rest = rtcp;
+    while rest.len() >= 8 {
+        let (count, kind) = (usize::from(rest[0] & 0x1F), rest[1]);
+        let len = (usize::from(u16::from_be_bytes([rest[2], rest[3]])) + 1) * 4;
+        let sender = u32::from_be_bytes([rest[4], rest[5], rest[6], rest[7]]);
+        let mut line = format!("pt={kind} fmt/rc={count} de={sender} len={len}");
+        // SR has 20 bytes of sender info before its report blocks.
+        let blocks = match kind {
+            200 => Some(28),
+            201 => Some(8),
+            _ => None,
+        };
+        if let Some(mut at) = blocks {
+            for _ in 0..count {
+                let Some(block) = rest.get(at..at + 24) else { break };
+                line += &format!(
+                    " [ssrc={} perda={} perdidos={} maior_seq={}]",
+                    u32::from_be_bytes([block[0], block[1], block[2], block[3]]),
+                    block[4],
+                    u32::from_be_bytes([0, block[5], block[6], block[7]]),
+                    u32::from_be_bytes([block[8], block[9], block[10], block[11]]),
+                );
+                at += 24;
+            }
+        } else {
+            line += &format!(" {:02x?}", &rest[8..len.min(rest.len()).min(24)]);
+        }
+        out.push(line);
+        rest = rest.get(len..).unwrap_or_default();
+    }
+    out.join(" | ")
+}
+
+/// Per-5 s packet counters for the log (see the report tick).
+#[derive(Debug, Default)]
+struct Stats {
+    udp_in: u32,
+    rtcp_in: u32,
+    undecryptable: u32,
+    payload_types: std::collections::BTreeMap<u8, u32>,
+    frames_in: u32,
+    broken_frames: u32,
+    dave_failures: u32,
+    keyframe_requests: u32,
+    frames_out: u32,
+    packets_out: u32,
+    biggest_frame_out: usize,
 }
 
 enum Reply {

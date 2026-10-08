@@ -74,10 +74,12 @@ pub(crate) struct GoLive {
     pub(crate) key: String,
     /// `(rtc_server_id, rtc_channel_id)` from STREAM_CREATE.
     rtc: Option<(String, u64)>,
-    /// The stream connection (docs/SCREENSHARE.md, phase 3).
+    /// The stream connection (docs/SCREENSHARE.md).
     task: Option<JoinHandle<()>>,
     /// Viewer only: the latest decoded frame.
     pub(crate) frames: Arc<Mutex<Option<crate::backend::capture::Frame>>>,
+    /// Set when the stream is a FockyTV live watched over WHEP instead.
+    pub(crate) fockytv: Option<crate::backend::fockytv::Viewer>,
 }
 
 impl GoLive {
@@ -87,6 +89,7 @@ impl GoLive {
             rtc: None,
             task: None,
             frames: Arc::default(),
+            fockytv: None,
         }
     }
 }
@@ -156,6 +159,11 @@ pub struct VesktopApp {
     /// The stream we watch (op 20), with its decoded frames.
     pub(crate) watch: Option<GoLive>,
     pub(crate) watch_texture: Option<egui::TextureHandle>,
+    /// Our WHIP publish when FockyTV is the share backend.
+    pub(crate) fockytv: Option<crate::backend::fockytv::Publisher>,
+    /// FockyTV lives now: lowercased key (matched to usernames) → key.
+    pub(crate) fockytv_live: HashMap<String, String>,
+    fockytv_polled: Option<Instant>,
     pub(crate) voice_deaf: bool,
     /// Voice-state user ids we already asked the API for.
     voice_users_pending: HashSet<String>,
@@ -228,6 +236,9 @@ impl VesktopApp {
             stream: None,
             watch: None,
             watch_texture: None,
+            fockytv: None,
+            fockytv_live: HashMap::new(),
+            fockytv_polled: None,
             voice_deaf: false,
             disconnected_at: None,
             selected_guild: None,
@@ -340,6 +351,7 @@ impl VesktopApp {
     }
 
     pub(crate) fn logout(&mut self) {
+        self.finish_screen_share();
         if let Some(task) = self.backend.take() {
             task.abort();
         }
@@ -603,6 +615,21 @@ impl VesktopApp {
         let Some(me) = &self.me else {
             return;
         };
+        if self.settings.fockytv_share {
+            let nick = self.fockytv_nick();
+            let ctx = ctx.clone();
+            let capture = crate::backend::capture::start(self.handle.clone(), move || {
+                ctx.request_repaint()
+            });
+            self.fockytv = Some(crate::backend::fockytv::publish(
+                &self.settings.fockytv_url,
+                &nick,
+                self.settings.fockytv_fps,
+                Arc::clone(&capture.frame),
+            ));
+            self.screen = Some(capture);
+            return;
+        }
         let stream_key = format!("guild:{guild_id}:{channel_id}:{}", me.id);
         self.send(Command::StartStream {
             guild_id: guild_id.clone(),
@@ -621,11 +648,92 @@ impl VesktopApp {
     pub(crate) fn stop_screen_share(&mut self) {
         self.screen = None;
         self.screen_texture = None;
+        self.fockytv = None;
         if let Some(stream) = self.stream.take() {
             self.send(Command::StopStream {
                 stream_key: stream.key.clone(),
             });
         }
+    }
+
+    /// Our FockyTV stream key: the configured nick, else the username.
+    pub(crate) fn fockytv_nick(&self) -> String {
+        self.settings
+            .fockytv_nick
+            .clone()
+            .filter(|nick| !nick.trim().is_empty())
+            .or_else(|| self.me.as_ref().map(|me| me.username.clone()))
+            .unwrap_or_default()
+    }
+
+    /// Whether `user_id` is live, on Discord's Go Live or on FockyTV (by
+    /// username, since the stream key is the nickname).
+    pub(crate) fn is_live(&self, user_id: &str, discord_stream: bool) -> bool {
+        if discord_stream {
+            return true;
+        }
+        if !self.settings.fockytv_share {
+            return false;
+        }
+        if self.me.as_ref().is_some_and(|me| me.id == user_id) {
+            return self.fockytv.is_some();
+        }
+        self.user_cache
+            .get(user_id)
+            .is_some_and(|user| self.fockytv_live.contains_key(&user.username.to_lowercase()))
+    }
+
+    /// "Assistir": the member's FockyTV live (WHEP) or Discord's Go Live,
+    /// both in the watch view in place of the chat.
+    pub(crate) fn watch(&mut self, user_id: &str) {
+        let fockytv_key = self
+            .settings
+            .fockytv_share
+            .then(|| self.user_cache.get(user_id))
+            .flatten()
+            .and_then(|user| self.fockytv_live.get(&user.username.to_lowercase()))
+            .cloned();
+        let Some(key) = fockytv_key else {
+            return self.watch_stream(user_id);
+        };
+        self.stop_watching();
+        let mut watch = GoLive::new(format!("fockytv:{key}"));
+        watch.fockytv = Some(crate::backend::fockytv::watch(
+            &self.settings.fockytv_url,
+            &key,
+            &self.fockytv_nick(),
+            Arc::clone(&watch.frames),
+            self.event_tx.clone(),
+        ));
+        self.watch = Some(watch);
+    }
+
+    /// While in a call, refreshes who's live on FockyTV every 5 s.
+    fn poll_fockytv(&mut self) {
+        if !self.settings.fockytv_share || !matches!(self.voice, VoiceConn::Connected { .. }) {
+            return;
+        }
+        if self.fockytv_polled.is_some_and(|at| at.elapsed() < Duration::from_secs(5)) {
+            return;
+        }
+        self.fockytv_polled = Some(Instant::now());
+        let (server, events) = (self.settings.fockytv_url.clone(), self.event_tx.clone());
+        self.handle.spawn(async move {
+            match crate::backend::fockytv::live_keys(&server).await {
+                Ok(keys) => events.send(UiEvent::FockyLive { keys }),
+                Err(err) => log::debug!("fockytv: status falhou: {err}"),
+            }
+        });
+    }
+
+    /// Ends any share before the session or process goes away (quit,
+    /// logout), waiting for FockyTV's WHIP `DELETE` so the stream doesn't
+    /// linger on the server.
+    pub(crate) fn finish_screen_share(&mut self) {
+        if let Some(publisher) = self.fockytv.take() {
+            publisher.stop_and_wait();
+        }
+        self.stop_screen_share();
     }
 
     /// Starts watching `user_id`'s stream in the voice channel we're in.
@@ -650,7 +758,7 @@ impl VesktopApp {
 
     pub(crate) fn stop_watching(&mut self) {
         self.watch_texture = None;
-        if let Some(watch) = self.watch.take() {
+        if let Some(watch) = self.watch.take().filter(|watch| watch.fockytv.is_none()) {
             self.send(Command::StopStream {
                 stream_key: watch.key.clone(),
             });
@@ -1188,6 +1296,9 @@ impl VesktopApp {
                     self.join_voice(guild_id, channel_id);
                 }
             }
+            UiEvent::FockyLive { keys } => {
+                self.fockytv_live = keys.into_iter().map(|key| (key.to_lowercase(), key)).collect();
+            }
             UiEvent::StreamCreated {
                 stream_key,
                 rtc_server_id,
@@ -1209,6 +1320,7 @@ impl VesktopApp {
                 let me = self.me.as_ref().and_then(|me| me.id.parse().ok());
                 let handle = self.handle.clone();
                 let events = self.event_tx.clone();
+                let capture = self.screen.as_ref().map(|capture| Arc::clone(&capture.frame));
                 let Some((go_live, viewer)) = self.go_live(&stream_key) else {
                     return;
                 };
@@ -1228,7 +1340,9 @@ impl VesktopApp {
                         events,
                     }
                 } else {
-                    crate::backend::stream::Role::Stream
+                    crate::backend::stream::Role::Stream {
+                        frames: capture.unwrap_or_default(),
+                    }
                 };
                 if let (Some(endpoint), Some((rtc_server_id, rtc_channel_id)), Some(user_id)) =
                     (endpoint, go_live.rtc.clone(), me)
@@ -1304,6 +1418,10 @@ impl VesktopApp {
 }
 
 impl eframe::App for VesktopApp {
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        self.finish_screen_share();
+    }
+
     fn ui(&mut self, root: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = &root.ctx().clone();
         if self.applied_theme != Some(self.settings.theme) {
@@ -1380,6 +1498,10 @@ impl eframe::App for VesktopApp {
             ui::settings_window::show(self, ctx);
         }
         ui::screen_share::poll(self, ctx);
+        self.poll_fockytv();
+        if self.settings.fockytv_share && matches!(self.voice, VoiceConn::Connected { .. }) {
+            ctx.request_repaint_after(Duration::from_secs(5));
+        }
         if matches!(self.conn, ConnState::Connecting) {
             ctx.request_repaint_after(Duration::from_millis(400));
         }

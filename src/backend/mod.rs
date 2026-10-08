@@ -4,7 +4,9 @@
 pub mod api;
 pub mod audio;
 pub mod capture;
+pub mod encode;
 pub mod events;
+pub mod fockytv;
 pub mod gateway;
 pub mod remote_auth;
 pub mod rtp;

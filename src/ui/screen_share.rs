@@ -1,6 +1,6 @@
-//! Screen share preview (docs/SCREENSHARE.md, phase 1): the captured
-//! frames, painted in a 16:9 box above the "Voz conectada" block, so the
-//! portal + PipeWire path can be checked before anything goes to Discord.
+//! Screen share views (docs/SCREENSHARE.md): our own capture as a 16:9
+//! "AO VIVO" preview above the "Voz conectada" block, and a watched live
+//! (FockyTV or Go Live) in place of the chat.
 
 use egui::{Rect, Vec2, pos2};
 
@@ -23,16 +23,26 @@ pub fn poll(app: &mut VesktopApp, ctx: &egui::Context) {
     let Some(capture) = &app.screen else {
         return;
     };
-    // The source went away or the picker was cancelled.
-    let ended = capture.ended.lock().unwrap().take();
+    // The source went away, the picker was cancelled or FockyTV dropped us.
+    let ended = capture.ended.lock().unwrap().take().or_else(|| {
+        app.fockytv
+            .as_ref()
+            .and_then(|publisher| publisher.ended.lock().unwrap().take())
+    });
     if let Some(reason) = ended {
         log::info!("compartilhamento encerrado: {reason}");
         app.stop_screen_share();
         return;
     }
-    let Some(frame) = capture.frame.lock().unwrap().take() else {
+    let Some(frame) = capture.frame.lock().unwrap().clone() else {
         return;
     };
+    if frame.seq == capture.preview_seq {
+        return;
+    }
+    if let Some(capture) = app.screen.as_mut() {
+        capture.preview_seq = frame.seq;
+    }
     // The sidebar box is ~224 px wide; 640 keeps it sharp on HiDPI.
     let (size, rgba) = frame.preview_rgba(640);
     let image = egui::ColorImage::from_rgba_unmultiplied(size, &rgba);
@@ -95,10 +105,32 @@ pub fn paint_watch(app: &mut VesktopApp, ui: &mut egui::Ui) {
     let Some(watch) = &app.watch else {
         return;
     };
+    // A FockyTV live that ended (or never started) closes the view.
+    let ended = watch
+        .fockytv
+        .as_ref()
+        .and_then(|viewer| viewer.ended.lock().unwrap().take());
+    if let Some(reason) = ended {
+        log::info!("fockytv: {reason}");
+        app.stop_watching();
+        return;
+    }
+    let title = match watch.key.strip_prefix("fockytv:") {
+        Some(key) => format!("Assistindo {key} no FockyTV"),
+        None => "Assistindo à transmissão".to_string(),
+    };
     let frame = watch.frames.lock().unwrap().take();
     if let Some(frame) = frame {
-        let (size, rgba) = frame.preview_rgba(frame.width);
-        let image = egui::ColorImage::from_rgba_unmultiplied(size, &rgba);
+        // Decoded frames are already RGBA; only captures need swizzling.
+        let image = if frame.bgr {
+            let (size, rgba) = frame.preview_rgba(frame.width);
+            egui::ColorImage::from_rgba_unmultiplied(size, &rgba)
+        } else {
+            egui::ColorImage::from_rgba_unmultiplied(
+                [frame.width as usize, frame.height as usize],
+                &frame.pixels,
+            )
+        };
         match &mut app.watch_texture {
             Some(texture) => texture.set(image, egui::TextureOptions::LINEAR),
             None => {
@@ -109,7 +141,7 @@ pub fn paint_watch(app: &mut VesktopApp, ui: &mut egui::Ui) {
     }
     let mut leave = false;
     ui.horizontal(|ui| {
-        ui.label(egui::RichText::new("Assistindo à transmissão").strong().color(theme::TEXT));
+        ui.label(egui::RichText::new(title).strong().color(theme::TEXT));
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             leave = ui.button("Parar de assistir").clicked();
         });

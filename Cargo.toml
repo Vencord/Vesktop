@@ -109,6 +109,10 @@ davey = "0.1"
 aes-gcm = "0.10"
 ashpd = { version = "0.13", default-features = false, features = ["tokio", "screencast"] }
 pipewire = "0.10"
+# FockyTV backend (docs/SCREENSHARE.md): WHIP publish with fockytv-share's
+# own GStreamer pipeline (whipsink, VAAPI/x264 ladder).
+gstreamer = "0.25"
+gstreamer-app = "0.25"
 # H.264 for Go Live: decodes watched streams now, encodes ours in phase 4.
 # Built from source (BSD), no system library needed.
 openh264 = "0.9"
@@ -116,6 +120,14 @@ openh264 = "0.9"
 # Vendored songbird 0.6 with DAVE opt-out (docs/VOICE.md; upstream #310).
 [patch.crates-io]
 songbird = { path = "third_party/songbird" }
+
+# H.264 runs in real time even in debug builds (720p30 encode/decode
+# is far too slow unoptimized).
+[profile.dev.package.openh264-sys2]
+opt-level = 3
+
+[profile.dev.package.openh264]
+opt-level = 3
 
 [profile.release]
 lto = "thin"
