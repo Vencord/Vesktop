@@ -79,7 +79,9 @@ for (let i = 0; i < releaseList.childNodes.length; i++) {
 
 const release = parser.createElement("release");
 release.setAttribute("version", latestReleaseInformation.name);
-release.setAttribute("date", latestReleaseInformation.published_at.split("T")[0]);
+const date =
+    latestReleaseInformation.published_at || latestReleaseInformation.updated_at || latestReleaseInformation.created_at;
+release.setAttribute("date", date.split("T")[0]);
 release.setAttribute("type", "stable");
 
 const releaseUrl = parser.createElement("url");

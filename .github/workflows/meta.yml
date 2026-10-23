@@ -21,9 +21,6 @@ jobs:
                   tag=$(git tag --sort=-creatordate | head -n1)
                   echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-            - name: Checkout latest tag
-              run: git checkout "${{ steps.latest_tag.outputs.tag }}"
-
             - uses: pnpm/action-setup@v6 # Install pnpm using packageManager key in package.json
 
             - name: Use Node.js 24

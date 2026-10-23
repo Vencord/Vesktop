@@ -435,6 +435,7 @@ function createMainWindow() {
     initDevtoolsListeners(win);
     initStaticTitle(win);
 
+    win.webContents.session.setUserAgent(BrowserUserAgent);
     win.webContents.setUserAgent(BrowserUserAgent);
 
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
