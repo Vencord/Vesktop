@@ -21,6 +21,16 @@ interface AutoStart {
 }
 
 function getEscapedCommandLine() {
+    // Inside a flatpak, process.argv[0] is /app/bin/vesktop/vesktop.bin (the raw Electron
+    // binary that startvesktop+zypak invoke). The Background portal writes argv[0] as
+    // `flatpak run --command=...`, which would bypass the startvesktop wrapper (and zypak)
+    // and crash Chromium with a SUID-sandbox FATAL on next login. Use the manifest's
+    // default command name instead.
+    if (IS_FLATPAK) {
+        const args = ["startvesktop"];
+        if (Settings.store.autoStartMinimized) args.push("--start-minimized");
+        return args.map(escapeDesktopFileArgument);
+    }
     const args = process.argv.map(escapeDesktopFileArgument);
     if (Settings.store.autoStartMinimized) args.push("--start-minimized");
     return args;
