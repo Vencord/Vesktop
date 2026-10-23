@@ -38,7 +38,7 @@ const DEFAULT_POPOUT_OPTIONS: BrowserWindowConstructorOptions = {
     minWidth: MIN_POPOUT_WIDTH,
     minHeight: MIN_POPOUT_HEIGHT,
     frame: Settings.store.nativeTitleBar,
-    titleBarStyle: process.platform === "darwin" ? "hidden" : undefined,
+    titleBarStyle: process.platform === "darwin" && !Settings.store.nativeTitleBar ? "hidden" : undefined,
     trafficLightPosition:
         process.platform === "darwin"
             ? {
