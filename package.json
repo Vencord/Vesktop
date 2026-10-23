@@ -5,6 +5,10 @@
     "description": "Vesktop is a custom Discord desktop app",
     "keywords": [],
     "homepage": "https://vencord.dev/",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Vencord/Vesktop.git"
+    },
     "license": "GPL-3.0-or-later",
     "author": "Vendicated <vendicated@riseup.net>",
     "main": "dist/js/main.js",
@@ -195,7 +199,11 @@
                         "arm64"
                     ]
                 }
-            ]
+            ],
+            "signtoolOptions": {
+                "sign": "scripts/sign.js",
+                "signingHashAlgorithms": ["sha256"]
+            }
         },
         "publish": {
             "provider": "github"
