@@ -162,6 +162,8 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                             } else {
                                 await VesktopNative.virtmic.start(v.includeSources);
                             }
+                        } else {
+                            await VesktopNative.virtmic.stop();
                         }
 
                         resolve(v);
