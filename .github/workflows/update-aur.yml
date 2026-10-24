@@ -10,6 +10,8 @@ jobs:
     update:
         runs-on: ubuntu-latest
         container: archlinux:latest
+        env:
+            HOME: /root
         steps:
             - name: Install packaging tools
               run: |
@@ -29,7 +31,9 @@ jobs:
                   cat > ~/.ssh/config <<'EOF'
                   Host aur.archlinux.org
                       User aur
-                      IdentityFile ~/.ssh/aur
+                      IdentityFile /root/.ssh/aur
+                      UserKnownHostsFile /root/.ssh/known_hosts
+                      StrictHostKeyChecking yes
                       IdentitiesOnly yes
                   EOF
                   chmod 0600 ~/.ssh/config
