@@ -15,7 +15,7 @@ jobs:
         steps:
             - name: Install packaging tools
               run: |
-                  pacman -Syu --noconfirm --needed base-devel devtools git openssh sudo
+                  pacman -Syu --noconfirm --needed base-devel devtools git openssh sudo nvchecker
 
                   useradd --create-home builder
                   printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/builder
