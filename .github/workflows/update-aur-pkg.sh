@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-set -euo pipefail
+set -exuo pipefail
 
 cd ~
 
