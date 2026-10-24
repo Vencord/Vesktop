@@ -13,6 +13,8 @@ Host aur.archlinux.org
     IdentitiesOnly yes
 EOF
 chmod 0600 ~/.ssh/config
+ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+chmod 0600 ~/.ssh/known_hosts
 
 git clone ssh://aur@aur.archlinux.org/vesktop-bin.git aur
 cd aur
