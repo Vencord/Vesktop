@@ -36,6 +36,7 @@ jobs:
 
             - name: Trust AUR host
               run: |
+                  install -m 0600 /dev/null ~/.ssh/known_hosts
                   ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
 
             - name: Upgrade package and regenerate metadata
