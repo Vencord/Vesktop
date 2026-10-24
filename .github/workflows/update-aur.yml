@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         container: archlinux:latest
         env:
-            HOME: /root
+            GIT_SSH_COMMAND: ssh -i /tmp/aur-ssh-key -o IdentitiesOnly=yes -o UserKnownHostsFile=/tmp/aur-known-hosts -o StrictHostKeyChecking=yes
         steps:
             - name: Install packaging tools
               run: |
@@ -25,24 +25,14 @@ jobs:
               env:
                   AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
               run: |
-                  install -d -m 0700 ~/.ssh
-                  printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
-                  chmod 0600 ~/.ssh/aur
-                  cat > ~/.ssh/config <<'EOF'
-                  Host aur.archlinux.org
-                      User aur
-                      IdentityFile /root/.ssh/aur
-                      UserKnownHostsFile /root/.ssh/known_hosts
-                      StrictHostKeyChecking yes
-                      IdentitiesOnly yes
-                  EOF
-                  chmod 0600 ~/.ssh/config
+                  install -m 0600 /dev/null /tmp/aur-ssh-key
+                  printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > /tmp/aur-ssh-key
 
             - name: Trust AUR host
               run: |
-                  install -m 0600 /dev/null ~/.ssh/known_hosts
-                  ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
-                  ssh-keygen -F aur.archlinux.org -f ~/.ssh/known_hosts
+                  install -m 0600 /dev/null /tmp/aur-known-hosts
+                  ssh-keyscan -H aur.archlinux.org >> /tmp/aur-known-hosts
+                  ssh-keygen -F aur.archlinux.org -f /tmp/aur-known-hosts
 
             - name: Upgrade package and regenerate metadata
               run: |
