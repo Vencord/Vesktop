@@ -10,8 +10,6 @@ jobs:
     update:
         runs-on: ubuntu-latest
         container: archlinux:latest
-        env:
-            GIT_SSH_COMMAND: ssh -i /tmp/aur-ssh-key -o IdentitiesOnly=yes -o UserKnownHostsFile=/tmp/aur-known-hosts -o StrictHostKeyChecking=yes
         steps:
             - name: Install packaging tools
               run: |
@@ -21,47 +19,13 @@ jobs:
                   printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/builder
                   chmod 0440 /etc/sudoers.d/builder
 
-            - name: Configure AUR SSH key
+            - name: Check out repository
+              uses: actions/checkout@v7.0.1
+
+            - name: Update AUR package
               env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  RELEASE_TAG: ${{ github.event.release.tag_name }}
                   AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
               run: |
-                  install -m 0600 /dev/null /tmp/aur-ssh-key
-                  printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > /tmp/aur-ssh-key
-
-            - name: Trust AUR host
-              run: |
-                  install -m 0600 /dev/null /tmp/aur-known-hosts
-                  ssh-keyscan -H aur.archlinux.org >> /tmp/aur-known-hosts
-                  ssh-keygen -F aur.archlinux.org -f /tmp/aur-known-hosts
-
-            - name: Upgrade package and regenerate metadata
-              run: |
-                  git clone ssh://aur@aur.archlinux.org/vesktop-bin.git aur
-                  cd aur
-                  pkgctl version upgrade
-                  makepkg --printsrcinfo > .SRCINFO
-
-            - name: Build package
-              run: |
-                  chown -R builder:builder aur
-                  cd aur
-                  sudo -u builder makepkg --syncdeps --noconfirm
-
-            - name: Push package update
-              run: |
-                  cd aur
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git add PKGBUILD .SRCINFO
-                  if git diff --cached --quiet; then
-                      echo "AUR package is already up to date"
-                      exit 0
-                  fi
-
-                  if [[ "${{ github.event_name }}" = workflow_dispatch ]]; then
-                      echo "Skipping push for workflow dispatch"
-                      exit 0
-                  fi
-
-                  git commit -m "Update vesktop-bin to ${{ github.event.release.tag_name }}"
-                  git push
+                  sudo -u builder AUR_SSH_PRIVATE_KEY="$AUR_SSH_PRIVATE_KEY" EVENT_NAME="$EVENT_NAME" RELEASE_TAG="$RELEASE_TAG" bash .github/workflows/update-aur-pkg.sh
