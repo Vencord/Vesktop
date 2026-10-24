@@ -19,6 +19,7 @@ chmod 0600 ~/.ssh/known_hosts
 git clone ssh://aur@aur.archlinux.org/vesktop-bin.git aur
 cd aur
 
+export TERM=xterm # without this, pkgctl EXPLODES
 pkgctl version upgrade
 makepkg --printsrcinfo > .SRCINFO
 
