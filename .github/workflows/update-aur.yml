@@ -61,5 +61,11 @@ jobs:
                       echo "AUR package is already up to date"
                       exit 0
                   fi
+
+                  if [[ "${{ github.event_name }}" = workflow_dispatch ]]; then
+                      echo "Skipping push for workflow dispatch"
+                      exit 0
+                  fi
+
                   git commit -m "Update vesktop-bin to ${{ github.event.release.tag_name }}"
                   git push
