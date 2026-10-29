@@ -5,8 +5,8 @@
  */
 
 import { Button, Heading, Paragraph, TextButton } from "@vencord/types/components";
-import { Margins, useForceUpdater } from "@vencord/types/utils";
-import { Modal, openModal, Toasts } from "@vencord/types/webpack/common";
+import { Margins, promptToRestart, useForceUpdater } from "@vencord/types/utils";
+import { Modal, openModal, showToast } from "@vencord/types/webpack/common";
 import { Settings } from "shared/settings";
 
 import { cl, SettingsComponent } from "./Settings";
@@ -64,18 +64,12 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                             case "cancelled":
                                 break;
                             case "ok":
-                                Toasts.show({
-                                    message: "Vencord install changed. Fully restart Vesktop to apply.",
-                                    id: Toasts.genId(),
-                                    type: Toasts.Type.SUCCESS
-                                });
+                                promptToRestart("relaunch");
                                 break;
                             case "invalid":
-                                Toasts.show({
-                                    message:
-                                        "You did not choose a valid Vencord install. Make sure you're selecting the dist dir!",
-                                    id: Toasts.genId(),
-                                    type: Toasts.Type.FAILURE
+                                showToast({
+                                    text: "You did not choose a valid Vencord install. Make sure you're selecting the dist dir!",
+                                    variant: "critical"
                                 });
                                 break;
                         }

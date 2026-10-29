@@ -7,7 +7,7 @@
 import "./settings.css";
 
 import { classNameFactory } from "@vencord/types/api/Styles";
-import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
+import { Divider, ErrorBoundary, Text } from "@vencord/types/components";
 import { ComponentType } from "react";
 import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 import { getValueAndOnChange, Settings, useSettings } from "renderer/settings";
@@ -156,9 +156,9 @@ function SettingsSections() {
 
     const sections = Object.entries(SettingsOptions).map(([title, settings], i, arr) => (
         <div key={title} className={cl("category")}>
-            <BaseText size="lg" weight="semibold" tag="h3" className={cl("category-title")}>
+            <Text size="lg" weight="semibold" tag="h3" className={cl("category-title")}>
                 {title}
-            </BaseText>
+            </Text>
 
             <div className={cl("category-content")}>
                 {settings.map((Setting, i) => {
