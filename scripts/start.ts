@@ -4,7 +4,12 @@
  * Copyright (c) 2023 Vendicated and Vencord contributors
  */
 
-import "./utils/dotenv";
 import { spawnNodeModuleBin } from "./utils/spawn.mjs";
 
-spawnNodeModuleBin("electron", [process.cwd(), ...(process.env.ELECTRON_LAUNCH_FLAGS?.split(" ") ?? [])]);
+const flags = [process.cwd(), "--enable-source-maps"];
+
+if (process.env.ELECTRON_LAUNCH_FLAGS) {
+    flags.push(...process.env.ELECTRON_LAUNCH_FLAGS.split(" "));
+}
+
+spawnNodeModuleBin("electron", flags);

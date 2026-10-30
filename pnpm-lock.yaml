@@ -188,9 +188,6 @@ importers:
       '@vencord/types':
         specifier: ^1.15.14
         version: 1.15.14(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)
-      dotenv:
-        specifier: ^17.3.1
-        version: 17.4.2
       electron:
         specifier: 45.1.0
         version: 45.1.0(supports-color@7.2.0)
@@ -1173,10 +1170,6 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
-    engines: {node: '>=12'}
-
-  dotenv@17.4.2:
-    resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -3248,8 +3241,6 @@ snapshots:
       dotenv: 16.6.1
 
   dotenv@16.6.1: {}
-
-  dotenv@17.4.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
