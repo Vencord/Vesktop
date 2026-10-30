@@ -1,0 +1,1 @@
+designated => certificate leaf = H"a7718adf9b038153ba0576411cb131c87fa1d11e" or anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "N3WUQV79ZX"

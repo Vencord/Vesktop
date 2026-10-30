@@ -17,6 +17,8 @@ const logger = new Logger("VesktopRPC", "#5865f2");
 
 const arRPC = Vencord.Plugins.plugins["WebRichPresence (arRPC)"] as typeof arRpcPlugin;
 
+let userDisabledStreamerMode = false;
+
 onIpcCommand(IpcCommands.RPC_ACTIVITY, async jsonData => {
     if (!Settings.store.arRPC) return;
 
@@ -25,15 +27,33 @@ onIpcCommand(IpcCommands.RPC_ACTIVITY, async jsonData => {
     const data = JSON.parse(jsonData);
 
     if (data.socketId === "STREAMERMODE" && StreamerModeStore.autoToggle) {
+        const value = data.activity?.application_id === "STREAMERMODE";
+
+        if (!value) {
+            userDisabledStreamerMode = false;
+        } else if (userDisabledStreamerMode) {
+            return;
+        }
+
         FluxDispatcher.dispatch({
             type: "STREAMER_MODE_UPDATE",
             key: "enabled",
-            value: data.activity?.application_id === "STREAMERMODE"
+            value,
+            isAuto: true
         });
+
         return;
     }
 
     arRPC.handleEvent(new MessageEvent("message", { data: jsonData }));
+});
+
+onceReady.then(() => {
+    FluxDispatcher.subscribe("STREAMER_MODE_UPDATE", e => {
+        if (!e.isAuto && !e.value) {
+            userDisabledStreamerMode = true;
+        }
+    });
 });
 
 onIpcCommand(IpcCommands.RPC_INVITE, async code => {

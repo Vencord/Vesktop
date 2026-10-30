@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import Server from "arrpc";
 import { randomUUID } from "crypto";
 import { MessagePort, workerData } from "worker_threads";
+
+import Server from "arrpc";
 
 import { ArRpcEvent, ArRpcHostEvent } from "./types";
 

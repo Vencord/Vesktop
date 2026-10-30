@@ -16,7 +16,9 @@ export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => 
 
     return (
         <div>
-            <Heading tag="h5">Transparency Options</Heading>
+            <Heading tag="h5" className={Margins.bottom8}>
+                Transparency Options
+            </Heading>
             <Paragraph className={Margins.bottom8}>
                 Requires a full restart. You will need a theme that supports transparency for this to work.
             </Paragraph>

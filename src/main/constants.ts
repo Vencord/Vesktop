@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
+
+import { app } from "electron";
 
 import { CommandLine } from "./cli";
 

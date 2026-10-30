@@ -213,19 +213,6 @@ bool request_background(bool autostart, const std::vector<std::string> &commandl
     return true;
 }
 
-Napi::Value updateUnityLauncherCount(Napi::CallbackInfo const &info)
-{
-    if (info.Length() < 1 || !info[0].IsNumber())
-    {
-        Napi::TypeError::New(info.Env(), "Expected (number)").ThrowAsJavaScriptException();
-        return info.Env().Undefined();
-    }
-
-    int count = info[0].As<Napi::Number>().Int32Value();
-    bool success = update_launcher_count(count);
-    return Napi::Boolean::New(info.Env(), success);
-}
-
 Napi::Value getAccentColor(const Napi::CallbackInfo &info)
 {
     auto color = get_accent_color();
@@ -260,7 +247,6 @@ Napi::Value RequestBackground(const Napi::CallbackInfo &info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set("updateUnityLauncherCount", Napi::Function::New(env, updateUnityLauncherCount));
     exports.Set("getAccentColor", Napi::Function::New(env, getAccentColor));
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
     return exports;

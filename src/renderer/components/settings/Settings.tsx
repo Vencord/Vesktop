@@ -5,12 +5,12 @@
  */
 
 import "./settings.css";
-
 import { classNameFactory } from "@vencord/types/api/Styles";
-import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
+import { Divider, ErrorBoundary, Text } from "@vencord/types/components";
 import { ComponentType } from "react";
-import { Settings, useSettings } from "renderer/settings";
-import { isMac, isWindows } from "renderer/utils";
+import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
+import { getValueAndOnChange, Settings, useSettings } from "renderer/settings";
+import { isMac } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
@@ -25,7 +25,6 @@ interface BooleanSetting {
     key: keyof typeof Settings.store;
     title: string;
     description: string;
-    defaultValue: boolean;
     disabled?(): boolean;
     invisible?(): boolean;
 }
@@ -41,50 +40,55 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "hardwareAcceleration",
             title: "Hardware Acceleration",
-            description: "Enable hardware acceleration",
-            defaultValue: true
+            description: "Enable hardware acceleration"
         },
         {
             key: "hardwareVideoAcceleration",
             title: "Video Hardware Acceleration",
             description:
                 "Enable hardware video acceleration. This can improve performance of screenshare and video playback, but may cause graphical glitches and infinitely loading streams.",
-            defaultValue: false,
-            disabled: () => Settings.store.hardwareAcceleration === false
+            disabled: () => !Settings.store.hardwareAcceleration
         }
     ],
     "User Interface": [
         {
-            key: "customTitleBar",
-            title: "Discord Titlebar",
-            description: "Use Discord's custom title bar instead of the native system one. Requires a full restart.",
-            defaultValue: isWindows
+            key: "nativeTitleBar",
+            title: "Native Titlebar",
+            description: "Enable the system titlebar in addition to Discord's custom one. Requires a full restart."
         },
         {
             key: "staticTitle",
             title: "Static Title",
-            description: 'Makes the window title "Vesktop" instead of changing to the current page',
-            defaultValue: false
+            description: 'Makes the window title "Vesktop" instead of changing to the current page'
         },
         {
             key: "enableMenu",
             title: "Enable Menu Bar",
             description: "Enables the application menu bar. Press ALT to toggle visibility.",
-            defaultValue: false,
-            disabled: () => Settings.store.customTitleBar ?? isWindows
+            disabled: () => !Settings.store.nativeTitleBar
+        },
+        {
+            key: "enableShadow",
+            title: "Enable Window Shadow",
+            description: "Enables the window shadow. Requires a full restart.",
+            disabled: () => Settings.store.nativeTitleBar
+        },
+        {
+            key: "enableRoundedCorners",
+            title: "Enable Rounded Corners",
+            description: "Enables rounded corners. Requires a full restart.",
+            disabled: () => Settings.store.nativeTitleBar
         },
         {
             key: "enableSplashScreen",
             title: "Enable Splash Screen",
             description:
-                "Shows a small splash screen while Vesktop is loading. Disabling this option will show the main window earlier while it's still loading.",
-            defaultValue: true
+                "Shows a small splash screen while Vesktop is loading. Disabling this option will show the main window earlier while it's still loading."
         },
         {
             key: "splashTheming",
             title: "Splash theming",
-            description: "Adapt the splash window colors to your custom theme",
-            defaultValue: true
+            description: "Adapt the splash window colors to your custom theme"
         },
         WindowsTransparencyControls,
         UserAssetsButton
@@ -94,34 +98,29 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "tray",
             title: "Tray Icon",
             description: "Add a tray icon for Vesktop",
-            defaultValue: true,
             invisible: () => isMac
         },
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
             description: "Hitting X will make Vesktop minimize to the tray instead of closing",
-            defaultValue: true,
             invisible: () => isMac,
-            disabled: () => Settings.store.tray === false
+            disabled: () => !Settings.store.tray
         },
         {
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
-            description: "Left clicking tray icon will toggle the vesktop window visibility.",
-            defaultValue: false
+            description: "Left clicking tray icon will toggle the vesktop window visibility."
         },
         {
             key: "disableMinSize",
             title: "Disable minimum window size",
-            description: "Allows you to make the window as small as your heart desires",
-            defaultValue: false
+            description: "Allows you to make the window as small as your heart desires"
         },
         {
             key: "disableSmoothScroll",
             title: "Disable smooth scrolling",
-            description: "Disables smooth scrolling",
-            defaultValue: false
+            description: "Disables smooth scrolling"
         }
     ],
     Notifications: [
@@ -129,25 +128,25 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "enableTaskbarFlashing",
             title: "Enable Taskbar Flashing",
-            description: "Flashes the app in your taskbar when you have new notifications.",
-            defaultValue: false
+            description: "Flashes the app in your taskbar when you have new notifications."
         }
     ],
     Miscellaneous: [
         {
             key: "arRPC",
             title: "Rich Presence",
-            description: "Enables Rich Presence via arRPC",
-            defaultValue: false
+            description: "Enables Rich Presence via arRPC"
         },
 
         {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",
-            description: "Opens links in a new Vesktop window instead of your web browser",
-            defaultValue: false
-        }
+            description: "Opens links in a new Vesktop window instead of your web browser"
+        },
+
+        WebRTCIPHandlingPolicyPicker
     ],
+
     "Developer Options": [DeveloperOptionsButton]
 };
 
@@ -156,24 +155,23 @@ function SettingsSections() {
 
     const sections = Object.entries(SettingsOptions).map(([title, settings], i, arr) => (
         <div key={title} className={cl("category")}>
-            <BaseText size="lg" weight="semibold" tag="h3" className={cl("category-title")}>
+            <Text size="lg" weight="semibold" tag="h3" className={cl("category-title")}>
                 {title}
-            </BaseText>
+            </Text>
 
             <div className={cl("category-content")}>
                 {settings.map((Setting, i) => {
                     if (typeof Setting === "function") return <Setting key={`Custom-${i}`} settings={Settings} />;
 
-                    const { defaultValue, title, description, key, disabled, invisible } = Setting;
+                    const { title, description, key, disabled, invisible } = Setting;
                     if (invisible?.()) return null;
 
                     return (
                         <VesktopSettingsSwitch
                             title={title}
                             description={description}
-                            value={Settings[key as any] ?? defaultValue}
-                            onChange={v => (Settings[key as any] = v)}
                             disabled={disabled?.()}
+                            {...getValueAndOnChange(key)}
                             key={key}
                         />
                     );

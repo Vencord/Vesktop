@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
-import { BrowserWindow } from "electron/main";
 import { copyFileSync, mkdirSync, readdirSync } from "fs";
 import { join } from "path";
+
+import { app } from "electron";
+import { BrowserWindow } from "electron/main";
 import { SplashProps } from "shared/browserWinProperties";
 
 import { autoStart } from "./autoStart";

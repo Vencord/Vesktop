@@ -14,7 +14,7 @@
         "skipLibCheck": true,
 
         "paths": {
-            "*": ["./src/*"],
+            "*": ["./src/*"]
         },
 
         "types": ["node", "@vencord/types"]

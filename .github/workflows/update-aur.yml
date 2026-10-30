@@ -1,0 +1,31 @@
+name: Update AUR package
+
+on:
+    release:
+        types:
+            - published
+    workflow_dispatch:
+
+jobs:
+    update:
+        runs-on: ubuntu-latest
+        container: archlinux:latest
+        steps:
+            - name: Install packaging tools
+              run: |
+                  pacman -Syu --noconfirm --needed base-devel devtools git openssh sudo nvchecker
+
+                  useradd --create-home builder
+                  printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\n' > /etc/sudoers.d/builder
+                  chmod 0440 /etc/sudoers.d/builder
+
+            - name: Check out repository
+              uses: actions/checkout@v7.0.1
+
+            - name: Update AUR package
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  RELEASE_TAG: ${{ github.event.release.tag_name }}
+                  AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+              run: |
+                  sudo -u builder AUR_SSH_PRIVATE_KEY="$AUR_SSH_PRIVATE_KEY" EVENT_NAME="$EVENT_NAME" RELEASE_TAG="$RELEASE_TAG" bash .github/workflows/update-aur-pkg.sh

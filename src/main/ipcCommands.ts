@@ -5,6 +5,7 @@
  */
 
 import { randomUUID } from "crypto";
+
 import { ipcMain } from "electron";
 import { IpcEvents } from "shared/IpcEvents";
 

@@ -6,6 +6,7 @@
 
 import { promises as fs } from "node:fs";
 import { mkdir } from "node:fs/promises";
+
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import xmlFormat from "xml-formatter";
 
@@ -46,7 +47,8 @@ function generateDescription(description: string, descriptionNode: Element) {
 const releases = await fetch("https://api.github.com/repos/Vencord/Vesktop/releases", {
     headers: {
         Accept: "application/vnd.github+json",
-        "X-Github-Api-Version": "2022-11-28"
+        "X-Github-Api-Version": "2022-11-28",
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
     }
 }).then(res => res.json());
 
@@ -78,7 +80,9 @@ for (let i = 0; i < releaseList.childNodes.length; i++) {
 
 const release = parser.createElement("release");
 release.setAttribute("version", latestReleaseInformation.name);
-release.setAttribute("date", latestReleaseInformation.published_at.split("T")[0]);
+const date =
+    latestReleaseInformation.published_at || latestReleaseInformation.updated_at || latestReleaseInformation.created_at;
+release.setAttribute("date", date.split("T")[0]);
 release.setAttribute("type", "stable");
 
 const releaseUrl = parser.createElement("url");

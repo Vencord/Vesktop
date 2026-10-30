@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow } from "electron";
 import { join } from "path";
+
+import { BrowserWindow } from "electron";
 import { SplashProps } from "shared/browserWinProperties";
 
 import { Settings } from "./settings";
@@ -26,7 +27,7 @@ export function createSplashWindow(startMinimized = false) {
 
     const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
-    if (splashTheming !== false) {
+    if (splashTheming) {
         if (splashColor) {
             const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
 

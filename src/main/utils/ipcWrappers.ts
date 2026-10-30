@@ -14,7 +14,7 @@ export function validateSender(frame: WebFrameMain | null, event: string) {
 
     try {
         var { hostname, protocol } = new URL(frame.url);
-    } catch (e) {
+    } catch {
         throw new Error(`ipc[${event}]: Invalid URL ${frame.url}`);
     }
 

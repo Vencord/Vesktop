@@ -7,26 +7,27 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
+import { readFileSync, watch } from "fs";
+import { readFile, stat } from "fs/promises";
+import { release } from "os";
+import { join } from "path";
+
 import {
     app,
     BrowserWindow,
     clipboard,
+    ClipboardItem,
     dialog,
     IpcMainInvokeEvent,
-    nativeImage,
     RelaunchOptions,
     session,
     shell
 } from "electron";
-import { readFileSync, watch } from "fs";
-import { readFile, stat } from "fs/promises";
-import { enableHardwareAcceleration } from "main";
-import { release } from "os";
-import { join } from "path";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
+import { enableHardwareAcceleration } from "./main";
 import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
@@ -35,9 +36,6 @@ import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
-handleSync(IpcEvents.DEPRECATED_GET_VENCORD_PRELOAD_SCRIPT_PATH, () =>
-    join(VENCORD_FILES_DIR, "vencordDesktopPreload.js")
-);
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_SCRIPT, () =>
     readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopPreload.js"), "utf-8")
 );
@@ -152,7 +150,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
     if (!res.filePaths.length) return "cancelled";
 
     const dir = res.filePaths[0];
-    if (!isValidVencordInstall(dir)) return "invalid";
+    if (!(await isValidVencordInstall(dir))) return "invalid";
 
     State.store.vencordDir = dir;
 
@@ -167,10 +165,14 @@ handle(IpcEvents.FLASH_FRAME, (_, flag: boolean) => {
 });
 
 handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {
-    clipboard.write({
-        html: `<img src="${src.replaceAll('"', '\\"')}">`,
-        image: nativeImage.createFromBuffer(Buffer.from(buf))
-    });
+    src = src.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
+    clipboard.write([
+        new ClipboardItem({
+            "text/html": `<img src="${src}" />`,
+            "image/png": new Blob([buf], { type: "image/png" })
+        })
+    ]);
 });
 
 function openDebugPage(page: string) {

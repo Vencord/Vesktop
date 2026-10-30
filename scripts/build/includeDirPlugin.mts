@@ -1,5 +1,6 @@
-import { Plugin } from "esbuild";
 import { readdir } from "fs/promises";
+
+import { Plugin } from "esbuild";
 
 const makeImportAllCode = (files: string[]) =>
     files.map(f => `require("./${f.replace(/\.[cm]?[tj]sx?$/, "")}")`).join("\n");

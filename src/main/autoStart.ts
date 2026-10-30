@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
+
+import { app } from "electron";
 import { stripIndent } from "shared/utils/text";
 
 import { IS_FLATPAK } from "./constants";
@@ -73,7 +74,11 @@ function makeAutoStartLinuxPortal() {
 }
 
 const autoStartWindowsMac: AutoStart = {
-    isEnabled: () => app.getLoginItemSettings().openAtLogin,
+    isEnabled: () => {
+        const { openAtLogin, executableWillLaunchAtLogin } = app.getLoginItemSettings();
+        // Windows only reports openAtLogin as true when queried with the same args set in enable()
+        return openAtLogin || executableWillLaunchAtLogin;
+    },
     enable: () =>
         app.setLoginItemSettings({
             openAtLogin: true,

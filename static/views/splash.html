@@ -36,7 +36,7 @@
             word-break: break-word;
             padding: 0 16px;
             position: absolute;
-            font-size: 14px
+            font-size: 14px;
         }
 
         p {
@@ -61,9 +61,9 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const messageElement = document.querySelector('.message');
+        const messageElement = document.querySelector(".message");
         VesktopSplashNative.onUpdateMessage(message => {
             messageElement.textContent = message;
-        })
+        });
     });
 </script>

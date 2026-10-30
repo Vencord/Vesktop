@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { mkdirSync, readFileSync } from "fs";
+import { mkdirSync } from "fs";
 import { access, constants as FsConstants, writeFile } from "fs/promises";
-import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
+
+import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 
 import { USER_AGENT } from "../constants";
 import { downloadFile, fetchie } from "./http";
@@ -64,7 +65,7 @@ const existsAsync = (path: string) =>
         .catch(() => false);
 
 export async function isValidVencordInstall(dir: string) {
-    const results = await Promise.all(["package.json", ...FILES_TO_DOWNLOAD].map(f => existsAsync(join(dir, f))));
+    const results = await Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f))));
     return !results.includes(false);
 }
 
@@ -74,17 +75,4 @@ export async function ensureVencordFiles() {
     mkdirSync(VENCORD_FILES_DIR, { recursive: true });
 
     await Promise.all([downloadVencordFiles(), writeFile(join(VENCORD_FILES_DIR, "package.json"), "{}")]);
-}
-
-// TODO: remove this once enough time has passed
-export function vencordSupportsSandboxing() {
-    const supports = readFileSync(join(VENCORD_FILES_DIR, "vencordDesktopMain.js"), "utf-8").includes(
-        "VencordGetRendererCss"
-    );
-    if (!supports) {
-        console.warn(
-            "⚠️  [VencordLoader] Vencord version is outdated and does not support sandboxing. Please update Vencord to the latest version."
-        );
-    }
-    return supports;
 }

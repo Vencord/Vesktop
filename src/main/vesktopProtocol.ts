@@ -15,11 +15,24 @@ app.whenReady().then(() => {
 
         switch (url.hostname) {
             case "assets":
-                return handleVesktopAssetsProtocol(url.pathname, req);
+                return handleVesktopAssetsProtocol(url.pathname);
             case "static":
-                return handleVesktopStaticProtocol(url.pathname, req);
+                return handleVesktopStaticProtocol(url.pathname);
             default:
                 return new Response(null, { status: 404 });
         }
     });
 });
+
+protocol.registerSchemesAsPrivileged([
+    {
+        scheme: "vesktop",
+        privileges: {
+            standard: true,
+            secure: true,
+            supportFetchAPI: true,
+            corsEnabled: true,
+            stream: true
+        }
+    }
+]);

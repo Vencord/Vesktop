@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { resolve } from "path";
-import { IpcCommands } from "shared/IpcEvents";
+import { join, resolve } from "path";
 import { MessageChannel, Worker } from "worker_threads";
+
+import { SESSION_DATA_DIR } from "main/constants";
+import { IpcCommands } from "shared/IpcEvents";
 
 import { sendRendererCommand } from "../ipcCommands";
 import { Settings } from "../settings";
@@ -18,6 +20,8 @@ const inviteCodeRegex = /^(\w|-)+$/;
 
 export async function initArRPC() {
     if (worker || !Settings.store.arRPC) return;
+
+    process.env.ARRPC_DETECTABLE_CACHE_PATH = join(SESSION_DATA_DIR, "arrpc-detectable-db.json");
 
     try {
         const { port1: hostPort, port2: workerPort } = new MessageChannel();

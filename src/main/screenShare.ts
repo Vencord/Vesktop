@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { release } from "os";
+
 import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
@@ -13,6 +15,8 @@ import { handle } from "./utils/ipcWrappers";
 
 const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
+const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 19045;
 
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
@@ -78,7 +82,10 @@ export function registerScreenShareHandler() {
         const streams: Streams = {
             video: source
         };
-        if (choice.audio && process.platform === "win32") streams.audio = "loopback";
+        if (choice.audio && process.platform === "win32") {
+            // @ts-expect-error loopbackWithoutChrome is real but not documented
+            streams.audio = supportsLoopbackWithoutChrome ? "loopbackWithoutChrome" : "loopback";
+        }
 
         callback(streams);
     });
