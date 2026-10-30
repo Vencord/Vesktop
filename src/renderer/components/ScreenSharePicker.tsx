@@ -13,7 +13,6 @@ import {
     CogWheel,
     FormSwitch,
     Heading,
-    HeadingTertiary,
     Margins,
     Paragraph,
     RestartIcon,
@@ -385,18 +384,24 @@ function StreamSettingsUi({
 
     return (
         <div>
-            <HeadingTertiary className={Margins.bottom8}>What you're streaming</HeadingTertiary>
+            <Heading tag="h4" className={Margins.bottom8}>
+                What you're streaming
+            </Heading>
             <Card className={cl("card", "preview")}>
                 <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
                 <Paragraph>{source.name}</Paragraph>
             </Card>
 
-            <HeadingTertiary className={Margins.bottom8}>Stream Settings</HeadingTertiary>
+            <Heading tag="h4" className={Margins.bottom8}>
+                Stream Settings
+            </Heading>
 
             <Card className={cl("card")}>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Resolution</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Resolution
+                        </Heading>
                         <OptionRadio
                             options={StreamResolutions}
                             settings={qualitySettings}
@@ -406,7 +411,9 @@ function StreamSettingsUi({
                     </section>
 
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Frame Rate</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Frame Rate
+                        </Heading>
                         <OptionRadio
                             options={StreamFps}
                             settings={qualitySettings}
@@ -417,7 +424,9 @@ function StreamSettingsUi({
                 </div>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Content Type</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Content Type
+                        </Heading>
                         <div>
                             <OptionRadio
                                 options={["motion", "detail"]}
@@ -637,7 +646,9 @@ function AudioSourcePickerLinux({
         <>
             <div className={cl("audio-sources")}>
                 <section>
-                    <Heading tag="h5">{loading ? "Loading Sources..." : "Audio Sources"}</Heading>
+                    <Heading tag="h5" className={Margins.bottom8}>
+                        {loading ? "Loading Sources..." : "Audio Sources"}
+                    </Heading>
                     <SimpleErrorBoundary>
                         <Select
                             options={allSources.map(({ name, value }) => ({
@@ -656,7 +667,9 @@ function AudioSourcePickerLinux({
                 </section>
                 {includeSources === "Entire System" && (
                     <section>
-                        <Heading tag="h5">Exclude Sources</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Exclude Sources
+                        </Heading>
                         <SimpleErrorBoundary>
                             <Select
                                 options={allSources
