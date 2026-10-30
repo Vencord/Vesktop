@@ -8,12 +8,11 @@ import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { BADGE_DIR } from "shared/paths";
 
-import { updateUnityLauncherCount } from "./dbus";
 import { AppEvents } from "./events";
 import { mainWin } from "./mainWindow";
 
 const imgCache = new Map<number, NativeImage>();
-function loadBadge(index: number) {
+function loadWindowsBadge(index: number) {
     const cached = imgCache.get(index);
     if (cached) return cached;
 
@@ -35,7 +34,7 @@ export function setBadgeCount(count: number) {
     switch (process.platform) {
         case "linux":
             if (count === -1) count = 0;
-            updateUnityLauncherCount(count);
+            app.setBadgeCount(count);
             break;
         case "darwin":
             if (count === 0) {
@@ -50,7 +49,7 @@ export function setBadgeCount(count: number) {
 
             lastIndex = index;
 
-            mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
+            mainWin.setOverlayIcon(index === null ? null : loadWindowsBadge(index), description);
             break;
     }
 }
