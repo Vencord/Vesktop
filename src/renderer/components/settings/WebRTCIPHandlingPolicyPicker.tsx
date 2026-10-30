@@ -14,7 +14,9 @@ export const WebRTCIPHandlingPolicyPicker: SettingsComponent = ({ settings }) =>
     return (
         <SimpleErrorBoundary>
             <div>
-                <Heading tag="h5">WebRTC IP Handling Policy</Heading>
+                <Heading tag="h5" className={Margins.bottom8}>
+                    WebRTC IP Handling Policy
+                </Heading>
                 <Paragraph className={Margins.bottom8}>
                     Changing this may help with voice connection issues on some networks, most notably VPNs like
                     Tailscale.
