@@ -9,5 +9,6 @@
     "useTabs": false,
     "endOfLine": "lf",
     "sortImports": true,
-    "sortPackageJson": false
+    "sortPackageJson": false,
+    "insertFinalNewline": true
 }
