@@ -16,7 +16,6 @@
     flex-grow: 1;
 }
 
-
 /* Screen Grid */
 .vcd-screen-picker-screen-grid {
     display: grid;
@@ -72,7 +71,6 @@
     align-items: center;
     margin-bottom: 1em;
 }
-
 
 /* Option Radios */
 
@@ -144,7 +142,7 @@
     display: flex;
     gap: 1em;
 
-    >section {
+    > section {
         flex: 1;
     }
 }

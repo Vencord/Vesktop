@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BuildContext, BuildOptions, context } from "esbuild";
 import { copyFile } from "fs/promises";
 
-import vencordDep from "./vencordDep.mjs";
+import { BuildContext, BuildOptions, context } from "esbuild";
+
 import { includeDirPlugin } from "./includeDirPlugin.mts";
+import vencordDep from "./vencordDep.mjs";
 
 const isDev = process.argv.includes("--dev");
 

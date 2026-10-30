@@ -7,6 +7,11 @@
 if (process.platform === "linux") import("./venmic");
 
 import { execFile } from "child_process";
+import { readFileSync, watch } from "fs";
+import { readFile, stat } from "fs/promises";
+import { release } from "os";
+import { join } from "path";
+
 import {
     app,
     BrowserWindow,
@@ -18,10 +23,6 @@ import {
     session,
     shell
 } from "electron";
-import { readFileSync, watch } from "fs";
-import { readFile, stat } from "fs/promises";
-import { release } from "os";
-import { join } from "path";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";

@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow } from "electron";
 import { join } from "path";
+
+import { BrowserWindow } from "electron";
 import { SplashProps } from "shared/browserWinProperties";
 
 import { Settings } from "./settings";

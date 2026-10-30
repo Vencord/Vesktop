@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join } from "path";
+
+import { app } from "electron";
 import { stripIndent } from "shared/utils/text";
 
 import { IS_FLATPAK } from "./constants";

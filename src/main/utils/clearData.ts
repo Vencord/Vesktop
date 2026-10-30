@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app, BrowserWindow, dialog } from "electron";
 import { rm } from "fs/promises";
+
+import { app, BrowserWindow, dialog } from "electron";
 import { DATA_DIR, MessageBoxChoice } from "main/constants";
 
 export async function clearData(win: BrowserWindow) {

@@ -6,8 +6,9 @@
 
 import { mkdirSync } from "fs";
 import { access, constants as FsConstants, writeFile } from "fs/promises";
-import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
+
+import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 
 import { USER_AGENT } from "../constants";
 import { downloadFile, fetchie } from "./http";

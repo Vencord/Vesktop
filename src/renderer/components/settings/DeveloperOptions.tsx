@@ -34,7 +34,7 @@ function openDeveloperOptionsModal(settings: Settings) {
     ));
 }
 
-const VencordLocationPicker: SettingsComponent = ({ settings }) => {
+const VencordLocationPicker: SettingsComponent = () => {
     const forceUpdate = useForceUpdater();
     const usingCustomVencordDir = VesktopNative.fileManager.isUsingCustomVencordDir();
 

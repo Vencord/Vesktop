@@ -5,7 +5,6 @@
  */
 
 import "./settings.css";
-
 import { classNameFactory } from "@vencord/types/api/Styles";
 import { Divider, ErrorBoundary, Text } from "@vencord/types/components";
 import { ComponentType } from "react";

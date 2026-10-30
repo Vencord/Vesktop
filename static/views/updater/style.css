@@ -27,7 +27,6 @@ body {
     }
 }
 
-
 #versions {
     display: inline-grid;
     grid-template-columns: auto 1fr;

@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app, NativeImage, nativeImage } from "electron";
 import { join } from "path";
+
+import { app, NativeImage, nativeImage } from "electron";
 import { BADGE_DIR } from "shared/paths";
 
 import { AppEvents } from "./events";

@@ -9,7 +9,6 @@ import "./updater";
 import "./ipc";
 import "./userAssets";
 import "./vesktopProtocol";
-
 import { app, BrowserWindow, nativeTheme } from "electron";
 
 import { DATA_DIR } from "./constants";

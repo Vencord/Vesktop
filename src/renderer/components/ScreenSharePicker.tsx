@@ -5,7 +5,6 @@
  */
 
 import "./screenSharePicker.css";
-
 import { classNameFactory } from "@vencord/types/api/Styles";
 import {
     Button,

@@ -5,6 +5,7 @@
  */
 
 import { join } from "path";
+
 import { STATIC_DIR } from "shared/paths";
 
 let libVesktop: typeof import("libvesktop") | null = null;

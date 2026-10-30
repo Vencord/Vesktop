@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "path";
+
 import type { LinkData, Node, PatchBay as PatchBayType } from "@vencord/venmic";
 import { app, ipcMain } from "electron";
-import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 

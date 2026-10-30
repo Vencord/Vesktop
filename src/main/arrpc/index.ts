@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { SESSION_DATA_DIR } from "main/constants";
 import { join, resolve } from "path";
-import { IpcCommands } from "shared/IpcEvents";
 import { MessageChannel, Worker } from "worker_threads";
+
+import { SESSION_DATA_DIR } from "main/constants";
+import { IpcCommands } from "shared/IpcEvents";
 
 import { sendRendererCommand } from "../ipcCommands";
 import { Settings } from "../settings";

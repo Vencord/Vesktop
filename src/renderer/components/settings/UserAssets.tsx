@@ -5,7 +5,6 @@
  */
 
 import "./UserAssets.css";
-
 import { Button, FormSwitch, Text } from "@vencord/types/components";
 import { Margins, wordsFromCamel, wordsToTitle } from "@vencord/types/utils";
 import { Modal, openModal, showToast, useState } from "@vencord/types/webpack/common";
@@ -34,7 +33,7 @@ function openAssetsModal() {
 
 function Asset({ asset }: { asset: UserAssetType }) {
     // cache busting
-    const [version, setVersion] = useState(Date.now());
+    const [version, setVersion] = useState(() => Date.now());
     const settings = useSettings();
 
     const isSplash = asset === "splash";

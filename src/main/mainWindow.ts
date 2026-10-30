@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "path";
+
 import {
     app,
     BrowserWindow,
@@ -15,7 +17,6 @@ import {
     screen,
     session
 } from "electron";
-import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
