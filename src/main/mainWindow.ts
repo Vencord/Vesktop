@@ -33,6 +33,7 @@ import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
 import { clearData } from "./utils/clearData";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { showWindow } from "./utils/showWindow";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
@@ -46,6 +47,12 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
+
+export function focusMainWindow() {
+    showWindow(mainWin);
+    mainWin.setSkipTaskbar(false);
+    mainWin.focus();
+}
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();

@@ -11,15 +11,15 @@ import "./rpc";
 import "./userAssets";
 import "./vesktopProtocol";
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { readFileSync } from "fs";
 
-import { DATA_DIR } from "./constants";
+import { DATA_DIR, IS_FLATPAK } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, mainWin } from "./mainWindow";
+import { createWindows, focusMainWindow, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
-import { showWindow } from "./utils/showWindow";
 import { isDeckGameMode } from "./utils/steamOS";
 
 console.log("Vesktop v" + app.getVersion());
@@ -72,6 +72,16 @@ function init() {
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
         disabledFeatures.add("WaylandWpColorManagerV1");
+
+        // The Flatpak notification portal can't pass activation tokens, so clicking a notification can't focus the window on Wayland.
+        // Make libnotify talk to org.freedesktop.Notifications directly instead, but only if the sandbox allows it,
+        // otherwise notifications would be silently dropped
+        if (
+            IS_FLATPAK &&
+            /^org\.freedesktop\.Notifications=(talk|own)$/m.test(readFileSync("/.flatpak-info", "utf-8"))
+        ) {
+            process.env.NOTIFY_IGNORE_PORTAL = "1";
+        }
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
@@ -94,7 +104,7 @@ function init() {
 
     app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
-        else if (mainWin) showWindow(mainWin);
+        else if (mainWin) focusMainWindow();
     });
 
     app.whenReady().then(async () => {

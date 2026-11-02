@@ -28,11 +28,10 @@ import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { enableHardwareAcceleration } from "./main";
-import { mainWin } from "./mainWindow";
+import { focusMainWindow, mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
-import { showWindow } from "./utils/showWindow";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
@@ -105,10 +104,7 @@ function getWindow(e: IpcMainInvokeEvent, key?: string) {
     return key ? PopoutWindows.get(key)! : (BrowserWindow.fromWebContents(e.sender) ?? mainWin);
 }
 
-handle(IpcEvents.FOCUS, () => {
-    showWindow(mainWin);
-    mainWin.setSkipTaskbar(false);
-});
+handle(IpcEvents.FOCUS, focusMainWindow);
 
 handle(IpcEvents.CLOSE, (e, key?: string) => {
     getWindow(e, key).close();
