@@ -11,6 +11,7 @@ import { autoUpdater, UpdateInfo } from "electron-updater";
 import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
 import { Millis } from "shared/utils/millis";
 
+import { PORTABLE } from "./constants";
 import { State } from "./settings";
 import { handle } from "./utils/ipcWrappers";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -55,7 +56,7 @@ function openUpdater(update: UpdateInfo) {
     });
     makeLinksOpenExternally(updaterWindow);
 
-    handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion() }));
+    handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion(), portable: PORTABLE }));
     handle(UpdaterIpcEvents.INSTALL, async () => {
         await autoUpdater.downloadUpdate();
     });
