@@ -5,9 +5,11 @@
  */
 
 import { app, BrowserWindow, Menu, Tray } from "electron";
+import { IpcCommands } from "shared/IpcEvents";
 
 import { createAboutWindow } from "./about";
 import { AppEvents } from "./events";
+import { sendRendererCommand } from "./ipcCommands";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
 import { clearData } from "./utils/clearData";
@@ -47,6 +49,39 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
             click() {
                 win.show();
             }
+        },
+        {
+            label: "Status",
+            submenu: [
+                {
+                    label: "Online",
+                    type: "radio",
+                    click: () => {
+                        sendRendererCommand(IpcCommands.SET_STATUS, "online");
+                    }
+                },
+                {
+                    label: "Idle",
+                    type: "radio",
+                    click: () => {
+                        sendRendererCommand(IpcCommands.SET_STATUS, "idle");
+                    }
+                },
+                {
+                    label: "Do Not Disturb",
+                    type: "radio",
+                    click: () => {
+                        sendRendererCommand(IpcCommands.SET_STATUS, "dnd");
+                    }
+                },
+                {
+                    label: "Invisible",
+                    type: "radio",
+                    click: () => {
+                        sendRendererCommand(IpcCommands.SET_STATUS, "invisible");
+                    }
+                }
+            ]
         },
         {
             label: "About",
