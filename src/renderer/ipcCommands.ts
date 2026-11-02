@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { SettingsRouter } from "@vencord/types/webpack/common";
+import { NavigationRouter, SettingsRouter } from "@vencord/types/webpack/common";
 import { IpcCommands } from "shared/IpcEvents";
 
 import { openScreenSharePicker } from "./components/ScreenSharePicker";
@@ -44,6 +44,8 @@ export function offIpcCommand(channel: string) {
 }
 
 /* Generic Handlers */
+
+onIpcCommand(IpcCommands.NAVIGATE, (path: string) => NavigationRouter.transitionTo(path));
 
 onIpcCommand(IpcCommands.NAVIGATE_SETTINGS, () => {
     SettingsRouter.openUserSettings("my_account_panel");

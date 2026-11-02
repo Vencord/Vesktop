@@ -7,11 +7,12 @@
 import { join } from "path";
 
 import type { LinkData, Node, PatchBay as PatchBayType } from "@vencord/venmic";
-import { app, ipcMain } from "electron";
+import { app } from "electron";
 import { IpcEvents } from "shared/IpcEvents";
 import { STATIC_DIR } from "shared/paths";
 
 import { Settings } from "./settings";
+import { handle } from "./utils/ipcWrappers";
 
 let PatchBay: typeof PatchBayType | undefined;
 let patchBayInstance: PatchBayType | undefined;
@@ -99,7 +100,7 @@ function buildLinkData({ include, exclude }: { include?: Node[]; exclude?: Node[
     return data;
 }
 
-ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
+handle(IpcEvents.VIRT_MIC_LIST, () => {
     const audioPid = getRendererAudioServicePid();
 
     const { granularSelect } = Settings.store.audio ?? {};
@@ -111,16 +112,16 @@ ipcMain.handle(IpcEvents.VIRT_MIC_LIST, () => {
     return targets ? { ok: true, targets, hasPipewirePulse } : { ok: false, isGlibCxxOutdated };
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
+handle(IpcEvents.VIRT_MIC_START, (_, include: Node[]) => {
     return obtainVenmic()?.link(buildLinkData({ include }));
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
+handle(IpcEvents.VIRT_MIC_START_SYSTEM, (_, exclude: Node[]) => {
     return obtainVenmic()?.link(buildLinkData({ exclude }));
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_UNMUTE, () => {
+handle(IpcEvents.VIRT_MIC_UNMUTE, () => {
     return obtainVenmic()?.unmute();
 });
 
-ipcMain.handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());
+handle(IpcEvents.VIRT_MIC_STOP, () => obtainVenmic()?.unlink());
