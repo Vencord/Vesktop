@@ -42,17 +42,17 @@ export function destroyTray() {
 async function waitForStatusNotifierHost() {
     if (process.platform !== "linux") return;
 
-    for (let i = 0; i < 30 && !isStatusNotifierHostRegistered(); i++) {
+    for (let i = 0; i < 30; i++) {
+        if (isStatusNotifierHostRegistered()) return;
+
         await sleep(1000);
     }
 
-    if (!isStatusNotifierHostRegistered()) {
-        console.warn(
-            "StatusNotifierHost not registered after 30 seconds. Vesktop's Tray will likely not function correctly.\n" +
-                "If you are on GNOME, make sure you installed & enabled the AppIndicator and KStatusNotifierItem Support extension:\n" +
-                "https://extensions.gnome.org/extension/615/appindicator-support/"
-        );
-    }
+    console.warn(
+        "StatusNotifierHost not registered after 30 seconds. Vesktop's Tray will likely not function correctly.\n" +
+            "If you are on GNOME, make sure you installed & enabled the AppIndicator and KStatusNotifierItem Support extension:\n" +
+            "https://extensions.gnome.org/extension/615/appindicator-support/"
+    );
 }
 
 export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
