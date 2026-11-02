@@ -10,8 +10,9 @@ import "./ipc";
 import "./rpc";
 import "./userAssets";
 import "./vesktopProtocol";
-import { app, BrowserWindow, nativeTheme } from "electron";
 import { readFileSync } from "fs";
+
+import { app, BrowserWindow, nativeTheme } from "electron";
 
 import { DATA_DIR, IS_FLATPAK } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
