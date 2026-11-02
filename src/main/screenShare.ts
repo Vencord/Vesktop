@@ -43,7 +43,7 @@ export function registerScreenShareHandler() {
             })
             .catch(err => console.error("Error during screenshare picker", err));
 
-        if (!sources) return callback({});
+        if (!sources) return callback(null);
 
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
@@ -57,12 +57,15 @@ export function registerScreenShareHandler() {
                 const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
                     screens: [video],
                     skipPicker: true
-                }).catch(() => null);
+                }).catch(e => {
+                    console.error("Error during screenshare picker", e);
+                    return null;
+                });
 
-                if (stream === null) return callback({});
+                if (stream === null) return callback(null);
             }
 
-            callback(video ? { video: sources[0] } : {});
+            callback(video ? { video: sources[0] } : null);
             return;
         }
 
@@ -74,10 +77,10 @@ export function registerScreenShareHandler() {
             return null;
         });
 
-        if (!choice) return callback({});
+        if (!choice) return callback(null);
 
         const source = sources.find(s => s.id === choice.id);
-        if (!source) return callback({});
+        if (!source) return callback(null);
 
         const streams: Streams = {
             video: source
