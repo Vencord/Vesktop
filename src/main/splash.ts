@@ -23,26 +23,16 @@ export function createSplashWindow(startMinimized = false) {
         }
     });
 
-    loadView(splash, "splash.html");
-
     const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
+    const params = new URLSearchParams();
     if (splashTheming) {
-        if (splashColor) {
-            const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
-
-            splash.webContents.insertCSS(`body { --fg: ${splashColor} !important }`);
-            splash.webContents.insertCSS(`body { --fg-semi-trans: ${semiTransparentSplashColor} !important }`);
-        }
-
-        if (splashBackground) {
-            splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
-        }
+        if (splashColor) params.set("fg", splashColor);
+        if (splashBackground) params.set("bg", splashBackground);
     }
+    if (splashPixelated) params.set("pixelated", "");
 
-    if (splashPixelated) {
-        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
-    }
+    loadView(splash, "splash.html", params);
 
     return splash;
 }
