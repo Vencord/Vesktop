@@ -213,6 +213,46 @@ bool request_background(bool autostart, const std::vector<std::string> &commandl
     return true;
 }
 
+bool is_status_notifier_host_registered()
+{
+    GError *error = nullptr;
+
+    GObjectPtr<GDBusConnection> bus(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
+    if (!bus)
+    {
+        GErrorPtr error_ptr(error);
+        std::cerr << "[libvesktop::is_status_notifier_host_registered] Failed to connect to session bus: "
+                  << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
+        return false;
+    }
+
+    // Fails with ServiceUnknown if the watcher isn't running yet
+    GVariantPtr reply(g_dbus_connection_call_sync(
+        bus.get(),
+        "org.kde.StatusNotifierWatcher",
+        "/StatusNotifierWatcher",
+        "org.freedesktop.DBus.Properties",
+        "Get",
+        g_variant_new("(ss)", "org.kde.StatusNotifierWatcher", "IsStatusNotifierHostRegistered"),
+        G_VARIANT_TYPE("(v)"),
+        G_DBUS_CALL_FLAGS_NO_AUTO_START,
+        1000,
+        nullptr,
+        &error));
+
+    if (!reply)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
+    }
+
+    GVariant *inner_raw = nullptr;
+    g_variant_get(reply.get(), "(v)", &inner_raw);
+    GVariantPtr inner(inner_raw);
+
+    return inner && g_variant_is_of_type(inner.get(), G_VARIANT_TYPE_BOOLEAN) && g_variant_get_boolean(inner.get());
+}
+
 Napi::Value getAccentColor(const Napi::CallbackInfo &info)
 {
     auto color = get_accent_color();
@@ -245,10 +285,16 @@ Napi::Value RequestBackground(const Napi::CallbackInfo &info)
     return Napi::Boolean::New(env, ok);
 }
 
+Napi::Value IsStatusNotifierHostRegistered(const Napi::CallbackInfo &info)
+{
+    return Napi::Boolean::New(info.Env(), is_status_notifier_host_registered());
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set("getAccentColor", Napi::Function::New(env, getAccentColor));
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
+    exports.Set("isStatusNotifierHostRegistered", Napi::Function::New(env, IsStatusNotifierHostRegistered));
     return exports;
 }
 
