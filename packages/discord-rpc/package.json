@@ -1,0 +1,14 @@
+{
+    "name": "discord-rpc",
+    "private": true,
+    "license": "GPL-3.0-or-later",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "dependencies": {
+        "@vencord/game-detection": "0.1.0-alpha.1",
+        "ws": "^8.21.3"
+    },
+    "devDependencies": {
+        "@types/ws": "^8.18.1"
+    }
+}

@@ -135,7 +135,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "arRPC",
             title: "Rich Presence",
-            description: "Enables Rich Presence via arRPC"
+            description: "Lets games and apps connect to Vesktop for Rich Presence and game detection"
         },
 
         {

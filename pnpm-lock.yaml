@@ -169,9 +169,6 @@ importers:
 
   .:
     dependencies:
-      arrpc:
-        specifier: github:Vencord/arrpc#1dc801e8ea14d96ce8dccff416417614f058afb8
-        version: https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8
       electron-updater:
         specifier: 6.6.2
         version: 6.6.2(patch_hash=080505564abb2ebbda932bbf8fe91540c74dd905de994888d52ffce6f882f887)(supports-color@7.2.0)
@@ -188,6 +185,9 @@ importers:
       '@vencord/types':
         specifier: ^1.15.14
         version: 1.15.14(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)
+      discord-rpc:
+        specifier: workspace:*
+        version: link:packages/discord-rpc
       electron:
         specifier: 45.1.0
         version: 45.1.0(supports-color@7.2.0)
@@ -228,6 +228,19 @@ importers:
       '@vencord/venmic':
         specifier: ^7.2.5
         version: 7.2.5(supports-color@7.2.0)
+
+  packages/discord-rpc:
+    dependencies:
+      '@vencord/game-detection':
+        specifier: 0.1.0-alpha.1
+        version: 0.1.0-alpha.1
+      ws:
+        specifier: ^8.21.3
+        version: 8.21.3
+    devDependencies:
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.2
 
   packages/libvesktop:
     devDependencies:
@@ -854,10 +867,16 @@ packages:
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
 
+  '@types/ws@8.18.2':
+    resolution: {integrity: sha512-67MQl+fpWKVTT1NYdnmo3U4sc/xPo/zQBncVnI74qmQa0z/b+1g6iYqNmGCPbxO+zz2aklb08a0oHfegiVd0/w==}
+
   '@vencord/discord-types@1.15.14':
     resolution: {integrity: sha512-ZMzj0qLVPrHzXEkaAaDW4pLZdEBNjrNPakQrDMy7JWnCGZZbhviNFSVCSp6ihBWrPMmap5lsOPjkkOc58ho2cw==}
     peerDependencies:
       '@types/react': 19.2.3
+
+  '@vencord/game-detection@0.1.0-alpha.1':
+    resolution: {integrity: sha512-5SqfcX2KEY4deEcKUncaW7t8KgmRF2QrePJM9H5tBiXZYB6k+VWjh/8ypfALBjMfXGRBX34ZXhmcJI/cv3SIcQ==}
 
   '@vencord/types@1.15.14':
     resolution: {integrity: sha512-mJIx1ikRa3QyWh+mZlP/HC5EU4Sb6Jlv1xSjyHO4WaJXybr5tEKsPinwMh3zosjpEubj1Ious28X5TFOW36IFg==}
@@ -940,11 +959,6 @@ packages:
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-
-  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8:
-    resolution: {gitHosted: true, integrity: sha512-/hVH9ZN2J1S2uExkz/8DjsuskA3YYcWb9oXRyaRbPExybJkvx33bpZsWOIVqgZO85ihn4wb9J97JdeWO+HIhrQ==, tarball: https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8}
-    version: 3.7.0
-    hasBin: true
 
   asn1js@3.0.10:
     resolution: {integrity: sha512-S2s3aOytiKdFRdulw2qPE51MzjzVOisppcVv7jVFR+Kw0kxwvFrDcYA0h7Ndqbmj0HkMIXYWaoj7fli8kgx1eg==}
@@ -2835,11 +2849,17 @@ snapshots:
     dependencies:
       '@types/node': 26.6.5
 
+  '@types/ws@8.18.2':
+    dependencies:
+      '@types/node': 26.6.5
+
   '@vencord/discord-types@1.15.14(@types/react@19.2.9)':
     dependencies:
       '@types/react': 19.2.9
       moment: 2.30.1
       type-fest: 5.10.0
+
+  '@vencord/game-detection@0.1.0-alpha.1': {}
 
   '@vencord/types@1.15.14(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)':
     dependencies:
@@ -2964,13 +2984,6 @@ snapshots:
     optional: true
 
   argparse@2.0.1: {}
-
-  arrpc@https://codeload.github.com/Vencord/arrpc/tar.gz/1dc801e8ea14d96ce8dccff416417614f058afb8:
-    dependencies:
-      ws: 8.21.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   asn1js@3.0.10:
     dependencies:

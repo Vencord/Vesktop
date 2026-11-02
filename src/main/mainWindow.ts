@@ -23,7 +23,6 @@ import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
-import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
@@ -516,5 +515,4 @@ export async function createWindows() {
     });
 
     mainWin.webContents.on("render-process-gone", (event, details) => console.log(details));
-    initArRPC();
 }

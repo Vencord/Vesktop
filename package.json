@@ -14,7 +14,7 @@
         "buildLibVesktop": "pnpm -C packages/libvesktop install && pnpm -C packages/libvesktop run build",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
-        "lint": "oxlint src scripts",
+        "lint": "oxlint src scripts packages/discord-rpc",
         "lint:fix": "pnpm lint --fix",
         "fmt": "oxfmt",
         "fmt:check": "oxfmt --check",
@@ -27,7 +27,6 @@
         "generateMeta": "tsx scripts/utils/generateMeta.mts"
     },
     "dependencies": {
-        "arrpc": "github:Vencord/arrpc#1dc801e8ea14d96ce8dccff416417614f058afb8",
         "electron-updater": "6.6.2"
     },
     "optionalDependencies": {
@@ -38,6 +37,7 @@
         "@types/node": "^26.6.5",
         "@types/react": "19.2.9",
         "@vencord/types": "^1.15.14",
+        "discord-rpc": "workspace:*",
         "electron": "45.1.0",
         "electron-builder": "^26.18.0",
         "esbuild": "^0.28.2",
