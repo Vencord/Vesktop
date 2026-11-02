@@ -11,6 +11,7 @@ import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
 import { clearData } from "./utils/clearData";
+import { showWindow } from "./utils/showWindow";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
@@ -38,14 +39,14 @@ export function destroyTray() {
 export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
     const onTrayClick = () => {
         if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
-        else win.show();
+        else showWindow(win);
     };
 
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
             click() {
-                win.show();
+                showWindow(win);
             }
         },
         {

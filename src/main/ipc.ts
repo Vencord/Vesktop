@@ -32,6 +32,7 @@ import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
+import { showWindow } from "./utils/showWindow";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
@@ -105,7 +106,7 @@ function getWindow(e: IpcMainInvokeEvent, key?: string) {
 }
 
 handle(IpcEvents.FOCUS, () => {
-    mainWin.show();
+    showWindow(mainWin);
     mainWin.setSkipTaskbar(false);
 });
 
