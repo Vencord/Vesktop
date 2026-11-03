@@ -31,6 +31,9 @@ process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
 
+// The instance launched to forward a notification activation token must never replace the running one, even in dev
+const replacesRunningInstance = IS_DEV && !process.env.VESKTOP_ACTIVATION_RELAUNCH;
+
 export let enableHardwareAcceleration = true;
 
 function init() {
@@ -117,7 +120,7 @@ function init() {
                 spawn(process.execPath, process.argv.slice(1), {
                     detached: true,
                     stdio: "ignore",
-                    env: { ...process.env, XDG_ACTIVATION_TOKEN: activationToken }
+                    env: { ...process.env, XDG_ACTIVATION_TOKEN: activationToken, VESKTOP_ACTIVATION_RELAUNCH: "1" }
                 }).unref();
             });
         }
@@ -128,8 +131,8 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV })) {
-    if (IS_DEV) {
+if (!app.requestSingleInstanceLock({ IS_DEV: replacesRunningInstance })) {
+    if (replacesRunningInstance) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
     } else {
