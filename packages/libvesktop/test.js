@@ -11,5 +11,8 @@ test("requestBackground should return true (success)", () => {
 });
 
 test("listenForActivation should return true (success)", () => {
-    assert.strictEqual(libVesktop.listenForActivation("dev.vencord.VesktopTest", () => {}), true);
+    assert.strictEqual(
+        libVesktop.listenForActivation("dev.vencord.VesktopTest", () => {}),
+        true
+    );
 });
