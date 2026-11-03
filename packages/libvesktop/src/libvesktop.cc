@@ -109,9 +109,8 @@ static const char* application_interface_xml =
     "    </method>"
     "  </interface>"
     "</node>";
-1
 
-    struct ActivationListener {
+struct ActivationListener {
     std::string app_id;
     std::string object_path;
     Napi::ThreadSafeFunction callback;
