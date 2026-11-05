@@ -17,7 +17,7 @@ import {
     RestartIcon,
     Span
 } from "@vencord/types/components";
-import { useAwaiter, useForceUpdater } from "@vencord/types/utils";
+import { Logger, useAwaiter, useForceUpdater } from "@vencord/types/utils";
 import { onceReady } from "@vencord/types/webpack";
 import {
     closeModal,
@@ -125,7 +125,7 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                                 }
                             } catch (e) {
                                 // still start the stream, just without audio
-                                logger.error("Failed to set up venmic", e);
+                                new Logger("VesktopScreenShare").error("Failed to set up venmic", e);
                             }
                         }
 
