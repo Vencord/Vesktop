@@ -87,6 +87,8 @@
     border: 1px solid var(--primary-800);
     padding: 0.3em;
     cursor: pointer;
+    white-space: nowrap;
+    min-width: fit-content;
 }
 
 .vcd-screen-picker-option-radio:first-child {
@@ -142,7 +144,7 @@
     display: flex;
     gap: 1em;
 
-    > section {
+    >section {
         flex: 1;
     }
 }
