@@ -87,8 +87,8 @@ addPatch({
             }
         },
         {
-            // Stereo stream audio (sending and receiving) and a higher audio bitrate are behind an experiment.
-            // Without it, audio of streams we watch is decoded as mono
+            // Stereo stream audio (sending and receiving) and a higher audio bitrate are behind an experiment
+            // Force enable it
             find: 'push("web_screen_share_audio")',
             replacement: {
                 match: /\i\.getConfig\(\{location:"RTCConnection"\}\)\.enabled(?=&&\i\.push\("web_screen_share_audio"\))/,
@@ -99,8 +99,8 @@ addPatch({
             // Stream context menu. The Stream Settings submenu is only shown in the native client
             find: '"stream-settings-audio-enable"',
             replacement: {
-                match: /\i\.isPlatformEmbedded(\?\(0,\i\.jsx\)\(\i\.\i,\{id:"stream-settings")/,
-                replace: "true$1"
+                match: /\i\.isPlatformEmbedded(?=\?\(0,\i\.jsx\)\(\i\.\i,\{id:"stream-settings")/,
+                replace: "true"
             }
         }
     ],
