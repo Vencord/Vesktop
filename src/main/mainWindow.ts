@@ -37,6 +37,7 @@ import { clearData } from "./utils/clearData";
 import { isDiscordUrl } from "./utils/isDiscordUrl";
 import { handleExternalUrl, makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
 import { relaunch } from "./utils/relaunch";
+import { showWindow } from "./utils/showWindow";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
 import { downloadVencordFiles, isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
@@ -50,6 +51,12 @@ app.on("before-quit", () => {
 });
 
 export let mainWin: BrowserWindow;
+
+export function focusMainWindow() {
+    showWindow(mainWin);
+    mainWin.setSkipTaskbar(false);
+    mainWin.focus();
+}
 
 function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
     const listeners = new Map<(data: any) => void, PropertyKey>();
