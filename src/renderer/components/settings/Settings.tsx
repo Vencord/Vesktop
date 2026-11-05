@@ -128,8 +128,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         {
             key: "disableSmoothScroll",
             title: "Disable smooth scrolling",
-            description: "Disables smooth scrolling",
-            defaultValue: false
+            description: "Disables smooth scrolling"
         },
         KeybindsButton
     ],

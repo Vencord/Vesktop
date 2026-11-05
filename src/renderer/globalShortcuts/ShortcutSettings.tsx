@@ -5,18 +5,9 @@
  */
 
 import "./ShortcutSettings.css";
-import { BaseText, Button, Card, DeleteIcon, Switch } from "@vencord/types/components";
-import {
-    classNameFactory,
-    identity,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalRoot,
-    ModalSize,
-    openModal
-} from "@vencord/types/utils";
-import { React, Select, useState } from "@vencord/types/webpack/common";
+import { Button, Card, DeleteIcon, Switch, Text } from "@vencord/types/components";
+import { classNameFactory, identity } from "@vencord/types/utils";
+import { Modal, openModal, React, Select, useState } from "@vencord/types/webpack/common";
 import { SettingsComponent } from "renderer/components/settings/Settings";
 import { onIpcCommand } from "renderer/ipcCommands";
 import { reactiveValue } from "renderer/reactiveState";
@@ -47,12 +38,12 @@ function WaylandKeyBindDisplay({ keyBind }: { keyBind: KeyBind }) {
 
     return (
         <div className={cl("group", "wayland-group")}>
-            <BaseText size="md" weight="medium">
+            <Text size="md" weight="medium">
                 {ACTION_DESCRIPTIONS[keyBind.action] ?? keyBind.action}
-            </BaseText>
-            <BaseText size="md" className={cl("trigger")}>
+            </Text>
+            <Text size="md" className={cl("trigger")}>
                 {displayKey || "No trigger set"}
-            </BaseText>
+            </Text>
         </div>
     );
 }
@@ -75,12 +66,12 @@ function KeyBindGroup({
 
     return (
         <div className={cl("group")}>
-            <BaseText size="md" weight="medium" className={cl("label")} id={actionId}>
+            <Text size="md" weight="medium" className={cl("label")} id={actionId}>
                 Action
-            </BaseText>
-            <BaseText size="md" weight="medium" className={cl("label")} id={keyId}>
+            </Text>
+            <Text size="md" weight="medium" className={cl("label")} id={keyId}>
                 Keybind
-            </BaseText>
+            </Text>
 
             {/* @ts-expect-error incorrect type for aria-labelledby */}
             <Select
@@ -143,9 +134,9 @@ export function KeyBindSettings() {
         <div className={cl("container")}>
             {shortcutsStatus === false && (
                 <Card variant="danger">
-                    <BaseText size="md" weight="medium">
+                    <Text size="md" weight="medium">
                         Some of your keybinds failed to register.
-                    </BaseText>
+                    </Text>
                 </Card>
             )}
 
@@ -197,17 +188,9 @@ export function KeyBindSettings() {
 
 export function openKeybindsModal() {
     openModal(props => (
-        <ModalRoot {...props} size={ModalSize.LARGE}>
-            <ModalHeader>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    Keybinds
-                </BaseText>
-                <ModalCloseButton onClick={props.onClose} />
-            </ModalHeader>
-            <ModalContent>
-                <KeyBindSettings />
-            </ModalContent>
-        </ModalRoot>
+        <Modal {...props} size="lg" title="Keybinds">
+            <KeyBindSettings />
+        </Modal>
     ));
 }
 
