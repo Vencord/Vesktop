@@ -32,7 +32,7 @@ export function reactiveValue<T>(initialValue?: T) {
             useEffect(() => {
                 changeListeners.add(update);
                 return () => void changeListeners.delete(update);
-            }, []);
+            }, [update]);
 
             return value;
         }

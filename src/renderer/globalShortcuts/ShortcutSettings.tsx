@@ -5,7 +5,6 @@
  */
 
 import "./ShortcutSettings.css";
-
 import { BaseText, Button, Card, DeleteIcon, Switch } from "@vencord/types/components";
 import {
     classNameFactory,

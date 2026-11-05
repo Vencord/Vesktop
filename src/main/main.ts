@@ -20,7 +20,7 @@ import { createFirstLaunchTour } from "./firstLaunch";
 import { sendRendererCommand } from "./ipcCommands";
 import { initSocket } from "./ipcSocket";
 import { registerKeyBinds } from "./keyBinds";
-import { createWindows, mainWin, openDeepLink } from "./mainWindow"
+import { createWindows, mainWin, openDeepLink } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
