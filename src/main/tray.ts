@@ -5,8 +5,10 @@
  */
 
 import { app, BrowserWindow, Menu, Tray } from "electron";
+import { sleep } from "shared/utils/sleep";
 
 import { createAboutWindow } from "./about";
+import { isStatusNotifierHostRegistered } from "./dbus";
 import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
@@ -37,6 +39,24 @@ AppEvents.on("setTrayVariant", async variant => {
 export function destroyTray() {
     tray?.destroy();
     tray = undefined;
+}
+
+// Chromium gives up on the tray if no StatusNotifierHost is registered when it is created and never retries.
+// This happens when we are autostarted before the desktop shell is ready, so wait for it first
+async function waitForStatusNotifierHost() {
+    if (process.platform !== "linux") return;
+
+    for (let i = 0; i < 30; i++) {
+        if (isStatusNotifierHostRegistered()) return;
+
+        await sleep(1000);
+    }
+
+    console.warn(
+        "StatusNotifierHost not registered after 30 seconds. Vesktop's Tray will likely not function correctly.\n" +
+            "If you are on GNOME, make sure you installed & enabled the AppIndicator and KStatusNotifierItem Support extension:\n" +
+            "https://extensions.gnome.org/extension/615/appindicator-support/"
+    );
 }
 
 export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
@@ -84,6 +104,9 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
             }
         }
     ]);
+
+    await waitForStatusNotifierHost();
+    if (Settings.store.tray === false) return;
 
     tray = new Tray(await resolveAssetPath(trayVariant));
     tray.setToolTip("Vesktop");
