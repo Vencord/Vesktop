@@ -114,39 +114,47 @@ addPatch({
     },
 
     scaleEncodeToSinkWants(encode: { width: number; height: number; framerate: number }, sinkPixelCount: number) {
-        const scale = Math.sqrt(sinkPixelCount / (encode.width * encode.height));
-        if (!(scale < 1)) return encode;
+        try {
+            const scale = Math.sqrt(sinkPixelCount / (encode.width * encode.height));
+            if (!(scale < 1)) return encode;
 
-        return {
-            ...encode,
-            width: Math.round(encode.width * scale),
-            height: Math.round(encode.height * scale)
-        };
+            return {
+                ...encode,
+                width: Math.round(encode.width * scale),
+                height: Math.round(encode.height * scale)
+            };
+        } catch (e) {
+            logger.error("Failed to scale encode to sink wants", e);
+        }
     },
 
     async updateOngoingStream(engine: any, { quality }: { quality?: { resolution: number; frameRate: number } }) {
-        if (!quality) return;
+        try {
+            if (!quality) return;
 
-        State.store.screenshareQuality = {
-            resolution: String(quality.resolution),
-            frameRate: String(quality.frameRate)
-        };
+            State.store.screenshareQuality = {
+                resolution: String(quality.resolution),
+                frameRate: String(quality.frameRate)
+            };
 
-        const conns: any[] = [];
-        engine.eachConnection((c: any) => c.streamUserId === c.userId && conns.push(c), "stream");
+            const conns: any[] = [];
+            engine.eachConnection((c: any) => c.streamUserId === c.userId && conns.push(c), "stream");
 
-        for (const conn of conns) {
-            const track: MediaStreamTrack | undefined = conn.input.getVideoStream()?.getVideoTracks()[0];
-            if (!track) continue;
+            for (const conn of conns) {
+                const track: MediaStreamTrack | undefined = conn.input.getVideoStream()?.getVideoTracks()[0];
+                if (!track) continue;
 
-            try {
-                await track.applyConstraints(getTrackConstraints(quality.resolution, quality.frameRate));
-                applyStreamQuality(conn, track);
-                conn.updateVideoQuality();
-                conn.handleVideo(conn.input.getVideoStreamId());
-            } catch (e) {
-                logger.error("Failed to update stream quality", e);
+                try {
+                    await track.applyConstraints(getTrackConstraints(quality.resolution, quality.frameRate));
+                    applyStreamQuality(conn, track);
+                    conn.updateVideoQuality();
+                    conn.handleVideo(conn.input.getVideoStreamId());
+                } catch (e) {
+                    logger.error("Failed to update stream quality", e);
+                }
             }
+        } catch (e) {
+            logger.error("Failed to update ongoing stream", e);
         }
     }
 });
