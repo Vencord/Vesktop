@@ -49,7 +49,12 @@ export const enum IpcEvents {
     VIRT_MIC_LIST = "VCD_VIRT_MIC_LIST",
     VIRT_MIC_START = "VCD_VIRT_MIC_START",
     VIRT_MIC_START_SYSTEM = "VCD_VIRT_MIC_START_ALL",
+    VIRT_MIC_UNMUTE = "VCD_VIRT_MIC_UNMUTE",
     VIRT_MIC_STOP = "VCD_VIRT_MIC_STOP",
+
+    RPC_READY = "VCD_RPC_READY",
+    RPC_SEND = "VCD_RPC_SEND",
+    RPC_CLOSE = "VCD_RPC_CLOSE",
 
     CLIPBOARD_COPY_IMAGE = "VCD_CLIPBOARD_COPY_IMAGE",
 
@@ -76,10 +81,13 @@ export const enum UpdaterIpcEvents {
 }
 
 export const enum IpcCommands {
-    RPC_ACTIVITY = "rpc:activity",
-    RPC_INVITE = "rpc:invite",
-    RPC_DEEP_LINK = "rpc:link",
+    RPC_CONNECT = "rpc:connect",
+    RPC_REQUEST = "rpc:request",
+    RPC_DISCONNECT = "rpc:disconnect",
+    RPC_GAME = "rpc:game",
+    RPC_RESET = "rpc:reset",
 
+    NAVIGATE = "navigate",
     NAVIGATE_SETTINGS = "navigate:settings",
 
     GET_LANGUAGES = "navigator.languages",

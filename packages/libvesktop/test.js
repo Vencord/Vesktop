@@ -6,15 +6,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { EventEmitter } = require("node:events");
 
-test("updateUnityLauncherCount should return true (success)", () => {
-    assert.strictEqual(libVesktop.updateUnityLauncherCount(5), true);
-    assert.strictEqual(libVesktop.updateUnityLauncherCount(0), true);
-    assert.strictEqual(libVesktop.updateUnityLauncherCount(10), true);
-});
-
 test("requestBackground should return true (success)", () => {
     assert.strictEqual(libVesktop.requestBackground(true, ["bash"]), true);
     assert.strictEqual(libVesktop.requestBackground(false, []), true);
+});
+
+test("isStatusNotifierHostRegistered should return true", () => {
+    assert.strictEqual(libVesktop.isStatusNotifierHostRegistered(), true);
 });
 
 // test("XDPGlobalShortcuts", async (t) => { // standalone tests need own glib thread and loop, electron handles this

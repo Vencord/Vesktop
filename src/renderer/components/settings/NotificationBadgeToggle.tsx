@@ -14,7 +14,7 @@ export const NotificationBadgeToggle: SettingsComponent = ({ settings }) => {
         <VesktopSettingsSwitch
             title="Notification Badge"
             description="Show mention badge on the app icon"
-            value={settings.appBadge ?? true}
+            value={settings.appBadge}
             onChange={v => {
                 settings.appBadge = v;
                 if (v) setBadge();

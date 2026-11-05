@@ -25,10 +25,12 @@ export function useSettings() {
     return Settings.store;
 }
 
-export function getValueAndOnChange(key: keyof typeof Settings.store) {
+export function getValueAndOnChange<K extends keyof typeof Settings.store, V extends (typeof Settings.store)[K]>(
+    key: K
+) {
     return {
-        value: Settings.store[key] as any,
-        onChange: (value: any) => (Settings.store[key] = value)
+        value: Settings.store[key] as V,
+        onChange: (value: V) => (Settings.store[key] = value)
     };
 }
 
@@ -53,7 +55,7 @@ const currentState: TState = (() => {
 })();
 
 export const State = new SettingsStore<TState>(currentState);
-State.addGlobalChangeListener((o, p) => localStorage.setItem(stateKey, JSON.stringify(o)));
+State.addGlobalChangeListener(o => localStorage.setItem(stateKey, JSON.stringify(o)));
 
 export function useVesktopState() {
     const [, update] = useReducer(x => x + 1, 0);

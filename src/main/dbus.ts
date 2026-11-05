@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
 import { EventEmitter } from "events";
-import { XDPShortcut } from "libvesktop";
 import { join } from "path";
+
+import { XDPShortcut } from "libvesktop";
 import { STATIC_DIR } from "shared/paths";
 
 let libVesktop: typeof import("libvesktop") | null = null;
@@ -24,17 +24,12 @@ function loadLibVesktop() {
     return libVesktop;
 }
 
-export function updateUnityLauncherCount(count: number) {
-    const libVesktop = loadLibVesktop();
-    if (!libVesktop) {
-        return app.setBadgeCount(count);
-    }
-
-    return libVesktop.updateUnityLauncherCount(count);
-}
-
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
     return loadLibVesktop()?.requestBackground(autoStart, commandLine) ?? false;
+}
+
+export function isStatusNotifierHostRegistered() {
+    return loadLibVesktop()?.isStatusNotifierHostRegistered() ?? true;
 }
 
 export const xdpEmitter = new EventEmitter();

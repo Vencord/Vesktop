@@ -8,6 +8,7 @@
 
 import fs from "fs/promises";
 import path from "path";
+
 import AppImageTarget from "app-builder-lib/out/targets/appimage/AppImageTarget.js";
 
 let isApplied = false;
@@ -45,14 +46,14 @@ export async function applyAppImageSandboxFix() {
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$( cd "$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-IS_STEAMOS=0
+ARGS=()
 
 if [[ "$SteamOS" == "1" && "$SteamGamepadUI" == "1" ]]; then
     echo "Running Vesktop on SteamOS, disabling sandbox"
-    IS_STEAMOS=1
+    ARGS+=(--no-sandbox)
 fi
 
-exec "$SCRIPT_DIR/${this.packager.executableName}.bin" "$([ "$IS_STEAMOS" == 1 ] && echo '--no-sandbox')" "$@"
+exec "$SCRIPT_DIR/${this.packager.executableName}.bin" "\${ARGS[@]}" "$@"
                 `.trim();
 
         try {
