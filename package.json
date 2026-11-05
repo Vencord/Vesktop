@@ -36,7 +36,7 @@
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
         "@types/node": "^26.6.5",
         "@types/react": "19.2.9",
-        "@vencord/types": "^1.15.15",
+        "@vencord/types": "1.15.14",
         "discord-rpc": "workspace:*",
         "electron": "45.2.3",
         "electron-builder": "^26.18.0",
@@ -51,7 +51,7 @@
         "typescript": "^6.0.3",
         "xml-formatter": "^3.6.7"
     },
-    "packageManager": "pnpm@12.15.0",
+    "packageManager": "pnpm@12.16.1",
     "engines": {
         "node": ">=22",
         "pnpm": ">=11"
