@@ -108,16 +108,25 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     submit={async v => {
                         didSubmit = true;
 
-                        if (v.includeSources && v.includeSources !== "None") {
-                            if (v.includeSources === "Entire System") {
-                                await VesktopNative.virtmic.startSystem(
-                                    !v.excludeSources || isSpecialSource(v.excludeSources) ? [] : v.excludeSources
-                                );
-                            } else {
-                                await VesktopNative.virtmic.start(v.includeSources);
+                        if (isLinux) {
+                            try {
+                                if (v.includeSources && v.includeSources !== "None") {
+                                    if (v.includeSources === "Entire System") {
+                                        await VesktopNative.virtmic.startSystem(
+                                            !v.excludeSources || isSpecialSource(v.excludeSources)
+                                                ? []
+                                                : v.excludeSources
+                                        );
+                                    } else {
+                                        await VesktopNative.virtmic.start(v.includeSources);
+                                    }
+                                } else {
+                                    await VesktopNative.virtmic.stop();
+                                }
+                            } catch (e) {
+                                // still start the stream, just without audio
+                                logger.error("Failed to set up venmic", e);
                             }
-                        } else {
-                            await VesktopNative.virtmic.stop();
                         }
 
                         resolve(v);

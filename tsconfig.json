@@ -19,5 +19,5 @@
 
         "types": ["node", "@vencord/types"]
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*", "packages/discord-rpc/src/**/*"]
 }

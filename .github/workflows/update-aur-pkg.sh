@@ -4,7 +4,10 @@ set -exuo pipefail
 cd ~
 
 install -d -m 0700 ~/.ssh
+# don't print the key via xtrace
+set +x
 echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+set -x
 chmod 0600 ~/.ssh/aur
 cat > ~/.ssh/config <<'EOF'
 Host aur.archlinux.org
@@ -32,7 +35,7 @@ if git diff --cached --quiet; then
     exit 0
 fi
 
-if [[ "$AUR_EVENT_NAME" == workflow_dispatch ]]; then
+if [[ "$EVENT_NAME" == workflow_dispatch ]]; then
     echo "Skipping push for workflow dispatch"
     exit 0
 fi
@@ -40,5 +43,5 @@ fi
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-git commit -m "Update vesktop-bin to $AUR_RELEASE_TAG"
+git commit -m "Update vesktop-bin to $RELEASE_TAG"
 git push

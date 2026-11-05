@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { rm } from "fs/promises";
+import { writeFile } from "fs/promises";
 
-import { app, BrowserWindow, dialog } from "electron";
-import { DATA_DIR, MessageBoxChoice } from "main/constants";
+import { BrowserWindow, dialog } from "electron";
+import { MessageBoxChoice, RESET_MARKER_FILE } from "main/constants";
+
+import { relaunch } from "./relaunch";
 
 export async function clearData(win: BrowserWindow) {
     const { response } = await dialog.showMessageBox(win, {
@@ -21,13 +23,7 @@ export async function clearData(win: BrowserWindow) {
 
     if (response === MessageBoxChoice.Cancel) return;
 
-    win.close();
-
-    await win.webContents.session.clearStorageData();
-    await win.webContents.session.clearCache();
-    await win.webContents.session.clearCodeCaches({});
-    await rm(DATA_DIR, { force: true, recursive: true });
-
-    app.relaunch();
-    app.quit();
+    // Chromium keeps files open while running, so the data is deleted on the next start instead
+    await writeFile(RESET_MARKER_FILE, "");
+    relaunch();
 }

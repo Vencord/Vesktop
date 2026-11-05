@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Heading, Margins, Paragraph } from "@vencord/types/components";
+import { Margins, Paragraph, Heading } from "@vencord/types/components";
 import { Select } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
