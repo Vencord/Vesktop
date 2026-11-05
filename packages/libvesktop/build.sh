@@ -3,7 +3,7 @@ set -e
 
 docker build -t libvesktop-builder -f Dockerfile .
 
-docker run --rm -v "$PWD":/src -w /src libvesktop-builder bash -c "
+docker run --rm -v "$PWD/../..":/src -w /src/packages/libvesktop libvesktop-builder bash -c "
   set -e
 
   echo '=== Building x64 ==='
