@@ -144,7 +144,7 @@
     display: flex;
     gap: 1em;
 
-    >section {
+    > section {
         flex: 1;
     }
 }
