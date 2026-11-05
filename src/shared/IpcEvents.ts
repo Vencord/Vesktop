@@ -85,6 +85,7 @@ export const enum IpcCommands {
     RPC_GAME = "rpc:game",
     RPC_RESET = "rpc:reset",
 
+    NAVIGATE = "navigate",
     NAVIGATE_SETTINGS = "navigate:settings",
 
     GET_LANGUAGES = "navigator.languages",

@@ -15,7 +15,7 @@ import { readFileSync } from "fs";
 
 import { DATA_DIR, IS_FLATPAK } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, focusMainWindow, mainWin } from "./mainWindow";
+import { createWindows, focusMainWindow, mainWin, openDeepLink } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -34,7 +34,8 @@ export let enableHardwareAcceleration = true;
 function init() {
     setAsDefaultProtocolClient("discord");
 
-    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration, hardwareVideoEncoding } =
+        Settings.store;
 
     const enabledFeatures = new Set(app.commandLine.getSwitchValue("enable-features").split(","));
     const disabledFeatures = new Set(app.commandLine.getSwitchValue("disable-features").split(","));
@@ -45,8 +46,11 @@ function init() {
         enableHardwareAcceleration = false;
         app.disableHardwareAcceleration();
     } else {
-        if (hardwareVideoAcceleration) {
+        if (hardwareVideoEncoding) {
             enabledFeatures.add("AcceleratedVideoEncoder");
+        }
+
+        if (hardwareVideoAcceleration) {
             enabledFeatures.add("AcceleratedVideoDecoder");
 
             if (isLinux) {
@@ -102,9 +106,14 @@ function init() {
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
-    app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        if (data.IS_DEV) app.quit();
-        else if (mainWin) focusMainWindow();
+    app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
+        if (data?.IS_DEV) return app.quit();
+        if (!mainWin) return;
+
+        const deepLink = cmdLine.find(arg => arg.startsWith("discord://"));
+        if (deepLink) openDeepLink(deepLink);
+
+        focusMainWindow();
     });
 
     app.whenReady().then(async () => {
@@ -144,7 +153,12 @@ async function bootstrap() {
 // MacOS only event
 export let darwinURL: string | undefined;
 app.on("open-url", (_, url) => {
-    darwinURL = url;
+    if (mainWin) {
+        openDeepLink(url);
+        focusMainWindow();
+    } else {
+        darwinURL = url;
+    }
 });
 
 app.on("window-all-closed", () => {

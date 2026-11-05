@@ -25,3 +25,7 @@ function loadLibVesktop() {
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
     return loadLibVesktop()?.requestBackground(autoStart, commandLine) ?? false;
 }
+
+export function isStatusNotifierHostRegistered() {
+    return loadLibVesktop()?.isStatusNotifierHostRegistered() ?? true;
+}

@@ -13,6 +13,7 @@ import { Settings } from "./settings";
 import { loadView } from "./vesktopStatic";
 
 let splash: BrowserWindow | undefined;
+let message = "";
 
 export function createSplashWindow(startMinimized = false) {
     splash = new BrowserWindow({
@@ -22,6 +23,9 @@ export function createSplashWindow(startMinimized = false) {
             preload: join(__dirname, "splashPreload.js")
         }
     });
+
+    // messages sent before the page finished loading are lost, so resend the latest one
+    splash.webContents.on("did-finish-load", () => updateSplashMessage(message));
 
     const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
@@ -37,6 +41,7 @@ export function createSplashWindow(startMinimized = false) {
     return splash;
 }
 
-export function updateSplashMessage(message: string) {
+export function updateSplashMessage(newMessage: string) {
+    message = newMessage;
     if (splash && !splash.isDestroyed()) splash.webContents.send("update-splash-message", message);
 }

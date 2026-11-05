@@ -22,7 +22,6 @@ import { onceReady } from "@vencord/types/webpack";
 import {
     closeModal,
     FluxDispatcher,
-    MediaEngineStore,
     Modal,
     openModal,
     Select,
@@ -31,13 +30,13 @@ import {
 } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
-import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
 
 import { SimpleErrorBoundary } from "./SimpleErrorBoundary";
 
-const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440", "2160", "0"] as const;
+const StreamResolutionLabels = ["480", "720", "1080", "1440", "2160", "Source"];
 const StreamFps = ["15", "30", "60"] as const;
 
 const cl = classNameFactory("vcd-screen-picker-");
@@ -74,49 +73,6 @@ interface Source {
 
 export let currentSettings: StreamSettings | null = null;
 
-const logger = new Logger("VesktopScreenShare");
-
-addPatch({
-    patches: [
-        {
-            find: "this.getDefaultGoliveQuality()",
-            replacement: {
-                match: /this\.getDefaultGoliveQuality\(\)/,
-                replace: "$self.patchStreamQuality($&)"
-            }
-        }
-    ],
-    patchStreamQuality(opts: any) {
-        const { screenshareQuality } = State.store;
-        if (!screenshareQuality) return opts;
-
-        const framerate = Number(screenshareQuality.frameRate);
-        const height = Number(screenshareQuality.resolution);
-        const width = Math.round(height * (16 / 9));
-
-        Object.assign(opts, {
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
-        });
-        if (opts?.encode) {
-            Object.assign(opts.encode, {
-                framerate,
-                width,
-                height,
-                pixelCount: height * width
-            });
-        }
-        Object.assign(opts.capture, {
-            framerate,
-            width,
-            height,
-            pixelCount: height * width
-        });
-        return opts;
-    }
-});
-
 if (isLinux) {
     onceReady.then(() => {
         const ownsStream = (streamKey: string) => {
@@ -152,16 +108,25 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     submit={async v => {
                         didSubmit = true;
 
-                        if (v.includeSources && v.includeSources !== "None") {
-                            if (v.includeSources === "Entire System") {
-                                await VesktopNative.virtmic.startSystem(
-                                    !v.excludeSources || isSpecialSource(v.excludeSources) ? [] : v.excludeSources
-                                );
-                            } else {
-                                await VesktopNative.virtmic.start(v.includeSources);
+                        if (isLinux) {
+                            try {
+                                if (v.includeSources && v.includeSources !== "None") {
+                                    if (v.includeSources === "Entire System") {
+                                        await VesktopNative.virtmic.startSystem(
+                                            !v.excludeSources || isSpecialSource(v.excludeSources)
+                                                ? []
+                                                : v.excludeSources
+                                        );
+                                    } else {
+                                        await VesktopNative.virtmic.start(v.includeSources);
+                                    }
+                                } else {
+                                    await VesktopNative.virtmic.stop();
+                                }
+                            } catch (e) {
+                                // still start the stream, just without audio
+                                new Logger("VesktopScreenShare").error("Failed to set up venmic", e);
                             }
-                        } else {
-                            await VesktopNative.virtmic.stop();
                         }
 
                         resolve(v);
@@ -405,6 +370,7 @@ function StreamSettingsUi({
                         </Heading>
                         <OptionRadio
                             options={StreamResolutions}
+                            labels={StreamResolutionLabels}
                             settings={qualitySettings}
                             settingsKey="resolution"
                             onChange={value => (qualitySettings.resolution = value)}
@@ -724,64 +690,17 @@ function ModalComponent({
         audio: true,
         includeSources: "None"
     });
-    const qualitySettings = (useVesktopState().screenshareQuality ??= {
+    useVesktopState().screenshareQuality ??= {
         resolution: "720",
         frameRate: "30"
-    });
+    };
 
     function handleGoLive() {
         currentSettings = settings;
-        try {
-            const frameRate = Number(qualitySettings.frameRate);
-            const height = Number(qualitySettings.resolution);
-            const width = Math.round(height * (16 / 9));
-
-            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                connection => connection.streamUserId === UserStore.getCurrentUser().id
-            );
-
-            if (conn) {
-                conn.videoStreamParameters[0].maxFrameRate = frameRate;
-                conn.videoStreamParameters[0].maxResolution ??= { width: 0, height: 0 };
-                conn.videoStreamParameters[0].maxResolution.height = height;
-                conn.videoStreamParameters[0].maxResolution.width = width;
-            }
-
-            submit({
-                id: selected!,
-                ...settings
-            });
-
-            setTimeout(async () => {
-                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                    connection => connection.streamUserId === UserStore.getCurrentUser().id
-                );
-                if (!conn) return;
-
-                // @ts-expect-error incorrect type
-                const track = conn.input.stream.getVideoTracks()[0];
-
-                const constraints = {
-                    ...track.getConstraints(),
-                    frameRate: { min: frameRate, ideal: frameRate },
-                    width: { min: 640, ideal: width, max: width },
-                    height: { min: 480, ideal: height, max: height },
-                    advanced: [{ width: width, height: height }],
-                    resizeMode: "none"
-                };
-
-                try {
-                    await track.applyConstraints(constraints);
-
-                    logger.info("Applied constraints successfully. New constraints:", track.getConstraints());
-                } catch (e) {
-                    logger.error("Failed to apply constraints.", e);
-                }
-            }, 100);
-        } catch (error) {
-            logger.error("Error while submitting stream.", error);
-        }
-
+        submit({
+            id: selected!,
+            ...settings
+        });
         close();
     }
 
