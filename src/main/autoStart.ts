@@ -22,9 +22,15 @@ interface AutoStart {
 }
 
 function getEscapedCommandLine() {
-    const args = process.argv.map(escapeDesktopFileArgument);
+    // inside an AppImage, argv[0] is a temporary mount
+    const exe = (app.isPackaged && process.env.APPIMAGE) || process.execPath;
+    const args = process.argv
+        .slice(1) // skip the executable path
+        .filter(arg => arg !== "--start-minimized" && arg !== "-m" && !arg.startsWith("discord://"));
+
     if (Settings.store.autoStartMinimized) args.push("--start-minimized");
-    return args;
+
+    return [exe, ...args].map(escapeDesktopFileArgument);
 }
 
 function makeAutoStartLinuxDesktop(): AutoStart {

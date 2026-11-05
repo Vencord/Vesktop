@@ -13,28 +13,32 @@ import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
 import { clearData } from "./utils/clearData";
+import { relaunch } from "./utils/relaunch";
+import { showWindow } from "./utils/showWindow";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
-let tray: Tray;
+let tray: Tray | undefined;
 let trayVariant: "tray" | "trayUnread" = "tray";
 
+// resolve the image before checking tray, as it might get destroyed in the meantime
 AppEvents.on("userAssetChanged", async asset => {
-    if (tray && (asset === "tray" || asset === "trayUnread")) {
-        tray.setImage(await resolveAssetPath(trayVariant));
-    }
+    if (asset !== "tray" && asset !== "trayUnread") return;
+
+    const image = await resolveAssetPath(trayVariant);
+    tray?.setImage(image);
 });
 
 AppEvents.on("setTrayVariant", async variant => {
     if (trayVariant === variant) return;
 
     trayVariant = variant;
-    if (!tray) return;
-
-    tray.setImage(await resolveAssetPath(trayVariant));
+    const image = await resolveAssetPath(trayVariant);
+    tray?.setImage(image);
 });
 
 export function destroyTray() {
     tray?.destroy();
+    tray = undefined;
 }
 
 // Chromium gives up on the tray if no StatusNotifierHost is registered when it is created and never retries.
@@ -58,14 +62,14 @@ async function waitForStatusNotifierHost() {
 export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
     const onTrayClick = () => {
         if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
-        else win.show();
+        else showWindow(win);
     };
 
     const trayMenu = Menu.buildFromTemplate([
         {
             label: "Open",
             click() {
-                win.show();
+                showWindow(win);
             }
         },
         {
@@ -76,8 +80,7 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
             label: "Repair Vencord",
             async click() {
                 await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
+                relaunch();
             }
         },
         {
@@ -91,10 +94,7 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
         },
         {
             label: "Restart",
-            click() {
-                app.relaunch();
-                app.quit();
-            }
+            click: relaunch
         },
         {
             label: "Quit",

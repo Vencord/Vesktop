@@ -6,23 +6,12 @@
 
 if (process.platform === "linux") import("./venmic");
 
-import { execFile } from "child_process";
 import { readFileSync, watch } from "fs";
 import { readFile, stat } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
 
-import {
-    app,
-    BrowserWindow,
-    clipboard,
-    ClipboardItem,
-    dialog,
-    IpcMainInvokeEvent,
-    RelaunchOptions,
-    session,
-    shell
-} from "electron";
+import { app, BrowserWindow, clipboard, ClipboardItem, dialog, IpcMainInvokeEvent, session, shell } from "electron";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
@@ -32,7 +21,8 @@ import { mainWin } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
-import { isDeckGameMode, showGamePage } from "./utils/steamOS";
+import { relaunch } from "./utils/relaunch";
+import { showWindow } from "./utils/showWindow";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
@@ -74,20 +64,7 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
     Settings.setData(settings, path);
 });
 
-handle(IpcEvents.RELAUNCH, async () => {
-    const options: RelaunchOptions = {
-        args: process.argv.slice(1).concat(["--relaunch"])
-    };
-    if (isDeckGameMode) {
-        // We can't properly relaunch when running under gamescope, but we can at least navigate to our page in Steam.
-        await showGamePage();
-    } else if (app.isPackaged && process.env.APPIMAGE) {
-        execFile(process.env.APPIMAGE, options.args);
-    } else {
-        app.relaunch(options);
-    }
-    app.exit();
-});
+handle(IpcEvents.RELAUNCH, relaunch);
 
 handleSync(IpcEvents.IS_USING_CUSTOM_VENCORD_DIR, () => !!State.store.vencordDir);
 handle(IpcEvents.SHOW_CUSTOM_VENCORD_DIR, async () => {
@@ -105,7 +82,7 @@ function getWindow(e: IpcMainInvokeEvent, key?: string) {
 }
 
 handle(IpcEvents.FOCUS, () => {
-    mainWin.show();
+    showWindow(mainWin);
     mainWin.setSkipTaskbar(false);
 });
 
