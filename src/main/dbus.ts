@@ -25,7 +25,3 @@ function loadLibVesktop() {
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
     return loadLibVesktop()?.requestBackground(autoStart, commandLine) ?? false;
 }
-
-export function listenForActivation(appId: string, callback: (activationToken: string) => void) {
-    return loadLibVesktop()?.listenForActivation(appId, callback) ?? false;
-}

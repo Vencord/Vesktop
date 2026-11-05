@@ -10,12 +10,10 @@ import "./ipc";
 import "./rpc";
 import "./userAssets";
 import "./vesktopProtocol";
-import { spawn } from "child_process";
-
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { readFileSync } from "fs";
 
 import { DATA_DIR, IS_FLATPAK } from "./constants";
-import { listenForActivation } from "./dbus";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, focusMainWindow, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
@@ -30,9 +28,6 @@ console.log("Vesktop v" + app.getVersion());
 process.env.VENCORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
-
-// The instance launched to forward a notification activation token must never replace the running one, even in dev
-const replacesRunningInstance = IS_DEV && !process.env.VESKTOP_ACTIVATION_RELAUNCH;
 
 export let enableHardwareAcceleration = true;
 
@@ -77,6 +72,16 @@ function init() {
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
         disabledFeatures.add("WaylandWpColorManagerV1");
+
+        // The Flatpak notification portal can't pass activation tokens, so clicking a notification can't focus the window on Wayland.
+        // Make libnotify talk to org.freedesktop.Notifications directly instead, but only if the sandbox allows it,
+        // otherwise notifications would be silently dropped
+        if (
+            IS_FLATPAK &&
+            /^org\.freedesktop\.Notifications=(talk|own)$/m.test(readFileSync("/.flatpak-info", "utf-8"))
+        ) {
+            process.env.NOTIFY_IGNORE_PORTAL = "1";
+        }
     }
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
@@ -110,29 +115,14 @@ function init() {
 
         bootstrap();
 
-        // In the Flatpak, GNOME hands the activation token of a notification click to org.freedesktop.Application.Activate,
-        // as the notification portal can't pass it on. Electron can only apply a token to the existing window through its
-        // single instance handling, so launch a second instance with the token and let it forward to this one.
-        if (IS_FLATPAK) {
-            listenForActivation(process.env.FLATPAK_ID!, activationToken => {
-                if (!activationToken) return focusMainWindow();
-
-                spawn(process.execPath, process.argv.slice(1), {
-                    detached: true,
-                    stdio: "ignore",
-                    env: { ...process.env, XDG_ACTIVATION_TOKEN: activationToken, VESKTOP_ACTIVATION_RELAUNCH: "1" }
-                }).unref();
-            });
-        }
-
         app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) createWindows();
         });
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV: replacesRunningInstance })) {
-    if (replacesRunningInstance) {
+if (!app.requestSingleInstanceLock({ IS_DEV })) {
+    if (IS_DEV) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
     } else {
