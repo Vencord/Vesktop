@@ -92,6 +92,7 @@ export const VesktopNative = {
             >(IpcEvents.VIRT_MIC_LIST),
         start: (include: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START, include),
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
+        unmute: () => invoke<void>(IpcEvents.VIRT_MIC_UNMUTE),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
     },
     clipboard: {
@@ -101,6 +102,11 @@ export const VesktopNative = {
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),
         launchWebrtcInternals: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_WEBRTC_INTERNALS)
+    },
+    rpc: {
+        ready: () => invoke<void>(IpcEvents.RPC_READY),
+        send: (id: string, json: string) => invoke<void>(IpcEvents.RPC_SEND, id, json),
+        close: (id: string, code: number, message?: string) => invoke<void>(IpcEvents.RPC_CLOSE, id, code, message)
     },
     commands: {
         onCommand(cb: (message: IpcMessage) => void) {

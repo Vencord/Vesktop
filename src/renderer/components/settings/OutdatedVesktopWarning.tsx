@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Button, Card, HeadingTertiary, Paragraph } from "@vencord/types/components";
+import { Button, Card, Heading, Paragraph } from "@vencord/types/components";
 import { useAwaiter } from "@vencord/types/utils";
 
 import { cl } from "./Settings";
@@ -16,7 +16,7 @@ export function OutdatedVesktopWarning() {
 
     return (
         <Card variant="warning" className={cl("updater-card")}>
-            <HeadingTertiary>Your Vesktop is outdated!</HeadingTertiary>
+            <Heading tag="h4">Your Vesktop is outdated!</Heading>
             <Paragraph>Staying up to date is important for security and stability.</Paragraph>
 
             <Button onClick={() => VesktopNative.app.openUpdater()} variant="secondary">

@@ -3,11 +3,14 @@
 
 <head>
     <title>Vesktop Updater</title>
-    <meta http-equiv="Content-Security-Policy" content="
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="
         default-src 'none';
         script-src vesktop:;
         style-src vesktop:;
-      ">
+      "
+    />
 
     <link rel="stylesheet" href="../common.css" type="text/css" />
     <link rel="stylesheet" href="./style.css" type="text/css" />
@@ -43,8 +46,9 @@
             automatically install and Vesktop will restart.
         </p>
 
-        <p id="linux-note" class="hidden">You will likely be prompted to enter your password. Do so to finish the
-            update.</p>
+        <p id="linux-note" class="hidden">
+            You will likely be prompted to enter your password. Do so to finish the update.
+        </p>
 
         <progress id="download-progress" value="0" max="100"></progress>
 

@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
 import { basename } from "path";
-import { stripIndent } from "shared/utils/text";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
+
+import { app } from "electron";
+import { stripIndent } from "shared/utils/text";
 
 type Option = ParseArgsOptionDescriptor & {
     description: string;

@@ -5,20 +5,9 @@
  */
 
 import "./UserAssets.css";
-
-import { BaseText, Button, FormSwitch } from "@vencord/types/components";
-import {
-    Margins,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalRoot,
-    ModalSize,
-    openModal,
-    wordsFromCamel,
-    wordsToTitle
-} from "@vencord/types/utils";
-import { showToast, useState } from "@vencord/types/webpack/common";
+import { Button, FormSwitch, Text } from "@vencord/types/components";
+import { Margins, wordsFromCamel, wordsToTitle } from "@vencord/types/utils";
+import { Modal, openModal, showToast, useState } from "@vencord/types/webpack/common";
 import { UserAssetType } from "main/userAssets";
 import { useSettings } from "renderer/settings";
 
@@ -32,28 +21,19 @@ export const UserAssetsButton: SettingsComponent = () => {
 
 function openAssetsModal() {
     openModal(props => (
-        <ModalRoot {...props} size={ModalSize.MEDIUM}>
-            <ModalHeader>
-                <BaseText size="lg" weight="semibold" tag="h3" style={{ flexGrow: 1 }}>
-                    User Assets
-                </BaseText>
-                <ModalCloseButton onClick={props.onClose} />
-            </ModalHeader>
-
-            <ModalContent>
-                <div className="vcd-user-assets">
-                    {CUSTOMIZABLE_ASSETS.map(asset => (
-                        <Asset key={asset} asset={asset} />
-                    ))}
-                </div>
-            </ModalContent>
-        </ModalRoot>
+        <Modal {...props} size="lg" title="User Assets">
+            <div className="vcd-user-assets">
+                {CUSTOMIZABLE_ASSETS.map(asset => (
+                    <Asset key={asset} asset={asset} />
+                ))}
+            </div>
+        </Modal>
     ));
 }
 
 function Asset({ asset }: { asset: UserAssetType }) {
     // cache busting
-    const [version, setVersion] = useState(Date.now());
+    const [version, setVersion] = useState(() => Date.now());
     const settings = useSettings();
 
     const isSplash = asset === "splash";
@@ -67,15 +47,15 @@ function Asset({ asset }: { asset: UserAssetType }) {
                 settings.splashPixelated = false;
             }
         } else if (res === "failed") {
-            showToast("Something went wrong. Please try again");
+            showToast({ text: "Something went wrong. Please try again", variant: "critical" });
         }
     };
 
     return (
         <section>
-            <BaseText size="md" weight="medium" tag="h3">
+            <Text size="md" weight="medium" tag="h3">
                 {wordsToTitle(wordsFromCamel(asset))}
-            </BaseText>
+            </Text>
             <div className="vcd-user-assets-asset">
                 <img
                     className="vcd-user-assets-image"
@@ -93,7 +73,7 @@ function Asset({ asset }: { asset: UserAssetType }) {
                     {isSplash && (
                         <FormSwitch
                             title="Nearest-Neighbor Scaling (for pixel art)"
-                            value={settings.splashPixelated ?? false}
+                            value={settings.splashPixelated}
                             onChange={val => (settings.splashPixelated = val)}
                             className={Margins.top16}
                             hideBorder

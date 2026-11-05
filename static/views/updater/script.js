@@ -1,4 +1,4 @@
-const { update, version: currentVersion } = await VesktopUpdaterNative.getData();
+const { update, version: currentVersion, portable } = await VesktopUpdaterNative.getData();
 
 document.getElementById("current-version").textContent = currentVersion;
 document.getElementById("new-version").textContent = update.version;
@@ -33,7 +33,17 @@ const downloadProgress = document.getElementById("download-progress");
 /** @type {HTMLElement} */
 const errorText = document.getElementById("error");
 
-document.getElementById("update-button").addEventListener("click", () => {
+const updateButton = document.getElementById("update-button");
+
+// electron-updater doesn't support portable installs, so link to the release instead
+if (portable) updateButton.textContent = "Download update";
+
+updateButton.addEventListener("click", () => {
+    if (portable) {
+        window.open(`https://github.com/Vencord/Vesktop/releases/tag/v${update.version}`);
+        return;
+    }
+
     downloadProgress.value = 0;
     errorText.textContent = "";
 
