@@ -513,7 +513,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
     exports.Set("isStatusNotifierHostRegistered", Napi::Function::New(env, IsStatusNotifierHostRegistered));
-    return XDPGlobalShortcuts::Init(env, exports);
+
+    // global shortcuts error in CI
+    return std::getenv("CI") ? exports : XDPGlobalShortcuts::Init(env, exports);
 }
 
 NODE_API_MODULE(libvesktop, Init)
