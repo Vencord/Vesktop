@@ -44,9 +44,16 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
         },
         {
             key: "hardwareVideoAcceleration",
-            title: "Video Hardware Acceleration",
+            title: "Video Hardware Decoding",
             description:
-                "Enable hardware video acceleration. This can improve performance of screenshare and video playback, but may cause graphical glitches and infinitely loading streams.",
+                "Use your GPU to decode video, like streams you watch. This can improve performance, but may cause graphical glitches.",
+            disabled: () => !Settings.store.hardwareAcceleration
+        },
+        {
+            key: "hardwareVideoEncoding",
+            title: "Video Hardware Encoding",
+            description:
+                "Use your GPU to encode your screenshare. This lowers CPU usage, but on some drivers (for example AMD with Mesa 24.3 or newer) viewers will be stuck loading your stream forever.",
             disabled: () => !Settings.store.hardwareAcceleration
         }
     ],

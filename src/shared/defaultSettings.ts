@@ -10,6 +10,7 @@ export const DefaultVesktopSettings: Settings = {
     discordBranch: "stable",
     hardwareAcceleration: true,
     hardwareVideoAcceleration: false,
+    hardwareVideoEncoding: false,
     nativeTitleBar: false,
     staticTitle: false,
     enableMenu: false,

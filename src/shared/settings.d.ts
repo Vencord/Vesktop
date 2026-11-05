@@ -25,6 +25,7 @@ export interface Settings {
     disableSmoothScroll: boolean;
     hardwareAcceleration: boolean;
     hardwareVideoAcceleration: boolean;
+    hardwareVideoEncoding: boolean;
     arRPC: boolean;
     appBadge: boolean;
     enableTaskbarFlashing: boolean;

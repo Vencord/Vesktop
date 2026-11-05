@@ -34,7 +34,8 @@ export let enableHardwareAcceleration = true;
 function init() {
     setAsDefaultProtocolClient("discord");
 
-    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration, hardwareVideoEncoding } =
+        Settings.store;
 
     const enabledFeatures = new Set(app.commandLine.getSwitchValue("enable-features").split(","));
     const disabledFeatures = new Set(app.commandLine.getSwitchValue("disable-features").split(","));
@@ -45,8 +46,11 @@ function init() {
         enableHardwareAcceleration = false;
         app.disableHardwareAcceleration();
     } else {
-        if (hardwareVideoAcceleration) {
+        if (hardwareVideoEncoding) {
             enabledFeatures.add("AcceleratedVideoEncoder");
+        }
+
+        if (hardwareVideoAcceleration) {
             enabledFeatures.add("AcceleratedVideoDecoder");
 
             if (isLinux) {
