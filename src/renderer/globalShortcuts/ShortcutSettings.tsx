@@ -25,6 +25,7 @@ import { SettingsComponent } from "renderer/components/settings/Settings";
 import { onIpcCommand } from "renderer/ipcCommands";
 import { reactiveValue } from "renderer/reactiveState";
 import { useSettings } from "renderer/settings";
+import { isLinux } from "renderer/utils";
 import { IpcCommands } from "shared/IpcEvents";
 import { ACTION_DESCRIPTIONS, KeyBind, KeybindStatus } from "shared/utils/keybind";
 
@@ -314,8 +315,12 @@ function KeybindSettings() {
     return (
         <div className={cl("container")}>
             {status.backend === "portal" ? <PortalKeybinds status={status} /> : <HookKeybinds status={status} />}
-            <Divider />
-            <ExternalTriggers />
+            {isLinux && (
+                <>
+                    <Divider />
+                    <ExternalTriggers />
+                </>
+            )}
         </div>
     );
 }
