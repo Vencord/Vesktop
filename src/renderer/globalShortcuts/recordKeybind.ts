@@ -5,116 +5,135 @@
  */
 
 import { isMac, isWindows } from "renderer/utils";
-import { keyNameToAccelerator, NUMPAD_KEYS } from "shared/utils/keybind";
+import { sortKeys } from "shared/utils/keybind";
 
-const MODIFIER_KEYS = new Set(["Control", "Shift", "Alt", "Meta", "Dead"]);
-
-const DISPLAY_MAP: Record<string, string> = {
-    ...Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`Numpad${i}`, `Num+${i}`])),
-    NumpadMultiply: "Num+*",
-    NumpadAdd: "Num+Plus",
-    NumpadSubtract: "Num+-",
-    NumpadDecimal: "Num+.",
-    NumpadDivide: "Num+/",
-    NumpadEnter: "Num+Enter",
-    NumpadEnd: "Num+End",
-    NumpadArrowDown: "Num+Down",
-    NumpadPageDown: "Num+PgDn",
-    NumpadArrowLeft: "Num+Left",
-    NumpadArrowRight: "Num+Right",
-    NumpadHome: "Num+Home",
-    NumpadArrowUp: "Num+Up",
-    NumpadPageUp: "Num+PgUp",
-    NumpadInsert: "Num+Ins",
-    NumpadDelete: "Num+Del",
-
-    Super: isWindows ? "⊞ Win" : isMac ? "⌘ Cmd" : "Meta"
+const MODIFIER_CODES: Record<string, string> = {
+    ControlLeft: "Control",
+    ControlRight: "Control",
+    ShiftLeft: "Shift",
+    ShiftRight: "Shift",
+    AltLeft: "Alt",
+    AltRight: "Alt",
+    MetaLeft: "Meta",
+    MetaRight: "Meta"
 };
-export function acceleratorToDisplay(accelerator: string): string {
-    return accelerator
-        .split("+")
-        .map(t => DISPLAY_MAP[t] ?? t)
-        .join(" + ");
+
+// MouseEvent.button: 1 is middle, 3 is back and 4 is forward. Same numbering as the input hook
+const MOUSE_BUTTONS: Record<number, string> = {
+    1: "Mouse3",
+    3: "Mouse4",
+    4: "Mouse5"
+};
+
+// Keys the input hook can detect, besides modifiers and mouse buttons
+const SUPPORTED_KEY = new RegExp(
+    "^(" +
+        [
+            "Key[A-Z]",
+            "Digit\\d",
+            "F([1-9]|1\\d|2[0-4])",
+            "Numpad(\\d|Add|Subtract|Multiply|Divide|Decimal|Enter)",
+            "Arrow(Up|Down|Left|Right)",
+            "Backspace|Tab|Enter|CapsLock|Escape|Space|PageUp|PageDown|End|Home|Insert|Delete",
+            "Semicolon|Equal|Comma|Minus|Period|Slash|Backquote|BracketLeft|Backslash|BracketRight|Quote",
+            "NumLock|ScrollLock|PrintScreen"
+        ].join("|") +
+        ")$"
+);
+
+const DISPLAY_NAMES: Record<string, string> = {
+    Control: "Ctrl",
+    Alt: isMac ? "Option" : "Alt",
+    Meta: isWindows ? "Win" : isMac ? "Cmd" : "Super",
+    Escape: "Esc",
+    Backquote: "`",
+    Minus: "-",
+    Equal: "=",
+    BracketLeft: "[",
+    BracketRight: "]",
+    Backslash: "\\",
+    Semicolon: ";",
+    Quote: "'",
+    Comma: ",",
+    Period: ".",
+    Slash: "/",
+    NumpadAdd: "Num +",
+    NumpadSubtract: "Num -",
+    NumpadMultiply: "Num *",
+    NumpadDivide: "Num /",
+    NumpadDecimal: "Num .",
+    NumpadEnter: "Num Enter"
+};
+
+function keyToDisplay(key: string) {
+    if (DISPLAY_NAMES[key]) return DISPLAY_NAMES[key];
+
+    const match = /^(Key|Digit|Arrow|Numpad|Mouse)(.+)$/.exec(key);
+    if (!match) return key;
+
+    const [, prefix, rest] = match;
+    if (prefix === "Numpad") return `Num ${rest}`;
+    if (prefix === "Mouse") return `Mouse ${rest}`;
+    return rest;
 }
 
-function codeToAcceleratorKey(event: KeyboardEvent): string | null {
-    const { code, key } = event;
-    if (event.location === 3) {
-        // Handle numlock shenanigans
-        const last = code.at(-1)!;
-        if (/\d/.test(last) && last !== key) {
-            const numpad = "Numpad" + key;
-            if (NUMPAD_KEYS.has(numpad)) return numpad;
-        }
-    }
-
-    const letterMatch = /^Key([A-Z])$/.exec(code);
-    if (letterMatch) return letterMatch[1]; // KeyA -> "A"
-    const digitMatch = /^Digit(\d)$/.exec(code);
-    if (digitMatch) return digitMatch[1]; // Digit0 -> "0"
-
-    const fromMap = keyNameToAccelerator(code);
-    if (fromMap !== null) return fromMap;
-
-    return null;
+export function keysToDisplay(keys: string[]) {
+    return keys.map(keyToDisplay).join(" + ");
 }
 
-export async function recordKeybind(signal?: AbortSignal): Promise<string> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) {
-            reject(new DOMException("Recording aborted", "AbortError"));
-            return;
-        }
+/**
+ * Records a keybind: every key and mouse button held down until the first one is released.
+ * Modifiers on their own are allowed, since they are popular for push to talk
+ */
+export function recordKeybind(signal: AbortSignal) {
+    return new Promise<string[]>((resolve, reject) => {
+        const keys = new Set<string>();
+        // Aborted once recording finishes, to remove all listeners
+        const done = new AbortController();
 
-        const heldKeys: string[] = [];
-        let capturedMods = { meta: false, ctrl: false, shift: false, alt: false };
-        function cleanup() {
-            document.removeEventListener("keydown", onKeyDown, { capture: true });
-            document.removeEventListener("keyup", onKeyUp, { capture: true });
-            signal?.removeEventListener("abort", onAbort);
-        }
+        const finish = () => {
+            if (!keys.size) return;
+            done.abort();
+            resolve(sortKeys([...keys]));
+        };
 
-        function onAbort() {
-            cleanup();
-            reject(new DOMException("Recording aborted", "AbortError"));
-        }
+        const onKeyDown = (e: KeyboardEvent) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
 
-        function onKeyDown(event: KeyboardEvent) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            if (MODIFIER_KEYS.has(event.key)) return;
+            const key = MODIFIER_CODES[e.code] ?? e.code;
+            if (MODIFIER_CODES[e.code] || SUPPORTED_KEY.test(key)) keys.add(key);
+        };
 
-            const key = codeToAcceleratorKey(event);
-            if (!key || heldKeys.includes(key)) return;
+        const onKeyUp = (e: KeyboardEvent) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            finish();
+        };
 
-            // Update modifiers on every keydown
-            capturedMods = {
-                meta: event.metaKey,
-                ctrl: event.ctrlKey,
-                shift: event.shiftKey,
-                alt: event.altKey
-            };
-            heldKeys.push(key);
-        }
-        function onKeyUp(event: KeyboardEvent) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            if (MODIFIER_KEYS.has(event.key)) return;
-            if (heldKeys.length === 0) return;
+        const onMouseDown = (e: MouseEvent) => {
+            const key = MOUSE_BUTTONS[e.button];
+            if (!key) return;
 
-            cleanup();
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            keys.add(key);
+        };
 
-            const parts: string[] = [];
-            if (capturedMods.meta) parts.push("Super");
-            if (capturedMods.ctrl) parts.push("Ctrl");
-            if (capturedMods.shift) parts.push("Shift");
-            if (capturedMods.alt) parts.push("Alt");
-            parts.push(...heldKeys.sort());
-            resolve(parts.join("+"));
-        }
+        const onMouseUp = (e: MouseEvent) => {
+            if (!MOUSE_BUTTONS[e.button]) return;
 
-        signal?.addEventListener("abort", onAbort, { once: true });
-        document.addEventListener("keydown", onKeyDown, { capture: true });
-        document.addEventListener("keyup", onKeyUp, { capture: true });
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            finish();
+        };
+
+        const options = { capture: true, signal: AbortSignal.any([signal, done.signal]) };
+
+        document.addEventListener("keydown", onKeyDown, options);
+        document.addEventListener("keyup", onKeyUp, options);
+        document.addEventListener("mousedown", onMouseDown, options);
+        document.addEventListener("mouseup", onMouseUp, options);
+        signal.addEventListener("abort", () => reject(signal.reason), { signal: done.signal });
     });
 }

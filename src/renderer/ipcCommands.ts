@@ -8,7 +8,7 @@ import { NavigationRouter, SettingsRouter } from "@vencord/types/webpack/common"
 import { IpcCommands } from "shared/IpcEvents";
 
 import { openScreenSharePicker } from "./components/ScreenSharePicker";
-import { handleKeyBind } from "./globalShortcuts/keybindHandler";
+import { handleKeybind } from "./globalShortcuts/keybindHandler";
 
 type IpcCommandHandler = (data: any) => any;
 
@@ -56,4 +56,4 @@ onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
 
 onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data => openScreenSharePicker(data.screens, data.skipPicker));
 
-onIpcCommand(IpcCommands.KEY_BINDS_HANDLE, ({ action, keyup }) => handleKeyBind(action, keyup));
+onIpcCommand(IpcCommands.KEYBINDS_TRIGGER, ({ action, pressed }) => handleKeybind(action, pressed));
