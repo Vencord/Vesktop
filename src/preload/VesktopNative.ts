@@ -5,7 +5,7 @@
  */
 
 import type { Node } from "@vencord/venmic";
-import { ipcRenderer } from "electron/renderer";
+import { ipcRenderer } from "electron";
 import type { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
 
@@ -94,6 +94,10 @@ export const VesktopNative = {
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         unmute: () => invoke<void>(IpcEvents.VIRT_MIC_UNMUTE),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
+    },
+    wayland: {
+        isWayland: () => sendSync<boolean>(IpcEvents.IS_WAYLAND),
+        configureShortcuts: () => invoke<void>(IpcEvents.CONFIGURE_XDP_SHORTCUTS)
     },
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>

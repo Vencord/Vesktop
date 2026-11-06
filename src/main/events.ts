@@ -13,3 +13,5 @@ export const AppEvents = new EventEmitter<{
     userAssetChanged: [UserAssetType];
     setTrayVariant: ["tray" | "trayUnread"];
 }>();
+
+export const appReady = new Promise<void>(resolve => AppEvents.once("appLoaded", () => resolve()));

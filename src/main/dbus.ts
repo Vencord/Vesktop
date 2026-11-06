@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { EventEmitter } from "events";
 import { join } from "path";
 
+import { XDPShortcut } from "libvesktop";
 import { STATIC_DIR } from "shared/paths";
 
 let libVesktop: typeof import("libvesktop") | null = null;
@@ -28,4 +30,39 @@ export function requestBackground(autoStart: boolean, commandLine: string[]) {
 
 export function isStatusNotifierHostRegistered() {
     return loadLibVesktop()?.isStatusNotifierHostRegistered() ?? true;
+}
+
+export const xdpEmitter = new EventEmitter();
+let xdpShortcuts: InstanceType<typeof import("libvesktop").XDPGlobalShortcuts> | null = null;
+
+export function initXDPGlobalShortcuts(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const libVesktop = loadLibVesktop();
+        if (!libVesktop) {
+            reject();
+            return;
+        }
+        xdpShortcuts = new libVesktop.XDPGlobalShortcuts(xdpEmitter);
+
+        xdpEmitter.once("ready", (sessionHandle: string) => resolve(sessionHandle));
+        xdpEmitter.once("fatal", (err: any) => reject(new Error(`XDP fatal: ${err}`)));
+    });
+}
+
+export function bindXDPShortcuts(shortcuts: XDPShortcut[]) {
+    xdpShortcuts?.bindShortcuts(shortcuts);
+}
+
+export function configureXDPShortcuts() {
+    xdpShortcuts?.configureShortcuts();
+}
+
+export function onXDPShortcutEvent(event: string, callback: (id: string, pressed: boolean, timestamp: number) => void) {
+    xdpEmitter.on(event, callback);
+}
+
+export function destroyXDPShortcuts() {
+    xdpShortcuts?.destroy();
+    xdpShortcuts = null;
+    xdpEmitter.removeAllListeners();
 }
