@@ -4,18 +4,23 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { EventEmitter } from "events";
 import { join } from "path";
 
-import { XDPShortcut } from "libvesktop";
+import type { XDPGlobalShortcutsEvent } from "libvesktop";
 import { STATIC_DIR } from "shared/paths";
+
+import { IS_FLATPAK } from "./constants";
 
 let libVesktop: typeof import("libvesktop") | null = null;
 
 function loadLibVesktop() {
     try {
         if (!libVesktop) {
-            libVesktop = require(join(STATIC_DIR, `dist/libvesktop-${process.arch}.node`));
+            libVesktop = require(
+                join(STATIC_DIR, `dist/libvesktop-${process.arch}.node`)
+            ) as typeof import("libvesktop");
+            // Sandboxed apps already have an app id. Matches the name of our .desktop file
+            if (!IS_FLATPAK) libVesktop.registerHostApp("vesktop");
         }
     } catch (e) {
         console.error("Failed to load libvesktop:", e);
@@ -32,37 +37,9 @@ export function isStatusNotifierHostRegistered() {
     return loadLibVesktop()?.isStatusNotifierHostRegistered() ?? true;
 }
 
-export const xdpEmitter = new EventEmitter();
-let xdpShortcuts: InstanceType<typeof import("libvesktop").XDPGlobalShortcuts> | null = null;
+export function createXDPGlobalShortcuts(onEvent: (...args: XDPGlobalShortcutsEvent) => void) {
+    const lib = loadLibVesktop();
+    if (!lib) return null;
 
-export function initXDPGlobalShortcuts(): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const libVesktop = loadLibVesktop();
-        if (!libVesktop) {
-            reject();
-            return;
-        }
-        xdpShortcuts = new libVesktop.XDPGlobalShortcuts(xdpEmitter);
-
-        xdpEmitter.once("ready", (sessionHandle: string) => resolve(sessionHandle));
-        xdpEmitter.once("fatal", (err: any) => reject(new Error(`XDP fatal: ${err}`)));
-    });
-}
-
-export function bindXDPShortcuts(shortcuts: XDPShortcut[]) {
-    xdpShortcuts?.bindShortcuts(shortcuts);
-}
-
-export function configureXDPShortcuts() {
-    xdpShortcuts?.configureShortcuts();
-}
-
-export function onXDPShortcutEvent(event: string, callback: (id: string, pressed: boolean, timestamp: number) => void) {
-    xdpEmitter.on(event, callback);
-}
-
-export function destroyXDPShortcuts() {
-    xdpShortcuts?.destroy();
-    xdpShortcuts = null;
-    xdpEmitter.removeAllListeners();
+    return new lib.XDPGlobalShortcuts(onEvent);
 }

@@ -1,39 +1,28 @@
-import { EventEmitter } from "node:events";
-
 export function requestBackground(autoStart: boolean, commandLine: string[]): boolean;
 export function isStatusNotifierHostRegistered(): boolean;
-
-export interface XDPGlobalShortcutEvents {
-    ready: [];
-    error: [error: string];
-    fatal: [error: string];
-    shortcutEvent: [id: string, pressed: boolean, timestamp: number];
-    shortcutsBound: [{ id: string; enabled: boolean; action: string; key: string }[]];
-    portalVersion: [version: number];
-}
+export function registerHostApp(appId: string): boolean;
 
 export interface XDPShortcut {
     id: string;
     description: string;
-    preferred_trigger?: string;
 }
 
-export class XDPGlobalShortcuts extends EventEmitter {
-    constructor(emitter: EventEmitter);
+export interface XDPBoundShortcut extends XDPShortcut {
+    trigger: string;
+}
+
+export type XDPGlobalShortcutsEvent =
+    | [event: "version", version: number]
+    | [event: "ready"]
+    | [event: "fatal", message: string]
+    | [event: "error", message: string]
+    | [event: "shortcuts", shortcuts: XDPBoundShortcut[]]
+    | [event: "shortcut", id: string, pressed: boolean];
+
+export class XDPGlobalShortcuts {
+    constructor(onEvent: (...args: XDPGlobalShortcutsEvent) => void);
 
     bindShortcuts(shortcuts: XDPShortcut[]): void;
     configureShortcuts(): void;
     destroy(): void;
-
-    on<K extends keyof XDPGlobalShortcutEvents>(
-        event: K,
-        listener: (...args: XDPGlobalShortcutEvents[K]) => void
-    ): this;
-
-    once<K extends keyof XDPGlobalShortcutEvents>(
-        event: K,
-        listener: (...args: XDPGlobalShortcutEvents[K]) => void
-    ): this;
-
-    emit<K extends keyof XDPGlobalShortcutEvents>(event: K, ...args: XDPGlobalShortcutEvents[K]): boolean;
 }
