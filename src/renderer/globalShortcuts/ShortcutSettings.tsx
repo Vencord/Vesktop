@@ -178,7 +178,7 @@ function PortalKeybinds({ status }: { status: KeybindStatus }) {
     return (
         <>
             <FormSwitch
-                title="Enable Global Shortcuts"
+                title="Enable global shortcuts"
                 description="Registers Vesktop's actions with your desktop environment, which lets you assign shortcuts to them. Your system may ask you to set them up."
                 value={!!settings.globalShortcutsPortal}
                 onChange={v => (settings.globalShortcutsPortal = v)}
@@ -257,7 +257,7 @@ function ExternalTriggers() {
 
     return (
         <section className={cl("external")}>
-            <HeadingSecondary>Triggering Actions From Other Programs</HeadingSecondary>
+            <HeadingSecondary>Triggering actions from other programs</HeadingSecondary>
             <Paragraph size="md">
                 Useful for scripts or your compositor's keybinds. Add <InlineCode>:down</InlineCode> or{" "}
                 <InlineCode>:up</InlineCode> to only press or release an action, for example to bind push to talk to a
@@ -281,10 +281,7 @@ function ExternalTriggers() {
                 <Paragraph size="md">
                     Faster than the command line. Send one command per line to <InlineCode>{socketPath}</InlineCode>
                 </Paragraph>
-                <CodeBlock
-                    lang="sh"
-                    content={`echo "run-shortcut toggleMute" \\\n    | socat - UNIX-CONNECT:${socketPath}`}
-                />
+                <CodeBlock lang="sh" content={`echo "run-shortcut toggleMute" | socat - UNIX-CONNECT:${socketPath}`} />
             </div>
 
             <div className={cl("external-section")}>
@@ -324,7 +321,7 @@ function KeybindSettings() {
 
 export function openKeybindsModal() {
     openModal(props => (
-        <Modal {...props} size="lg" title="Global Keybinds">
+        <Modal {...props} size="xl" title="Global Keybinds">
             <KeybindSettings />
         </Modal>
     ));
