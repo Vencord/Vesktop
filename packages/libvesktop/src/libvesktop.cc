@@ -247,6 +247,66 @@ Napi::Value RegisterHostApp(const Napi::CallbackInfo &info)
     return Napi::Boolean::New(env, register_host_app(info[0].As<Napi::String>().Utf8Value()));
 }
 
+// Opens GNOME Settings on the page of the given app, which is where GNOME lets you change its global shortcuts
+bool open_gnome_app_settings(const std::string &app_id)
+{
+    GError *error = nullptr;
+
+    GObjectPtr<GDBusConnection> bus(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
+    if (!bus)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
+    }
+
+    GVariantBuilder panel_args;
+    g_variant_builder_init(&panel_args, G_VARIANT_TYPE("av"));
+    g_variant_builder_add(&panel_args, "v", g_variant_new_string(app_id.c_str()));
+
+    GVariantBuilder action_params;
+    g_variant_builder_init(&action_params, G_VARIANT_TYPE("av"));
+    g_variant_builder_add(&action_params, "v", g_variant_new("(sav)", "applications", &panel_args));
+
+    GVariantBuilder platform_data;
+    g_variant_builder_init(&platform_data, G_VARIANT_TYPE_VARDICT);
+
+    GVariantPtr reply(g_dbus_connection_call_sync(
+        bus.get(),
+        "org.gnome.Settings",
+        "/org/gnome/Settings",
+        "org.freedesktop.Application",
+        "ActivateAction",
+        g_variant_new("(sava{sv})", "launch-panel", &action_params, &platform_data),
+        nullptr,
+        G_DBUS_CALL_FLAGS_NONE,
+        5000,
+        nullptr,
+        &error));
+
+    if (!reply)
+    {
+        GErrorPtr error_ptr(error);
+        std::cerr << "[libvesktop::open_gnome_app_settings] Failed to open GNOME Settings: "
+                  << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+Napi::Value OpenGnomeAppSettings(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    return Napi::Boolean::New(env, open_gnome_app_settings(info[0].As<Napi::String>().Utf8Value()));
+}
+
 // org.freedesktop.portal.GlobalShortcuts session. Reports everything through the callback passed to the constructor:
 // ("version", number), ("ready"), ("fatal", message), ("error", message),
 // ("shortcuts", { id, description, trigger }[]), ("shortcut", id, pressed)
@@ -616,6 +676,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
     exports.Set("isStatusNotifierHostRegistered", Napi::Function::New(env, IsStatusNotifierHostRegistered));
     exports.Set("registerHostApp", Napi::Function::New(env, RegisterHostApp));
+    exports.Set("openGnomeAppSettings", Napi::Function::New(env, OpenGnomeAppSettings));
     XDPGlobalShortcuts::Init(env, exports);
     return exports;
 }

@@ -173,7 +173,7 @@ function formatPortalTrigger(trigger: string) {
 
 function PortalKeybinds({ status }: { status: KeybindStatus }) {
     const settings = useSettings();
-    const { portalState, portalShortcuts = [], portalVersion = 0 } = status;
+    const { portalState, portalShortcuts = [], portalConfigurable } = status;
 
     return (
         <>
@@ -214,7 +214,7 @@ function PortalKeybinds({ status }: { status: KeybindStatus }) {
                         ))}
                     </Table>
 
-                    {portalVersion >= 2 ? (
+                    {portalConfigurable ? (
                         <Button onClick={VesktopNative.keybinds.configurePortal}>Change Shortcuts</Button>
                     ) : (
                         <Paragraph size="md">You can change these shortcuts in your system settings.</Paragraph>
