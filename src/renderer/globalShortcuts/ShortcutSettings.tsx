@@ -127,16 +127,16 @@ function HookKeybinds({ status }: { status: KeybindStatus }) {
                         Vesktop needs the Accessibility permission to detect your keybinds while it is not focused.
                     </Text>
                     <div className={cl("buttons")}>
-                        <Button size="small" onClick={VesktopNative.keybinds.requestPermission}>
+                        <Button size="small" onClick={() => VesktopNative.keybinds.requestPermission()}>
                             Grant Permission
                         </Button>
-                        <Button size="small" variant="secondary" onClick={VesktopNative.keybinds.retry}>
+                        <Button size="small" variant="secondary" onClick={() => VesktopNative.keybinds.retry()}>
                             Retry
                         </Button>
                     </div>
                 </Card>
             )}
-            {status.error && <ErrorCard onRetry={VesktopNative.keybinds.retry}>{status.error}</ErrorCard>}
+            {status.error && <ErrorCard onRetry={() => VesktopNative.keybinds.retry()}>{status.error}</ErrorCard>}
 
             {keybinds.map((keybind, i) => (
                 <KeybindRow
@@ -188,7 +188,7 @@ function PortalKeybinds({ status }: { status: KeybindStatus }) {
             {portalState === "connecting" && <Text size="md">Connecting to your desktop environment...</Text>}
 
             {portalState === "unavailable" && (
-                <ErrorCard onRetry={VesktopNative.keybinds.retry}>
+                <ErrorCard onRetry={() => VesktopNative.keybinds.retry()}>
                     Your desktop environment does not support global shortcuts. You can still bind actions with your
                     compositor's keybinds instead, see below.
                     {status.error && ` (${status.error})`}
@@ -215,7 +215,7 @@ function PortalKeybinds({ status }: { status: KeybindStatus }) {
                     </Table>
 
                     {portalConfigurable ? (
-                        <Button onClick={VesktopNative.keybinds.configurePortal}>Change Shortcuts</Button>
+                        <Button onClick={() => VesktopNative.keybinds.configurePortal()}>Change Shortcuts</Button>
                     ) : (
                         <Paragraph size="md">You can change these shortcuts in your system settings.</Paragraph>
                     )}
