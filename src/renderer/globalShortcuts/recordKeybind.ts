@@ -5,7 +5,7 @@
  */
 
 import { isMac, isWindows } from "renderer/utils";
-import { sortKeys } from "shared/utils/keybind";
+import { KeyBind, sortKeys } from "shared/utils/keybind";
 
 const MODIFIER_CODES: Record<string, string> = {
     ControlLeft: "Control",
@@ -72,18 +72,35 @@ export async function loadKeyboardLayout() {
     layoutMap = await (navigator as any).keyboard.getLayoutMap();
 }
 
-// The input hook matches physical keys, except on Windows where letters are matched by what they type.
-// So store the letter the key types there, which is also what the hook reports for it
-function toBindKey(code: string) {
-    if (!isWindows || !code.startsWith("Key")) return code;
+// Layout dependent Windows virtual key codes, named like the input hook reports them
+const WINDOWS_OEM_KEYS: Record<number, string> = {
+    0xba: "Semicolon",
+    0xbb: "Equal",
+    0xbc: "Comma",
+    0xbd: "Minus",
+    0xbe: "Period",
+    0xbf: "Slash",
+    0xc0: "Backquote",
+    0xdb: "BracketLeft",
+    0xdc: "Backslash",
+    0xdd: "BracketRight",
+    0xde: "Quote"
+};
 
-    const letter = layoutMap?.get(code);
-    return letter && /^[a-z]$/.test(letter) ? "Key" + letter.toUpperCase() : code;
+// The input hook matches physical keys, except on Windows where it gets the virtual key the layout assigns.
+// So store the virtual key there, which keyCode is on Windows
+function toBindKey(e: KeyboardEvent) {
+    if (!isWindows) return e.code;
+
+    const vk = e.keyCode;
+    if (vk >= 0x30 && vk <= 0x39) return "Digit" + String.fromCharCode(vk);
+    if (vk >= 0x41 && vk <= 0x5a) return "Key" + String.fromCharCode(vk);
+    return WINDOWS_OEM_KEYS[vk] ?? e.code;
 }
 
-function keyToDisplay(key: string) {
-    // Windows binds already store the typed letter
-    const typed = isWindows && key.startsWith("Key") ? undefined : layoutMap?.get(key);
+function keyToDisplay(key: string, label?: string) {
+    // Windows binds store virtual keys, which we can't map to what they type, so they come with a label instead
+    const typed = label ?? (isWindows ? undefined : layoutMap?.get(key));
     if (typed?.trim()) return typed.toUpperCase();
     if (DISPLAY_NAMES[key]) return DISPLAY_NAMES[key];
 
@@ -96,8 +113,8 @@ function keyToDisplay(key: string) {
     return rest;
 }
 
-export function keysToDisplay(keys: string[]) {
-    return keys.map(keyToDisplay).join(" + ");
+export function keysToDisplay(keys: string[], labels?: Record<string, string>) {
+    return keys.map(key => keyToDisplay(key, labels?.[key])).join(" + ");
 }
 
 /**
@@ -105,23 +122,28 @@ export function keysToDisplay(keys: string[]) {
  * Modifiers on their own are allowed, since they are popular for push to talk
  */
 export function recordKeybind(signal: AbortSignal) {
-    return new Promise<string[]>((resolve, reject) => {
+    return new Promise<Pick<KeyBind, "keys" | "labels">>((resolve, reject) => {
         const keys = new Set<string>();
+        const labels: Record<string, string> = {};
         // Aborted once recording finishes, to remove all listeners
         const done = new AbortController();
 
         const finish = () => {
             if (!keys.size) return;
             done.abort();
-            resolve(sortKeys([...keys]));
+            resolve({ keys: sortKeys([...keys]), labels: Object.keys(labels).length ? labels : undefined });
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            const key = MODIFIER_CODES[e.code] ?? toBindKey(e.code);
-            if (MODIFIER_CODES[e.code] || SUPPORTED_KEY.test(key)) keys.add(key);
+            const key = MODIFIER_CODES[e.code] ?? toBindKey(e);
+            if (!MODIFIER_CODES[e.code] && !SUPPORTED_KEY.test(key)) return;
+
+            keys.add(key);
+            if (isWindows && Object.values(WINDOWS_OEM_KEYS).includes(key))
+                labels[key] = layoutMap?.get(e.code) ?? e.key;
         };
 
         const onKeyUp = (e: KeyboardEvent) => {

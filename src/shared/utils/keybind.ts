@@ -12,6 +12,8 @@ export interface KeyBind {
     id: string;
     action: ShortcutAction | "unassigned";
     keys: string[];
+    // What layout dependent keys typed when recorded on Windows, where we can't look that up later
+    labels?: Record<string, string>;
     enabled: boolean;
 }
 
