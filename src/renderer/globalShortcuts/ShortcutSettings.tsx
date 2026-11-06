@@ -28,7 +28,7 @@ import { useSettings } from "renderer/settings";
 import { IpcCommands } from "shared/IpcEvents";
 import { ACTION_DESCRIPTIONS, KeyBind, KeybindStatus } from "shared/utils/keybind";
 
-import { keysToDisplay, recordKeybind } from "./recordKeybind";
+import { keysToDisplay, loadKeyboardLayout, recordKeybind } from "./recordKeybind";
 
 const cl = classNameFactory("vcd-shortcuts-");
 
@@ -314,7 +314,9 @@ function KeybindSettings() {
     );
 }
 
-export function openKeybindsModal() {
+export async function openKeybindsModal() {
+    await loadKeyboardLayout().catch(e => console.error("Failed to get keyboard layout", e));
+
     openModal(props => (
         <Modal {...props} size="xl" title="Global Keybinds">
             <KeybindSettings />
@@ -323,5 +325,5 @@ export function openKeybindsModal() {
 }
 
 export const KeybindsButton: SettingsComponent = () => (
-    <Button onClick={openKeybindsModal}>Configure Global Keybinds</Button>
+    <Button onClick={() => openKeybindsModal()}>Configure Global Keybinds</Button>
 );

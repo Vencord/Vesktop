@@ -65,7 +65,26 @@ const DISPLAY_NAMES: Record<string, string> = {
     NumpadEnter: "Num Enter"
 };
 
+// Maps physical keys (KeyboardEvent.code) to what they type on the user's keyboard layout
+let layoutMap: Map<string, string> | undefined;
+
+export async function loadKeyboardLayout() {
+    layoutMap = await (navigator as any).keyboard.getLayoutMap();
+}
+
+// The input hook matches physical keys, except on Windows where letters are matched by what they type.
+// So store the letter the key types there, which is also what the hook reports for it
+function toBindKey(code: string) {
+    if (!isWindows || !code.startsWith("Key")) return code;
+
+    const letter = layoutMap?.get(code);
+    return letter && /^[a-z]$/.test(letter) ? "Key" + letter.toUpperCase() : code;
+}
+
 function keyToDisplay(key: string) {
+    // Windows binds already store the typed letter
+    const typed = isWindows && key.startsWith("Key") ? undefined : layoutMap?.get(key);
+    if (typed?.trim()) return typed.toUpperCase();
     if (DISPLAY_NAMES[key]) return DISPLAY_NAMES[key];
 
     const match = /^(Key|Digit|Arrow|Numpad|Mouse)(.+)$/.exec(key);
@@ -101,7 +120,7 @@ export function recordKeybind(signal: AbortSignal) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            const key = MODIFIER_CODES[e.code] ?? e.code;
+            const key = MODIFIER_CODES[e.code] ?? toBindKey(e.code);
             if (MODIFIER_CODES[e.code] || SUPPORTED_KEY.test(key)) keys.add(key);
         };
 
