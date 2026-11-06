@@ -5,56 +5,57 @@
  */
 
 import { rmSync } from "fs";
-import { rm } from "fs/promises";
 import { createServer, Server } from "net";
-import { join } from "path";
+import { createInterface } from "readline";
 
 import { app } from "electron";
-import { IpcCommands } from "shared/IpcEvents";
+import { parseShortcutCommand } from "shared/utils/keybind";
 
-import { sendRendererCommand } from "./ipcCommands";
+import { SOCKET_PATH } from "./constants";
+import { runShortcutCommand } from "./keybinds";
 
-const { env, platform } = process;
+let server: Server | undefined;
 
-let server: Server;
+function runCommand(line: string) {
+    const [command, arg = ""] = line.trim().split(/\s+/, 2);
 
-const SOCKET_PATH =
-    platform === "win32"
-        ? "\\\\?\\pipe\\vesktop.sock"
-        : join(env.XDG_RUNTIME_DIR || env.TMPDIR || env.TMP || env.TEMP || "/tmp", "vesktop.sock");
+    switch (command) {
+        case "run-shortcut": {
+            const shortcut = parseShortcutCommand(arg);
+            if (!shortcut) return "error: invalid shortcut";
 
-export async function initSocket() {
-    await rm(SOCKET_PATH, { force: true });
+            runShortcutCommand(shortcut);
+            return "ok";
+        }
+        default:
+            return "error: unknown command";
+    }
+}
+
+/**
+ * Line based socket for triggering actions from other programs, for example compositor keybinds.
+ * Connections stay open, so a client can send multiple commands, like `run-shortcut pushToTalk:down` and `:up`.
+ * Every line gets a reply line, either "ok" or "error: <reason>"
+ */
+export function initSocket() {
+    // We hold the single instance lock, so any existing socket is stale
+    if (process.platform !== "win32") rmSync(SOCKET_PATH, { force: true });
 
     server = createServer(socket => {
-        socket.setEncoding("utf-8");
+        socket.on("error", () => {});
 
-        const reply = (message: string) => {
-            socket.write(message);
-            socket.end();
-        };
-
-        socket.on("data", async (data: string) => {
-            try {
-                const [command, ...args] = data.trim().split(":");
-
-                if (command === "run-shortcut") {
-                    await sendRendererCommand(IpcCommands.KEY_BINDS_HANDLE, { action: args[0], keyup: false });
-                    return;
-                }
-
-                reply("Unknown Command");
-            } catch {
-                reply("Unknown Error");
-            }
+        createInterface({ input: socket }).on("line", line => {
+            if (line.trim()) socket.write(runCommand(line) + "\n");
         });
     });
 
+    server.on("error", err => console.error("Failed to start IPC socket:", err));
     server.listen(SOCKET_PATH);
-    server.on("error", err => console.error("Vesktop IPC Socket Error:", err));
 }
 
 app.on("will-quit", () => {
-    server?.close();
-    rmSync(SOCKET_PATH, { force: true });
+    if (!server) return;
+
+    server.close();
+    if (process.platform !== "win32") rmSync(SOCKET_PATH, { force: true });
 });

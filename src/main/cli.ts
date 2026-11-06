@@ -8,6 +8,7 @@ import { basename } from "path";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
 import { app } from "electron";
+import { parseShortcutCommand, SHORTCUT_ACTIONS } from "shared/utils/keybind";
 import { stripIndent } from "shared/utils/text";
 
 type Option = ParseArgsOptionDescriptor & {
@@ -46,9 +47,8 @@ const options = {
     },
     "run-shortcut": {
         type: "string",
-        description:
-            "Run a predefined shortcut action (for custom key binds). Vesktop has to be open for this to have any effect",
-        argumentName: "action"
+        description: `Trigger a keybind action in the running instance. Append :down or :up to only press or release it (e.g. for push to talk). Actions: ${SHORTCUT_ACTIONS.join(", ")}`,
+        argumentName: "action[:down|:up]"
     },
     repair: {
         type: "boolean",
@@ -146,10 +146,19 @@ export function checkCommandLineForHelpOrVersion() {
             app.exit(1);
         }
 
-        if ("options" in def && !def.options?.includes(value as any)) {
+        if ("options" in def && !def.options?.includes(value as string)) {
             console.error(`Invalid value for --${name}: ${value}\nExpected one of: ${def.options.join(", ")}`);
             app.exit(1);
         }
+    }
+
+    const runShortcut = CommandLine.values["run-shortcut"];
+    if (runShortcut && !parseShortcutCommand(runShortcut)) {
+        console.error(
+            `Invalid value for --run-shortcut: ${runShortcut}\nExpected one of: ${SHORTCUT_ACTIONS.join(", ")}`
+        );
+        console.error("Optionally followed by :down or :up");
+        app.exit(1);
     }
 }
 
