@@ -14,16 +14,22 @@ addPatch({
         {
             find: "#{intl::KEYBIND_IN_BROSWER_NOTICE}",
             replacement: {
-                match: /:(.{0,10}jsx.{0,50}messageType:.{0,100}#{intl::KEYBIND_IN_BROSWER_NOTICE})/,
+                match: /:(.{0,10}jsx.{0,50}message:.{0,100}#{intl::KEYBIND_IN_BROSWER_NOTICE})/,
                 replace: ":true?$self.renderKeybindsButton():$1"
+            }
+        },
+        // Push to talk shortcut in Voice & Video settings
+        {
+            find: ".VOICE_PUSH_TO_TALK_KEYBIND_SETTING,{",
+            replacement: {
+                match: /(VOICE_PUSH_TO_TALK_KEYBIND_SETTING,.+?\(0,\i\.jsx\)\(\i,\{shortcut:\i\}\))/,
+                replace: "$1,$self.renderKeybindsButton()"
             }
         }
     ],
 
-    // TODO: PTT under voice & video
-
     renderKeybindsButton: ErrorBoundary.wrap(
-        () => <Button onClick={() => openKeybindsModal()}>Configure Vesktop Keybinds</Button>,
+        () => <Button onClick={() => openKeybindsModal()}>Configure Global Keybinds</Button>,
         { noop: true }
     )
 });

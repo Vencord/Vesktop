@@ -5,51 +5,88 @@
     padding-block: 1em;
 }
 
-.vcd-shortcuts-group {
+.vcd-shortcuts-card,
+.vcd-shortcuts-buttons {
+    display: flex;
+    gap: 0.5em;
+}
+
+.vcd-shortcuts-card {
+    flex-direction: column;
+    align-items: start;
+}
+
+.vcd-shortcuts-row {
     display: grid;
-    gap: 0.25em 0.5em;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+    gap: 0.5em;
     align-items: center;
-}
-
-.vcd-shortcuts-label:first-child {
-    grid-column: 1 / 2;
-}
-
-.vcd-shortcuts-label:nth-child(2) {
-    grid-column: 2 / 5;
 }
 
 .vcd-shortcuts-recorder {
     display: flex;
+    align-items: center;
+    gap: 0.5em;
     background-color: var(--input-background-default);
-    border: 1px solid;
-    border-color: var(--input-border-default);
+    border: 1px solid var(--input-border-default);
     border-radius: var(--radius-sm);
-    width: 100%;
     min-height: calc(var(--select-option-height) - 2px);
     padding: 3px 4px 3px 12px;
     box-sizing: border-box;
 }
 
-.vcd-shortcuts-record-input {
-    background-color: transparent;
-    border: none;
-    flex: 1 1 0;
+.vcd-shortcuts-recorder-keys {
+    flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-strong);
-    font-weight: 600;
+    white-space: nowrap;
+}
 
-    &:disabled {
-        color: var(--text-muted);
-        font-weight: 400;
+.vcd-shortcuts-muted {
+    color: var(--text-muted);
+}
+
+.vcd-shortcuts-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+
+    & th,
+    & td {
+        text-align: start;
+        padding: 0.6em 1em;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    & th {
+        text-transform: uppercase;
+        background-color: var(--background-base-lower);
+    }
+
+    & tr:last-child td {
+        border-bottom: none;
     }
 }
 
-.vcd-shortcuts-record-button {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    min-width: max-content;
+.vcd-shortcuts-external {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em;
+
+    & :is(h3, h4) {
+        margin: 0;
+    }
+}
+
+.vcd-shortcuts-external-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+
+    & pre {
+        max-width: none;
+        margin: 0;
+    }
 }
