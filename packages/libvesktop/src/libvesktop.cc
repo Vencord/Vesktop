@@ -3,8 +3,11 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <napi.h>
 #include <memory>
+#include <string>
+#include <vector>
 
 template <typename T>
 struct GObjectDeleter
@@ -183,339 +186,499 @@ Napi::Value IsStatusNotifierHostRegistered(const Napi::CallbackInfo &info)
     return Napi::Boolean::New(info.Env(), is_status_notifier_host_registered());
 }
 
-class XDPGlobalShortcuts : public Napi::ObjectWrap<XDPGlobalShortcuts> {
-public:
-  static Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    exports.Set("XDPGlobalShortcuts", DefineClass(env, "XDPGlobalShortcuts", {
-      InstanceMethod("bindShortcuts", &XDPGlobalShortcuts::BindShortcuts),
-      InstanceMethod("configureShortcuts", &XDPGlobalShortcuts::Configure),
-      InstanceMethod("destroy",       &XDPGlobalShortcuts::Destroy),
-    }));
-    return exports;
-  }
 
-  // CreateSession on `new XDPGlobalShortcuts()`
-  XDPGlobalShortcuts(const Napi::CallbackInfo &info) : ObjectWrap(info) {
-    Napi::Env env = info.Env();
-    emitterRef_ = Napi::Persistent(info[0].As<Napi::Object>());
+constexpr const char *PORTAL_BUS_NAME = "org.freedesktop.portal.Desktop";
+constexpr const char *PORTAL_PATH = "/org/freedesktop/portal/desktop";
+constexpr const char *SHORTCUTS_INTERFACE = "org.freedesktop.portal.GlobalShortcuts";
 
+// Tells the portal our app id. Unsandboxed apps otherwise have an empty app id, which portals use to persist things like shortcut triggers.
+// Must happen before any other portal call on this connection.
+bool register_host_app(const std::string &app_id)
+{
     GError *error = nullptr;
-    connection_.reset(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
-    if (!connection_) {
-      const GErrorPtr err(error);
-      Napi::Error::New(env, err ? err->message : "Failed to connect to session bus")
-        .ThrowAsJavaScriptException();
-      return;
+
+    GObjectPtr<GDBusConnection> bus(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
+    if (!bus)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
     }
-    const char *unique = g_dbus_connection_get_unique_name(connection_.get());
-    connectionName_ = (unique && *unique == ':') ? unique + 1 : (unique ? unique : "");
-    std::ranges::replace(connectionName_, '.', '_');
 
-    // loop_ = g_main_loop_new(nullptr, FALSE); //electron has its own loop
-    // running glibThread_ = std::thread([this] { g_main_loop_run(loop_); });
-    tsfn_ = Napi::ThreadSafeFunction::New( env, Napi::Function::New(env, [](const Napi::CallbackInfo &) {}),
-      "dbus-events", 0, 1);
+    GVariantBuilder options;
+    g_variant_builder_init(&options, G_VARIANT_TYPE_VARDICT);
 
-    CreateSession();
-  }
+    GVariantPtr reply(g_dbus_connection_call_sync(
+        bus.get(),
+        PORTAL_BUS_NAME,
+        PORTAL_PATH,
+        "org.freedesktop.host.portal.Registry",
+        "Register",
+        g_variant_new("(sa{sv})", app_id.c_str(), &options),
+        nullptr,
+        G_DBUS_CALL_FLAGS_NONE,
+        1000,
+        nullptr,
+        &error));
 
-  ~XDPGlobalShortcuts() { Cleanup(); }
+    if (!reply)
+    {
+        GErrorPtr error_ptr(error);
+        std::cerr << "[libvesktop::register_host_app] Failed to register app id: "
+                  << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
+        return false;
+    }
 
-  Napi::Value Destroy(const Napi::CallbackInfo &info) {
-    Cleanup();
-    return info.Env().Undefined();
-  }
-  Napi::Value BindShortcuts(const Napi::CallbackInfo &info) {
+    // The registration belongs to this connection's unique name. The shared bus connection is only weakly cached by GLib,
+    // so keep it alive forever to not lose the registration once all other references are dropped
+    bus.release();
+    return true;
+}
+
+Napi::Value RegisterHostApp(const Napi::CallbackInfo &info)
+{
     Napi::Env env = info.Env();
-    if (info.Length() < 1 || !info[0].IsArray()) {
-      Napi::TypeError::New(env, "Expected (array)").ThrowAsJavaScriptException();
-      return env.Undefined();
-    }
-    if (sessionHandle_.empty()) {
-      Napi::Error::New(env, "Session not ready yet").ThrowAsJavaScriptException();
-      return env.Undefined();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
     }
 
-    const std::string token = generate_token();
+    return Napi::Boolean::New(env, register_host_app(info[0].As<Napi::String>().Utf8Value()));
+}
 
-    GVariantBuilder shortcuts_builder = G_VARIANT_BUILDER_INIT(G_VARIANT_TYPE("a(sa{sv})"));
-    auto arr = info[0].As<Napi::Array>();
-    for (uint32_t i = 0; i < arr.Length(); i++) {
-      auto item = arr.Get(i).As<Napi::Object>();
-      GVariantBuilder builder = G_VARIANT_BUILDER_INIT(G_VARIANT_TYPE_VARDICT);
-      g_variant_builder_add(&builder, "{sv}", "description",
-          g_variant_new_string(item.Get("description").As<Napi::String>().Utf8Value().c_str()));
-      if (item.Has("preferred_trigger"))
-        g_variant_builder_add(&builder, "{sv}", "preferred_trigger",
-            g_variant_new_string(item.Get("preferred_trigger").As<Napi::String>().Utf8Value().c_str()));
-      g_variant_builder_add(&shortcuts_builder, "(sa{sv})",
-          item.Get("id").As<Napi::String>().Utf8Value().c_str(), &builder);
+// Opens GNOME Settings on the page of the given app, which is where GNOME lets you change its global shortcuts
+bool open_gnome_app_settings(const std::string &app_id)
+{
+    GError *error = nullptr;
+
+    GObjectPtr<GDBusConnection> bus(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
+    if (!bus)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
     }
 
-    bindSignal_ = SubscribeResponse(token, [this](GVariant *parameters) {
-      bindSignal_.reset();
-      guint response = 0;
-      GVariant *results_raw = nullptr;
-      g_variant_get(parameters, "(u@a{sv})", &response, &results_raw);
-      GVariantPtr results(results_raw);
-      if (response == 2) { // 0 Success | 1 User cancelled so still listen to signals
-        EmitEvent("error", "BindShortcuts: portal returned response " + std::to_string(response));
-        return;
-      }
-      const GVariantPtr shortcuts(g_variant_lookup_value(
-          results.get(), "shortcuts", G_VARIANT_TYPE("a(sa{sv})")));
-      EmitEvent("shortcutsBound", { ParseShortcuts(shortcuts.get()) });
-      SubscribePressedSignals();
-    });
+    GVariantBuilder panel_args;
+    g_variant_builder_init(&panel_args, G_VARIANT_TYPE("av"));
+    g_variant_builder_add(&panel_args, "v", g_variant_new_string(app_id.c_str()));
 
-    GVariantBuilder options = G_VARIANT_BUILDER_INIT(G_VARIANT_TYPE_VARDICT);
-    g_variant_builder_add(&options, "{sv}", "handle_token", g_variant_new_string(token.c_str()));
+    GVariantBuilder action_params;
+    g_variant_builder_init(&action_params, G_VARIANT_TYPE("av"));
+    g_variant_builder_add(&action_params, "v", g_variant_new("(sav)", "applications", &panel_args));
 
-    CallPortalMethod("BindShortcuts",
-        g_variant_new("(oa(sa{sv})sa{sv})", sessionHandle_.c_str(), &shortcuts_builder, "", &options),
-        G_VARIANT_TYPE("(o)"), OnError(&bindSignal_));
+    GVariantBuilder platform_data;
+    g_variant_builder_init(&platform_data, G_VARIANT_TYPE_VARDICT);
 
-    return env.Undefined();
-  }
+    GVariantPtr reply(g_dbus_connection_call_sync(
+        bus.get(),
+        "org.gnome.Settings",
+        "/org/gnome/Settings",
+        "org.freedesktop.Application",
+        "ActivateAction",
+        g_variant_new("(sava{sv})", "launch-panel", &action_params, &platform_data),
+        nullptr,
+        G_DBUS_CALL_FLAGS_NONE,
+        5000,
+        nullptr,
+        &error));
 
-  Napi::Value Configure(const Napi::CallbackInfo &info) {
-    GVariantBuilder options = G_VARIANT_BUILDER_INIT(G_VARIANT_TYPE_VARDICT);
-    CallPortalMethod("ConfigureShortcuts",
-        g_variant_new("(osa{sv})", sessionHandle_.c_str(), "", &options),
-        G_VARIANT_TYPE("(o)"), OnError(nullptr, "error"));
-    return info.Env().Undefined();
-  }
+    if (!reply)
+    {
+        GErrorPtr error_ptr(error);
+        std::cerr << "[libvesktop::open_gnome_app_settings] Failed to open GNOME Settings: "
+                  << (error_ptr ? error_ptr->message : "unknown error") << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+Napi::Value OpenGnomeAppSettings(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    return Napi::Boolean::New(env, open_gnome_app_settings(info[0].As<Napi::String>().Utf8Value()));
+}
+
+// org.freedesktop.portal.GlobalShortcuts session. Reports everything through the callback passed to the constructor:
+// ("version", number), ("ready"), ("fatal", message), ("error", message),
+// ("shortcuts", { id, description, trigger }[]), ("shortcut", id, pressed)
+class XDPGlobalShortcuts : public Napi::ObjectWrap<XDPGlobalShortcuts>
+{
+public:
+    static void Init(Napi::Env env, Napi::Object exports)
+    {
+        exports.Set("XDPGlobalShortcuts", DefineClass(env, "XDPGlobalShortcuts", {
+            InstanceMethod("bindShortcuts", &XDPGlobalShortcuts::BindShortcuts),
+            InstanceMethod("configureShortcuts", &XDPGlobalShortcuts::ConfigureShortcuts),
+            InstanceMethod("destroy", &XDPGlobalShortcuts::Destroy),
+        }));
+    }
+
+    XDPGlobalShortcuts(const Napi::CallbackInfo &info) : ObjectWrap(info)
+    {
+        Napi::Env env = info.Env();
+
+        if (info.Length() < 1 || !info[0].IsFunction())
+        {
+            Napi::TypeError::New(env, "Expected (function)").ThrowAsJavaScriptException();
+            return;
+        }
+
+        GError *error = nullptr;
+        connection_.reset(g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error));
+        if (!connection_)
+        {
+            GErrorPtr error_ptr(error);
+            Napi::Error::New(env, error_ptr ? error_ptr->message : "Failed to connect to session bus")
+                .ThrowAsJavaScriptException();
+            return;
+        }
+
+        // Request objects live at /org/freedesktop/portal/desktop/request/SENDER/TOKEN, where SENDER is our unique name (":1.23" -> "1_23")
+        std::string sender = g_dbus_connection_get_unique_name(connection_.get()) + 1;
+        std::replace(sender.begin(), sender.end(), '.', '_');
+        requestPathPrefix_ = std::string(PORTAL_PATH) + "/request/" + sender + "/";
+
+        cancellable_.reset(g_cancellable_new());
+        tsfn_ = Napi::ThreadSafeFunction::New(env, info[0].As<Napi::Function>(), "libvesktop-global-shortcuts", 0, 1);
+        active_ = true;
+
+        FetchVersion();
+        SubscribeSignals();
+        CreateSession();
+    }
+
+    ~XDPGlobalShortcuts() override { Cleanup(); }
 
 private:
-  using ReplyCallback = std::function<void(GVariantPtr, GErrorPtr)>;
+    using ArgFactory = std::function<Napi::Value(Napi::Env)>;
+    using ReplyCallback = std::function<void(GVariant *reply, GError *error)>;
+    using ResponseCallback = std::function<void(guint32 response, GVariant *results)>;
+    using SignalCallback = std::function<void(GVariant *parameters)>;
 
-  struct SignalCtx {
-    std::function<void(GVariant *)> fn;
-    static void invoke(GDBusConnection *, const char *, const char *, const char *,
-                       const char *, GVariant *params, gpointer ud) {
-      static_cast<SignalCtx *>(ud)->fn(params);
+    GObjectPtr<GDBusConnection> connection_;
+    GObjectPtr<GCancellable> cancellable_;
+    Napi::ThreadSafeFunction tsfn_;
+    bool active_ = false;
+    std::string requestPathPrefix_;
+    std::string session_;
+    // Tokens must be unique per connection, so shared between all instances
+    static inline guint32 nextToken_ = 0;
+    std::map<std::string, SignalSubscription> requests_;
+    std::vector<SignalSubscription> signals_;
+
+    Napi::Value BindShortcuts(const Napi::CallbackInfo &info)
+    {
+        Napi::Env env = info.Env();
+
+        if (info.Length() < 1 || !info[0].IsArray())
+        {
+            Napi::TypeError::New(env, "Expected ({ id: string, description: string }[])").ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+        if (session_.empty())
+        {
+            Napi::Error::New(env, "Session is not ready").ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+
+        GVariantBuilder shortcuts;
+        g_variant_builder_init(&shortcuts, G_VARIANT_TYPE("a(sa{sv})"));
+
+        Napi::Array arr = info[0].As<Napi::Array>();
+        for (uint32_t i = 0; i < arr.Length(); i++)
+        {
+            Napi::Object item = arr.Get(i).As<Napi::Object>();
+            std::string id = item.Get("id").ToString().Utf8Value();
+            std::string description = item.Get("description").ToString().Utf8Value();
+
+            GVariantBuilder props;
+            g_variant_builder_init(&props, G_VARIANT_TYPE_VARDICT);
+            g_variant_builder_add(&props, "{sv}", "description", g_variant_new_string(description.c_str()));
+            g_variant_builder_add(&shortcuts, "(sa{sv})", id.c_str(), &props);
+        }
+
+        std::string token = NewToken();
+        GVariantBuilder options;
+        g_variant_builder_init(&options, G_VARIANT_TYPE_VARDICT);
+        g_variant_builder_add(&options, "{sv}", "handle_token", g_variant_new_string(token.c_str()));
+
+        Request("BindShortcuts", token,
+            g_variant_new("(oa(sa{sv})sa{sv})", session_.c_str(), &shortcuts, "", &options),
+            "error",
+            [this](guint32 response, GVariant *results) {
+                if (response != 0)
+                {
+                    Emit("error", {Str(response == 1 ? "Binding shortcuts was cancelled" : "Failed to bind shortcuts")});
+                    return;
+                }
+
+                GVariantPtr bound(g_variant_lookup_value(results, "shortcuts", G_VARIANT_TYPE("a(sa{sv})")));
+                Emit("shortcuts", {ParseShortcuts(bound.get())});
+            });
+
+        return env.Undefined();
     }
-    static void destroy(gpointer ud) { delete static_cast<SignalCtx *>(ud); }
-  };
 
-  void CallMethod(const char *interface, const char *method, GVariant *params, const GVariantType *replyType, ReplyCallback callback) {
-    struct Ctx { ReplyCallback fn; };
-    g_dbus_connection_call(
-        connection_.get(), "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop",
-        interface, method, params, replyType,
-        G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
-        [](GObject *src, GAsyncResult *res, gpointer ud) {
-          auto *ctx = static_cast<Ctx *>(ud);
-          GError *error = nullptr;
-          GVariantPtr reply(g_dbus_connection_call_finish(G_DBUS_CONNECTION(src), res, &error));
-          ctx->fn(std::move(reply), GErrorPtr(error));
-          delete ctx;
-        },
-        new Ctx{std::move(callback)});
-  }
+    Napi::Value ConfigureShortcuts(const Napi::CallbackInfo &info)
+    {
+        if (session_.empty())
+        {
+            Napi::Error::New(info.Env(), "Session is not ready").ThrowAsJavaScriptException();
+            return info.Env().Undefined();
+        }
 
-  void CallPortalMethod(const char *method, GVariant *params, const GVariantType *replyType, ReplyCallback callback) {
-    CallMethod("org.freedesktop.portal.GlobalShortcuts", method, params, replyType, std::move(callback));
-  }
+        GVariantBuilder options;
+        g_variant_builder_init(&options, G_VARIANT_TYPE_VARDICT);
 
-  ReplyCallback OnError(SignalSubscription *signal, std::string event = "fatal") {
-    return [this, signal, event = std::move(event)](GVariantPtr, GErrorPtr err) {
-      if (!err) return;
-      if (signal) signal->reset();
-      EmitEvent(event, err->message);
-    };
-  }
-  SignalSubscription SubscribeResponse(const std::string &token, std::function<void(GVariant *)> callback) {
-    return { connection_.get(),
-      g_dbus_connection_signal_subscribe(
-          connection_.get(), "org.freedesktop.portal.Desktop",
-          "org.freedesktop.portal.Request", "Response",
-          make_handle_path(token).c_str(), nullptr,
-          G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE,
-          SignalCtx::invoke, new SignalCtx{std::move(callback)}, SignalCtx::destroy)
-    };
-  }
-  SignalSubscription SubscribeGSSignal(const char *signal,
-                                       std::function<void(GVariant *)> callback) {
-    return { connection_.get(),
-      g_dbus_connection_signal_subscribe(
-          connection_.get(), "org.freedesktop.portal.Desktop",
-          "org.freedesktop.portal.GlobalShortcuts", signal,
-          "/org/freedesktop/portal/desktop", nullptr,
-          G_DBUS_SIGNAL_FLAGS_NONE,
-          SignalCtx::invoke, new SignalCtx{std::move(callback)}, SignalCtx::destroy)
-    };
-  }
+        Call(PORTAL_PATH, SHORTCUTS_INTERFACE, "ConfigureShortcuts",
+            g_variant_new("(osa{sv})", session_.c_str(), "", &options),
+            nullptr,
+            [this](GVariant *, GError *error) {
+                if (error)
+                    Emit("error", {Str(std::string("ConfigureShortcuts: ") + error->message)});
+            });
 
-  [[nodiscard]] static std::string generate_token() {
-    std::string uuid = g_uuid_string_random();
-    std::ranges::replace(uuid, '-', '_');
-    return "vesktop" + uuid;
-  }
-  [[nodiscard]] std::string make_handle_path(const std::string &token) const {
-    return "/org/freedesktop/portal/desktop/request/" + connectionName_ + "/" + token;
-  }
-  [[nodiscard]] static std::function<Napi::Value(Napi::Env)> ParseShortcuts(GVariant *shortcuts) {
-    std::vector<std::tuple<std::string, std::string, std::string>> vec;
-    if (shortcuts) {
-      GVariantIter iter;
-      g_variant_iter_init(&iter, shortcuts);
-      const char *id = nullptr;
-      GVariant *rawDict = nullptr;
-      while (g_variant_iter_next(&iter, "(&s@a{sv})", &id, &rawDict)) {
-        GVariantPtr vardict(rawDict);
-        const char *description = nullptr, *trigger_description = nullptr;
-        g_variant_lookup(vardict.get(), "description",         "&s", &description);
-        g_variant_lookup(vardict.get(), "trigger_description", "&s", &trigger_description);
-        vec.emplace_back(id ? id : "", description ? description : "", trigger_description ? trigger_description : "");
-      }
+        return info.Env().Undefined();
     }
-    return [data = std::move(vec)](Napi::Env env) -> Napi::Value {
-      auto arr = Napi::Array::New(env, data.size());
-      for (size_t i = 0; i < data.size(); ++i) {
-        const auto &[id, desc, trigger] = data[i];
-        auto obj = Napi::Object::New(env);
-        obj.Set("id",      Napi::String::New(env, id));
-        obj.Set("enabled", Napi::Boolean::New(env, true));
-        obj.Set("key",     Napi::String::New(env, trigger));
-        obj.Set("action",  Napi::String::New(env, id));
-        arr.Set(i, obj);
-      }
-      return arr;
-    };
-  }
 
-  void Cleanup() {
-    if (cleaned_) return;
-    cleaned_ = true;
-    requestSignal_.reset();
-    bindSignal_.reset();
-    activatedSignal_.reset();
-    deactivatedSignal_.reset();
-    shortcutsChangedSignal_.reset();
-    tsfn_.Release();
-  }
+    Napi::Value Destroy(const Napi::CallbackInfo &info)
+    {
+        Cleanup();
+        return info.Env().Undefined();
+    }
 
-  void CreateSession() {
-    const std::string token = generate_token();
+    void Cleanup()
+    {
+        if (!active_)
+            return;
+        active_ = false;
 
-    requestSignal_ = SubscribeResponse(token, [this](GVariant *parameters) {
-      requestSignal_.reset();
-      guint response = 0;
-      GVariant *results_raw = nullptr;
-      g_variant_get(parameters, "(u@a{sv})", &response, &results_raw);
-      GVariantPtr results(results_raw);
-      if (response != 0) {
-        EmitEvent("fatal", "CreateSession: portal returned response " + std::to_string(response));
-        return;
-      }
-      gchar *handle = nullptr;
-      if (!results || !g_variant_lookup(results.get(), "session_handle", "s", &handle)) {
-        EmitEvent("fatal", "CreateSession: session_handle missing from response");
-        return;
-      }
-      sessionHandle_ = handle;
-      g_free(handle);
-      EmitEvent("ready", sessionHandle_);
-      FetchPortalVersion();
-    });
+        g_cancellable_cancel(cancellable_.get());
+        requests_.clear();
+        signals_.clear();
 
-    GVariantBuilder options = G_VARIANT_BUILDER_INIT(G_VARIANT_TYPE_VARDICT);
-    g_variant_builder_add(&options, "{sv}", "handle_token",         g_variant_new_string(token.c_str()));
-    g_variant_builder_add(&options, "{sv}", "session_handle_token", g_variant_new_string((token + "s").c_str()));
+        if (!session_.empty())
+        {
+            g_dbus_connection_call(connection_.get(), PORTAL_BUS_NAME, session_.c_str(), "org.freedesktop.portal.Session",
+                "Close", nullptr, nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr, nullptr, nullptr);
+            session_.clear();
+        }
 
-    CallPortalMethod("CreateSession", g_variant_new("(a{sv})", &options), G_VARIANT_TYPE("(o)"), OnError(&requestSignal_));
-  }
+        tsfn_.Release();
+    }
 
-  void FetchPortalVersion() {
-    CallMethod("org.freedesktop.DBus.Properties", "Get",
-        g_variant_new("(ss)", "org.freedesktop.portal.GlobalShortcuts", "version"),
-        G_VARIANT_TYPE("(v)"),
-        [this](GVariantPtr reply, GErrorPtr) {
-          guint version = 0;
-          if (reply) {
-            GVariant *vv = nullptr;
-            g_variant_get(reply.get(), "(v)", &vv);
-            GVariantPtr version_variant(vv);
-            version = g_variant_get_uint32(version_variant.get());
-          }
-          EmitEvent("portalVersion", {
-            [version](Napi::Env env) -> Napi::Value { return Napi::Number::New(env, version); }
-          });
-        });
-  }
+    void FetchVersion()
+    {
+        Call(PORTAL_PATH, "org.freedesktop.DBus.Properties", "Get",
+            g_variant_new("(ss)", SHORTCUTS_INTERFACE, "version"),
+            G_VARIANT_TYPE("(v)"),
+            [this](GVariant *reply, GError *) {
+                guint32 version = 0;
+                if (reply)
+                {
+                    GVariant *raw = nullptr;
+                    g_variant_get(reply, "(v)", &raw);
+                    GVariantPtr value(raw);
+                    if (g_variant_is_of_type(value.get(), G_VARIANT_TYPE_UINT32))
+                        version = g_variant_get_uint32(value.get());
+                }
+                Emit("version", {[version](Napi::Env env) -> Napi::Value { return Napi::Number::New(env, version); }});
+            });
+    }
 
-  void SubscribePressedSignals() {
-    auto subscribeKeySignal = [this](const char *signal, bool pressed) {
-      return SubscribeGSSignal(signal, [this, pressed](GVariant *parameters) {
-        const char *raw_id = nullptr;
-        gulong timestamp = 0;
-        g_variant_get(parameters, "(&o&sta{sv})", nullptr, &raw_id, &timestamp, nullptr);
-        std::string id = raw_id ? raw_id : "";
-        EmitEvent("shortcutEvent", {
-          [id](Napi::Env env) -> Napi::Value { return Napi::String::New(env, id); },
-          [pressed](Napi::Env env) -> Napi::Value { return Napi::Boolean::New(env, pressed); },
-          [timestamp](Napi::Env env) -> Napi::Value { return Napi::Number::New(env, timestamp); }
-        });
-      });
-    };
+    void CreateSession()
+    {
+        std::string token = NewToken();
+        GVariantBuilder options;
+        g_variant_builder_init(&options, G_VARIANT_TYPE_VARDICT);
+        g_variant_builder_add(&options, "{sv}", "handle_token", g_variant_new_string(token.c_str()));
+        g_variant_builder_add(&options, "{sv}", "session_handle_token", g_variant_new_string(token.c_str()));
 
-    activatedSignal_ = subscribeKeySignal("Activated", true);
-    deactivatedSignal_ = subscribeKeySignal("Deactivated", false);
+        Request("CreateSession", token, g_variant_new("(a{sv})", &options), "fatal",
+            [this](guint32 response, GVariant *results) {
+                // Older portal versions send the handle as a string, newer as an object path
+                GVariantPtr handle(g_variant_lookup_value(results, "session_handle", nullptr));
+                if (response != 0 || !handle ||
+                    !(g_variant_is_of_type(handle.get(), G_VARIANT_TYPE_STRING) ||
+                      g_variant_is_of_type(handle.get(), G_VARIANT_TYPE_OBJECT_PATH)))
+                {
+                    Emit("fatal", {Str("Failed to create session (response " + std::to_string(response) + ")")});
+                    return;
+                }
 
-    shortcutsChangedSignal_ = SubscribeGSSignal("ShortcutsChanged", [this](GVariant *parameters) {
-      const GVariantPtr shortcuts(g_variant_get_child_value(parameters, 1));
-      EmitEvent("shortcutsBound", { ParseShortcuts(shortcuts.get()) });
-    });
-  }
+                session_ = g_variant_get_string(handle.get(), nullptr);
+                Emit("ready");
+            });
+    }
 
-  void EmitEvent(const std::string &eventName, std::vector<std::function<Napi::Value(Napi::Env)>> args) {
-    struct EventData {
-      std::string name;
-      std::vector<std::function<Napi::Value(Napi::Env)>> args;
-    };
-    auto *data = new EventData{eventName, std::move(args)};
-    tsfn_.BlockingCall(data, [this](Napi::Env env, Napi::Function, EventData *data) {
-      auto emitter = emitterRef_.Value();
-      auto emit = emitter.Get("emit").As<Napi::Function>();
-      std::vector<Napi::Value> call_args;
-      call_args.reserve(data->args.size() + 1);
-      call_args.push_back(Napi::String::New(env, data->name));
-      for (auto &make : data->args)
-        call_args.push_back(make(env));
-      emit.Call(emitter, call_args);
-      if (data->name == "fatal") Cleanup();
-      delete data;
-    });
-  }
+    void SubscribeSignals()
+    {
+        auto onKey = [this](bool pressed) {
+            return [this, pressed](GVariant *parameters) {
+                const char *session = nullptr;
+                const char *id = nullptr;
+                guint64 timestamp = 0;
+                g_variant_get(parameters, "(&o&sta{sv})", &session, &id, &timestamp, nullptr);
+                if (session_ != session)
+                    return;
 
-  void EmitEvent(const std::string &eventName, const std::string &payload) {
-    EmitEvent(eventName, {[payload](Napi::Env env) -> Napi::Value {
-      return Napi::String::New(env, payload);
-    }});
-  }
+                Emit("shortcut", {Str(id), [pressed](Napi::Env env) -> Napi::Value { return Napi::Boolean::New(env, pressed); }});
+            };
+        };
 
-  GObjectPtr<GDBusConnection> connection_;
-  std::string connectionName_;
-  Napi::ThreadSafeFunction tsfn_;
-  Napi::ObjectReference emitterRef_;
-  bool cleaned_ = false;
-  std::string sessionHandle_;
-  SignalSubscription requestSignal_;
-  SignalSubscription bindSignal_;
-  SignalSubscription activatedSignal_;
-  SignalSubscription deactivatedSignal_;
-  SignalSubscription shortcutsChangedSignal_;
+        signals_.push_back(Subscribe(SHORTCUTS_INTERFACE, "Activated", PORTAL_PATH, onKey(true)));
+        signals_.push_back(Subscribe(SHORTCUTS_INTERFACE, "Deactivated", PORTAL_PATH, onKey(false)));
+        signals_.push_back(Subscribe(SHORTCUTS_INTERFACE, "ShortcutsChanged", PORTAL_PATH, [this](GVariant *parameters) {
+            const char *session = nullptr;
+            GVariant *raw = nullptr;
+            g_variant_get(parameters, "(&o@a(sa{sv}))", &session, &raw);
+            GVariantPtr shortcuts(raw);
+            if (session_ == session)
+                Emit("shortcuts", {ParseShortcuts(shortcuts.get())});
+        }));
+    }
+
+    std::string NewToken() { return "vesktop" + std::to_string(++nextToken_); }
+
+    void Call(const char *path, const char *interface, const char *method, GVariant *params,
+              const GVariantType *replyType, ReplyCallback callback)
+    {
+        g_dbus_connection_call(
+            connection_.get(), PORTAL_BUS_NAME, path, interface, method, params, replyType,
+            G_DBUS_CALL_FLAGS_NONE, -1, cancellable_.get(),
+            [](GObject *source, GAsyncResult *res, gpointer user_data) {
+                std::unique_ptr<ReplyCallback> callback(static_cast<ReplyCallback *>(user_data));
+                GError *raw_error = nullptr;
+                GVariantPtr reply(g_dbus_connection_call_finish(G_DBUS_CONNECTION(source), res, &raw_error));
+                GErrorPtr error(raw_error);
+
+                // Cancelled means we were destroyed, so the callback must not run
+                if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                    (*callback)(reply.get(), error.get());
+            },
+            new ReplyCallback(std::move(callback)));
+    }
+
+    // Calls a portal method that answers asynchronously with a Request::Response signal
+    void Request(const char *method, const std::string &token, GVariant *params, const char *errorEvent,
+                 ResponseCallback onResponse)
+    {
+        requests_[token] = Subscribe("org.freedesktop.portal.Request", "Response", (requestPathPrefix_ + token).c_str(),
+            [this, token, onResponse](GVariant *parameters) {
+                guint32 response = 2;
+                GVariant *raw = nullptr;
+                g_variant_get(parameters, "(u@a{sv})", &response, &raw);
+                GVariantPtr results(raw);
+
+                // Erasing unsubscribes this handler, so copy what we need first
+                ResponseCallback callback = onResponse;
+                std::string key = token;
+                requests_.erase(key);
+                callback(response, results.get());
+            });
+
+        Call(PORTAL_PATH, SHORTCUTS_INTERFACE, method, params, G_VARIANT_TYPE("(o)"),
+            [this, token, method = std::string(method), errorEvent = std::string(errorEvent)](GVariant *, GError *error) {
+                if (!error)
+                    return;
+                requests_.erase(token);
+                Emit(errorEvent, {Str(method + ": " + error->message)});
+            });
+    }
+
+    SignalSubscription Subscribe(const char *interface, const char *signal, const char *path, SignalCallback callback)
+    {
+        guint id = g_dbus_connection_signal_subscribe(
+            connection_.get(), PORTAL_BUS_NAME, interface, signal, path, nullptr, G_DBUS_SIGNAL_FLAGS_NONE,
+            [](GDBusConnection *, const char *, const char *, const char *, const char *, GVariant *parameters,
+               gpointer user_data) { (*static_cast<SignalCallback *>(user_data))(parameters); },
+            new SignalCallback(std::move(callback)),
+            [](gpointer user_data) { delete static_cast<SignalCallback *>(user_data); });
+
+        return {connection_.get(), id};
+    }
+
+    void Emit(std::string name, std::vector<ArgFactory> args = {})
+    {
+        if (!active_)
+            return;
+
+        using Event = std::pair<std::string, std::vector<ArgFactory>>;
+        tsfn_.NonBlockingCall(new Event(std::move(name), std::move(args)),
+            [](Napi::Env env, Napi::Function callback, Event *event) {
+                std::unique_ptr<Event> owned(event);
+                if (env == nullptr)
+                    return;
+
+                std::vector<napi_value> values{Napi::String::New(env, owned->first)};
+                for (auto &make : owned->second)
+                    values.push_back(make(env));
+                callback.Call(values);
+            });
+    }
+
+    static ArgFactory Str(std::string value)
+    {
+        return [value = std::move(value)](Napi::Env env) -> Napi::Value { return Napi::String::New(env, value); };
+    }
+
+    static ArgFactory ParseShortcuts(GVariant *shortcuts)
+    {
+        struct Shortcut
+        {
+            std::string id, description, trigger;
+        };
+        std::vector<Shortcut> parsed;
+
+        if (shortcuts)
+        {
+            GVariantIter iter;
+            g_variant_iter_init(&iter, shortcuts);
+            const char *id = nullptr;
+            GVariant *raw = nullptr;
+            while (g_variant_iter_next(&iter, "(&s@a{sv})", &id, &raw))
+            {
+                GVariantPtr props(raw);
+                const char *description = "";
+                const char *trigger = "";
+                g_variant_lookup(props.get(), "description", "&s", &description);
+                g_variant_lookup(props.get(), "trigger_description", "&s", &trigger);
+                parsed.push_back({id, description, trigger});
+            }
+        }
+
+        return [parsed = std::move(parsed)](Napi::Env env) -> Napi::Value {
+            Napi::Array arr = Napi::Array::New(env, parsed.size());
+            for (size_t i = 0; i < parsed.size(); i++)
+            {
+                Napi::Object obj = Napi::Object::New(env);
+                obj.Set("id", parsed[i].id);
+                obj.Set("description", parsed[i].description);
+                obj.Set("trigger", parsed[i].trigger);
+                arr.Set(i, obj);
+            }
+            return arr;
+        };
+    }
 };
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set("requestBackground", Napi::Function::New(env, RequestBackground));
     exports.Set("isStatusNotifierHostRegistered", Napi::Function::New(env, IsStatusNotifierHostRegistered));
-
-    // global shortcuts error in CI
-    return std::getenv("CI") ? exports : XDPGlobalShortcuts::Init(env, exports);
+    exports.Set("registerHostApp", Napi::Function::New(env, RegisterHostApp));
+    exports.Set("openGnomeAppSettings", Napi::Function::New(env, OpenGnomeAppSettings));
+    XDPGlobalShortcuts::Init(env, exports);
+    return exports;
 }
 
 NODE_API_MODULE(libvesktop, Init)

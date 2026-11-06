@@ -67,8 +67,12 @@ export const enum IpcEvents {
     DEVTOOLS_CLOSED = "VCD_DEVTOOLS_CLOSED",
 
     CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET",
-    IS_WAYLAND = "IS_WAYLAND",
-    CONFIGURE_XDP_SHORTCUTS = "CONFIGURE_XDP_SHORTCUTS"
+
+    KEYBINDS_GET_STATUS = "VCD_KEYBINDS_GET_STATUS",
+    KEYBINDS_GET_SOCKET_PATH = "VCD_KEYBINDS_GET_SOCKET_PATH",
+    KEYBINDS_RETRY = "VCD_KEYBINDS_RETRY",
+    KEYBINDS_REQUEST_PERMISSION = "VCD_KEYBINDS_REQUEST_PERMISSION",
+    KEYBINDS_CONFIGURE_PORTAL = "VCD_KEYBINDS_CONFIGURE_PORTAL"
 }
 
 export const enum UpdaterIpcEvents {
@@ -94,7 +98,6 @@ export const enum IpcCommands {
 
     SCREEN_SHARE_PICKER = "screenshare:picker",
 
-    KEY_BINDS_HANDLE = "keyBinds:handle",
-    KEY_BINDS_SET_STATUS = "keyBinds:setStatus",
-    KEY_BINDS_WUPDATE = "keyBinds:waylandUpdate"
+    KEYBINDS_TRIGGER = "keybinds:trigger",
+    KEYBINDS_STATUS = "keybinds:status"
 }

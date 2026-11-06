@@ -6,12 +6,10 @@
 
 import { copyFile, rm } from "fs/promises";
 
-import { BuildContext, BuildOptions, context } from "esbuild";
+import { BuildContext, BuildOptions, context, Plugin } from "esbuild";
 
 import { includeDirPlugin } from "./includeDirPlugin.mts";
 import vencordDep from "./vencordDep.mjs";
-
-const { UiohookKey } = await import("uiohook-napi");
 
 const isDev = process.argv.includes("--dev");
 
@@ -36,6 +34,29 @@ const NodeCommonOpts: BuildOptions = {
     }
 };
 
+// uiohook-napi finds its binary with node-gyp-build, so point that at the copy in static/dist (see copyUiohook)
+const uiohookBinaryPlugin: Plugin = {
+    name: "uiohook-binary",
+    setup(build) {
+        build.onResolve({ filter: /^node-gyp-build$/ }, args => {
+            if (args.importer.includes("uiohook-napi")) return { path: "uiohook-binary", namespace: "uiohook-binary" };
+        });
+        build.onLoad({ filter: /.*/, namespace: "uiohook-binary" }, () => ({
+            contents: `
+                const { join } = require("path");
+                module.exports = () => require(join(__dirname, "../../static/dist/uiohook-napi-" + process.arch + ".node"));
+            `,
+            loader: "js"
+        }));
+    }
+};
+
+// Overwriting in place crashes a running instance, as the addon is mapped into memory, so replace the file instead
+async function copyNativeModule(src: string, dest: string) {
+    await rm(dest, { force: true });
+    await copyFile(src, dest);
+}
+
 const contexts = [] as BuildContext[];
 async function createContext(options: BuildOptions) {
     contexts.push(await context(options));
@@ -45,37 +66,40 @@ async function copyVenmic() {
     if (process.platform !== "linux") return;
 
     return Promise.all([
-        copyFile(
+        copyNativeModule(
             "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
             "./static/dist/venmic-x64.node"
         ),
-        copyFile(
+        copyNativeModule(
             "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
             "./static/dist/venmic-arm64.node"
         )
     ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
 }
 
-async function copyUIOHook() {
-    const p = process.platform;
-    const base = `./node_modules/uiohook-napi/prebuilds/${p}`;
-    if (p == "linux" || p == "win32" || p == "darwin")
-        return Promise.all([
-            copyFile(`${base}-x64/uiohook-napi.node`, "./static/dist/uiohook-napi-x64.node"),
-            copyFile(`${base}-arm64/uiohook-napi.node`, "./static/dist/uiohook-napi-arm64.node")
-        ]).catch(() => console.error("Failed to copy uiohook. exploding"));
+async function copyUiohook() {
+    const prebuilds = "./node_modules/uiohook-napi/prebuilds";
+
+    return Promise.all(
+        ["x64", "arm64"].map(arch =>
+            copyNativeModule(
+                `${prebuilds}/${process.platform}-${arch}/uiohook-napi.node`,
+                `./static/dist/uiohook-napi-${arch}.node`
+            )
+        )
+    ).catch(() => console.warn("Failed to copy uiohook. Building without global keybind support"));
 }
 
 async function copyGameDetection() {
     const prebuilds = "./node_modules/@vencord/game-detection/prebuilds";
 
     return Promise.all(
-        ["x64", "arm64"].map(async arch => {
-            const dest = `./static/dist/game-detection-${arch}.node`;
-            // Overwriting in place crashes a running instance, as the addon is mapped into memory
-            await rm(dest, { force: true });
-            await copyFile(`${prebuilds}/${process.platform}-${arch}/rpc_native.node`, dest);
-        })
+        ["x64", "arm64"].map(arch =>
+            copyNativeModule(
+                `${prebuilds}/${process.platform}-${arch}/rpc_native.node`,
+                `./static/dist/game-detection-${arch}.node`
+            )
+        )
     ).catch(() => console.warn("Failed to copy game detection. Building without game detection support"));
 }
 
@@ -83,7 +107,7 @@ async function copyLibVesktop() {
     if (process.platform !== "linux") return;
 
     try {
-        await copyFile(
+        await copyNativeModule(
             "./packages/libvesktop/build/Release/vesktop.node",
             `./static/dist/libvesktop-${process.arch}.node`
         );
@@ -93,8 +117,11 @@ async function copyLibVesktop() {
             "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
         );
         return Promise.all([
-            copyFile("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
-            copyFile("./packages/libvesktop/prebuilds/vesktop-arm64.node", "./static/dist/libvesktop-arm64.node")
+            copyNativeModule("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
+            copyNativeModule(
+                "./packages/libvesktop/prebuilds/vesktop-arm64.node",
+                "./static/dist/libvesktop-arm64.node"
+            )
         ]).catch(() => console.warn("Failed to copy libvesktop. Building without libvesktop support"));
     }
 }
@@ -103,28 +130,11 @@ await Promise.all([
     copyVenmic(),
     copyLibVesktop(),
     copyGameDetection(),
-    copyUIOHook(),
+    copyUiohook(),
     createContext({
         ...NodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
-        plugins: [
-            {
-                name: "uiohook-napi-native",
-                setup(build) {
-                    build.onResolve({ filter: /^node-gyp-build$/ }, args => {
-                        if (args.importer.includes("uiohook-napi"))
-                            return { path: "uiohook-gyp-build", namespace: "uiohook-gyp-build" };
-                    });
-                    build.onLoad({ filter: /.*/, namespace: "uiohook-gyp-build" }, () => ({
-                        contents: `
-                            const { join } = require("path");
-                            module.exports = () => require(join(__dirname, "..", "..", \`static/dist/uiohook-napi-\${process.arch}.node\`));`,
-                        loader: "js"
-                    }));
-                }
-            }
-        ],
-
+        plugins: [uiohookBinaryPlugin],
         outfile: "dist/js/main.js",
         footer: { js: "//# sourceURL=VesktopMain" }
     }),
@@ -156,25 +166,7 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
-        plugins: [
-            vencordDep,
-            includeDirPlugin("patches", "src/renderer/patches"),
-            {
-                name: "uiohook-napi-stub",
-                setup(build) {
-                    build.onResolve({ filter: /^uiohook-napi$/ }, () => ({
-                        path: "uiohook-napi-stub",
-                        namespace: "uiohook-napi-stub"
-                    }));
-                    build.onLoad({ filter: /.*/, namespace: "uiohook-napi-stub" }, () => {
-                        return {
-                            contents: `export const UiohookKey = ${JSON.stringify(UiohookKey, null, 2)} as const;`,
-                            loader: "ts"
-                        };
-                    });
-                }
-            }
-        ],
+        plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
         footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);
