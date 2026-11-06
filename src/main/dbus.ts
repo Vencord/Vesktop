@@ -11,6 +11,9 @@ import { STATIC_DIR } from "shared/paths";
 
 import { IS_FLATPAK } from "./constants";
 
+// Name of our .desktop file, which portals and GNOME identify us by
+const APP_ID = process.env.FLATPAK_ID ?? "vesktop";
+
 let libVesktop: typeof import("libvesktop") | null = null;
 
 function loadLibVesktop() {
@@ -19,8 +22,7 @@ function loadLibVesktop() {
             libVesktop = require(
                 join(STATIC_DIR, `dist/libvesktop-${process.arch}.node`)
             ) as typeof import("libvesktop");
-            // Sandboxed apps already have an app id. Matches the name of our .desktop file
-            if (!IS_FLATPAK) libVesktop.registerHostApp("vesktop");
+            if (!IS_FLATPAK) libVesktop.registerHostApp(APP_ID);
         }
     } catch (e) {
         console.error("Failed to load libvesktop:", e);
@@ -42,4 +44,8 @@ export function createXDPGlobalShortcuts(onEvent: (...args: XDPGlobalShortcutsEv
     if (!lib) return null;
 
     return new lib.XDPGlobalShortcuts(onEvent);
+}
+
+export function openGnomeAppSettings() {
+    return loadLibVesktop()?.openGnomeAppSettings(APP_ID) ?? false;
 }

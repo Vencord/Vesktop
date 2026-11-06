@@ -7,7 +7,7 @@
 import type { XDPGlobalShortcuts, XDPGlobalShortcutsEvent } from "libvesktop";
 import { ACTION_DESCRIPTIONS, isShortcutAction, SHORTCUT_ACTIONS } from "shared/utils/keybind";
 
-import { createXDPGlobalShortcuts } from "../dbus";
+import { createXDPGlobalShortcuts, openGnomeAppSettings } from "../dbus";
 import { setStatus, status, triggerAction } from "./actions";
 
 let session: XDPGlobalShortcuts | null = null;
@@ -15,7 +15,7 @@ let session: XDPGlobalShortcuts | null = null;
 function onEvent(...event: XDPGlobalShortcutsEvent) {
     switch (event[0]) {
         case "version":
-            setStatus({ ...status, portalVersion: event[1] });
+            setStatus({ ...status, portalVersion: event[1], portalConfigurable: canConfigure(event[1]) });
             break;
         case "ready":
             // The portal decides the triggers, so we register every action and let the user assign the ones they want
@@ -72,6 +72,14 @@ export function setPortalEnabled(enabled: boolean) {
     }
 }
 
+const IS_GNOME = process.env.XDG_CURRENT_DESKTOP?.split(":").includes("GNOME") ?? false;
+
+// Portals before version 2 can't open their shortcut settings, but GNOME Settings has them on the app's page
+const canConfigure = (version = 0) => version >= 2 || IS_GNOME;
+
 export function configurePortalShortcuts() {
-    session?.configureShortcuts();
+    if ((status.portalVersion ?? 0) >= 2) return session?.configureShortcuts();
+
+    if (IS_GNOME && !openGnomeAppSettings())
+        setStatus({ ...status, error: "Failed to open GNOME Settings. Find Vesktop under Apps instead" });
 }

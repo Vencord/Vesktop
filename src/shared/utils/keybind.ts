@@ -100,5 +100,7 @@ export interface KeybindStatus {
     needsPermission?: boolean;
     portalState?: "disabled" | "connecting" | "ready" | "unavailable";
     portalVersion?: number;
+    /** Whether we can open the portal's shortcut settings, see configurePortal */
+    portalConfigurable?: boolean;
     portalShortcuts?: PortalShortcut[];
 }
