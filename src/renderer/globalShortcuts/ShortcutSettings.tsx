@@ -53,7 +53,13 @@ function ErrorCard({ children, onRetry }: { children: React.ReactNode; onRetry?(
     );
 }
 
-function KeybindRecorder({ keys, onChange }: { keys: string[]; onChange(keys: string[]): void }) {
+function KeybindRecorder({
+    keybind: { keys, labels },
+    onChange
+}: {
+    keybind: KeyBind;
+    onChange(recorded: Pick<KeyBind, "keys" | "labels">): void;
+}) {
     const [controller, setController] = useState<AbortController | null>(null);
 
     // Stop listening for input if the modal is closed while recording
@@ -73,7 +79,7 @@ function KeybindRecorder({ keys, onChange }: { keys: string[]; onChange(keys: st
         }
     }
 
-    const display = keys.length ? keysToDisplay(keys) : "No Keybind Set";
+    const display = keys.length ? keysToDisplay(keys, labels) : "No Keybind Set";
 
     return (
         <div className={cl("recorder")}>
@@ -104,7 +110,7 @@ function KeybindRow({
                 select={action => onChange({ ...keybind, action })}
                 serialize={identity}
             />
-            <KeybindRecorder keys={keybind.keys} onChange={keys => onChange({ ...keybind, keys })} />
+            <KeybindRecorder keybind={keybind} onChange={recorded => onChange({ ...keybind, ...recorded })} />
             <Button size="iconOnly" variant="secondary" aria-label="Delete Keybind" onClick={onDelete}>
                 <DeleteIcon />
             </Button>
