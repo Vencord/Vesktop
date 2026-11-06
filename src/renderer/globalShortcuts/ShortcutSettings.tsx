@@ -126,14 +126,9 @@ function HookKeybinds({ status }: { status: KeybindStatus }) {
                     <Text size="md">
                         Vesktop needs the Accessibility permission to detect your keybinds while it is not focused.
                     </Text>
-                    <div className={cl("buttons")}>
-                        <Button size="small" onClick={() => VesktopNative.keybinds.requestPermission()}>
-                            Grant Permission
-                        </Button>
-                        <Button size="small" variant="secondary" onClick={() => VesktopNative.keybinds.retry()}>
-                            Retry
-                        </Button>
-                    </div>
+                    <Button size="small" onClick={() => VesktopNative.keybinds.requestPermission()}>
+                        Grant Permission
+                    </Button>
                 </Card>
             )}
             {status.error && <ErrorCard onRetry={() => VesktopNative.keybinds.retry()}>{status.error}</ErrorCard>}
