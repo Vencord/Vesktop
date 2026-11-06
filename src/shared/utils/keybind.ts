@@ -4,36 +4,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { UiohookKey } from "uiohook-napi";
-
-// UiohookKey
-const KEY_RENAMES: Partial<Record<string, string>> = {
-    Enter: "Return",
-    ArrowUp: "Up",
-    ArrowDown: "Down",
-    ArrowLeft: "Left",
-    ArrowRight: "Right",
-    Delete: "Del",
-    Insert: "Ins",
-    PageUp: "PgUp",
-    PageDown: "PgDn",
-    Escape: "Esc"
-} as const;
-
-const EXCLUDED_KEYS = new Set(["Ctrl", "CtrlRight", "Alt", "AltRight", "Shift", "ShiftRight", "Meta", "MetaRight"]);
-const KEY_TO_ACCELERATOR: Record<string, string> = Object.fromEntries(
-    (Object.keys(UiohookKey) as string[])
-        .filter(key => !EXCLUDED_KEYS.has(key))
-        .map(key => [key, KEY_RENAMES[key] ?? key])
-);
-
-export function keyNameToAccelerator(name: string): string | null {
-    return name in KEY_TO_ACCELERATOR ? KEY_TO_ACCELERATOR[name] : null;
+/**
+ * A global keybind. Keys are KeyboardEvent.code names, except that left and right modifiers
+ * are merged into "Control", "Shift", "Alt" and "Meta", and mouse buttons are "Mouse3" to "Mouse5"
+ */
+export interface KeyBind {
+    id: string;
+    action: ShortcutAction | "unassigned";
+    keys: string[];
+    enabled: boolean;
 }
 
-export const NUMPAD_KEYS = new Set((Object.keys(UiohookKey) as string[]).filter(key => /^Numpad\D/.test(key)));
-
-export const ACTION_MAP: Partial<Record<ShortcutAction, string>> = {
+// Discord's global keybind action for each of our actions
+export const ACTION_MAP = {
     pushToTalk: "PUSH_TO_TALK",
     pushToTalkPriority: "PUSH_TO_TALK_PRIORITY",
     pushToMute: "PUSH_TO_MUTE",
@@ -46,23 +29,76 @@ export const ACTION_MAP: Partial<Record<ShortcutAction, string>> = {
     navigateBack: "NAVIGATE_BACK",
     navigateForward: "NAVIGATE_FORWARD",
     disconnectFromVoiceChannel: "DISCONNECT_FROM_VOICE_CHANNEL"
-};
+} as const;
 
-export const ACTION_DESCRIPTIONS = {
-    unassigned: "Unassigned",
-    pushToTalk: "Push-to-talk (Normal)",
-    pushToTalkPriority: "Push-to-talk (Priority)",
-    pushToMute: "Push-to-mute",
+export type ShortcutAction = keyof typeof ACTION_MAP;
+
+export const ACTION_DESCRIPTIONS: Record<ShortcutAction, string> = {
+    pushToTalk: "Push to Talk (Normal)",
+    pushToTalkPriority: "Push to Talk (Priority)",
+    pushToMute: "Push to Mute",
     vadPriority: "Voice Activity Priority",
     toggleMute: "Toggle Mute",
     toggleDeafen: "Toggle Deafen",
-    toggleVAD: "Toggle PTT and Voice Activity",
+    toggleVAD: "Toggle Push to Talk / Voice Activity",
     toggleStreamerMode: "Toggle Streamer Mode",
     toggleCamera: "Toggle Camera",
     navigateBack: "Navigate Back",
     navigateForward: "Navigate Forward",
-    // connectToVoiceChannel
-    disconnectFromVoiceChannel: "Disconnect from VC"
-} as const;
+    disconnectFromVoiceChannel: "Disconnect from Voice Channel"
+};
 
-export type ShortcutAction = keyof typeof ACTION_DESCRIPTIONS;
+export const SHORTCUT_ACTIONS = Object.keys(ACTION_MAP) as ShortcutAction[];
+
+export function isShortcutAction(action: string): action is ShortcutAction {
+    return Object.hasOwn(ACTION_MAP, action);
+}
+
+/**
+ * Parses "action", "action:down" or "action:up", as used by --run-shortcut and the IPC socket.
+ * pressed is undefined if the action should be pressed and released
+ */
+export function parseShortcutCommand(command: string): { action: ShortcutAction; pressed?: boolean } | null {
+    const [action, state, ...rest] = command.trim().split(":");
+    if (rest.length || !isShortcutAction(action)) return null;
+
+    switch (state) {
+        case undefined:
+            return { action };
+        case "down":
+            return { action, pressed: true };
+        case "up":
+            return { action, pressed: false };
+        default:
+            return null;
+    }
+}
+
+export const MODIFIER_KEYS = ["Control", "Shift", "Alt", "Meta"];
+
+// Modifiers first, in a fixed order, then everything else alphabetically
+export function sortKeys(keys: string[]) {
+    const rank = (key: string) => {
+        const i = MODIFIER_KEYS.indexOf(key);
+        return i === -1 ? MODIFIER_KEYS.length : i;
+    };
+
+    return keys.toSorted((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+
+export interface PortalShortcut {
+    id: string;
+    description: string;
+    trigger: string;
+}
+
+export interface KeybindStatus {
+    /** "hook" listens to all input (Windows, macOS, X11). "portal" uses the GlobalShortcuts portal (Wayland) */
+    backend: "hook" | "portal";
+    error?: string;
+    /** macOS only. Accessibility permission is required to listen to input */
+    needsPermission?: boolean;
+    portalState?: "disabled" | "connecting" | "ready" | "unavailable";
+    portalVersion?: number;
+    portalShortcuts?: PortalShortcut[];
+}

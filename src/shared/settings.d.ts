@@ -5,7 +5,8 @@
  */
 
 import type { Rectangle } from "electron";
-import { KeyBind } from "renderer/globalShortcuts/ShortcutSettings";
+
+import type { KeyBind } from "./utils/keybind";
 
 export interface Settings {
     discordBranch: "stable" | "canary" | "ptb";
@@ -58,6 +59,8 @@ export interface Settings {
     };
 
     keyBinds?: KeyBind[];
+    /** Wayland only. Whether to register our actions with the GlobalShortcuts portal */
+    globalShortcutsPortal?: boolean;
 }
 
 export interface State {
