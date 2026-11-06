@@ -27,6 +27,12 @@ export function initKeybinds() {
 
     if (IS_WAYLAND) Settings.addChangeListener("globalShortcutsPortal", update);
     else Settings.addChangeListener("keyBinds", update);
+
+    // macOS doesn't tell us when the permission is granted, so check again when the user comes back from System Settings
+    if (process.platform === "darwin")
+        app.on("browser-window-focus", () => {
+            if (status.needsPermission && systemPreferences.isTrustedAccessibilityClient(false)) update();
+        });
 }
 
 handle(IpcEvents.KEYBINDS_GET_STATUS, () => status);
