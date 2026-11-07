@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow, dialog } from "electron";
 import { writeFile } from "fs/promises";
 import { join } from "path";
+
+import { BrowserWindow, dialog } from "electron";
 
 import { MessageBoxChoice } from "../constants";
 import { State } from "../settings";

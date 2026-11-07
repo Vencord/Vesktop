@@ -25,6 +25,7 @@ export interface Settings {
     disableSmoothScroll: boolean;
     hardwareAcceleration: boolean;
     hardwareVideoAcceleration: boolean;
+    hardwareVideoEncoding: boolean;
     arRPC: boolean;
     appBadge: boolean;
     enableTaskbarFlashing: boolean;
@@ -50,6 +51,7 @@ export interface Settings {
         ignoreDevices?: boolean;
         ignoreInputMedia?: boolean;
 
+        mute?: boolean;
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };

@@ -5,9 +5,10 @@
  */
 
 import { mkdirSync } from "fs";
-import { access, constants as FsConstants, writeFile } from "fs/promises";
-import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
+import { access, constants as FsConstants, rename, writeFile } from "fs/promises";
 import { join } from "path";
+
+import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 
 import { USER_AGENT } from "../constants";
 import { downloadFile, fetchie } from "./http";
@@ -48,14 +49,29 @@ export async function downloadVencordFiles() {
     const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
 
     const { assets }: ReleaseData = await release.json();
+    const files = assets.filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)));
+
+    mkdirSync(VENCORD_FILES_DIR, { recursive: true });
+
+    // Download to temp files and only move them into place once all succeeded,
+    // so an interrupted download can't leave a broken install behind
+    const results = await Promise.allSettled(
+        files.map(({ name, browser_download_url }) =>
+            downloadFile(
+                browser_download_url,
+                join(VENCORD_FILES_DIR, name + ".tmp"),
+                {},
+                { retryOnNetworkError: true }
+            )
+        )
+    );
+    const failed = results.find(r => r.status === "rejected");
+    if (failed) throw failed.reason;
 
     await Promise.all(
-        assets
-            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
-            .map(({ name, browser_download_url }) =>
-                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
-            )
+        files.map(({ name }) => rename(join(VENCORD_FILES_DIR, name + ".tmp"), join(VENCORD_FILES_DIR, name)))
     );
+    await writeFile(join(VENCORD_FILES_DIR, "package.json"), "{}");
 }
 
 const existsAsync = (path: string) =>
@@ -66,12 +82,4 @@ const existsAsync = (path: string) =>
 export async function isValidVencordInstall(dir: string) {
     const results = await Promise.all(FILES_TO_DOWNLOAD.map(f => existsAsync(join(dir, f))));
     return !results.includes(false);
-}
-
-export async function ensureVencordFiles() {
-    if (await isValidVencordInstall(VENCORD_FILES_DIR)) return;
-
-    mkdirSync(VENCORD_FILES_DIR, { recursive: true });
-
-    await Promise.all([downloadVencordFiles(), writeFile(join(VENCORD_FILES_DIR, "package.json"), "{}")]);
 }

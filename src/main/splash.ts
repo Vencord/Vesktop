@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow } from "electron";
 import { join } from "path";
+
+import { BrowserWindow } from "electron";
 import { SplashProps } from "shared/browserWinProperties";
 
 import { Settings } from "./settings";
 import { loadView } from "./vesktopStatic";
 
 let splash: BrowserWindow | undefined;
+let message = "";
 
 export function createSplashWindow(startMinimized = false) {
     splash = new BrowserWindow({
@@ -22,30 +24,24 @@ export function createSplashWindow(startMinimized = false) {
         }
     });
 
-    loadView(splash, "splash.html");
+    // messages sent before the page finished loading are lost, so resend the latest one
+    splash.webContents.on("did-finish-load", () => updateSplashMessage(message));
 
     const { splashBackground, splashColor, splashTheming, splashPixelated } = Settings.store;
 
+    const params = new URLSearchParams();
     if (splashTheming) {
-        if (splashColor) {
-            const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
-
-            splash.webContents.insertCSS(`body { --fg: ${splashColor} !important }`);
-            splash.webContents.insertCSS(`body { --fg-semi-trans: ${semiTransparentSplashColor} !important }`);
-        }
-
-        if (splashBackground) {
-            splash.webContents.insertCSS(`body { --bg: ${splashBackground} !important }`);
-        }
+        if (splashColor) params.set("fg", splashColor);
+        if (splashBackground) params.set("bg", splashBackground);
     }
+    if (splashPixelated) params.set("pixelated", "");
 
-    if (splashPixelated) {
-        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
-    }
+    loadView(splash, "splash.html", params);
 
     return splash;
 }
 
-export function updateSplashMessage(message: string) {
+export function updateSplashMessage(newMessage: string) {
+    message = newMessage;
     if (splash && !splash.isDestroyed()) splash.webContents.send("update-splash-message", message);
 }

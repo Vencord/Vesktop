@@ -5,7 +5,6 @@
  */
 
 import "./screenSharePicker.css";
-
 import { classNameFactory } from "@vencord/types/api/Styles";
 import {
     Button,
@@ -13,7 +12,6 @@ import {
     CogWheel,
     FormSwitch,
     Heading,
-    HeadingTertiary,
     Margins,
     Paragraph,
     RestartIcon,
@@ -24,7 +22,6 @@ import { onceReady } from "@vencord/types/webpack";
 import {
     closeModal,
     FluxDispatcher,
-    MediaEngineStore,
     Modal,
     openModal,
     Select,
@@ -33,13 +30,13 @@ import {
 } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
-import { addPatch } from "renderer/patches/shared";
 import { State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
 
 import { SimpleErrorBoundary } from "./SimpleErrorBoundary";
 
-const StreamResolutions = ["480", "720", "1080", "1440", "2160"] as const;
+const StreamResolutions = ["480", "720", "1080", "1440", "2160", "0"] as const;
+const StreamResolutionLabels = ["480", "720", "1080", "1440", "2160", "Source"];
 const StreamFps = ["15", "30", "60"] as const;
 
 const cl = classNameFactory("vcd-screen-picker-");
@@ -76,59 +73,26 @@ interface Source {
 
 export let currentSettings: StreamSettings | null = null;
 
-const logger = new Logger("VesktopScreenShare");
-
-addPatch({
-    patches: [
-        {
-            find: "this.getDefaultGoliveQuality()",
-            replacement: {
-                match: /this\.getDefaultGoliveQuality\(\)/,
-                replace: "$self.patchStreamQuality($&)"
-            }
-        }
-    ],
-    patchStreamQuality(opts: any) {
-        const { screenshareQuality } = State.store;
-        if (!screenshareQuality) return opts;
-
-        const framerate = Number(screenshareQuality.frameRate);
-        const height = Number(screenshareQuality.resolution);
-        const width = Math.round(height * (16 / 9));
-
-        Object.assign(opts, {
-            bitrateMin: 500000,
-            bitrateMax: 8000000,
-            bitrateTarget: 600000
-        });
-        if (opts?.encode) {
-            Object.assign(opts.encode, {
-                framerate,
-                width,
-                height,
-                pixelCount: height * width
-            });
-        }
-        Object.assign(opts.capture, {
-            framerate,
-            width,
-            height,
-            pixelCount: height * width
-        });
-        return opts;
-    }
-});
-
 if (isLinux) {
     onceReady.then(() => {
-        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
-            const owner = streamKey.split(":").at(-1);
+        const ownsStream = (streamKey: string) => {
+            return streamKey.split(":").at(-1) === UserStore.getCurrentUser().id;
+        };
 
-            if (owner !== UserStore.getCurrentUser().id) {
+        FluxDispatcher.subscribe("STREAM_CLOSE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
                 return;
             }
 
             VesktopNative.virtmic.stop();
+        });
+
+        FluxDispatcher.subscribe("STREAM_UPDATE", ({ streamKey }: { streamKey: string }) => {
+            if (!ownsStream(streamKey)) {
+                return;
+            }
+
+            VesktopNative.virtmic.unmute();
         });
     });
 }
@@ -144,13 +108,24 @@ export function openScreenSharePicker(screens: Source[], skipPicker: boolean) {
                     submit={async v => {
                         didSubmit = true;
 
-                        if (v.includeSources && v.includeSources !== "None") {
-                            if (v.includeSources === "Entire System") {
-                                await VesktopNative.virtmic.startSystem(
-                                    !v.excludeSources || isSpecialSource(v.excludeSources) ? [] : v.excludeSources
-                                );
-                            } else {
-                                await VesktopNative.virtmic.start(v.includeSources);
+                        if (isLinux) {
+                            try {
+                                if (v.includeSources && v.includeSources !== "None") {
+                                    if (v.includeSources === "Entire System") {
+                                        await VesktopNative.virtmic.startSystem(
+                                            !v.excludeSources || isSpecialSource(v.excludeSources)
+                                                ? []
+                                                : v.excludeSources
+                                        );
+                                    } else {
+                                        await VesktopNative.virtmic.start(v.includeSources);
+                                    }
+                                } else {
+                                    await VesktopNative.virtmic.stop();
+                                }
+                            } catch (e) {
+                                // still start the stream, just without audio
+                                new Logger("VesktopScreenShare").error("Failed to set up venmic", e);
                             }
                         }
 
@@ -216,6 +191,13 @@ function AudioSettingsModal({
             actions={[{ text: "Back", variant: "secondary", onClick: close }]}
         >
             <div className={cl("venmic-settings")}>
+                <FormSwitch
+                    title="Initial Mute"
+                    description="Fix an initial audio spike caused by chromium."
+                    hideBorder
+                    onChange={v => (Settings.audio = { ...Settings.audio, mute: v })}
+                    value={Settings.audio?.mute ?? true}
+                />
                 <FormSwitch
                     title="Microphone Workaround"
                     description="Work around an issue that causes the microphone to be shared instead of the correct audio. Only enable if you're experiencing this issue."
@@ -368,20 +350,27 @@ function StreamSettingsUi({
 
     return (
         <div>
-            <HeadingTertiary className={Margins.bottom8}>What you're streaming</HeadingTertiary>
+            <Heading tag="h4" className={Margins.bottom8}>
+                What you're streaming
+            </Heading>
             <Card className={cl("card", "preview")}>
                 <img src={thumb} alt="" className={cl(isLinux ? "preview-img-linux" : "preview-img")} />
                 <Paragraph>{source.name}</Paragraph>
             </Card>
 
-            <HeadingTertiary className={Margins.bottom8}>Stream Settings</HeadingTertiary>
+            <Heading tag="h4" className={Margins.bottom8}>
+                Stream Settings
+            </Heading>
 
             <Card className={cl("card")}>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Resolution</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Resolution
+                        </Heading>
                         <OptionRadio
                             options={StreamResolutions}
+                            labels={StreamResolutionLabels}
                             settings={qualitySettings}
                             settingsKey="resolution"
                             onChange={value => (qualitySettings.resolution = value)}
@@ -389,7 +378,9 @@ function StreamSettingsUi({
                     </section>
 
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Frame Rate</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Frame Rate
+                        </Heading>
                         <OptionRadio
                             options={StreamFps}
                             settings={qualitySettings}
@@ -400,7 +391,9 @@ function StreamSettingsUi({
                 </div>
                 <div className={cl("quality")}>
                     <section className={cl("quality-section")}>
-                        <Heading tag="h5">Content Type</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Content Type
+                        </Heading>
                         <div>
                             <OptionRadio
                                 options={["motion", "detail"]}
@@ -447,78 +440,61 @@ function isSpecialSource(value?: AudioSource | AudioSources): value is SpecialSo
     return typeof value === "string";
 }
 
-function hasMatchingProps(value: Node, other: Node) {
-    return Object.keys(value).every(key => value[key] === other[key]);
-}
-
 function mapToAudioItem(node: AudioSource, granularSelect?: boolean, deviceSelect?: boolean): AudioItem[] {
     if (isSpecialSource(node)) {
         return [{ name: node, value: node }];
     }
 
-    const rtn: AudioItem[] = [];
-
     const mediaClass = node["media.class"];
 
     if (mediaClass?.includes("Video") || mediaClass?.includes("Midi")) {
-        return rtn;
+        return [];
     }
 
     if (!deviceSelect && node["device.id"]) {
-        return rtn;
+        return [];
     }
 
-    const name = node["application.name"];
+    const preferred = ["application.name", "node.description", "node.name", "application.process.binary"] as const;
+    const prop = preferred.find(prop => node[prop]);
 
-    if (name) {
-        rtn.push({ name: name, value: { "application.name": name } });
+    if (!prop) {
+        return [];
     }
+
+    const name = node[prop]!;
+    const items: AudioItem[] = [{ name: name, value: { [prop]: name } }];
 
     if (!granularSelect) {
-        return rtn;
+        return items;
     }
 
-    const rawName = node["node.name"];
+    let granularName = name;
+    const granularProps: Node = { [prop]: name };
 
-    if (!name) {
-        rtn.push({ name: rawName, value: { "node.name": rawName } });
-    }
+    const append = (name: string, brackets: string) => {
+        const value = node[name];
 
-    const binary = node["application.process.binary"];
+        if (!value) {
+            return;
+        }
 
-    if (!name && binary) {
-        rtn.push({ name: binary, value: { "application.process.binary": binary } });
-    }
+        granularName += ` ${brackets[0]}${value}${brackets[1]}`;
+        granularProps[name] = value;
+    };
 
-    const pid = node["application.process.id"];
+    append("application.process.id", "<>");
+    append("application.process.binary", "()");
+    append("media.name", "[]");
 
-    const first = rtn[0];
-    const firstValues = first.value as Node;
+    items.push({ name: granularName, value: granularProps });
 
-    if (pid) {
-        rtn.push({
-            name: `${first.name} (${pid})`,
-            value: { ...firstValues, "application.process.id": pid }
-        });
-    }
+    return items;
+}
 
-    const mediaName = node["media.name"];
-
-    if (mediaName) {
-        rtn.push({
-            name: `${first.name} [${mediaName}]`,
-            value: { ...firstValues, "media.name": mediaName }
-        });
-    }
-
-    if (mediaClass) {
-        rtn.push({
-            name: `${first.name} [${mediaClass}]`,
-            value: { ...firstValues, "media.class": mediaClass }
-        });
-    }
-
-    return rtn;
+function hasMatchingProps(value: Node, other: Node) {
+    const keys = Object.keys(value);
+    return keys.length === Object.keys(other).length && keys.every(key => value[key] === other[key]);
 }
 
 function isItemSelected(sources?: AudioSources) {
@@ -637,7 +613,9 @@ function AudioSourcePickerLinux({
         <>
             <div className={cl("audio-sources")}>
                 <section>
-                    <Heading tag="h5">{loading ? "Loading Sources..." : "Audio Sources"}</Heading>
+                    <Heading tag="h5" className={Margins.bottom8}>
+                        {loading ? "Loading Sources..." : "Audio Sources"}
+                    </Heading>
                     <SimpleErrorBoundary>
                         <Select
                             options={allSources.map(({ name, value }) => ({
@@ -656,7 +634,9 @@ function AudioSourcePickerLinux({
                 </section>
                 {includeSources === "Entire System" && (
                     <section>
-                        <Heading tag="h5">Exclude Sources</Heading>
+                        <Heading tag="h5" className={Margins.bottom8}>
+                            Exclude Sources
+                        </Heading>
                         <SimpleErrorBoundary>
                             <Select
                                 options={allSources
@@ -710,64 +690,17 @@ function ModalComponent({
         audio: true,
         includeSources: "None"
     });
-    const qualitySettings = (useVesktopState().screenshareQuality ??= {
+    useVesktopState().screenshareQuality ??= {
         resolution: "720",
         frameRate: "30"
-    });
+    };
 
     function handleGoLive() {
         currentSettings = settings;
-        try {
-            const frameRate = Number(qualitySettings.frameRate);
-            const height = Number(qualitySettings.resolution);
-            const width = Math.round(height * (16 / 9));
-
-            const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                connection => connection.streamUserId === UserStore.getCurrentUser().id
-            );
-
-            if (conn) {
-                conn.videoStreamParameters[0].maxFrameRate = frameRate;
-                conn.videoStreamParameters[0].maxResolution ??= { width: 0, height: 0 };
-                conn.videoStreamParameters[0].maxResolution.height = height;
-                conn.videoStreamParameters[0].maxResolution.width = width;
-            }
-
-            submit({
-                id: selected!,
-                ...settings
-            });
-
-            setTimeout(async () => {
-                const conn = [...MediaEngineStore.getMediaEngine().connections].find(
-                    connection => connection.streamUserId === UserStore.getCurrentUser().id
-                );
-                if (!conn) return;
-
-                // @ts-expect-error incorrect type
-                const track = conn.input.stream.getVideoTracks()[0];
-
-                const constraints = {
-                    ...track.getConstraints(),
-                    frameRate: { min: frameRate, ideal: frameRate },
-                    width: { min: 640, ideal: width, max: width },
-                    height: { min: 480, ideal: height, max: height },
-                    advanced: [{ width: width, height: height }],
-                    resizeMode: "none"
-                };
-
-                try {
-                    await track.applyConstraints(constraints);
-
-                    logger.info("Applied constraints successfully. New constraints:", track.getConstraints());
-                } catch (e) {
-                    logger.error("Failed to apply constraints.", e);
-                }
-            }, 100);
-        } catch (error) {
-            logger.error("Error while submitting stream.", error);
-        }
-
+        submit({
+            id: selected!,
+            ...settings
+        });
         close();
     }
 

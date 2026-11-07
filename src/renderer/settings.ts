@@ -55,7 +55,7 @@ const currentState: TState = (() => {
 })();
 
 export const State = new SettingsStore<TState>(currentState);
-State.addGlobalChangeListener((o, p) => localStorage.setItem(stateKey, JSON.stringify(o)));
+State.addGlobalChangeListener(o => localStorage.setItem(stateKey, JSON.stringify(o)));
 
 export function useVesktopState() {
     const [, update] = useReducer(x => x + 1, 0);

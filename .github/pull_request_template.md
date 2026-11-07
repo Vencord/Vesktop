@@ -8,5 +8,7 @@ Also do not use AI in communication, it makes me ill
 ## Screenshots (if applicable)
 
 ## Checklist before submitting
+
 <!-- Hint: [x] this is how to check boxes -->
+
 - [ ] This pull request was written by me, and not an AI agent

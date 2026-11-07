@@ -5,13 +5,25 @@
  */
 
 import { addContextMenuPatch } from "@vencord/types/api/ContextMenu";
-import { FluxDispatcher, Menu, SpellCheckStore, useMemo, useStateFromStores } from "@vencord/types/webpack/common";
+import {
+    FluxDispatcher,
+    Menu,
+    SpellCheckStore,
+    useMemo,
+    useState,
+    useStateFromStores
+} from "@vencord/types/webpack/common";
 import { useSettings } from "renderer/settings";
 
 import { addPatch } from "./shared";
 
 let word: string;
 let corrections: string[];
+
+const displayNames = new Intl.DisplayNames(["en"], {
+    type: "language",
+    languageDisplay: "standard"
+});
 
 // Make spellcheck suggestions work
 addPatch({
@@ -47,7 +59,27 @@ addContextMenuPatch("textarea-context", children => {
     const spellCheckEnabled = useStateFromStores([SpellCheckStore], () => SpellCheckStore.isEnabled());
     const hasCorrections = Boolean(word && corrections?.length);
 
-    const availableLanguages = useMemo(VesktopNative.spellcheck.getAvailableLanguages, []);
+    const availableLanguages = useMemo(
+        () =>
+            VesktopNative.spellcheck
+                .getAvailableLanguages()
+                .map(lang => ({
+                    name: lang,
+                    displayName: displayNames.of(lang) ?? lang
+                }))
+                .sort((a, b) => a.displayName.localeCompare(b.displayName)),
+        []
+    );
+
+    const [search, setSearch] = useState("");
+    const filteredLanguages = useMemo(
+        () =>
+            availableLanguages.filter(({ name, displayName }) => {
+                const query = search.toLowerCase();
+                return name.toLowerCase().includes(query) || displayName.toLowerCase().includes(query);
+            }),
+        [search, availableLanguages]
+    );
 
     const settings = useSettings();
     const spellCheckLanguages = (settings.spellCheckLanguages ??= [...new Set(navigator.languages)]);
@@ -88,19 +120,26 @@ addContextMenuPatch("textarea-context", children => {
                 />
 
                 <Menu.MenuItem id="vcd-spellcheck-languages" label="Languages" disabled={!spellCheckEnabled}>
-                    {availableLanguages.map(lang => {
-                        const isEnabled = spellCheckLanguages.includes(lang);
+                    <Menu.MenuControlItem
+                        id="vcd-spellcheck-search"
+                        control={(props, ref) => (
+                            <Menu.MenuSearchControl {...props} query={search} onChange={setSearch} ref={ref} />
+                        )}
+                    />
+
+                    {filteredLanguages.map(({ name, displayName }) => {
+                        const isEnabled = spellCheckLanguages.includes(name);
                         return (
                             <Menu.MenuCheckboxItem
-                                key={lang}
-                                id={"vcd-spellcheck-lang-" + lang}
-                                label={lang}
+                                key={name}
+                                id={"vcd-spellcheck-lang-" + name}
+                                label={displayName}
                                 checked={isEnabled}
                                 disabled={!isEnabled && spellCheckLanguages.length >= 5}
                                 action={() => {
-                                    const newSpellCheckLanguages = spellCheckLanguages.filter(l => l !== lang);
+                                    const newSpellCheckLanguages = spellCheckLanguages.filter(l => l !== name);
                                     if (newSpellCheckLanguages.length === spellCheckLanguages.length) {
-                                        newSpellCheckLanguages.push(lang);
+                                        newSpellCheckLanguages.push(name);
                                     }
 
                                     settings.spellCheckLanguages = newSpellCheckLanguages;

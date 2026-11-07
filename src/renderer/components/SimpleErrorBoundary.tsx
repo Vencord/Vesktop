@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Card, ErrorBoundary, HeadingTertiary, Paragraph, TextButton } from "@vencord/types/components";
+import { Card, ErrorBoundary, Heading, Paragraph, TextButton } from "@vencord/types/components";
 import { FluxDispatcher, InviteActions } from "@vencord/types/webpack/common";
 import type { PropsWithChildren } from "react";
 
@@ -30,7 +30,7 @@ async function openSupportChannel() {
 function Fallback() {
     return (
         <Card variant="danger">
-            <HeadingTertiary>Something went wrong.</HeadingTertiary>
+            <Heading tag="h4">Something went wrong.</Heading>
             <Paragraph>
                 Please make sure Vencord and Vesktop are fully up to date. You can get help in our{" "}
                 <TextButton variant="link" onClick={openSupportChannel}>

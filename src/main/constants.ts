@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app } from "electron";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, rmSync } from "fs";
 import { dirname, join } from "path";
+
+import { app } from "electron";
 
 import { CommandLine } from "./cli";
 
@@ -22,6 +23,19 @@ export const DATA_DIR =
 
 export const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
+// Written by "Reset Vesktop". Our data is deleted here on the next start, before anything uses it
+export const RESET_MARKER_FILE = join(DATA_DIR, ".reset-pending");
+if (existsSync(RESET_MARKER_FILE)) {
+    try {
+        for (const entry of ["sessionData", "settings", "themes", "userAssets", "settings.json", "state.json"]) {
+            rmSync(join(DATA_DIR, entry), { recursive: true, force: true, maxRetries: 5 });
+        }
+        rmSync(RESET_MARKER_FILE);
+    } catch (err) {
+        console.error("Failed to reset Vesktop data:", err);
+    }
+}
 
 mkdirSync(DATA_DIR, { recursive: true });
 

@@ -7,18 +7,19 @@
 import "./cli";
 import "./updater";
 import "./ipc";
+import "./rpc";
 import "./userAssets";
 import "./vesktopProtocol";
-
 import { app, BrowserWindow, nativeTheme } from "electron";
 
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
-import { createWindows, mainWin } from "./mainWindow";
+import { createWindows, mainWin, openDeepLink } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
+import { showWindow } from "./utils/showWindow";
 import { isDeckGameMode } from "./utils/steamOS";
 
 console.log("Vesktop v" + app.getVersion());
@@ -33,7 +34,8 @@ export let enableHardwareAcceleration = true;
 function init() {
     setAsDefaultProtocolClient("discord");
 
-    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
+    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration, hardwareVideoEncoding } =
+        Settings.store;
 
     const enabledFeatures = new Set(app.commandLine.getSwitchValue("enable-features").split(","));
     const disabledFeatures = new Set(app.commandLine.getSwitchValue("disable-features").split(","));
@@ -44,8 +46,11 @@ function init() {
         enableHardwareAcceleration = false;
         app.disableHardwareAcceleration();
     } else {
-        if (hardwareVideoAcceleration) {
+        if (hardwareVideoEncoding) {
             enabledFeatures.add("AcceleratedVideoEncoder");
+        }
+
+        if (hardwareVideoAcceleration) {
             enabledFeatures.add("AcceleratedVideoDecoder");
 
             if (isLinux) {
@@ -59,29 +64,14 @@ function init() {
         app.commandLine.appendSwitch("disable-smooth-scrolling");
     }
 
-    // disable renderer backgrounding to prevent the app from unloading when in the background
-    // https://github.com/electron/electron/issues/2822
-    // https://github.com/GoogleChrome/chrome-launcher/blob/5a27dd574d47a75fec0fb50f7b774ebf8a9791ba/docs/chrome-flags-for-tools.md#task-throttling
-    app.commandLine.appendSwitch("disable-renderer-backgrounding");
-    app.commandLine.appendSwitch("disable-background-timer-throttling");
-    app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
-    if (process.platform === "win32") {
-        disabledFeatures.add("CalculateNativeWinOcclusion");
-    }
-
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-    // WinRetrieveSuggestionsOnlyOnDemand: Work around electron 13 bug w/ async spellchecking on Windows.
-    // HardwareMediaKeyHandling, MediaSessionService: Prevent Discord from registering as a media service.
-    disabledFeatures.add("WinRetrieveSuggestionsOnlyOnDemand");
+    // Prevent Discord from registering as a media service.
     disabledFeatures.add("HardwareMediaKeyHandling");
     disabledFeatures.add("MediaSessionService");
 
     if (isLinux) {
-        // Support TTS on Linux using https://wiki.archlinux.org/title/Speech_dispatcher
-        app.commandLine.appendSwitch("enable-speech-dispatcher");
-
         // This is needed to fix washed out colours - https://github.com/electron/electron/issues/49566
         // Supposed to be fixed already according to comments there, but it's just not lol, I can repro on Electron 43.0.0
         // when moving the window from my main monitor (HDR - not sure if this is relevant lol) to second monitor (SDR) and back
@@ -90,8 +80,8 @@ function init() {
 
     disabledFeatures.forEach(feat => enabledFeatures.delete(feat));
 
-    const enabledFeaturesArray = enabledFeatures.values().filter(Boolean).toArray();
-    const disabledFeaturesArray = disabledFeatures.values().filter(Boolean).toArray();
+    const enabledFeaturesArray = [...enabledFeatures].filter(Boolean);
+    const disabledFeaturesArray = [...disabledFeatures].filter(Boolean);
 
     if (enabledFeaturesArray.length) {
         app.commandLine.appendSwitch("enable-features", enabledFeaturesArray.join(","));
@@ -106,13 +96,14 @@ function init() {
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
-    app.on("second-instance", (_event, _cmdLine, _cwd, data: any) => {
-        if (data.IS_DEV) app.quit();
-        else if (mainWin) {
-            if (mainWin.isMinimized()) mainWin.restore();
-            if (!mainWin.isVisible()) mainWin.show();
-            mainWin.focus();
-        }
+    app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
+        if (data?.IS_DEV) return app.quit();
+        if (!mainWin) return;
+
+        const deepLink = cmdLine.find(arg => arg.startsWith("discord://"));
+        if (deepLink) openDeepLink(deepLink);
+
+        showWindow(mainWin);
     });
 
     app.whenReady().then(async () => {
@@ -152,7 +143,12 @@ async function bootstrap() {
 // MacOS only event
 export let darwinURL: string | undefined;
 app.on("open-url", (_, url) => {
-    darwinURL = url;
+    if (mainWin) {
+        openDeepLink(url);
+        showWindow(mainWin);
+    } else {
+        darwinURL = url;
+    }
 });
 
 app.on("window-all-closed", () => {

@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "path";
+
 import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
+    dialog,
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
@@ -15,16 +18,15 @@ import {
     screen,
     session
 } from "electron";
-import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
+import { debounce } from "shared/utils/debounce";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
-import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
-import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
+import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MessageBoxChoice, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
 import { sendRendererCommand } from "./ipcCommands";
 import { darwinURL } from "./main";
@@ -32,9 +34,11 @@ import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
 import { clearData } from "./utils/clearData";
-import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { isDiscordUrl } from "./utils/isDiscordUrl";
+import { handleExternalUrl, makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { relaunch } from "./utils/relaunch";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordFiles, isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 import { initWaylandIdleHandler } from "./waylandIdle";
 
@@ -85,8 +89,7 @@ function initMenuBar(win: BrowserWindow) {
             label: "Force Update Vencord",
             async click() {
                 await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
+                relaunch();
             },
             toolTip: "Vesktop will automatically restart after this operation"
         },
@@ -100,10 +103,7 @@ function initMenuBar(win: BrowserWindow) {
         {
             label: "Relaunch",
             accelerator: "CmdOrCtrl+Shift+R",
-            click() {
-                app.relaunch();
-                app.quit();
-            }
+            click: relaunch
         },
         ...(!isDarwin
             ? []
@@ -207,11 +207,12 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("unmaximize", saveState);
     win.on("restore", saveState);
 
-    const saveBounds = () => {
-        if (win.isMaximized()) return;
+    // move and resize fire continuously while dragging
+    const saveBounds = debounce(() => {
+        if (win.isDestroyed() || win.isMaximized()) return;
 
         State.store.windowBounds = win.getBounds();
-    };
+    });
 
     win.on("resize", saveBounds);
     win.on("move", saveBounds);
@@ -296,6 +297,18 @@ function initStaticTitle(win: BrowserWindow) {
             win.off("page-title-updated", listener);
         }
     });
+}
+
+function initNavigationGuard(win: BrowserWindow) {
+    const onNavigate = (e: Electron.Event<{ url: string; isMainFrame: boolean }>) => {
+        if (!e.isMainFrame || isDiscordUrl(e.url)) return;
+
+        e.preventDefault();
+        handleExternalUrl(e.url);
+    };
+
+    win.webContents.on("will-navigate", onNavigate);
+    win.webContents.on("will-redirect", onNavigate);
 }
 
 function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
@@ -387,9 +400,10 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     }
 
     if (process.platform === "darwin") {
-        options.titleBarStyle = "hidden";
-        options.trafficLightPosition = { x: 10, y: 10 };
-
+        if (!nativeTitleBar) {
+            options.titleBarStyle = "hidden";
+            options.trafficLightPosition = { x: 10, y: 10 };
+        }
         if (macosVibrancyStyle) {
             options.vibrancy = macosVibrancyStyle;
             options.backgroundColor = "#00000000";
@@ -407,7 +421,6 @@ function createMainWindow() {
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
 
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && Settings.store.nativeTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray && Settings.store.tray;
@@ -431,11 +444,13 @@ function createMainWindow() {
 
     initMenuBar(win);
     makeLinksOpenExternally(win);
+    initNavigationGuard(win);
     initSettingsListeners(win);
     initSpellCheck(win);
     initDevtoolsListeners(win);
     initStaticTitle(win);
 
+    win.webContents.session.setUserAgent(BrowserUserAgent);
     win.webContents.setUserAgent(BrowserUserAgent);
 
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
@@ -448,15 +463,31 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
+// discord://-/channels/@me -> /channels/@me
+function getDeepLinkPath(uri: string | undefined) {
+    if (!uri || !URL.canParse(uri)) return;
+
+    return new URL(uri).pathname;
+}
+
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    const path = getDeepLinkPath(uri)?.slice(1) || "app";
 
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
-        .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
+        .loadURL(`https://${subdomain}discord.com/${path}`)
         .then(() => AppEvents.emit("appLoaded"))
         .catch(error => retryUrl(error.url, error.code));
+}
+
+// Navigates within Discord instead of reloading, used for links opened while we're already running
+export function openDeepLink(uri: string) {
+    const path = getDeepLinkPath(uri);
+    if (!path) return;
+
+    sendRendererCommand(IpcCommands.NAVIGATE, path).catch(err => console.error("Failed to open deep link", uri, err));
 }
 
 const retryDelay = 1000;
@@ -464,6 +495,22 @@ function retryUrl(url: string, description: string) {
     console.log(`retrying in ${retryDelay}ms`);
     updateSplashMessage(`Failed to load Discord: ${description}`);
     setTimeout(() => loadUrl(url), retryDelay);
+}
+
+async function showStartupError(error: unknown) {
+    const { response } = await dialog.showMessageBox({
+        type: "error",
+        message: "Vesktop failed to start",
+        detail: `${error}\n\nRepair will re-download Vencord and restart Vesktop.`,
+        buttons: ["Repair", "Quit"],
+        defaultId: MessageBoxChoice.Default,
+        cancelId: MessageBoxChoice.Cancel
+    });
+
+    if (response === MessageBoxChoice.Cancel) return app.exit(1);
+
+    updateSplashMessage("Repairing Vencord...");
+    downloadVencordFiles().then(relaunch, showStartupError);
 }
 
 export async function createWindows() {
@@ -479,10 +526,19 @@ export async function createWindows() {
 
     initWaylandIdleHandler();
 
-    await ensureVencordFiles();
-    runVencordMain();
+    try {
+        if (!(await isValidVencordInstall(VENCORD_FILES_DIR))) {
+            updateSplashMessage("Downloading Vencord...");
+            await downloadVencordFiles();
+        }
 
-    mainWin = createMainWindow();
+        runVencordMain();
+
+        mainWin = createMainWindow();
+    } catch (err) {
+        console.error("Failed to start Vesktop:", err);
+        return showStartupError(err);
+    }
 
     AppEvents.on("appLoaded", () => {
         splash?.destroy();
@@ -517,5 +573,4 @@ export async function createWindows() {
     });
 
     mainWin.webContents.on("render-process-gone", (event, details) => console.log(details));
-    initArRPC();
 }

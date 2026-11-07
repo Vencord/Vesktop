@@ -5,8 +5,7 @@
  */
 
 import "./UserAssets.css";
-
-import { BaseText, Button, FormSwitch } from "@vencord/types/components";
+import { Button, FormSwitch, Text } from "@vencord/types/components";
 import { Margins, wordsFromCamel, wordsToTitle } from "@vencord/types/utils";
 import { Modal, openModal, showToast, useState } from "@vencord/types/webpack/common";
 import { UserAssetType } from "main/userAssets";
@@ -34,7 +33,7 @@ function openAssetsModal() {
 
 function Asset({ asset }: { asset: UserAssetType }) {
     // cache busting
-    const [version, setVersion] = useState(Date.now());
+    const [version, setVersion] = useState(() => Date.now());
     const settings = useSettings();
 
     const isSplash = asset === "splash";
@@ -48,15 +47,15 @@ function Asset({ asset }: { asset: UserAssetType }) {
                 settings.splashPixelated = false;
             }
         } else if (res === "failed") {
-            showToast("Something went wrong. Please try again");
+            showToast({ text: "Something went wrong. Please try again", variant: "critical" });
         }
     };
 
     return (
         <section>
-            <BaseText size="md" weight="medium" tag="h3">
+            <Text size="md" weight="medium" tag="h3">
                 {wordsToTitle(wordsFromCamel(asset))}
-            </BaseText>
+            </Text>
             <div className="vcd-user-assets-asset">
                 <img
                     className="vcd-user-assets-image"

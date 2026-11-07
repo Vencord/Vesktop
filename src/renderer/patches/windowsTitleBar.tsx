@@ -5,10 +5,11 @@
  */
 
 import { Settings } from "renderer/settings";
+import { isMac } from "renderer/utils";
 
 import { addPatch } from "./shared";
 
-if (!Settings.store.nativeTitleBar)
+if (!isMac && !Settings.store.nativeTitleBar)
     addPatch({
         patches: [
             {
@@ -25,11 +26,11 @@ if (!Settings.store.nativeTitleBar)
                 find: '"refresh-title-bar-small"',
                 replacement: [
                     {
-                        match: /\i===\i\.PlatformTypes\.WINDOWS/g,
+                        match: /\i===\i\.\i\.WINDOWS/g,
                         replace: "true"
                     },
                     {
-                        match: /\i===\i\.PlatformTypes\.WEB/g,
+                        match: /\i===\i\.\i\.WEB/g,
                         replace: "false"
                     }
                 ]
