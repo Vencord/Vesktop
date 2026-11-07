@@ -21,6 +21,9 @@ export const PORTABLE =
 export const DATA_DIR =
     process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
 
+export const isWayland =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
 // Written by "Reset Vesktop". Our data is deleted here on the next start, before anything uses it
 export const RESET_MARKER_FILE = join(DATA_DIR, ".reset-pending");
 if (existsSync(RESET_MARKER_FILE)) {

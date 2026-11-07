@@ -12,6 +12,7 @@
         "build": "tsx scripts/build/build.mts",
         "build:dev": "pnpm build --dev",
         "buildLibVesktop": "pnpm -C packages/libvesktop install && pnpm -C packages/libvesktop run build",
+        "buildWaylandProtocols": "pnpm -C packages/wayland-protocols install && pnpm -C packages/wayland-protocols run build",
         "package": "pnpm build && electron-builder",
         "package:dir": "pnpm build && electron-builder --dir",
         "lint": "oxlint src scripts packages/discord-rpc",
@@ -49,6 +50,7 @@
         "tsx": "^4.23.15",
         "type-fest": "^5.10.0",
         "typescript": "^6.0.3",
+        "wayland-protocols": "link:packages/wayland-protocols",
         "xml-formatter": "^3.6.7"
     },
     "packageManager": "pnpm@12.16.1",
