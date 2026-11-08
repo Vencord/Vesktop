@@ -22,10 +22,10 @@ function loadLibVesktop() {
     return libVesktop;
 }
 
-export function getAccentColor() {
-    return loadLibVesktop()?.getAccentColor() ?? null;
-}
-
 export function requestBackground(autoStart: boolean, commandLine: string[]) {
     return loadLibVesktop()?.requestBackground(autoStart, commandLine) ?? false;
+}
+
+export function isStatusNotifierHostRegistered() {
+    return loadLibVesktop()?.isStatusNotifierHostRegistered() ?? true;
 }

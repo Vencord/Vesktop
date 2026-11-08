@@ -15,7 +15,7 @@ export function includeDirPlugin(namespace: string, path: string): Plugin {
 
             build.onResolve({ filter }, args => ({ path: args.path, namespace }));
 
-            build.onLoad({ filter, namespace }, async args => {
+            build.onLoad({ filter, namespace }, async () => {
                 return {
                     contents: await makeImportDirRecursiveCode(path),
                     resolveDir: path

@@ -11,9 +11,11 @@ import { autoUpdater, UpdateInfo } from "electron-updater";
 import { IpcEvents, UpdaterIpcEvents } from "shared/IpcEvents";
 import { Millis } from "shared/utils/millis";
 
+import { PORTABLE } from "./constants";
 import { State } from "./settings";
 import { handle } from "./utils/ipcWrappers";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { showWindow } from "./utils/showWindow";
 import { loadView } from "./vesktopStatic";
 
 let updaterWindow: BrowserWindow | null = null;
@@ -44,6 +46,11 @@ handle(IpcEvents.UPDATER_OPEN, async () => {
 });
 
 function openUpdater(update: UpdateInfo) {
+    if (updaterWindow) {
+        showWindow(updaterWindow);
+        return;
+    }
+
     updaterWindow = new BrowserWindow({
         title: "Vesktop Updater",
         autoHideMenuBar: true,
@@ -55,7 +62,7 @@ function openUpdater(update: UpdateInfo) {
     });
     makeLinksOpenExternally(updaterWindow);
 
-    handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion() }));
+    handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion(), portable: PORTABLE }));
     handle(UpdaterIpcEvents.INSTALL, async () => {
         await autoUpdater.downloadUpdate();
     });
