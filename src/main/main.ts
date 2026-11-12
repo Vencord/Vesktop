@@ -11,9 +11,14 @@ import "./rpc";
 import "./userAssets";
 import "./vesktopProtocol";
 import { app, BrowserWindow, nativeTheme } from "electron";
+import { parseShortcutCommand } from "shared/utils/keybind";
 
+// eslint-disable-next-line no-duplicate-imports
+import { CommandLine } from "./cli";
 import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
+import { initSocket } from "./ipcSocket";
+import { initKeybinds, runShortcutCommand } from "./keybinds";
 import { createWindows, mainWin, openDeepLink } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
@@ -97,6 +102,12 @@ function init() {
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
     app.on("second-instance", (_event, cmdLine, _cwd, data: any) => {
+        if (data?.runShortcut) {
+            const command = parseShortcutCommand(data.runShortcut);
+            if (command) runShortcutCommand(command);
+            return;
+        }
+
         if (data?.IS_DEV) return app.quit();
         if (!mainWin) return;
 
@@ -111,6 +122,8 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        initKeybinds();
+        initSocket();
 
         bootstrap();
 
@@ -120,14 +133,19 @@ function init() {
     });
 }
 
-if (!app.requestSingleInstanceLock({ IS_DEV })) {
-    if (IS_DEV) {
+const runShortcut = CommandLine.values["run-shortcut"];
+
+if (!app.requestSingleInstanceLock({ IS_DEV, runShortcut })) {
+    if (IS_DEV && !runShortcut) {
         console.log("Vesktop is already running. Quitting previous instance...");
         init();
     } else {
         console.log("Vesktop is already running. Quitting...");
         app.quit();
     }
+} else if (runShortcut) {
+    console.error("Vesktop is not running, so --run-shortcut has no effect");
+    app.exit(1);
 } else {
     init();
 }
