@@ -21,11 +21,6 @@ addPatch({
         {
             find: '"Unable to find a unique rtx SSRC!"',
             replacement: {
-                // Discord takes the first H264 payload type in the offer, but its answer always describes that
-                // payload type as packetization-mode=1;profile-level-id=42e01f. Chromium offers 42001f first, so
-                // the answer renames it, and Chromium then gives H264 a new payload type on every later video
-                // m-section while the voice server keeps sending the old one. Remote video on those m-sections
-                // never decodes. Pick the payload type that Chromium itself offers for the codec Discord describes.
                 match: /(function \i\((\i),(\i),\i,(\i),\i\)\{let \i=)\2\.find\(\i=>\i\.codec===\4\);/,
                 replace: "$1$self.findPayload($2,$3,$4);"
             }
