@@ -7,7 +7,7 @@
 import { Logger } from "@vencord/types/utils";
 import { FluxDispatcher } from "@vencord/types/webpack/common";
 import { currentSettings } from "renderer/components/ScreenSharePicker";
-import { State } from "renderer/settings";
+import { Settings, State } from "renderer/settings";
 import { isLinux } from "renderer/utils";
 
 import { addPatch } from "./shared";
@@ -87,6 +87,15 @@ addPatch({
             }
         },
         {
+            // Discord web offers H264 > VP8 > VP9 and never AV1. Prefer the more efficient codecs
+            find: "case\"video\":(",
+            predicate: () => !!Settings.store.av1Screenshare,
+            replacement: {
+                match: /case"video":\(\i\?\[(\i\.\i)\.H265,\i\.\i\.H264,\i\.\i\.VP8,\i\.\i\.VP9\]:\[\i\.\i\.H264,\i\.\i\.VP8,\i\.\i\.VP9\]\)/,
+                replace: 'case"video":($self.getVideoCodecs($1))'
+            }
+        },
+        {
             // Stereo stream audio (sending and receiving) and a higher audio bitrate are behind an experiment
             // Force enable it
             find: 'push("web_screen_share_audio")',
@@ -104,6 +113,10 @@ addPatch({
             }
         }
     ],
+
+    getVideoCodecs(Codecs: Record<string, string>) {
+        return ["AV1", Codecs.VP9, Codecs.H264, Codecs.VP8];
+    },
 
     applyStreamQuality(conn: any, track: MediaStreamTrack) {
         try {

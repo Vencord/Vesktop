@@ -55,6 +55,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description:
                 "Use your GPU to encode your screenshare. This lowers CPU usage, but on some drivers (for example AMD with Mesa 24.3 or newer) viewers will be stuck loading your stream forever.",
             disabled: () => !Settings.store.hardwareAcceleration
+        },
+        {
+            key: "av1Screenshare",
+            title: "AV1 Screenshare (experimental)",
+            description:
+                "Prefer AV1, then VP9 for your screenshare. Much better quality at the same bitrate, but viewers whose client can't decode AV1 may be stuck loading your stream. Requires a restart."
         }
     ],
     "User Interface": [

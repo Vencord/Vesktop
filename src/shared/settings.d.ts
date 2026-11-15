@@ -26,6 +26,7 @@ export interface Settings {
     hardwareAcceleration: boolean;
     hardwareVideoAcceleration: boolean;
     hardwareVideoEncoding: boolean;
+    av1Screenshare?: boolean;
     arRPC: boolean;
     appBadge: boolean;
     enableTaskbarFlashing: boolean;
