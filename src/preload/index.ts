@@ -17,3 +17,8 @@ Function("require", "process", ipcRenderer.sendSync(IpcEvents.GET_VENCORD_PRELOA
 
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT));
 webFrame.executeJavaScript(ipcRenderer.sendSync(IpcEvents.GET_VESKTOP_RENDERER_SCRIPT));
+
+webFrame
+    .executeJavaScript("Vencord.Webpack.onceReady.then(() => true)")
+    .then(() => ipcRenderer.send(IpcEvents.DISCORD_READY))
+    .catch(error => console.error("Failed to observe Discord startup:", error));

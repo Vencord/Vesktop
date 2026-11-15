@@ -11,6 +11,7 @@ import {
     BrowserWindow,
     BrowserWindowConstructorOptions,
     dialog,
+    ipcMain,
     Menu,
     MenuItemConstructorOptions,
     nativeTheme,
@@ -412,12 +413,81 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     return options;
 }
 
+function initStartupRecovery(win: BrowserWindow) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let prompted = false;
+    let ready = false;
+
+    const clearTimer = () => clearTimeout(timer);
+    const onReady = (event: Electron.IpcMainEvent) => {
+        if (event.sender !== win.webContents || event.senderFrame !== win.webContents.mainFrame) return;
+        ready = true;
+        clearTimer();
+    };
+
+    const offerRecovery = async () => {
+        if (ready || prompted || win.isDestroyed() || isQuitting) return;
+        const hasLoginForm = await win.webContents.executeJavaScript(
+            '!!document.querySelector("input[name=email], input[name=password]")'
+        );
+        if (hasLoginForm || ready || win.isDestroyed() || isQuitting) return;
+        prompted = true;
+        const custom = !!State.store.vencordDir;
+        const { response } = await dialog.showMessageBox(win, {
+            type: "warning",
+            message: "Discord is taking longer than expected to start",
+            detail: custom
+                ? "You are using a custom Vencord directory. Update that installation manually and restart Vesktop."
+                : "An outdated Vencord installation can prevent Discord from starting. Repair will download Vencord again and restart Vesktop. Your login and settings will be preserved.",
+            buttons: custom ? ["Keep Waiting", "Quit"] : ["Repair and Restart", "Keep Waiting", "Quit"],
+            defaultId: custom ? 0 : 1,
+            cancelId: custom ? 0 : 1
+        });
+        if (win.isDestroyed() || isQuitting) return;
+        if (response === (custom ? 1 : 2)) return app.quit();
+        if (custom || response !== 0) return;
+        while (!win.isDestroyed() && !isQuitting) {
+            try {
+                await downloadVencordFiles();
+                if (win.isDestroyed() || isQuitting) return;
+                await relaunch();
+                return;
+            } catch (error) {
+                const result = await dialog.showMessageBox(win, {
+                    type: "error",
+                    message: "Failed to repair Vencord",
+                    detail: String(error),
+                    buttons: ["Retry", "Cancel"],
+                    cancelId: 1
+                });
+                if (result.response !== 0) return;
+            }
+        }
+    };
+
+    ipcMain.on(IpcEvents.DISCORD_READY, onReady);
+    win.webContents.on("did-start-navigation", event => {
+        if (!event.isMainFrame || event.isSameDocument) return;
+        clearTimer();
+        ready = false;
+        timer = setTimeout(() => void offerRecovery().catch(console.error), 60_000);
+    });
+    app.on("before-quit", clearTimer);
+    win.once("closed", () => {
+        clearTimer();
+        ipcMain.off(IpcEvents.DISCORD_READY, onReady);
+        app.off("before-quit", clearTimer);
+    });
+}
+
 function createMainWindow() {
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
 
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
+
+    initStartupRecovery(win);
 
     win.setMenuBarVisibility(false);
 
