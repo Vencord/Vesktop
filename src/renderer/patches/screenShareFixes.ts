@@ -169,6 +169,41 @@ async function getVirtmic() {
     }
 }
 
+// Without viewers Discord's stream server sends no bandwidth feedback, so WebRTC's estimate stays at its
+// 300kbps default (360p 15fps). Start the estimate at our target bitrate instead
+function withStartBitrate(pc: RTCPeerConnection, sdp: string) {
+    const sections = sdp.split(/(?=^m=)/m);
+    const videoIdx = sections.findIndex(s => s.startsWith("m=video") && /^a=recvonly/m.test(s));
+    if (videoIdx === -1) return sdp;
+
+    const track = pc.getSenders().find(s => s.track?.kind === "video")?.track;
+    if (!track) return sdp;
+
+    const { resolution, frameRate } = getStreamQuality();
+    const { width = Math.round((resolution * 16) / 9), height = resolution } = track.getSettings();
+    // capped: starting far above the real uplink causes heavy packet loss in the first seconds once viewers join
+    const startKbps = Math.round(Math.min(getMaxBitrate(width, height, frameRate), 4e6) / 1000);
+
+    sections[videoIdx] = sections[videoIdx].replace(
+        /^(a=fmtp:\d+ (?![^\r\n]*apt=)[^\r\n]*)/gm,
+        `$1;x-google-start-bitrate=${startKbps}`
+    );
+    logger.info("Set stream start bitrate", startKbps);
+    return sections.join("");
+}
+
+const originalSetRemoteDescription = RTCPeerConnection.prototype.setRemoteDescription;
+RTCPeerConnection.prototype.setRemoteDescription = function (this: RTCPeerConnection, desc, ...rest: any[]) {
+    try {
+        if (desc?.type === "answer" && desc.sdp && !desc.sdp.includes("x-google-start-bitrate")) {
+            desc = { type: desc.type, sdp: withStartBitrate(this, desc.sdp) };
+        }
+    } catch (e) {
+        logger.error("Failed to set stream start bitrate", e);
+    }
+    return (originalSetRemoteDescription as any).call(this, desc, ...rest);
+} as typeof originalSetRemoteDescription;
+
 const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
 navigator.mediaDevices.getDisplayMedia = async function (opts) {
     // our picker runs while this is pending, so the quality is final once it resolves
