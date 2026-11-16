@@ -5,6 +5,7 @@
  */
 
 import { existsSync, mkdirSync, rmSync } from "fs";
+import { tmpdir, userInfo } from "os";
 import { dirname, join } from "path";
 
 import { app } from "electron";
@@ -73,3 +74,20 @@ export const enum MessageBoxChoice {
 }
 
 export const IS_FLATPAK = process.env.FLATPAK_ID !== undefined;
+
+export const IS_WAYLAND =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+
+function getSocketPath() {
+    if (process.platform === "win32") return `\\\\.\\pipe\\vesktop-${userInfo().username}`;
+
+    const { XDG_RUNTIME_DIR, FLATPAK_ID } = process.env;
+    if (!XDG_RUNTIME_DIR) return join(tmpdir(), `vesktop-${userInfo().uid}.sock`);
+
+    // Only $XDG_RUNTIME_DIR/app/$FLATPAK_ID is shared with the host
+    return FLATPAK_ID
+        ? join(XDG_RUNTIME_DIR, "app", FLATPAK_ID, "vesktop.sock")
+        : join(XDG_RUNTIME_DIR, "vesktop.sock");
+}
+
+export const SOCKET_PATH = getSocketPath();

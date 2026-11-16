@@ -8,10 +8,10 @@ Vesktop is a custom Discord desktop app
 - Much more lightweight and faster than the official Discord app
 - Linux Screenshare with sound & wayland
 - Much better privacy, since Discord has no access to your system
+- Global keybinds, including push to talk (see [Global Keybinds](#global-keybinds))
 
 **Not yet supported**:
 
-- Global Keybinds
 - see the [Roadmap](https://github.com/Vencord/Vesktop/issues/324)
 
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
@@ -20,6 +20,31 @@ Vesktop is a custom Discord desktop app
 ## Installing
 
 Visit https://vesktop.dev/install
+
+## Global Keybinds
+
+Configure them in the Vesktop settings, or from Discord's Keybinds and Voice & Video settings.
+
+- **Windows, Linux (X11)**: Bind any keys or mouse buttons in the Vesktop keybind settings
+- **macOS**: Same as above, but Vesktop needs the Accessibility permission
+- **Linux (Wayland)**: Wayland doesn't let apps listen to global input. Enable global shortcuts in the Vesktop keybind settings and assign them in your system settings. This requires a desktop that supports the GlobalShortcuts portal, like GNOME or KDE
+
+You can also trigger actions from other programs, for example your compositor's keybinds:
+
+```sh
+vesktop --run-shortcut toggleMute
+# Append :down or :up to only press or release, e.g. for push to talk
+vesktop --run-shortcut pushToTalk:down
+vesktop --run-shortcut pushToTalk:up
+```
+
+For lower latency, send the same commands as lines to the socket at `$XDG_RUNTIME_DIR/vesktop.sock`:
+
+```sh
+echo "run-shortcut pushToTalk:down" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/vesktop.sock
+```
+
+Run `vesktop --help` to see all actions.
 
 ## Building from Source
 

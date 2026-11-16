@@ -8,6 +8,7 @@ import type { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron/renderer";
 import type { IpcMessage, IpcResponse } from "main/ipcCommands";
 import type { Settings } from "shared/settings";
+import type { KeybindStatus } from "shared/utils/keybind";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { invoke, sendSync } from "./typedIpc";
@@ -94,6 +95,13 @@ export const VesktopNative = {
         startSystem: (exclude: Node[]) => invoke<void>(IpcEvents.VIRT_MIC_START_SYSTEM, exclude),
         unmute: () => invoke<void>(IpcEvents.VIRT_MIC_UNMUTE),
         stop: () => invoke<void>(IpcEvents.VIRT_MIC_STOP)
+    },
+    keybinds: {
+        getStatus: () => invoke<KeybindStatus>(IpcEvents.KEYBINDS_GET_STATUS),
+        getSocketPath: () => sendSync<string>(IpcEvents.KEYBINDS_GET_SOCKET_PATH),
+        retry: () => invoke<void>(IpcEvents.KEYBINDS_RETRY),
+        requestPermission: () => invoke<void>(IpcEvents.KEYBINDS_REQUEST_PERMISSION),
+        configurePortal: () => invoke<void>(IpcEvents.KEYBINDS_CONFIGURE_PORTAL)
     },
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>

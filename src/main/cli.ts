@@ -8,6 +8,7 @@ import { basename } from "path";
 import { parseArgs, ParseArgsOptionDescriptor } from "util";
 
 import { app } from "electron";
+import { parseShortcutCommand, SHORTCUT_ACTIONS } from "shared/utils/keybind";
 import { stripIndent } from "shared/utils/text";
 
 type Option = ParseArgsOptionDescriptor & {
@@ -43,6 +44,11 @@ const options = {
         type: "string",
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
+    },
+    "run-shortcut": {
+        type: "string",
+        description: `Trigger a keybind action in the running instance. Append :down or :up to only press or release it (e.g. for push to talk). Actions: ${SHORTCUT_ACTIONS.join(", ")}`,
+        argumentName: "action[:down|:up]"
     },
     repair: {
         type: "boolean",
@@ -144,6 +150,15 @@ export function checkCommandLineForHelpOrVersion() {
             console.error(`Invalid value for --${name}: ${value}\nExpected one of: ${def.options.join(", ")}`);
             app.exit(1);
         }
+    }
+
+    const runShortcut = CommandLine.values["run-shortcut"];
+    if (runShortcut && !parseShortcutCommand(runShortcut)) {
+        console.error(
+            `Invalid value for --run-shortcut: ${runShortcut}\nExpected one of: ${SHORTCUT_ACTIONS.join(", ")}`
+        );
+        console.error("Optionally followed by :down or :up");
+        app.exit(1);
     }
 }
 

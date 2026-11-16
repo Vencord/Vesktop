@@ -27,7 +27,8 @@
         "generateMeta": "tsx scripts/utils/generateMeta.mts"
     },
     "dependencies": {
-        "electron-updater": "6.6.2"
+        "electron-updater": "6.6.2",
+        "uiohook-napi": "^1.5.5"
     },
     "optionalDependencies": {
         "@vencord/venmic": "^7.2.5"
