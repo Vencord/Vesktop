@@ -77,6 +77,7 @@
         },
         "beforePack": "scripts/build/beforePack.mjs",
         "afterPack": "scripts/build/afterPack.mjs",
+        "npmRebuild": false,
         "toolsets": {
             "appimage": "1.0.3"
         },
