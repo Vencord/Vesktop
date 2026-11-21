@@ -32,7 +32,7 @@ addPatch({
             find: ",setSystemTrayApplications",
             replacement: [
                 {
-                    match: /setObservedGamesCallback\(\i,\i,(\i),\i\)\{/,
+                    match: /setObservedGamesCallback\(\i,(\i)(?:,\i)*\)\{/,
                     replace: "$&return VesktopPatchGlobals.setObservedGamesCallback($1);"
                 },
                 {
