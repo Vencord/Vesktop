@@ -10,10 +10,6 @@ Vesktop is a custom Discord desktop app
 - Much better privacy, since Discord has no access to your system
 - Global keybinds, including push to talk (see [Global Keybinds](#global-keybinds))
 
-**Not yet supported**:
-
-- see the [Roadmap](https://github.com/Vencord/Vesktop/issues/324)
-
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8608a899-96a9-4027-9725-2cb02ba189fd)
 ![](https://github.com/Vencord/Vesktop/assets/45497981/8701e5de-52c4-4346-a990-719cb971642e)
 
