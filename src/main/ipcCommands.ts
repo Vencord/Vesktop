@@ -69,7 +69,10 @@ export function sendRendererCommand<T = any>(message: string, data?: any, timeou
 
 ipcMain.on(IpcEvents.IPC_COMMAND, (_event, { nonce, ok, data }: IpcResponse) => {
     const resolver = resolvers.get(nonce);
-    if (!resolver) return;
+    if (!resolver) {
+        console.warn(`Ignoring response to unknown or timed out IPC command: ${nonce}`);
+        return;
+    }
 
     if (resolver.timeout) clearTimeout(resolver.timeout);
     if (ok) {

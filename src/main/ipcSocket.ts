@@ -21,6 +21,11 @@ let server: Server | undefined;
 
 const RENDERER_TIMEOUT_MS = 3000;
 
+function errorMessage(err: unknown) {
+    // This is a bit hacky but it's the best solution without touching everything
+    return (err instanceof Error ? err.message : String(err)).replace(/^Error: /, "");
+}
+
 async function runCommand(line: string): Promise<string> {
     const [command, arg = ""] = line.trim().split(/\s+/, 2);
 
@@ -41,7 +46,7 @@ async function runCommand(line: string): Promise<string> {
                 );
                 return JSON.stringify(state);
             } catch (err) {
-                return `error: ${String(err)}`;
+                return `error: ${errorMessage(err)}`;
             }
         }
         case "set-voice-state": {
@@ -56,7 +61,7 @@ async function runCommand(line: string): Promise<string> {
                 );
                 return "ok";
             } catch (err) {
-                return `error: ${String(err)}`;
+                return `error: ${errorMessage(err)}`;
             }
         }
         default:
@@ -79,6 +84,7 @@ export function initSocket() {
     server = createServer({ allowHalfOpen: true }, socket => {
         socket.on("error", () => {});
 
+        // Replies must be sent in the same order that the commands were received in
         let queue = Promise.resolve();
 
         const lines = createInterface({ input: socket });
@@ -93,7 +99,7 @@ export function initSocket() {
                     if (!socket.destroyed && socket.writable) socket.write(response + "\n");
                 })
                 .catch(err => {
-                    if (!socket.destroyed && socket.writable) socket.write(`error: ${String(err)}\n`);
+                    if (!socket.destroyed && socket.writable) socket.write(`error: ${errorMessage(err)}\n`);
                 });
         });
 
