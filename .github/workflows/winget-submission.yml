@@ -10,6 +10,9 @@ on:
                 description: The release tag to submit
                 required: true
 
+permissions:
+    contents: read
+
 jobs:
     winget:
         name: Publish winget package

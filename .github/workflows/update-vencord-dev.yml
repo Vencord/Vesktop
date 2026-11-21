@@ -5,6 +5,8 @@ on:
         types:
             - published
 
+permissions: {}
+
 jobs:
     update:
         runs-on: ubuntu-latest
