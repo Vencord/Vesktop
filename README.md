@@ -40,6 +40,14 @@ For lower latency, send the same commands as lines to the socket at `$XDG_RUNTIM
 echo "run-shortcut pushToTalk:down" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/vesktop.sock
 ```
 
+The socket can also read and set your mute state:
+
+```sh
+echo "get-voice-state" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/vesktop.sock
+# {"mute":false,"deaf":false}
+echo "set-voice-state mute=true" | socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/vesktop.sock
+```
+
 Run `vesktop --help` to see all actions.
 
 ## Building from Source

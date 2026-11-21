@@ -99,5 +99,8 @@ export const enum IpcCommands {
     SCREEN_SHARE_PICKER = "screenshare:picker",
 
     KEYBINDS_TRIGGER = "keybinds:trigger",
-    KEYBINDS_STATUS = "keybinds:status"
+    KEYBINDS_STATUS = "keybinds:status",
+
+    GET_VOICE_STATE = "voice:get-state",
+    SET_VOICE_STATE = "voice:set-state"
 }

@@ -11,7 +11,12 @@ import { IpcEvents } from "shared/IpcEvents";
 
 import { mainWin } from "./mainWindow";
 
-const resolvers = new Map<string, Record<"resolve" | "reject", (data: any) => void>>();
+type Resolver = {
+    resolve: (data: any) => void;
+    reject: (data: any) => void;
+    timeout?: ReturnType<typeof setTimeout>;
+};
+const resolvers = new Map<string, Resolver>();
 
 export interface IpcMessage {
     nonce: string;
@@ -31,7 +36,7 @@ export interface IpcResponse {
  *
  * You must add a handler for the message in the renderer process.
  */
-export function sendRendererCommand<T = any>(message: string, data?: any) {
+export function sendRendererCommand<T = any>(message: string, data?: any, timeoutMs?: number) {
     if (mainWin.isDestroyed()) {
         console.warn("Main window is destroyed, cannot send IPC command:", message);
         return Promise.reject(new Error("Main window is destroyed"));
@@ -40,18 +45,33 @@ export function sendRendererCommand<T = any>(message: string, data?: any) {
     const nonce = randomUUID();
 
     const promise = new Promise<T>((resolve, reject) => {
-        resolvers.set(nonce, { resolve, reject });
+        const timeout =
+            timeoutMs === undefined
+                ? undefined
+                : setTimeout(() => {
+                      resolvers.delete(nonce);
+                      reject(new Error(`Timed out waiting for renderer command: ${message}`));
+                  }, timeoutMs);
+        resolvers.set(nonce, { resolve, reject, timeout });
     });
 
-    mainWin.webContents.send(IpcEvents.IPC_COMMAND, { nonce, message, data });
+    try {
+        mainWin.webContents.send(IpcEvents.IPC_COMMAND, { nonce, message, data });
+    } catch (err) {
+        const resolver = resolvers.get(nonce);
+        if (resolver?.timeout) clearTimeout(resolver.timeout);
+        resolvers.delete(nonce);
+        return Promise.reject(err);
+    }
 
     return promise;
 }
 
 ipcMain.on(IpcEvents.IPC_COMMAND, (_event, { nonce, ok, data }: IpcResponse) => {
     const resolver = resolvers.get(nonce);
-    if (!resolver) throw new Error(`Unknown message: ${nonce}`);
+    if (!resolver) return;
 
+    if (resolver.timeout) clearTimeout(resolver.timeout);
     if (ok) {
         resolver.resolve(data);
     } else {

@@ -24,20 +24,23 @@ waitFor(["dispatch", "subscribe"], FluxDispatcher => {
     });
 });
 
-export function handleKeybind(action: ShortcutAction, pressed: boolean) {
+/** @returns whether Discord's action was triggered */
+export function handleKeybind(action: ShortcutAction, pressed: boolean): boolean {
     if (!keybindActions) {
         logger.warn("Ignoring keybind, Discord has not registered its keybind actions yet");
-        return;
+        return false;
     }
 
     const discordAction = ACTION_MAP[action];
     const keybind = keybindActions[discordAction];
     if (!keybind) {
         logger.warn(`Discord keybind action ${discordAction} not found`);
-        return;
+        return false;
     }
 
     // Discord decides which key events an action uses. Push to talk uses both, toggles only key up
-    if (pressed ? keybind.keyEvents.keydown : keybind.keyEvents.keyup)
-        keybind.onTrigger(pressed, { action: discordAction, shortcut: [], params: {} });
+    if (!(pressed ? keybind.keyEvents.keydown : keybind.keyEvents.keyup)) return false;
+
+    keybind.onTrigger(pressed, { action: discordAction, shortcut: [], params: {} });
+    return true;
 }
