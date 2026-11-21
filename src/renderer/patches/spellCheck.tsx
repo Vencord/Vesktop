@@ -32,7 +32,7 @@ addPatch({
             find: ".enableSpellCheck",
             replacement: {
                 // if (settings?.enableSpellCheck && isDesktop) { DiscordNative.onSpellcheck(openMenu(props)) } else { e.preventDefault(); openMenu(props) }
-                match: /else (\i)\.preventDefault\(\),(\i\(\i\))(?<=(\i)\??\.enableSpellCheck.+?)/,
+                match: /else .{0,20}?(\i)\.preventDefault\(\),(\i\(\i\))(?<=(\i)\??\.enableSpellCheck.+?)/,
                 replace: "else $self.onSlateContext($1, $3?.enableSpellCheck, () => $2)"
             }
         }

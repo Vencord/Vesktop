@@ -6,6 +6,7 @@ allowBuilds:
     electron: true
     electron-winstaller: false
     esbuild: true
+    uiohook-napi: true
 pmOnFail: warn
 verifyDepsBeforeRun: warn
 recursiveInstall: false

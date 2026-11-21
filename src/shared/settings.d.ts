@@ -6,6 +6,8 @@
 
 import type { Rectangle } from "electron";
 
+import type { KeyBind } from "./utils/keybind";
+
 export interface Settings {
     discordBranch: "stable" | "canary" | "ptb";
     transparencyOption: "none" | "mica" | "tabbed" | "acrylic";
@@ -56,6 +58,10 @@ export interface Settings {
         onlyDefaultSpeakers?: boolean;
     };
     scrollSpeed?: number;
+
+    keyBinds?: KeyBind[];
+    /** Wayland only. Whether to register our actions with the GlobalShortcuts portal */
+    globalShortcutsPortal?: boolean;
 }
 
 export interface State {

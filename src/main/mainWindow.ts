@@ -472,7 +472,7 @@ function getDeepLinkPath(uri: string | undefined) {
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
-    const path = getDeepLinkPath(uri)?.slice(1) || "app";
+    const path = getDeepLinkPath(uri)?.slice(1) || "channels/@me";
 
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
@@ -563,9 +563,9 @@ export async function createWindows() {
         updateSplashMessage(""); // clear the splash message
 
         // check url to ensure app doesn't loop
-        if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
+        if (responseCode >= 300 && new URL(url).pathname !== `/channels/@me`) {
             loadUrl(undefined);
-            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
+            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to /channels/@me`);
         }
     });
 
