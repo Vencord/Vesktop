@@ -9,6 +9,7 @@ import { IpcCommands } from "shared/IpcEvents";
 
 import { openScreenSharePicker } from "./components/ScreenSharePicker";
 import { handleKeybind } from "./globalShortcuts/keybindHandler";
+import { getVoiceState, setVoiceMute } from "./voiceState";
 
 type IpcCommandHandler = (data: any) => any;
 
@@ -57,3 +58,7 @@ onIpcCommand(IpcCommands.GET_LANGUAGES, () => navigator.languages);
 onIpcCommand(IpcCommands.SCREEN_SHARE_PICKER, data => openScreenSharePicker(data.screens, data.skipPicker));
 
 onIpcCommand(IpcCommands.KEYBINDS_TRIGGER, ({ action, pressed }) => handleKeybind(action, pressed));
+
+onIpcCommand(IpcCommands.GET_VOICE_STATE, () => getVoiceState());
+
+onIpcCommand(IpcCommands.SET_VOICE_STATE, ({ mute }) => setVoiceMute(mute));
