@@ -57,6 +57,7 @@ export interface Settings {
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
+    scrollSpeed?: number;
 
     keyBinds?: KeyBind[];
     /** Wayland only. Whether to register our actions with the GlobalShortcuts portal */
