@@ -4,35 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { systemPreferences } from "electron";
+import { join } from "path";
+
+import { systemPreferences, utilityProcess } from "electron";
 import { KeyBind, KeybindStatus, ShortcutAction } from "shared/utils/keybind";
-import type { UiohookKeyboardEvent, UiohookMouseEvent } from "uiohook-napi";
 
-import { triggerAction } from "./actions";
+import { IS_FLATPAK } from "../constants";
+import { setStatus, triggerAction } from "./actions";
+import { HookInput, HookMessage, startNativeHook } from "./nativeHook";
 
-type Uiohook = typeof import("uiohook-napi");
-type InputEvent = UiohookKeyboardEvent | UiohookMouseEvent;
 type ActiveBind = KeyBind & { action: ShortcutAction };
-
-// uiohook key names that differ from our key names (KeyboardEvent.code with merged modifiers)
-const KEY_RENAMES: Record<string, string> = {
-    Ctrl: "Control",
-    CtrlRight: "Control",
-    AltRight: "Alt",
-    ShiftRight: "Shift",
-    MetaRight: "Meta",
-    // Numpad keys with NumLock off
-    NumpadInsert: "Numpad0",
-    NumpadEnd: "Numpad1",
-    NumpadArrowDown: "Numpad2",
-    NumpadPageDown: "Numpad3",
-    NumpadArrowLeft: "Numpad4",
-    NumpadArrowRight: "Numpad6",
-    NumpadHome: "Numpad7",
-    NumpadArrowUp: "Numpad8",
-    NumpadPageUp: "Numpad9",
-    NumpadDelete: "NumpadDecimal"
-};
 
 const MODIFIER_FLAGS = {
     Control: "ctrlKey",
@@ -41,28 +22,10 @@ const MODIFIER_FLAGS = {
     Meta: "metaKey"
 } as const;
 
-let uiohook: Uiohook | null = null;
-let keyNames = new Map<number, string>();
-let running = false;
-
+let stopInput: (() => void) | null = null;
 let binds: ActiveBind[] = [];
 const heldKeys = new Set<string>();
 const activeBinds = new Set<ActiveBind>();
-
-function toKeyName(uiohookName: string) {
-    if (/^[A-Z]$/.test(uiohookName)) return "Key" + uiohookName;
-    if (/^\d$/.test(uiohookName)) return "Digit" + uiohookName;
-    return KEY_RENAMES[uiohookName] ?? uiohookName;
-}
-
-function loadUiohook() {
-    if (!uiohook) {
-        uiohook = require("uiohook-napi") as Uiohook;
-        keyNames = new Map(Object.entries(uiohook.UiohookKey).map(([name, code]) => [code, toKeyName(name)]));
-    }
-
-    return uiohook;
-}
 
 function press(key: string) {
     // Held keys repeat their keydown event
@@ -93,67 +56,85 @@ function releaseAll() {
     for (const key of heldKeys) release(key);
 }
 
-// A modifier release can be missed, for example when the lock screen grabs input. The flags of later events tell us
-function syncModifiers(event: InputEvent, key?: string) {
+function onInput(input: HookInput) {
+    const { key, pressed } = input;
+
+    // A modifier release can be missed, e.g. when the lock screen grabs input.
     for (const [modifier, flag] of Object.entries(MODIFIER_FLAGS)) {
-        if (modifier !== key && heldKeys.has(modifier) && !event[flag]) release(modifier);
+        if (modifier !== key && heldKeys.has(modifier) && !input[flag]) {
+            release(modifier);
+        }
+    }
+
+    if (key) {
+        if (pressed) {
+            press(key);
+        } else {
+            release(key);
+        }
     }
 }
 
-function onKeyDown(event: UiohookKeyboardEvent) {
-    const key = keyNames.get(event.keycode);
-    syncModifiers(event, key);
-    if (key) press(key);
+function hookError(message: string) {
+    console.error("Failed to start input hook:", message);
+    return { error: `Failed to listen to input: ${message}` };
 }
 
-function onKeyUp(event: UiohookKeyboardEvent) {
-    const key = keyNames.get(event.keycode);
-    syncModifiers(event, key);
-    if (key) release(key);
-}
+function startFlatpakHook() {
+    // libuiohook can deadlock with Zypak's host preload during dlopen.
+    const child = utilityProcess.fork(join(__dirname, "hookProcess.js"), [], {
+        serviceName: "Vesktop Global Keybinds"
+    });
 
-// 1 and 2 are left and right click, which we don't allow binding
-const mouseKey = (event: UiohookMouseEvent) => {
-    const button = event.button as number;
-    return button >= 3 && button <= 5 ? `Mouse${button}` : null;
-};
-
-function onMouseDown(event: UiohookMouseEvent) {
-    syncModifiers(event);
-    const key = mouseKey(event);
-    if (key) press(key);
-}
-
-function onMouseUp(event: UiohookMouseEvent) {
-    syncModifiers(event);
-    const key = mouseKey(event);
-    if (key) release(key);
-}
-
-function start() {
-    const { uIOhook } = loadUiohook();
-    if (running) return;
-
-    uIOhook.on("keydown", onKeyDown);
-    uIOhook.on("keyup", onKeyUp);
-    uIOhook.on("mousedown", onMouseDown);
-    uIOhook.on("mouseup", onMouseUp);
-    try {
-        uIOhook.start();
-    } catch (err) {
-        uIOhook.removeAllListeners();
-        throw err;
+    function fail(message: string) {
+        stopHook();
+        setStatus(hookError(message));
     }
-    running = true;
+
+    const timeout = setTimeout(() => fail("Input hook startup timed out"), 5000);
+    function stop() {
+        clearTimeout(timeout);
+        child.kill();
+    }
+
+    child.once("spawn", () => {
+        if (stopInput !== stop) {
+            child.kill();
+        }
+    });
+
+    child.on("message", (message: HookMessage) => {
+        if (stopInput !== stop) {
+            return;
+        }
+
+        switch (message.type) {
+            case "ready":
+                clearTimeout(timeout);
+                break;
+            case "input":
+                onInput(message.input);
+                break;
+            case "error":
+                fail(message.message);
+                break;
+        }
+    });
+
+    child.on("exit", code => {
+        if (stopInput === stop) {
+            fail(`Input hook process exited (code ${code})`);
+        }
+    });
+
+    return stop;
 }
 
 export function stopHook() {
     releaseAll();
-    if (!running) return;
-
-    uiohook!.uIOhook.stop();
-    uiohook!.uIOhook.removeAllListeners();
-    running = false;
+    const stop = stopInput;
+    stopInput = null;
+    stop?.();
 }
 
 /** Listens for the given binds, only running the input hook while there are any */
@@ -172,10 +153,9 @@ export function setHookBinds(newBinds: KeyBind[]): Omit<KeybindStatus, "backend"
     }
 
     try {
-        start();
+        stopInput ??= IS_FLATPAK ? startFlatpakHook() : startNativeHook(onInput);
         return {};
-    } catch (err) {
-        console.error("Failed to start input hook:", err);
-        return { error: `Failed to listen to input: ${err instanceof Error ? err.message : err}` };
+    } catch (error) {
+        return hookError(error instanceof Error ? error.message : String(error));
     }
 }

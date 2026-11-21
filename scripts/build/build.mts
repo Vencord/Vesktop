@@ -140,6 +140,12 @@ await Promise.all([
     }),
     createContext({
         ...NodeCommonOpts,
+        entryPoints: ["src/main/keybinds/hookProcess.ts"],
+        plugins: [uiohookBinaryPlugin],
+        outfile: "dist/js/hookProcess.js"
+    }),
+    createContext({
+        ...NodeCommonOpts,
         entryPoints: ["src/preload/index.ts"],
         outfile: "dist/js/preload.js",
         footer: { js: "//# sourceURL=VesktopPreload" }
