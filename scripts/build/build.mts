@@ -8,6 +8,7 @@ import { copyFile, rm } from "fs/promises";
 
 import { BuildContext, BuildOptions, context, Plugin } from "esbuild";
 
+import { fileImportPlugin } from "./fileImportPlugin.mts";
 import { includeDirPlugin } from "./includeDirPlugin.mts";
 import vencordDep from "./vencordDep.mjs";
 
@@ -172,7 +173,7 @@ await Promise.all([
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
         external: ["@vencord/types/*"],
-        plugins: [vencordDep, includeDirPlugin("patches", "src/renderer/patches")],
+        plugins: [vencordDep, fileImportPlugin, includeDirPlugin("patches", "src/renderer/patches")],
         footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);
