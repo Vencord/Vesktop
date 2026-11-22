@@ -27,7 +27,7 @@ import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
 import { CommandLine } from "./cli";
-import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MessageBoxChoice, MIN_HEIGHT, MIN_WIDTH } from "./constants";
+import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
 import { sendRendererCommand } from "./ipcCommands";
 import { darwinURL } from "./main";
@@ -498,12 +498,19 @@ function retryUrl(url: string, description: string) {
     setTimeout(() => loadUrl(url), retryDelay);
 }
 
+const enum StartupErrorChoice {
+    Repair,
+    Quit,
+    Dismiss
+}
+
 export async function showStartupError(error: unknown) {
     console.error("Failed to start Vesktop:", error);
 
     const splash = getSplashWindow();
+    const hasMainWindow = mainWin && !mainWin.isDestroyed();
     let parent = splash;
-    if (mainWin && !mainWin.isDestroyed()) {
+    if (hasMainWindow) {
         splash?.hide();
         parent = mainWin;
     }
@@ -512,9 +519,9 @@ export async function showStartupError(error: unknown) {
         type: "error",
         message: "Vesktop failed to start",
         detail: `${error}\n\nRepair will re-download Vencord and restart Vesktop.`,
-        buttons: ["Repair", "Quit"],
-        defaultId: MessageBoxChoice.Default,
-        cancelId: MessageBoxChoice.Cancel
+        buttons: hasMainWindow ? ["Repair", "Quit", "Dismiss"] : ["Repair", "Quit"],
+        defaultId: StartupErrorChoice.Repair,
+        cancelId: hasMainWindow ? StartupErrorChoice.Dismiss : StartupErrorChoice.Quit
     };
 
     if (parent) {
@@ -522,10 +529,14 @@ export async function showStartupError(error: unknown) {
     }
     const { response } = await (parent ? dialog.showMessageBox(parent, options) : dialog.showMessageBox(options));
 
-    if (response === MessageBoxChoice.Cancel) return app.exit(1);
+    if (response === StartupErrorChoice.Quit) {
+        return app.exit(1);
+    }
 
-    updateSplashMessage("Repairing Vencord...");
-    downloadVencordFiles().then(relaunch, showStartupError);
+    if (response === StartupErrorChoice.Repair) {
+        updateSplashMessage("Repairing Vencord...");
+        downloadVencordFiles().then(relaunch, showStartupError);
+    }
 }
 
 export async function createWindows() {
