@@ -116,12 +116,26 @@ addPatch({
     scaleEncodeToSinkWants(encode: { width: number; height: number; framerate: number }, sinkPixelCount: number) {
         try {
             const scale = Math.sqrt(sinkPixelCount / (encode.width * encode.height));
-            if (!(scale < 1)) return encode;
+            if (!(scale > 0 && scale < 1)) {
+                return encode;
+            }
+
+            const shortEdge = Math.min(encode.width, encode.height);
+            const scaledShortEdge = Math.max(2, Math.floor((shortEdge * scale) / 2) * 2);
+            const longEdge = Math.max(encode.width, encode.height);
+            const idealLongEdge = (scaledShortEdge * longEdge) / shortEdge;
+
+            // Discord sends only the pixel count. WebRTC fits that area back to the capture
+            // aspect ratio, so check which even dimension survives that second rounding.
+            const lowerEven = Math.floor(idealLongEdge / 2) * 2;
+            const projectedLongEdge = Math.round(Math.sqrt(idealLongEdge * lowerEven));
+            const scaledLongEdge = projectedLongEdge === lowerEven ? lowerEven : lowerEven + 2;
+            const landscape = encode.width >= encode.height;
 
             return {
                 ...encode,
-                width: Math.round(encode.width * scale),
-                height: Math.round(encode.height * scale)
+                width: landscape ? scaledLongEdge : scaledShortEdge,
+                height: landscape ? scaledShortEdge : scaledLongEdge
             };
         } catch (e) {
             logger.error("Failed to scale encode to sink wants", e);
