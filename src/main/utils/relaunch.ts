@@ -22,5 +22,5 @@ export async function relaunch() {
         app.relaunch();
     }
 
-    app.exit();
+    app.quit();
 }
