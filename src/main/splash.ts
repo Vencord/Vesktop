@@ -43,5 +43,11 @@ export function createSplashWindow(startMinimized = false) {
 
 export function updateSplashMessage(newMessage: string) {
     message = newMessage;
-    if (splash && !splash.isDestroyed()) splash.webContents.send("update-splash-message", message);
+    getSplashWindow()?.webContents.send("update-splash-message", message);
+}
+
+export function getSplashWindow() {
+    if (splash && !splash.isDestroyed()) {
+        return splash;
+    }
 }

@@ -12,12 +12,13 @@ import { release } from "os";
 import { join } from "path";
 
 import { app, BrowserWindow, clipboard, ClipboardItem, dialog, IpcMainInvokeEvent, session, shell } from "electron";
+import { once } from "shared/utils/once";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { enableHardwareAcceleration } from "./main";
-import { mainWin } from "./mainWindow";
+import { mainWin, showStartupError } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
@@ -37,6 +38,13 @@ const VESKTOP_RENDERER_JS_PATH = join(__dirname, "renderer.js");
 const VESKTOP_RENDERER_CSS_PATH = join(__dirname, "renderer.css");
 handleSync(IpcEvents.GET_VESKTOP_RENDERER_SCRIPT, () => readFileSync(VESKTOP_RENDERER_JS_PATH, "utf-8"));
 handle(IpcEvents.GET_VESKTOP_RENDERER_CSS, () => readFile(VESKTOP_RENDERER_CSS_PATH, "utf-8"));
+
+const showRendererStartupError = once((error: string) => showStartupError(error));
+handle(IpcEvents.RENDERER_STARTUP_ERROR, (event, error: string) => {
+    if (event.sender === mainWin?.webContents && event.senderFrame === event.sender.mainFrame) {
+        return showRendererStartupError(error);
+    }
+});
 
 if (IS_DEV) {
     watch(VESKTOP_RENDERER_CSS_PATH, { persistent: false }, async () => {
