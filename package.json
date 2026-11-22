@@ -197,7 +197,8 @@
         },
         "rpm": {
             "fpm": [
-                "--rpm-rpmbuild-define=_build_id_links none"
+                "--rpm-rpmbuild-define=_build_id_links none",
+                "--rpm-rpmbuild-define=_rpmformat 4"
             ]
         },
         "electronFuses": {
