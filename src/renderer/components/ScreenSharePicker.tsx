@@ -563,12 +563,16 @@ function AudioSourcePickerLinux({
                 return;
             }
 
-            const isAvailable = includeSources.every(selected =>
+            // Filter out persisted sources that are no longer available
+
+            const availableSources = includeSources.filter(selected =>
                 value.targets.some(target => hasMatchingProps(selected, target))
             );
 
-            if (!isAvailable) {
+            if (!availableSources.length) {
                 persistIncludeSources("Entire System");
+            } else if (availableSources.length !== includeSources.length) {
+                persistIncludeSources(availableSources);
             }
         }
     });
