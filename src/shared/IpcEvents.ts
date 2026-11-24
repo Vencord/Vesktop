@@ -11,6 +11,7 @@ export const enum IpcEvents {
     GET_VESKTOP_RENDERER_SCRIPT = "VCD_GET_RENDERER_SCRIPT",
     GET_VESKTOP_RENDERER_CSS = "VCD_GET_RENDERER_CSS",
     VESKTOP_RENDERER_CSS_UPDATE = "VCD_PRELOAD_RENDERER_CSS_UPDATE",
+    RENDERER_STARTUP_ERROR = "VCD_RENDERER_STARTUP_ERROR",
 
     GET_VERSION = "VCD_GET_VERSION",
     SUPPORTS_WINDOWS_TRANSPARENCY = "VCD_SUPPORTS_WINDOWS_TRANSPARENCY",
@@ -49,7 +50,12 @@ export const enum IpcEvents {
     VIRT_MIC_LIST = "VCD_VIRT_MIC_LIST",
     VIRT_MIC_START = "VCD_VIRT_MIC_START",
     VIRT_MIC_START_SYSTEM = "VCD_VIRT_MIC_START_ALL",
+    VIRT_MIC_UNMUTE = "VCD_VIRT_MIC_UNMUTE",
     VIRT_MIC_STOP = "VCD_VIRT_MIC_STOP",
+
+    RPC_READY = "VCD_RPC_READY",
+    RPC_SEND = "VCD_RPC_SEND",
+    RPC_CLOSE = "VCD_RPC_CLOSE",
 
     CLIPBOARD_COPY_IMAGE = "VCD_CLIPBOARD_COPY_IMAGE",
 
@@ -61,7 +67,13 @@ export const enum IpcEvents {
     DEVTOOLS_OPENED = "VCD_DEVTOOLS_OPENED",
     DEVTOOLS_CLOSED = "VCD_DEVTOOLS_CLOSED",
 
-    CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET"
+    CHOOSE_USER_ASSET = "VCD_CHOOSE_USER_ASSET",
+
+    KEYBINDS_GET_STATUS = "VCD_KEYBINDS_GET_STATUS",
+    KEYBINDS_GET_SOCKET_PATH = "VCD_KEYBINDS_GET_SOCKET_PATH",
+    KEYBINDS_RETRY = "VCD_KEYBINDS_RETRY",
+    KEYBINDS_REQUEST_PERMISSION = "VCD_KEYBINDS_REQUEST_PERMISSION",
+    KEYBINDS_CONFIGURE_PORTAL = "VCD_KEYBINDS_CONFIGURE_PORTAL"
 }
 
 export const enum UpdaterIpcEvents {
@@ -74,13 +86,19 @@ export const enum UpdaterIpcEvents {
 }
 
 export const enum IpcCommands {
-    RPC_ACTIVITY = "rpc:activity",
-    RPC_INVITE = "rpc:invite",
-    RPC_DEEP_LINK = "rpc:link",
+    RPC_CONNECT = "rpc:connect",
+    RPC_REQUEST = "rpc:request",
+    RPC_DISCONNECT = "rpc:disconnect",
+    RPC_GAME = "rpc:game",
+    RPC_RESET = "rpc:reset",
 
+    NAVIGATE = "navigate",
     NAVIGATE_SETTINGS = "navigate:settings",
 
     GET_LANGUAGES = "navigator.languages",
 
-    SCREEN_SHARE_PICKER = "screenshare:picker"
+    SCREEN_SHARE_PICKER = "screenshare:picker",
+
+    KEYBINDS_TRIGGER = "keybinds:trigger",
+    KEYBINDS_STATUS = "keybinds:status"
 }

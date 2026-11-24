@@ -7,37 +7,40 @@
 import type { Node } from "@vencord/venmic";
 import type { Rectangle } from "electron";
 
+import type { KeyBind } from "./utils/keybind";
+
 export interface Settings {
-    discordBranch?: "stable" | "canary" | "ptb";
-    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
-    webRTCIPHandlingPolicy?:
+    discordBranch: "stable" | "canary" | "ptb";
+    transparencyOption: "none" | "mica" | "tabbed" | "acrylic";
+    webRTCIPHandlingPolicy:
         | "default"
         | "default_public_interface_only"
         | "default_public_and_private_interfaces"
         | "disable_non_proxied_udp";
-    tray?: boolean;
-    minimizeToTray?: boolean;
-    autoStartMinimized?: boolean;
-    openLinksWithElectron?: boolean;
-    staticTitle?: boolean;
-    enableMenu?: boolean;
-    enableShadow?: boolean;
-    enableRoundedCorners?: boolean;
-    disableSmoothScroll?: boolean;
-    hardwareAcceleration?: boolean;
-    hardwareVideoAcceleration?: boolean;
-    arRPC?: boolean;
-    appBadge?: boolean;
-    enableTaskbarFlashing?: boolean;
-    disableMinSize?: boolean;
-    clickTrayToShowHide?: boolean;
-    customTitleBar?: boolean;
+    tray: boolean;
+    minimizeToTray: boolean;
+    autoStartMinimized: boolean;
+    openLinksWithElectron: boolean;
+    staticTitle: boolean;
+    enableMenu: boolean;
+    enableShadow: boolean;
+    enableRoundedCorners: boolean;
+    disableSmoothScroll: boolean;
+    hardwareAcceleration: boolean;
+    hardwareVideoAcceleration: boolean;
+    hardwareVideoEncoding: boolean;
+    arRPC: boolean;
+    appBadge: boolean;
+    enableTaskbarFlashing: boolean;
+    disableMinSize: boolean;
+    clickTrayToShowHide: boolean;
+    nativeTitleBar: boolean;
 
-    enableSplashScreen?: boolean;
-    splashTheming?: boolean;
+    enableSplashScreen: boolean;
+    splashTheming: boolean;
+    splashPixelated: boolean;
     splashColor?: string;
     splashBackground?: string;
-    splashPixelated?: boolean;
 
     spellCheckLanguages?: string[];
 
@@ -53,9 +56,14 @@ export interface Settings {
         ignoreDevices?: boolean;
         ignoreInputMedia?: boolean;
 
+        mute?: boolean;
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
+
+    keyBinds?: KeyBind[];
+    /** Wayland only. Whether to register our actions with the GlobalShortcuts portal */
+    globalShortcutsPortal?: boolean;
 }
 
 export interface State {

@@ -4,21 +4,27 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { desktopCapturer, session, Streams } from "electron";
 import { release } from "os";
+
+import { desktopCapturer, session, Streams } from "electron";
 import type { StreamPick } from "renderer/components/ScreenSharePicker";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
 
+import { IS_WAYLAND } from "./constants";
 import { sendRendererCommand } from "./ipcCommands";
 import { handle } from "./utils/ipcWrappers";
+import { isDiscordUrl } from "./utils/isDiscordUrl";
 
-const isWayland =
-    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 19045;
 
-const supportsLoopbackWithoutChrome = process.platform === "win32" && Number(release().split(".").pop()) >= 20348;
+// Sources shown in the currently open picker. Only serve thumbnails for these,
+// otherwise the renderer could silently take screenshots of any window or screen
+let pickerSourceIds = new Set<string>();
 
 export function registerScreenShareHandler() {
     handle(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, async (_, id: string) => {
+        if (!pickerSourceIds.has(id)) return;
+
         const sources = await desktopCapturer.getSources({
             types: ["window", "screen"],
             thumbnailSize: {
@@ -30,8 +36,11 @@ export function registerScreenShareHandler() {
     });
 
     session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
+        // the handler applies to the whole session, so other sites (e.g. opened via openLinksWithElectron) would get our picker
+        if (!isDiscordUrl(request.frame?.top?.url)) return callback(null);
+
         // request full resolution on wayland right away because we always only end up with one result anyway
-        const width = isWayland ? 1920 : 176;
+        const width = IS_WAYLAND ? 1920 : 176;
         const sources = await desktopCapturer
             .getSources({
                 types: ["window", "screen"],
@@ -42,7 +51,7 @@ export function registerScreenShareHandler() {
             })
             .catch(err => console.error("Error during screenshare picker", err));
 
-        if (!sources) return callback({});
+        if (!sources) return callback(null);
 
         const data = sources.map(({ id, name, thumbnail }) => ({
             id,
@@ -50,21 +59,25 @@ export function registerScreenShareHandler() {
             url: thumbnail.toDataURL()
         }));
 
-        if (isWayland) {
+        if (IS_WAYLAND) {
             const video = data[0];
             if (video) {
                 const stream = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
                     screens: [video],
                     skipPicker: true
-                }).catch(() => null);
+                }).catch(e => {
+                    console.error("Error during screenshare picker", e);
+                    return null;
+                });
 
-                if (stream === null) return callback({});
+                if (stream === null) return callback(null);
             }
 
-            callback(video ? { video: sources[0] } : {});
+            callback(video ? { video: sources[0] } : null);
             return;
         }
 
+        pickerSourceIds = new Set(data.map(s => s.id));
         const choice = await sendRendererCommand<StreamPick>(IpcCommands.SCREEN_SHARE_PICKER, {
             screens: data,
             skipPicker: false
@@ -72,11 +85,12 @@ export function registerScreenShareHandler() {
             console.error("Error during screenshare picker", e);
             return null;
         });
+        pickerSourceIds.clear();
 
-        if (!choice) return callback({});
+        if (!choice) return callback(null);
 
         const source = sources.find(s => s.id === choice.id);
-        if (!source) return callback({});
+        if (!source) return callback(null);
 
         const streams: Streams = {
             video: source

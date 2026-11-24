@@ -9,6 +9,7 @@
     "scripts": {
         "build": "node-gyp configure build",
         "clean": "node-gyp clean",
-        "test": "npm run build && node test.js"
+        "test": "npm run build && node test.js",
+        "install": "exit 0"
     }
 }

@@ -5,6 +5,8 @@ on:
         types:
             - published
 
+permissions: {}
+
 jobs:
     update:
         runs-on: ubuntu-latest
@@ -19,7 +21,7 @@ jobs:
                   cd repo
                   version="${{ github.event.release.tag_name }}"
                   echo "${version#v}" > scripts/_latestVesktopVersion.txt
-                  
+
                   git add scripts/_latestVesktopVersion.txt
                   git commit -m "Update Vesktop version to ${{ github.event.release.tag_name }}"
                   git push https://$USERNAME:$API_TOKEN@github.com/$GH_REPO.git

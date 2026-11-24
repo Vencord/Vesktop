@@ -1,5 +1,6 @@
-import { Plugin } from "esbuild";
 import { readdir } from "fs/promises";
+
+import { Plugin } from "esbuild";
 
 const makeImportAllCode = (files: string[]) =>
     files.map(f => `require("./${f.replace(/\.[cm]?[tj]sx?$/, "")}")`).join("\n");
@@ -14,7 +15,7 @@ export function includeDirPlugin(namespace: string, path: string): Plugin {
 
             build.onResolve({ filter }, args => ({ path: args.path, namespace }));
 
-            build.onLoad({ filter, namespace }, async args => {
+            build.onLoad({ filter, namespace }, async () => {
                 return {
                     contents: await makeImportDirRecursiveCode(path),
                     resolveDir: path

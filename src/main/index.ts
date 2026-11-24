@@ -11,7 +11,12 @@ import { downloadVencordFiles } from "./utils/vencordLoader";
 
 if (CommandLine.values.repair) {
     console.log("Repairing Vesktop...");
-    downloadVencordFiles().then(() => app.quit());
+    downloadVencordFiles()
+        .then(() => app.quit())
+        .catch(err => {
+            console.error("Failed to repair Vesktop:", err);
+            app.exit(1);
+        });
 } else {
     require("./main");
 }

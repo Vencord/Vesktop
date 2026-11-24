@@ -4,37 +4,43 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "path";
+
 import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
+    dialog,
     Menu,
     MenuItemConstructorOptions,
+    MessageBoxOptions,
     nativeTheme,
     Rectangle,
     screen,
     session
 } from "electron";
-import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
+import { debounce } from "shared/utils/debounce";
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
-import { initArRPC } from "./arrpc";
 import { CommandLine } from "./cli";
 import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constants";
 import { AppEvents } from "./events";
 import { sendRendererCommand } from "./ipcCommands";
 import { darwinURL } from "./main";
 import { Settings, State, VencordSettings } from "./settings";
-import { createSplashWindow, updateSplashMessage } from "./splash";
+import { createSplashWindow, getSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
 import { clearData } from "./utils/clearData";
-import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { isDiscordUrl } from "./utils/isDiscordUrl";
+import { handleExternalUrl, makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { relaunch } from "./utils/relaunch";
+import { showWindow } from "./utils/showWindow";
 import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
-import { downloadVencordFiles, ensureVencordFiles } from "./utils/vencordLoader";
+import { downloadVencordFiles, isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 let isQuitting = false;
@@ -84,8 +90,7 @@ function initMenuBar(win: BrowserWindow) {
             label: "Force Update Vencord",
             async click() {
                 await downloadVencordFiles();
-                app.relaunch();
-                app.quit();
+                relaunch();
             },
             toolTip: "Vesktop will automatically restart after this operation"
         },
@@ -99,10 +104,7 @@ function initMenuBar(win: BrowserWindow) {
         {
             label: "Relaunch",
             accelerator: "CmdOrCtrl+Shift+R",
-            click() {
-                app.relaunch();
-                app.quit();
-            }
+            click: relaunch
         },
         ...(!isDarwin
             ? []
@@ -156,6 +158,25 @@ function initMenuBar(win: BrowserWindow) {
             accelerator: "CmdOrCtrl+=",
             role: "zoomIn",
             visible: false
+        },
+        // numpad zooms
+        {
+            label: "Zoom in (hidden)",
+            accelerator: "CmdOrCtrl+numadd",
+            role: "zoomIn",
+            visible: false
+        },
+        {
+            label: "Zoom out (hidden)",
+            accelerator: "CmdOrCtrl+numsub",
+            role: "zoomOut",
+            visible: false
+        },
+        {
+            label: "Reset Zoom (hidden)",
+            accelerator: "CmdOrCtrl+num0",
+            role: "resetZoom",
+            visible: false
         }
     ] satisfies MenuItemList;
 
@@ -187,11 +208,12 @@ function initWindowBoundsListeners(win: BrowserWindow) {
     win.on("unmaximize", saveState);
     win.on("restore", saveState);
 
-    const saveBounds = () => {
-        if (win.isMaximized()) return;
+    // move and resize fire continuously while dragging
+    const saveBounds = debounce(() => {
+        if (win.isDestroyed() || win.isMaximized()) return;
 
         State.store.windowBounds = win.getBounds();
-    };
+    });
 
     win.on("resize", saveBounds);
     win.on("move", saveBounds);
@@ -278,6 +300,18 @@ function initStaticTitle(win: BrowserWindow) {
     });
 }
 
+function initNavigationGuard(win: BrowserWindow) {
+    const onNavigate = (e: Electron.Event<{ url: string; isMainFrame: boolean }>) => {
+        if (!e.isMainFrame || isDiscordUrl(e.url)) return;
+
+        e.preventDefault();
+        handleExternalUrl(e.url);
+    };
+
+    win.webContents.on("will-navigate", onNavigate);
+    win.webContents.on("will-redirect", onNavigate);
+}
+
 function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
     // We want the default window behaviour to apply in game mode since it expects everything to be fullscreen and maximized.
     if (isDeckGameMode) return {};
@@ -318,19 +352,18 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         enableMenu,
         enableShadow,
         enableRoundedCorners,
-        customTitleBar,
+        nativeTitleBar,
         splashTheming,
         splashBackground
     } = Settings.store;
 
-    const { frameless, transparent, macosVibrancyStyle } = VencordSettings.store;
+    const { transparent, macosVibrancyStyle } = VencordSettings.store;
 
-    const noFrame = frameless === true || customTitleBar === true;
-    const backgroundColor =
-        splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
+    const frameless = !nativeTitleBar;
+    const backgroundColor = splashTheming ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
     const options: BrowserWindowConstructorOptions = {
-        show: Settings.store.enableSplashScreen === false && !CommandLine.values["start-minimized"],
+        show: !Settings.store.enableSplashScreen && !CommandLine.values["start-minimized"],
         backgroundColor,
         webPreferences: {
             nodeIntegration: false,
@@ -342,10 +375,10 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
             // disable renderer backgrounding to prevent the app from unloading when in the background
             backgroundThrottling: false
         },
-        frame: !noFrame,
+        frame: !frameless,
         autoHideMenuBar: enableMenu,
-        hasShadow: enableShadow !== false,
-        roundedCorners: enableRoundedCorners !== false,
+        hasShadow: enableShadow,
+        roundedCorners: enableRoundedCorners,
         ...getWindowBoundsOptions()
     };
 
@@ -358,7 +391,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         options.backgroundColor = "#00000000";
         options.backgroundMaterial = transparencyOption;
 
-        if (customTitleBar) {
+        if (frameless) {
             options.transparent = true;
         }
     }
@@ -368,9 +401,10 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     }
 
     if (process.platform === "darwin") {
-        options.titleBarStyle = "hidden";
-        options.trafficLightPosition = { x: 10, y: 10 };
-
+        if (!nativeTitleBar) {
+            options.titleBarStyle = "hidden";
+            options.trafficLightPosition = { x: 10, y: 10 };
+        }
         if (macosVibrancyStyle) {
             options.vibrancy = macosVibrancyStyle;
             options.backgroundColor = "#00000000";
@@ -388,10 +422,9 @@ function createMainWindow() {
     const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
 
     win.setMenuBarVisibility(false);
-    if (process.platform === "darwin" && Settings.store.customTitleBar) win.setWindowButtonVisibility(false);
 
     win.on("close", e => {
-        const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
+        const useTray = !isDeckGameMode && Settings.store.minimizeToTray && Settings.store.tray;
         if (isQuitting || (process.platform !== "darwin" && !useTray)) return;
 
         e.preventDefault();
@@ -412,11 +445,13 @@ function createMainWindow() {
 
     initMenuBar(win);
     makeLinksOpenExternally(win);
+    initNavigationGuard(win);
     initSettingsListeners(win);
     initSpellCheck(win);
     initDevtoolsListeners(win);
     initStaticTitle(win);
 
+    win.webContents.session.setUserAgent(BrowserUserAgent);
     win.webContents.setUserAgent(BrowserUserAgent);
 
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
@@ -429,15 +464,31 @@ function createMainWindow() {
 
 const runVencordMain = once(() => require(join(VENCORD_FILES_DIR, "vencordDesktopMain.js")));
 
+// discord://-/channels/@me -> /channels/@me
+function getDeepLinkPath(uri: string | undefined) {
+    if (!uri || !URL.canParse(uri)) return;
+
+    return new URL(uri).pathname;
+}
+
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
     const subdomain = branch === "canary" || branch === "ptb" ? `${branch}.` : "";
+    const path = getDeepLinkPath(uri)?.slice(1) || "channels/@me";
 
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
-        .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
+        .loadURL(`https://${subdomain}discord.com/${path}`)
         .then(() => AppEvents.emit("appLoaded"))
         .catch(error => retryUrl(error.url, error.code));
+}
+
+// Navigates within Discord instead of reloading, used for links opened while we're already running
+export function openDeepLink(uri: string) {
+    const path = getDeepLinkPath(uri);
+    if (!path) return;
+
+    sendRendererCommand(IpcCommands.NAVIGATE, path).catch(err => console.error("Failed to open deep link", uri, err));
 }
 
 const retryDelay = 1000;
@@ -447,21 +498,70 @@ function retryUrl(url: string, description: string) {
     setTimeout(() => loadUrl(url), retryDelay);
 }
 
+const enum StartupErrorChoice {
+    Repair,
+    Quit,
+    Dismiss
+}
+
+export async function showStartupError(error: unknown) {
+    console.error("Failed to start Vesktop:", error);
+
+    const splash = getSplashWindow();
+    const hasMainWindow = mainWin && !mainWin.isDestroyed();
+    let parent = splash;
+    if (hasMainWindow) {
+        splash?.hide();
+        parent = mainWin;
+    }
+
+    const options: MessageBoxOptions = {
+        type: "error",
+        message: "Vesktop failed to start",
+        detail: `${error}\n\nRepair will re-download Vencord and restart Vesktop.`,
+        buttons: hasMainWindow ? ["Repair", "Quit", "Dismiss"] : ["Repair", "Quit"],
+        defaultId: StartupErrorChoice.Repair,
+        cancelId: hasMainWindow ? StartupErrorChoice.Dismiss : StartupErrorChoice.Quit
+    };
+
+    if (parent) {
+        showWindow(parent);
+    }
+    const { response } = await (parent ? dialog.showMessageBox(parent, options) : dialog.showMessageBox(options));
+
+    if (response === StartupErrorChoice.Quit) {
+        return app.exit(1);
+    }
+
+    if (response === StartupErrorChoice.Repair) {
+        updateSplashMessage("Repairing Vencord...");
+        downloadVencordFiles().then(relaunch, showStartupError);
+    }
+}
+
 export async function createWindows() {
     const startMinimized = CommandLine.values["start-minimized"];
 
     let splash: BrowserWindow | undefined;
-    if (Settings.store.enableSplashScreen !== false) {
+    if (Settings.store.enableSplashScreen) {
         splash = createSplashWindow(startMinimized);
 
         // SteamOS letterboxes and scales it terribly, so just full screen it
         if (isDeckGameMode) splash.setFullScreen(true);
     }
 
-    await ensureVencordFiles();
-    runVencordMain();
+    try {
+        if (!(await isValidVencordInstall(VENCORD_FILES_DIR))) {
+            updateSplashMessage("Downloading Vencord...");
+            await downloadVencordFiles();
+        }
 
-    mainWin = createMainWindow();
+        runVencordMain();
+
+        mainWin = createMainWindow();
+    } catch (err) {
+        return showStartupError(err);
+    }
 
     AppEvents.on("appLoaded", () => {
         splash?.destroy();
@@ -489,12 +589,11 @@ export async function createWindows() {
         updateSplashMessage(""); // clear the splash message
 
         // check url to ensure app doesn't loop
-        if (responseCode >= 300 && new URL(url).pathname !== `/app`) {
+        if (responseCode >= 300 && new URL(url).pathname !== `/channels/@me`) {
             loadUrl(undefined);
-            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to main app`);
+            console.warn(`'did-navigate': Caught bad page response: ${responseCode}, redirecting to /channels/@me`);
         }
     });
 
     mainWin.webContents.on("render-process-gone", (event, details) => console.log(details));
-    initArRPC();
 }

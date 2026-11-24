@@ -11,3 +11,18 @@ contextBridge.exposeInMainWorld("VesktopSplashNative", {
         ipcRenderer.on("update-splash-message", (_, message: string) => callback(message));
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(location.search);
+    const root = document.documentElement;
+
+    const fg = params.get("fg");
+    const bg = params.get("bg");
+
+    if (fg) {
+        root.style.setProperty("--fg", fg);
+        root.style.setProperty("--fg-semi-trans", `color-mix(in srgb, ${fg} 20%, transparent)`);
+    }
+    if (bg) root.style.setProperty("--bg", bg);
+    if (params.has("pixelated")) root.classList.add("pixelated");
+});

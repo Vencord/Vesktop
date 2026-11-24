@@ -8,3 +8,8 @@ declare module "__patches__" {
     const never: never;
     export default never;
 }
+
+declare module "file://*" {
+    const contents: string;
+    export default contents;
+}

@@ -6,32 +6,24 @@
 
 if (process.platform === "linux") import("./venmic");
 
-import { execFile } from "child_process";
-import {
-    app,
-    BrowserWindow,
-    clipboard,
-    dialog,
-    IpcMainInvokeEvent,
-    nativeImage,
-    RelaunchOptions,
-    session,
-    shell
-} from "electron";
 import { readFileSync, watch } from "fs";
 import { readFile, stat } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
 
+import { app, BrowserWindow, clipboard, ClipboardItem, dialog, IpcMainInvokeEvent, session, shell } from "electron";
+import { once } from "shared/utils/once";
+
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { enableHardwareAcceleration } from "./main";
-import { mainWin } from "./mainWindow";
+import { mainWin, showStartupError } from "./mainWindow";
 import { Settings, State } from "./settings";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
-import { isDeckGameMode, showGamePage } from "./utils/steamOS";
+import { relaunch } from "./utils/relaunch";
+import { showWindow } from "./utils/showWindow";
 import { isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
@@ -46,6 +38,13 @@ const VESKTOP_RENDERER_JS_PATH = join(__dirname, "renderer.js");
 const VESKTOP_RENDERER_CSS_PATH = join(__dirname, "renderer.css");
 handleSync(IpcEvents.GET_VESKTOP_RENDERER_SCRIPT, () => readFileSync(VESKTOP_RENDERER_JS_PATH, "utf-8"));
 handle(IpcEvents.GET_VESKTOP_RENDERER_CSS, () => readFile(VESKTOP_RENDERER_CSS_PATH, "utf-8"));
+
+const showRendererStartupError = once((error: string) => showStartupError(error));
+handle(IpcEvents.RENDERER_STARTUP_ERROR, (event, error: string) => {
+    if (event.sender === mainWin?.webContents && event.senderFrame === event.sender.mainFrame) {
+        return showRendererStartupError(error);
+    }
+});
 
 if (IS_DEV) {
     watch(VESKTOP_RENDERER_CSS_PATH, { persistent: false }, async () => {
@@ -73,20 +72,7 @@ handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: strin
     Settings.setData(settings, path);
 });
 
-handle(IpcEvents.RELAUNCH, async () => {
-    const options: RelaunchOptions = {
-        args: process.argv.slice(1).concat(["--relaunch"])
-    };
-    if (isDeckGameMode) {
-        // We can't properly relaunch when running under gamescope, but we can at least navigate to our page in Steam.
-        await showGamePage();
-    } else if (app.isPackaged && process.env.APPIMAGE) {
-        execFile(process.env.APPIMAGE, options.args);
-    } else {
-        app.relaunch(options);
-    }
-    app.exit();
-});
+handle(IpcEvents.RELAUNCH, relaunch);
 
 handleSync(IpcEvents.IS_USING_CUSTOM_VENCORD_DIR, () => !!State.store.vencordDir);
 handle(IpcEvents.SHOW_CUSTOM_VENCORD_DIR, async () => {
@@ -104,7 +90,7 @@ function getWindow(e: IpcMainInvokeEvent, key?: string) {
 }
 
 handle(IpcEvents.FOCUS, () => {
-    mainWin.show();
+    showWindow(mainWin);
     mainWin.setSkipTaskbar(false);
 });
 
@@ -149,7 +135,7 @@ handle(IpcEvents.SELECT_VENCORD_DIR, async (_e, value?: null) => {
     if (!res.filePaths.length) return "cancelled";
 
     const dir = res.filePaths[0];
-    if (!isValidVencordInstall(dir)) return "invalid";
+    if (!(await isValidVencordInstall(dir))) return "invalid";
 
     State.store.vencordDir = dir;
 
@@ -164,10 +150,14 @@ handle(IpcEvents.FLASH_FRAME, (_, flag: boolean) => {
 });
 
 handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) => {
-    clipboard.write({
-        html: `<img src="${src.replaceAll('"', '\\"')}">`,
-        image: nativeImage.createFromBuffer(Buffer.from(buf))
-    });
+    src = src.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
+    clipboard.write([
+        new ClipboardItem({
+            "text/html": `<img src="${src}" />`,
+            "image/png": new Blob([buf], { type: "image/png" })
+        })
+    ]);
 });
 
 function openDebugPage(page: string) {

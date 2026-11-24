@@ -4,15 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow, net } from "electron";
 import { join } from "path";
 import { pathToFileURL } from "url";
+
+import { BrowserWindow, net } from "electron";
 
 import { isPathInDirectory } from "./utils/isPathInDirectory";
 
 const STATIC_DIR = join(__dirname, "..", "..", "static");
 
-export async function handleVesktopStaticProtocol(path: string, req: Request) {
+export async function handleVesktopStaticProtocol(path: string) {
     const fullPath = join(STATIC_DIR, path);
     if (!isPathInDirectory(fullPath, STATIC_DIR)) {
         return new Response(null, { status: 404 });

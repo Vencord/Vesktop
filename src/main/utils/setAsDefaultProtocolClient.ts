@@ -5,6 +5,7 @@
  */
 
 import { execFile } from "child_process";
+
 import { app } from "electron";
 
 export async function setAsDefaultProtocolClient(protocol: string) {
