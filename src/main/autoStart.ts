@@ -23,7 +23,8 @@ interface AutoStart {
 
 function getEscapedCommandLine() {
     // inside an AppImage, argv[0] is a temporary mount
-    const exe = (app.isPackaged && process.env.APPIMAGE) || process.execPath;
+    // inside the Flatpak, we use a wrapper script `startvesktop`
+    const exe = (app.isPackaged && process.env.APPIMAGE) || (IS_FLATPAK ? "startvesktop" : process.execPath);
     const args = process.argv
         .slice(1) // skip the executable path
         .filter(arg => arg !== "--start-minimized" && arg !== "-m" && !arg.startsWith("discord://"));
