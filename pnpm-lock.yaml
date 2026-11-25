@@ -195,14 +195,14 @@ importers:
         specifier: 19.2.9
         version: 19.2.9
       '@vencord/types':
-        specifier: 1.15.14
-        version: 1.15.14(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)
+        specifier: 1.15.19
+        version: 1.15.19(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)
       discord-rpc:
         specifier: workspace:*
         version: link:packages/discord-rpc
       electron:
-        specifier: 45.4.1
-        version: 45.4.1(supports-color@7.2.0)
+        specifier: 45.5.0
+        version: 45.5.0(supports-color@7.2.0)
       electron-builder:
         specifier: ^26.18.0
         version: 26.18.0(electron-builder-squirrel-windows@26.18.0)(supports-color@7.2.0)
@@ -882,16 +882,16 @@ packages:
   '@types/ws@8.18.2':
     resolution: {integrity: sha512-67MQl+fpWKVTT1NYdnmo3U4sc/xPo/zQBncVnI74qmQa0z/b+1g6iYqNmGCPbxO+zz2aklb08a0oHfegiVd0/w==}
 
-  '@vencord/discord-types@1.15.14':
-    resolution: {integrity: sha512-ZMzj0qLVPrHzXEkaAaDW4pLZdEBNjrNPakQrDMy7JWnCGZZbhviNFSVCSp6ihBWrPMmap5lsOPjkkOc58ho2cw==}
+  '@vencord/discord-types@1.15.19':
+    resolution: {integrity: sha512-l2A5+eBM+CcZ2Meq0lsOyHyU/X4FgzZb/aiSPVabRhR+kKGi6tmZ54lJVK4xCdZYoBr2ZJw0kpIAai8EniZoIQ==}
     peerDependencies:
       '@types/react': 19.2.3
 
   '@vencord/game-detection@0.1.0-alpha.1':
     resolution: {integrity: sha512-5SqfcX2KEY4deEcKUncaW7t8KgmRF2QrePJM9H5tBiXZYB6k+VWjh/8ypfALBjMfXGRBX34ZXhmcJI/cv3SIcQ==}
 
-  '@vencord/types@1.15.14':
-    resolution: {integrity: sha512-mJIx1ikRa3QyWh+mZlP/HC5EU4Sb6Jlv1xSjyHO4WaJXybr5tEKsPinwMh3zosjpEubj1Ious28X5TFOW36IFg==}
+  '@vencord/types@1.15.19':
+    resolution: {integrity: sha512-XISIrDrDdPSIBZS6KIp+u0Na66kEM32rtCKCigrMRzWeCEWFtLCM3TrOpNCnRVYv4uy1XypN5c0GUz/J6XMlcg==}
     peerDependencies:
       '@types/react': 19.2.3
       '@types/react-dom': 19.2.3
@@ -1231,8 +1231,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@45.4.1:
-    resolution: {integrity: sha512-DjsJ/eQhovkjf1vYFFyh5GB8NMx+L5bdYaonvGOlWselg3DQ0fwIF0N/+2hrPsoS4whmmNswh21ym/8dgt1y5Q==}
+  electron@45.5.0:
+    resolution: {integrity: sha512-rBQ0Czu1Qrtrs6Fygq7Qtfcgkhpt79SylMkaFb1AhtXItdxh0Wq3ERQoPfBYECYf+FxptAiXKCZ7p+H/39CWIA==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -2229,8 +2229,8 @@ packages:
   truncate-utf8-bytes@1.0.2:
     resolution: {integrity: sha512-95Pu1QXQvruGEhv62XCMO3Mm90GscOCClvrIUwCM0PYOXK3kaF3l3sIHxx71ThJfcbM2O5Au6SO3AWCSEfW4mQ==}
 
-  ts-pattern@5.9.0:
-    resolution: {integrity: sha512-6s5V71mX8qBUmlgbrfL33xDUwO0fq48rxAu2LBE11WBeGdpCPOsXksQbZJHvHwhrd3QjUusd3mAOM5Gg0mFBLg==}
+  ts-pattern@5.9.2:
+    resolution: {integrity: sha512-qAf+7M7Jjk7uebZeIo9uEzyintfuRtgHdzM9dqxRKcMi2dt76Ec+FH2wW3bnU9TuGLkZIJLoLs7cCQnU7Tu8ig==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -2873,7 +2873,7 @@ snapshots:
     dependencies:
       '@types/node': 26.6.5
 
-  '@vencord/discord-types@1.15.14(@types/react@19.2.9)':
+  '@vencord/discord-types@1.15.19(@types/react@19.2.9)':
     dependencies:
       '@types/react': 19.2.9
       moment: 2.30.1
@@ -2881,15 +2881,15 @@ snapshots:
 
   '@vencord/game-detection@0.1.0-alpha.1': {}
 
-  '@vencord/types@1.15.14(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)':
+  '@vencord/types@1.15.19(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)':
     dependencies:
       '@types/node': 26.6.5
       '@types/react': 19.2.9
       '@types/react-dom': 19.2.3(@types/react@19.2.9)
-      '@vencord/discord-types': 1.15.14(@types/react@19.2.9)
+      '@vencord/discord-types': 1.15.19(@types/react@19.2.9)
       lodash: 4.18.1
       moment: 2.30.1
-      ts-pattern: 5.9.0
+      ts-pattern: 5.9.2
       type-fest: 5.10.0
 
   '@vencord/venmic@7.2.5(supports-color@7.2.0)':
@@ -3355,7 +3355,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@45.4.1(supports-color@7.2.0):
+  electron@45.5.0(supports-color@7.2.0):
     dependencies:
       '@electron-internal/extract-zip': 1.0.8
       '@electron/get': 5.1.0(supports-color@7.2.0)
@@ -4454,7 +4454,7 @@ snapshots:
     dependencies:
       utf8-byte-length: 1.0.5
 
-  ts-pattern@5.9.0: {}
+  ts-pattern@5.9.2: {}
 
   tslib@2.8.1: {}
 

@@ -12,8 +12,7 @@ import {
     DeleteIcon,
     Divider,
     FormSwitch,
-    HeadingSecondary,
-    HeadingTertiary,
+    Heading,
     InlineCode,
     Paragraph,
     Switch,
@@ -259,7 +258,7 @@ function ExternalTriggers() {
 
     return (
         <section className={cl("external")}>
-            <HeadingSecondary>Triggering actions from other programs</HeadingSecondary>
+            <Heading tag="h3">Triggering actions from other programs</Heading>
             <Paragraph size="md">
                 Useful for scripts or your compositor's keybinds. Add <InlineCode>:down</InlineCode> or{" "}
                 <InlineCode>:up</InlineCode> to only press or release an action, for example to bind push to talk to a
@@ -267,7 +266,7 @@ function ExternalTriggers() {
             </Paragraph>
 
             <div className={cl("external-section")}>
-                <HeadingTertiary>Command Line</HeadingTertiary>
+                <Heading tag="h4">Comma</Heading>
                 <CodeBlock
                     lang="sh"
                     content={[
@@ -279,7 +278,7 @@ function ExternalTriggers() {
             </div>
 
             <div className={cl("external-section")}>
-                <HeadingTertiary>Socket</HeadingTertiary>
+                <Heading tag="h4">Socket</Heading>
                 <Paragraph size="md">
                     Faster than the command line. Send one command per line to <InlineCode>{socketPath}</InlineCode>
                 </Paragraph>
@@ -287,7 +286,7 @@ function ExternalTriggers() {
             </div>
 
             <div className={cl("external-section")}>
-                <HeadingTertiary>Actions</HeadingTertiary>
+                <Heading tag="h4">Actions</Heading>
                 <Table columns={["Name", "Action"]}>
                     {Object.entries(ACTION_DESCRIPTIONS).map(([name, description]) => (
                         <tr key={name}>
