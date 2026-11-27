@@ -30,7 +30,7 @@ import {
 } from "@vencord/types/webpack/common";
 import { Node } from "@vencord/venmic";
 import type { Dispatch, SetStateAction } from "react";
-import { State, useSettings, useVesktopState } from "renderer/settings";
+import { Settings, State, useSettings, useVesktopState } from "renderer/settings";
 import { isLinux, isWindows } from "renderer/utils";
 
 import { SimpleErrorBoundary } from "./SimpleErrorBoundary";
@@ -549,10 +549,32 @@ function AudioSourcePickerLinux({
     setIncludeSources: (s: AudioSources) => void;
     setExcludeSources: (s: AudioSources) => void;
 }) {
+    const persistIncludeSources = (s: AudioSources) => {
+        Settings.store.audio = { ...Settings.store.audio, lastSelectedSource: s };
+        setIncludeSources(s);
+    };
+
     const [audioSourcesSignal, refreshAudioSources] = useForceUpdater(true);
     const [sources, _, loading] = useAwaiter(() => VesktopNative.virtmic.list(), {
         fallbackValue: { ok: true, targets: [], hasPipewirePulse: true },
-        deps: [audioSourcesSignal]
+        deps: [audioSourcesSignal],
+        onSuccess(value) {
+            if (!value.ok || !Array.isArray(includeSources)) {
+                return;
+            }
+
+            // Filter out persisted sources that are no longer available
+
+            const availableSources = includeSources.filter(selected =>
+                value.targets.some(target => hasMatchingProps(selected, target))
+            );
+
+            if (!availableSources.length) {
+                persistIncludeSources("Entire System");
+            } else if (availableSources.length !== includeSources.length) {
+                persistIncludeSources(availableSources);
+            }
+        }
     });
 
     const hasPipewirePulse = sources.ok ? sources.hasPipewirePulse : true;
@@ -624,7 +646,7 @@ function AudioSourcePickerLinux({
                                 default: name === "None"
                             }))}
                             isSelected={isItemSelected(includeSources)}
-                            select={updateItems(setIncludeSources, includeSources)}
+                            select={updateItems(persistIncludeSources, includeSources)}
                             serialize={JSON.stringify}
                             popoutPosition="top"
                             closeOnSelect={false}
@@ -688,7 +710,7 @@ function ModalComponent({
     const [settings, setSettings] = useState<StreamSettings>({
         contentHint: "motion",
         audio: true,
-        includeSources: "None"
+        includeSources: isLinux ? (Settings.store.audio?.lastSelectedSource ?? "Entire System") : "None"
     });
     useVesktopState().screenshareQuality ??= {
         resolution: "720",
