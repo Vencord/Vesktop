@@ -8,8 +8,8 @@ import { copyFile, rm } from "fs/promises";
 
 import { BuildContext, BuildOptions, context, Plugin } from "esbuild";
 
-import { fileImportPlugin } from "./fileImportPlugin.mts";
-import { includeDirPlugin } from "./includeDirPlugin.mts";
+import { fileImportPlugin } from "./fileImportPlugin.mjs";
+import { includeDirPlugin } from "./includeDirPlugin.mjs";
 import vencordDep from "./vencordDep.mjs";
 
 const isDev = process.argv.includes("--dev");

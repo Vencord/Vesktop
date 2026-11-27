@@ -69,12 +69,19 @@ const parser = new DOMParser().parseFromString(metaInfo, "text/xml");
 
 const releaseList = parser.getElementsByTagName("releases")[0];
 
-for (let i = 0; i < releaseList.childNodes.length; i++) {
-    const release = releaseList.childNodes[i] as Element;
+const existingReleases = Array.from(releaseList.getElementsByTagName("release"));
+if (existingReleases.some(release => release.getAttribute("version") === latestReleaseInformation.name)) {
+    console.log("Latest release already added, nothing to be done");
+    process.exit(0);
+}
 
-    if (release.nodeType === 1 && release.getAttribute("version") === latestReleaseInformation.name) {
-        console.log("Latest release already added, nothing to be done");
-        process.exit(0);
+// We generate this on drafts, where the release URL is untagged-something. Thus we need to manually build the URL.
+// This code fixes past releases that have untagged URLs
+const tagUrl = "https://github.com/Vencord/Vesktop/releases/tag/";
+for (const release of existingReleases) {
+    const url = release.getElementsByTagName("url")[0];
+    if (url?.textContent?.startsWith(tagUrl + "untagged-")) {
+        url.textContent = tagUrl + "v" + release.getAttribute("version");
     }
 }
 
@@ -86,7 +93,7 @@ release.setAttribute("date", date.split("T")[0]);
 release.setAttribute("type", "stable");
 
 const releaseUrl = parser.createElement("url");
-releaseUrl.textContent = latestReleaseInformation.html_url;
+releaseUrl.textContent = tagUrl + encodeURIComponent(latestReleaseInformation.tag_name);
 
 release.appendChild(releaseUrl);
 
